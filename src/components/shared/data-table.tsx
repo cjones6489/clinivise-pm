@@ -10,6 +10,7 @@ import {
   useReactTable,
   type SortingState,
   type ColumnFiltersState,
+  type Table as TableInstance,
 } from "@tanstack/react-table";
 import { useState } from "react";
 import {
@@ -21,17 +22,39 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableWithInstanceProps<TData> {
+  table: TableInstance<TData>;
+  children?: React.ReactNode;
+}
+
+interface DataTableWithDataProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   children?: React.ReactNode;
 }
 
-export function DataTable<TData, TValue>({
+type DataTableProps<TData, TValue> =
+  | DataTableWithInstanceProps<TData>
+  | DataTableWithDataProps<TData, TValue>;
+
+function hasTable<TData, TValue>(
+  props: DataTableProps<TData, TValue>,
+): props is DataTableWithInstanceProps<TData> {
+  return "table" in props;
+}
+
+export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
+  if (hasTable(props)) {
+    return <DataTableRenderer table={props.table}>{props.children}</DataTableRenderer>;
+  }
+  return <DataTableInternal {...props} />;
+}
+
+function DataTableInternal<TData, TValue>({
   columns,
   data,
   children,
-}: DataTableProps<TData, TValue>) {
+}: DataTableWithDataProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
@@ -47,6 +70,16 @@ export function DataTable<TData, TValue>({
     state: { sorting, columnFilters },
   });
 
+  return <DataTableRenderer table={table}>{children}</DataTableRenderer>;
+}
+
+function DataTableRenderer<TData>({
+  table,
+  children,
+}: {
+  table: TableInstance<TData>;
+  children?: React.ReactNode;
+}) {
   return (
     <div className="space-y-3">
       {children}
@@ -88,7 +121,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={table.getAllColumns().length}
                   className="h-24 text-center text-xs text-muted-foreground"
                 >
                   No results.

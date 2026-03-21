@@ -33,7 +33,13 @@ export const idSchema = z.string().min(1);
 export const dateStringSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format")
-  .refine((d) => !isNaN(Date.parse(d)), { message: "Invalid date" });
+  .refine(
+    (d) => {
+      const parsed = new Date(d);
+      return !isNaN(parsed.getTime()) && parsed.toISOString().startsWith(d);
+    },
+    { message: "Invalid date" },
+  );
 export const moneySchema = z.string().regex(/^-?\d+(\.\d{1,2})?$/);
 export const phoneSchema = z.string().min(1).optional();
 export const emailSchema = z.email().optional();

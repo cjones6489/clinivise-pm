@@ -176,6 +176,16 @@ export const ABA_CPT_CODES = {
 
 export type CptCode = keyof typeof ABA_CPT_CODES;
 
+// ── Credential Labels ──────────────────────────────────────────────────────
+
+export const CREDENTIAL_LABELS: Record<CredentialType, string> = {
+  bcba: "BCBA",
+  bcba_d: "BCBA-D",
+  bcaba: "BCaBA",
+  rbt: "RBT",
+  other: "Other",
+};
+
 // ── Provider Modifier Codes ─────────────────────────────────────────────────
 
 export const CREDENTIAL_MODIFIERS: Record<string, string> = {

@@ -111,17 +111,19 @@ Key fixes applied across all audit rounds:
 
 ## Sprint 2: Core CRUD
 
-### 2A — Providers
+### 2A — Providers (completed)
 
 | # | Task | Files | Status |
 |---|------|-------|--------|
-| 48 | Provider list page (data table, search, filters) | `src/app/(dashboard)/providers/page.tsx` | `[ ]` |
-| 49 | Provider table component | `src/components/providers/provider-table.tsx` | `[ ]` |
-| 50 | Provider create/edit form (credential type, NPI, supervisor) | `src/components/providers/provider-form.tsx` | `[ ]` |
-| 51 | Provider detail page (credentials, caseload) | `src/app/(dashboard)/providers/[id]/page.tsx` | `[ ]` |
-| 52 | Provider server actions (CRUD) | `src/server/actions/providers.ts` | `[ ]` |
-| 53 | Provider Zod validators | `src/lib/validators/providers.ts` | `[ ]` |
-| 54 | Provider read queries | `src/server/queries/providers.ts` | `[ ]` |
+| 48 | Provider list page (data table, search, filters) | `src/app/(dashboard)/providers/page.tsx` | `[x]` |
+| 49 | Provider table component | `src/components/providers/provider-table.tsx` | `[x]` |
+| 50 | Provider create/edit form (credential type, NPI, supervisor) | `src/components/providers/provider-form.tsx` | `[x]` |
+| 51 | Provider detail page (credentials, caseload) | `src/app/(dashboard)/providers/[id]/page.tsx` | `[x]` |
+| 52 | Provider server actions (CRUD) | `src/server/actions/providers.ts` | `[x]` |
+| 53 | Provider Zod validators | `src/lib/validators/providers.ts` | `[x]` |
+| 54 | Provider read queries | `src/server/queries/providers.ts` | `[x]` |
+
+**2A audit fixes (3 rounds):** Radix Select empty-string crash, NPI empty-string validation, Drizzle `undefined` → `null` for clearable fields, archive confirmation dialog, `CREDENTIAL_LABELS` deduplication, `Record<string, unknown>` type safety, invalid calendar date validation (round-trip refine), whitespace-only name rejection (`.trim()`), supervisor FK existence check, `handleServerError` whitelist for business-logic errors, duplicate-submit guard (`hasSubmitted` state)
 
 ### 2B — Clients
 

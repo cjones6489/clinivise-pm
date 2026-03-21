@@ -8,11 +8,19 @@ import { eq, and } from "drizzle-orm";
 
 const DEFAULT_SERVER_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
+/** Error messages safe to surface to the client as-is. */
+const USER_FACING_ERRORS = new Set([
+  "Unauthorized",
+  "Forbidden: insufficient role",
+  "Provider not found",
+  "Supervisor not found",
+]);
+
 export const actionClient = createSafeActionClient({
   handleServerError(e) {
     console.error("Action error:", e.message);
 
-    if (e.message === "Unauthorized" || e.message === "Forbidden: insufficient role") {
+    if (USER_FACING_ERRORS.has(e.message)) {
       return e.message;
     }
 
