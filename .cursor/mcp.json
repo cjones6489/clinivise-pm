@@ -1,0 +1,28 @@
+{
+    "mcpServers": {
+      "context7": {
+        "command": "cmd",
+        "args": [
+          "/c",
+          "npx",
+          "-y",
+          "@upstash/context7-mcp"
+        ],
+        "env": {
+          "CONTEXT7_API_KEY": "ctx7sk-7e8f22ce-896a-4e71-81eb-a46589953b0c"
+        }
+      },
+      "next-devtools": {
+        "command": "cmd",
+        "args": ["/c", "npx", "-y", "next-devtools-mcp@latest"]
+      },
+      "shadcn": {
+        "command": "cmd",
+        "args": ["/c", "npx", "shadcn@latest", "mcp"]
+      },
+      "openaiDeveloperDocs": {
+        "type": "http",
+        "url": "https://developers.openai.com/mcp"
+      }
+    }
+  }
