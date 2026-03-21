@@ -101,6 +101,55 @@ export type Gender = (typeof GENDERS)[number];
 export const UNIT_CALC_METHODS = ["cms", "ama"] as const;
 export type UnitCalcMethod = (typeof UNIT_CALC_METHODS)[number];
 
+// ── Client Statuses ──────────────────────────────────────────────────────────
+
+export const CLIENT_STATUSES = [
+  "inquiry", "intake", "waitlist", "pending_assessment",
+  "pending_treatment_auth", "active", "on_hold", "discharged", "archived",
+] as const;
+export type ClientStatus = (typeof CLIENT_STATUSES)[number];
+
+export const CLIENT_STATUS_LABELS: Record<ClientStatus, string> = {
+  inquiry: "Inquiry", intake: "Intake", waitlist: "Waitlist",
+  pending_assessment: "Pending Assessment", pending_treatment_auth: "Pending Auth",
+  active: "Active", on_hold: "On Hold", discharged: "Discharged", archived: "Archived",
+};
+
+export const CLIENT_STATUS_VARIANT: Record<ClientStatus, "default" | "secondary" | "outline"> = {
+  inquiry: "outline", intake: "secondary", waitlist: "secondary",
+  pending_assessment: "secondary", pending_treatment_auth: "secondary",
+  active: "default", on_hold: "outline", discharged: "outline", archived: "outline",
+};
+
+// ── Contact Relationship Types ───────────────────────────────────────────────
+
+export const CONTACT_RELATIONSHIP_TYPES = [
+  "mother", "father", "stepmother", "stepfather",
+  "grandmother", "grandfather", "legal_guardian", "foster_parent",
+  "aunt", "uncle", "sibling", "other",
+] as const;
+export type ContactRelationshipType = (typeof CONTACT_RELATIONSHIP_TYPES)[number];
+
+export const CONTACT_RELATIONSHIP_LABELS: Record<ContactRelationshipType, string> = {
+  mother: "Mother", father: "Father", stepmother: "Stepmother", stepfather: "Stepfather",
+  grandmother: "Grandmother", grandfather: "Grandfather", legal_guardian: "Legal Guardian",
+  foster_parent: "Foster Parent", aunt: "Aunt", uncle: "Uncle", sibling: "Sibling", other: "Other",
+};
+
+// ── Referral Sources ─────────────────────────────────────────────────────────
+
+export const REFERRAL_SOURCES = [
+  "pediatrician", "school", "self_referral", "insurance",
+  "other_provider", "website", "word_of_mouth", "other",
+] as const;
+export type ReferralSource = (typeof REFERRAL_SOURCES)[number];
+
+export const REFERRAL_SOURCE_LABELS: Record<ReferralSource, string> = {
+  pediatrician: "Pediatrician", school: "School", self_referral: "Self-Referral",
+  insurance: "Insurance", other_provider: "Other Provider", website: "Website",
+  word_of_mouth: "Word of Mouth", other: "Other",
+};
+
 // ── ABA CPT Codes ───────────────────────────────────────────────────────────
 
 export const ABA_CPT_CODES = {

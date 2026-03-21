@@ -14,6 +14,9 @@ const USER_FACING_ERRORS = new Set([
   "Forbidden: insufficient role",
   "Provider not found",
   "Supervisor not found",
+  "Client not found",
+  "Contact not found",
+  "BCBA not found",
 ]);
 
 export const actionClient = createSafeActionClient({

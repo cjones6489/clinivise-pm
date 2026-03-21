@@ -36,6 +36,15 @@ export function calculateUnits(startTime: Date, endTime: Date): number {
   return Math.floor(totalMinutes / 15) + (totalMinutes % 15 >= 8 ? 1 : 0);
 }
 
+/** Convert undefined values to null so Drizzle includes them in UPDATE queries. */
+export function undefinedToNull<T extends Record<string, unknown>>(obj: T) {
+  const result = {} as Record<string, unknown>;
+  for (const [key, value] of Object.entries(obj)) {
+    result[key] = value === undefined ? null : value;
+  }
+  return result as { [K in keyof T]: T[K] extends undefined ? null : T[K] };
+}
+
 /**
  * Calculate utilization percentage for an authorization service.
  */

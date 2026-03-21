@@ -11,6 +11,9 @@ import {
   GENDERS,
   SUBSCRIBER_RELATIONSHIPS,
   UNIT_CALC_METHODS,
+  CLIENT_STATUSES,
+  CONTACT_RELATIONSHIP_TYPES,
+  REFERRAL_SOURCES,
 } from "@/lib/constants";
 
 // ── Enum Schemas ────────────────────────────────────────────────────────────
@@ -26,6 +29,9 @@ export const payerTypeSchema = z.enum(PAYER_TYPES);
 export const genderSchema = z.enum(GENDERS);
 export const subscriberRelationshipSchema = z.enum(SUBSCRIBER_RELATIONSHIPS);
 export const unitCalcMethodSchema = z.enum(UNIT_CALC_METHODS);
+export const clientStatusSchema = z.enum(CLIENT_STATUSES);
+export const contactRelationshipSchema = z.enum(CONTACT_RELATIONSHIP_TYPES);
+export const referralSourceSchema = z.enum(REFERRAL_SOURCES);
 
 // ── Common Field Schemas ────────────────────────────────────────────────────
 

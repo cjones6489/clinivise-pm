@@ -8,16 +8,8 @@ import { providers } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { CREDENTIAL_MODIFIERS } from "@/lib/constants";
+import { undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
-
-/** Convert undefined values to null so Drizzle includes them in UPDATE queries. */
-function undefinedToNull<T extends Record<string, unknown>>(obj: T) {
-  const result = {} as Record<string, unknown>;
-  for (const [key, value] of Object.entries(obj)) {
-    result[key] = value === undefined ? null : value;
-  }
-  return result as { [K in keyof T]: T[K] extends undefined ? null : T[K] };
-}
 
 export const createProvider = authActionClient
   .schema(createProviderSchema)

@@ -3,6 +3,7 @@ import {
   text,
   timestamp,
   boolean,
+  integer,
   index,
   date,
 } from "drizzle-orm/pg-core";
@@ -39,8 +40,9 @@ export const clients = pgTable(
       onDelete: "set null",
     }),
     intakeDate: date("intake_date"),
-    dischargeDate: date("discharge_date"),
-    isActive: boolean("is_active").default(true).notNull(),
+    status: text("status").default("inquiry").notNull(),
+    referralSource: text("referral_source"),
+    holdReason: text("hold_reason"),
     notes: text("notes"),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -59,6 +61,7 @@ export const clients = pgTable(
       table.lastName,
       table.firstName,
     ),
+    index("clients_status_idx").on(table.organizationId, table.status),
   ],
 );
 
@@ -73,7 +76,7 @@ export const clientInsurance = pgTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     clientId: text("client_id")
       .notNull()
-      .references(() => clients.id, { onDelete: "cascade" }),
+      .references(() => clients.id, { onDelete: "restrict" }),
     payerId: text("payer_id")
       .notNull()
       .references(() => payers.id, { onDelete: "restrict" }),
@@ -82,10 +85,11 @@ export const clientInsurance = pgTable(
     subscriberFirstName: text("subscriber_first_name"),
     subscriberLastName: text("subscriber_last_name"),
     subscriberDateOfBirth: date("subscriber_date_of_birth"),
+    subscriberGender: text("subscriber_gender"),
     relationshipToSubscriber: text("relationship_to_subscriber").default(
       "self",
     ),
-    isPrimary: boolean("is_primary").default(true).notNull(),
+    priority: integer("priority").default(1).notNull(),
     effectiveDate: date("effective_date"),
     terminationDate: date("termination_date"),
     isActive: boolean("is_active").default(true).notNull(),
@@ -101,5 +105,44 @@ export const clientInsurance = pgTable(
     index("client_insurance_org_idx").on(table.organizationId),
     index("client_insurance_client_idx").on(table.clientId),
     index("client_insurance_payer_idx").on(table.payerId),
+  ],
+);
+
+export const clientContacts = pgTable(
+  "client_contacts",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "restrict" }),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    phone: text("phone"),
+    email: text("email"),
+    relationship: text("relationship").notNull(),
+    isLegalGuardian: boolean("is_legal_guardian").default(false).notNull(),
+    isEmergencyContact: boolean("is_emergency_contact").default(false).notNull(),
+    isBillingResponsible: boolean("is_billing_responsible").default(false).notNull(),
+    canReceivePhi: boolean("can_receive_phi").default(false).notNull(),
+    canPickup: boolean("can_pickup").default(false).notNull(),
+    livesWithClient: boolean("lives_with_client").default(false).notNull(),
+    priority: integer("priority").default(1).notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index("client_contacts_org_idx").on(table.organizationId),
+    index("client_contacts_client_idx").on(table.organizationId, table.clientId),
   ],
 );
