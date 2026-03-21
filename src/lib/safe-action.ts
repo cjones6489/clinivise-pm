@@ -2,9 +2,7 @@ import "server-only";
 
 import { createSafeActionClient } from "next-safe-action";
 import { auth } from "@clerk/nextjs/server";
-import { db } from "@/server/db";
-import { users, organizations } from "@/server/db/schema";
-import { eq, and } from "drizzle-orm";
+import { getCurrentUser } from "@/lib/auth";
 
 const DEFAULT_SERVER_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -45,23 +43,8 @@ export const authActionClient = actionClient.use(async ({ next }) => {
     throw new Error("Unauthorized");
   }
 
-  // Look up org first so we can scope the user query
-  const [org] = await db
-    .select()
-    .from(organizations)
-    .where(eq(organizations.clerkOrgId, orgId))
-    .limit(1);
-
-  if (!org) {
-    throw new Error("Organization not found");
-  }
-
-  // Filter user by BOTH clerkUserId AND organizationId to prevent cross-tenant leakage
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(and(eq(users.clerkUserId, userId), eq(users.organizationId, org.id)))
-    .limit(1);
+  // Reuse getCurrentUser which handles dev auto-provisioning
+  const user = await getCurrentUser();
 
   if (!user) {
     throw new Error("User not found in this organization");
@@ -70,7 +53,7 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   return next({
     ctx: {
       userId: user.id,
-      organizationId: org.id,
+      organizationId: user.organizationId,
       userRole: user.role,
       clerkUserId: userId,
       clerkOrgId: orgId,

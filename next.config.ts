@@ -24,12 +24,13 @@ const nextConfig: NextConfig = {
           key: "Content-Security-Policy",
           value: [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.clinivise.com",
+            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' https://img.clerk.com data: blob:",
-            "font-src 'self'",
-            "connect-src 'self' https://api.clerk.com https://clerk.clinivise.com https://*.vercel-blob.com",
-            "frame-src 'self' https://clerk.clinivise.com",
+            "font-src 'self' https://*.clerk.com",
+            "connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://*.vercel-blob.com",
+            "frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com",
+            "worker-src 'self' blob:",
           ].join("; "),
         },
       ],
@@ -38,9 +39,7 @@ const nextConfig: NextConfig = {
 
   images: {
     unoptimized: false,
-    remotePatterns: [
-      { protocol: "https", hostname: "img.clerk.com" },
-    ],
+    remotePatterns: [{ protocol: "https", hostname: "img.clerk.com" }],
   },
 
   experimental: {
