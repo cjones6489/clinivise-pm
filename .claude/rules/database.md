@@ -14,9 +14,9 @@ globs: src/server/**, src/lib/db*, drizzle/**
 ## IDs & Types
 
 - `nanoid()` for all primary keys — never UUID, never auto-increment
-- `numeric(10, 2)` for money columns — never `real`, `float`, or `doublePrecision`
+- `numeric(10, 2)` for money columns — never `real`, `float`, or `doublePrecision`. Use `decimal.js` for arithmetic. NEVER `parseFloat()` or `Number()` on monetary values
 - `timestamp('column_name', { withTimezone: true })` for all date/time columns
-- Use `text` for enums with Drizzle's type inference (not Postgres native enums — they're hard to migrate)
+- `text` for ALL enum/status columns — NEVER use `pgEnum`. Define allowed values as `as const` arrays in `src/lib/constants.ts`, validate with Zod at the application boundary. Rationale: pgEnum `ALTER TYPE` acquires ACCESS EXCLUSIVE lock, Drizzle has open bugs on enum value deletion/modification, and you can't remove values from pgEnum without a multi-step migration
 
 ## Multi-Tenancy
 

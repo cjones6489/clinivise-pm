@@ -1,0 +1,66 @@
+import "server-only";
+
+import { createSafeActionClient } from "next-safe-action";
+import { auth } from "@clerk/nextjs/server";
+import { db } from "@/server/db";
+import { users, organizations } from "@/server/db/schema";
+import { eq, and } from "drizzle-orm";
+
+const DEFAULT_SERVER_ERROR_MESSAGE = "Something went wrong. Please try again.";
+
+export const actionClient = createSafeActionClient({
+  handleServerError(e) {
+    console.error("Action error:", e.message);
+
+    if (e.message === "Unauthorized" || e.message === "Forbidden: insufficient role") {
+      return e.message;
+    }
+
+    return DEFAULT_SERVER_ERROR_MESSAGE;
+  },
+});
+
+export const authActionClient = actionClient.use(async ({ next }) => {
+  const { userId, orgId } = await auth();
+
+  if (!userId || !orgId) {
+    throw new Error("Unauthorized");
+  }
+
+  // Look up org first so we can scope the user query
+  const [org] = await db
+    .select()
+    .from(organizations)
+    .where(eq(organizations.clerkOrgId, orgId))
+    .limit(1);
+
+  if (!org) {
+    throw new Error("Organization not found");
+  }
+
+  // Filter user by BOTH clerkUserId AND organizationId to prevent cross-tenant leakage
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(
+      and(
+        eq(users.clerkUserId, userId),
+        eq(users.organizationId, org.id),
+      ),
+    )
+    .limit(1);
+
+  if (!user) {
+    throw new Error("User not found in this organization");
+  }
+
+  return next({
+    ctx: {
+      userId: user.id,
+      organizationId: org.id,
+      userRole: user.role,
+      clerkUserId: userId,
+      clerkOrgId: orgId,
+    },
+  });
+});

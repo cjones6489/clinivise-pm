@@ -81,11 +81,13 @@ src/
 ## Critical Constraints
 
 - **Security**: See `.claude/rules/security.md`. Key: always filter by `organization_id`, keep AI behind a wrapper for easy provider swap later
-- **Multi-tenancy**: Every table has `organization_id`. Every query filters by it. `authActionClient` injects it from Clerk session
+- **Multi-tenancy**: Every table has `organization_id`. Every query filters by it. `authActionClient` injects it from Clerk session. Use a scoped query builder that auto-injects `organization_id` + `deleted_at IS NULL`
 - **IDs**: `nanoid()` for all primary keys (not UUID)
-- **Money**: `numeric(10, 2)` in Postgres (never float/decimal JS)
-- **Sessions**: Measured in 15-minute units per CMS 8-minute rule
-- **Auth tracking**: `used_units` vs `approved_units` per CPT code per authorization
+- **Enums**: `text` columns + TypeScript `as const` arrays + Zod validation. NEVER use `pgEnum` (can't remove values, Drizzle migration bugs, ACCESS EXCLUSIVE lock on ALTER TYPE)
+- **Money**: `numeric(10, 2)` in Postgres. Use `decimal.js` for arithmetic. NEVER `parseFloat()` or `Number()` on monetary values. Drizzle returns numeric as strings — this is correct, pass directly to Stedi API
+- **Sessions**: Measured in 15-minute units per CMS 8-minute rule. Store actual minutes + calculated units. Two calculation methods: CMS (aggregate across codes, Medicare/Medicaid) and AMA (per-code, commercial payers). Default AMA. Store payer preference
+- **Auth tracking**: `used_units` vs `approved_units` per CPT code per authorization. Atomic SQL increments only (`SET used_units = used_units + N`), never read-modify-write. Overlapping auths: FIFO (oldest expiration first), allow manual override
+- **Auth utilization alerts**: 80% warning, 95% critical, 100%+ over-utilized. Alert on expiring auths (30/14/7 days). Alert on under-utilization (<50% used with >50% of period elapsed)
 
 ## Phase Context
 
@@ -93,11 +95,12 @@ src/
 
 **Out of scope now:** Claims submission, ERA processing, eligibility checks, denial management, analytics, parent portal.
 
-## Spec Files
+## Documentation
 
-For deep domain context, reference these files (don't read unless needed):
-- `clinivise-engineering-spec.md` — Full DB schema, config files, 33-task breakdown
-- `clinivise-research-spec.md` — Technology decisions, pricing, ABA billing codes, HIPAA analysis
+All project docs are indexed in `docs/INDEX.md`. Key references:
+- `docs/engineering-spec.md` — Full DB schema, config files, task breakdown
+- `docs/research-spec.md` — Technology decisions, pricing, ABA billing codes, HIPAA analysis
+- `ROADMAP.md` — Phase 1 working roadmap with task tracking
 
 ## MCP Servers
 

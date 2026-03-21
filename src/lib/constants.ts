@@ -1,0 +1,226 @@
+// ── Status & Type Enums (as const arrays — NO pgEnum) ──────────────────────
+
+export const USER_ROLES = [
+  "owner",
+  "admin",
+  "bcba",
+  "bcaba",
+  "rbt",
+  "billing_staff",
+] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+
+export const CREDENTIAL_TYPES = [
+  "bcba",
+  "bcba_d",
+  "bcaba",
+  "rbt",
+  "other",
+] as const;
+export type CredentialType = (typeof CREDENTIAL_TYPES)[number];
+
+export const AUTH_STATUSES = [
+  "pending",
+  "approved",
+  "denied",
+  "expired",
+  "exhausted",
+] as const;
+export type AuthStatus = (typeof AUTH_STATUSES)[number];
+
+export const SESSION_STATUSES = [
+  "scheduled",
+  "completed",
+  "cancelled",
+  "no_show",
+  "flagged",
+] as const;
+export type SessionStatus = (typeof SESSION_STATUSES)[number];
+
+export const CLAIM_STATUSES = [
+  "draft",
+  "ready",
+  "submitted",
+  "accepted",
+  "rejected",
+  "paid",
+  "partially_paid",
+  "denied",
+  "appealed",
+  "void",
+] as const;
+export type ClaimStatus = (typeof CLAIM_STATUSES)[number];
+
+export const DOCUMENT_TYPES = [
+  "authorization_letter",
+  "assessment_report",
+  "treatment_plan",
+  "insurance_card",
+  "other",
+] as const;
+export type DocumentType = (typeof DOCUMENT_TYPES)[number];
+
+export const PLACE_OF_SERVICE_CODES = [
+  "02",
+  "03",
+  "10",
+  "11",
+  "12",
+  "99",
+] as const;
+export type PlaceOfServiceCode = (typeof PLACE_OF_SERVICE_CODES)[number];
+
+export const PAYER_TYPES = [
+  "commercial",
+  "medicaid",
+  "medicare",
+  "tricare",
+] as const;
+export type PayerType = (typeof PAYER_TYPES)[number];
+
+export const SUBSCRIBER_RELATIONSHIPS = [
+  "self",
+  "spouse",
+  "child",
+  "other",
+] as const;
+export type SubscriberRelationship =
+  (typeof SUBSCRIBER_RELATIONSHIPS)[number];
+
+export const AI_PROCESSING_STATUSES = [
+  "pending",
+  "processing",
+  "completed",
+  "failed",
+] as const;
+export type AiProcessingStatus = (typeof AI_PROCESSING_STATUSES)[number];
+
+export const GENDERS = ["M", "F", "U"] as const;
+export type Gender = (typeof GENDERS)[number];
+
+export const UNIT_CALC_METHODS = ["cms", "ama"] as const;
+export type UnitCalcMethod = (typeof UNIT_CALC_METHODS)[number];
+
+// ── ABA CPT Codes ───────────────────────────────────────────────────────────
+
+export const ABA_CPT_CODES = {
+  "97151": {
+    description: "Behavior identification assessment",
+    provider: "BCBA/QHP",
+    maxUnitsPerDay: 32,
+    isAssessment: true,
+  },
+  "97152": {
+    description: "Behavior identification supporting assessment",
+    provider: "RBT under QHP",
+    maxUnitsPerDay: 16,
+    isAssessment: true,
+  },
+  "97153": {
+    description:
+      "Adaptive behavior treatment by protocol (1:1 direct therapy)",
+    provider: "RBT under QHP",
+    maxUnitsPerDay: 32,
+    isAssessment: false,
+  },
+  "97154": {
+    description:
+      "Group adaptive behavior treatment by protocol (2–8 patients)",
+    provider: "RBT under QHP",
+    maxUnitsPerDay: 18,
+    isAssessment: false,
+  },
+  "97155": {
+    description: "Adaptive behavior treatment with protocol modification",
+    provider: "BCBA/QHP",
+    maxUnitsPerDay: 24,
+    isAssessment: false,
+  },
+  "97156": {
+    description:
+      "Family adaptive behavior treatment guidance (caregiver training)",
+    provider: "BCBA/QHP",
+    maxUnitsPerDay: 16,
+    isAssessment: false,
+  },
+  "97157": {
+    description: "Multiple-family group treatment guidance",
+    provider: "BCBA/QHP",
+    maxUnitsPerDay: 16,
+    isAssessment: false,
+  },
+  "97158": {
+    description:
+      "Group treatment with protocol modification (2–8 patients)",
+    provider: "BCBA/QHP",
+    maxUnitsPerDay: 16,
+    isAssessment: false,
+  },
+  "0362T": {
+    description:
+      "Multi-technician behavior assessment for destructive behavior",
+    provider: "QHP on-site",
+    maxUnitsPerDay: 16,
+    isAssessment: true,
+    retirementDate: "2027-01-01",
+  },
+  "0373T": {
+    description:
+      "Multi-technician adaptive behavior treatment for destructive behavior",
+    provider: "QHP on-site",
+    maxUnitsPerDay: 32,
+    isAssessment: false,
+    retirementDate: "2027-01-01",
+  },
+} as const;
+
+export type CptCode = keyof typeof ABA_CPT_CODES;
+
+// ── Provider Modifier Codes ─────────────────────────────────────────────────
+
+export const CREDENTIAL_MODIFIERS: Record<string, string> = {
+  rbt: "HM",
+  bcaba: "HN",
+  bcba: "HO",
+  bcba_d: "HP",
+};
+
+// ── Place of Service Labels ─────────────────────────────────────────────────
+
+export const PLACE_OF_SERVICE_LABELS: Record<PlaceOfServiceCode, string> = {
+  "02": "Telehealth (not patient home)",
+  "03": "School",
+  "10": "Telehealth (patient home)",
+  "11": "Office/Clinic",
+  "12": "Home",
+  "99": "Other/Community",
+};
+
+// ── Authorization Alert Thresholds ──────────────────────────────────────────
+
+export const AUTH_ALERT_THRESHOLDS = {
+  EXPIRY_WARNING_DAYS: 30,
+  UTILIZATION_WARNING_PCT: 80,
+  UTILIZATION_CRITICAL_PCT: 95,
+  UNDER_UTILIZATION_PCT: 50,
+} as const;
+
+// ── User Role Labels ────────────────────────────────────────────────────────
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  owner: "Owner",
+  admin: "Admin",
+  bcba: "BCBA",
+  bcaba: "BCaBA",
+  rbt: "RBT",
+  billing_staff: "Billing Staff",
+};
+
+export const ROLE_HIERARCHY = [
+  "owner",
+  "admin",
+  "bcba",
+  "bcaba",
+  "rbt",
+  "billing_staff",
+] as const;
