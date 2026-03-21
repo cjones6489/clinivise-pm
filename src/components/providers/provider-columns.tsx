@@ -24,28 +24,20 @@ export function getProviderColumns(opts: {
       id: "name",
       accessorFn: (row) => `${row.lastName}, ${row.firstName}`,
       header: "Name",
-      cell: ({ getValue }) => (
-        <span className="font-medium">{getValue<string>()}</span>
-      ),
+      cell: ({ getValue }) => <span className="font-medium">{getValue<string>()}</span>,
     },
     {
       accessorKey: "credentialType",
       header: "Credential",
       cell: ({ getValue }) => {
         const type = getValue<string>() as CredentialType;
-        return (
-          <Badge variant="secondary">
-            {CREDENTIAL_LABELS[type] ?? type}
-          </Badge>
-        );
+        return <Badge variant="secondary">{CREDENTIAL_LABELS[type] ?? type}</Badge>;
       },
     },
     {
       accessorKey: "npi",
       header: "NPI",
-      cell: ({ getValue }) => (
-        <span className="tabular-nums">{getValue<string>() ?? "--"}</span>
-      ),
+      cell: ({ getValue }) => <span className="tabular-nums">{getValue<string>() ?? "--"}</span>,
     },
     {
       accessorKey: "isActive",
@@ -53,9 +45,7 @@ export function getProviderColumns(opts: {
       cell: ({ getValue }) => {
         const active = getValue<boolean>();
         return (
-          <Badge variant={active ? "default" : "outline"}>
-            {active ? "Active" : "Inactive"}
-          </Badge>
+          <Badge variant={active ? "default" : "outline"}>{active ? "Active" : "Inactive"}</Badge>
         );
       },
     },
@@ -71,9 +61,7 @@ export function getProviderColumns(opts: {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => opts.onEdit(row.original)}>
-              Edit
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => opts.onEdit(row.original)}>Edit</DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => opts.onArchive(row.original)}
               className="text-destructive focus:text-destructive"

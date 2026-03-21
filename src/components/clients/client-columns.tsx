@@ -36,9 +36,7 @@ export function getClientColumns(opts: {
       id: "name",
       accessorFn: (row) => `${row.lastName}, ${row.firstName}`,
       header: "Name",
-      cell: ({ getValue }) => (
-        <span className="font-medium">{getValue<string>()}</span>
-      ),
+      cell: ({ getValue }) => <span className="font-medium">{getValue<string>()}</span>,
     },
     {
       accessorKey: "dateOfBirth",
@@ -84,9 +82,7 @@ export function getClientColumns(opts: {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => opts.onView(row.original)}>
-              View
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => opts.onView(row.original)}>View</DropdownMenuItem>
             {opts.onArchive && (
               <DropdownMenuItem
                 onClick={() => opts.onArchive!(row.original)}

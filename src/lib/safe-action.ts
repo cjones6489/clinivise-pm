@@ -17,6 +17,13 @@ const USER_FACING_ERRORS = new Set([
   "Client not found",
   "Contact not found",
   "BCBA not found",
+  "Insurance policy not found",
+  "Payer not found",
+  "Cannot delete payer with active insurance policies",
+  "Maximum of 3 insurance policies allowed",
+  "Cannot verify an expired insurance policy",
+  "Organization not found",
+  "User not found in this organization",
 ]);
 
 export const actionClient = createSafeActionClient({
@@ -53,12 +60,7 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   const [user] = await db
     .select()
     .from(users)
-    .where(
-      and(
-        eq(users.clerkUserId, userId),
-        eq(users.organizationId, org.id),
-      ),
-    )
+    .where(and(eq(users.clerkUserId, userId), eq(users.organizationId, org.id)))
     .limit(1);
 
   if (!user) {

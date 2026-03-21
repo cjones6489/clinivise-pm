@@ -18,10 +18,9 @@ export const documents = pgTable(
     clientId: text("client_id").references(() => clients.id, {
       onDelete: "set null",
     }),
-    authorizationId: text("authorization_id").references(
-      () => authorizations.id,
-      { onDelete: "set null" },
-    ),
+    authorizationId: text("authorization_id").references(() => authorizations.id, {
+      onDelete: "set null",
+    }),
     claimId: text("claim_id").references(() => claims.id, {
       onDelete: "set null",
     }),
@@ -35,9 +34,7 @@ export const documents = pgTable(
     }),
     aiProcessed: text("ai_processed").default("pending"),
     aiExtractedData: text("ai_extracted_data"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

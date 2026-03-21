@@ -1,31 +1,12 @@
 // ── Status & Type Enums (as const arrays — NO pgEnum) ──────────────────────
 
-export const USER_ROLES = [
-  "owner",
-  "admin",
-  "bcba",
-  "bcaba",
-  "rbt",
-  "billing_staff",
-] as const;
+export const USER_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
-export const CREDENTIAL_TYPES = [
-  "bcba",
-  "bcba_d",
-  "bcaba",
-  "rbt",
-  "other",
-] as const;
+export const CREDENTIAL_TYPES = ["bcba", "bcba_d", "bcaba", "rbt", "other"] as const;
 export type CredentialType = (typeof CREDENTIAL_TYPES)[number];
 
-export const AUTH_STATUSES = [
-  "pending",
-  "approved",
-  "denied",
-  "expired",
-  "exhausted",
-] as const;
+export const AUTH_STATUSES = ["pending", "approved", "denied", "expired", "exhausted"] as const;
 export type AuthStatus = (typeof AUTH_STATUSES)[number];
 
 export const SESSION_STATUSES = [
@@ -60,39 +41,16 @@ export const DOCUMENT_TYPES = [
 ] as const;
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
 
-export const PLACE_OF_SERVICE_CODES = [
-  "02",
-  "03",
-  "10",
-  "11",
-  "12",
-  "99",
-] as const;
+export const PLACE_OF_SERVICE_CODES = ["02", "03", "10", "11", "12", "99"] as const;
 export type PlaceOfServiceCode = (typeof PLACE_OF_SERVICE_CODES)[number];
 
-export const PAYER_TYPES = [
-  "commercial",
-  "medicaid",
-  "medicare",
-  "tricare",
-] as const;
+export const PAYER_TYPES = ["commercial", "medicaid", "medicare", "tricare"] as const;
 export type PayerType = (typeof PAYER_TYPES)[number];
 
-export const SUBSCRIBER_RELATIONSHIPS = [
-  "self",
-  "spouse",
-  "child",
-  "other",
-] as const;
-export type SubscriberRelationship =
-  (typeof SUBSCRIBER_RELATIONSHIPS)[number];
+export const SUBSCRIBER_RELATIONSHIPS = ["self", "spouse", "child", "other"] as const;
+export type SubscriberRelationship = (typeof SUBSCRIBER_RELATIONSHIPS)[number];
 
-export const AI_PROCESSING_STATUSES = [
-  "pending",
-  "processing",
-  "completed",
-  "failed",
-] as const;
+export const AI_PROCESSING_STATUSES = ["pending", "processing", "completed", "failed"] as const;
 export type AiProcessingStatus = (typeof AI_PROCESSING_STATUSES)[number];
 
 export const GENDERS = ["M", "F", "U"] as const;
@@ -104,50 +62,142 @@ export type UnitCalcMethod = (typeof UNIT_CALC_METHODS)[number];
 // ── Client Statuses ──────────────────────────────────────────────────────────
 
 export const CLIENT_STATUSES = [
-  "inquiry", "intake", "waitlist", "pending_assessment",
-  "pending_treatment_auth", "active", "on_hold", "discharged", "archived",
+  "inquiry",
+  "intake",
+  "waitlist",
+  "pending_assessment",
+  "pending_treatment_auth",
+  "active",
+  "on_hold",
+  "discharged",
+  "archived",
 ] as const;
 export type ClientStatus = (typeof CLIENT_STATUSES)[number];
 
 export const CLIENT_STATUS_LABELS: Record<ClientStatus, string> = {
-  inquiry: "Inquiry", intake: "Intake", waitlist: "Waitlist",
-  pending_assessment: "Pending Assessment", pending_treatment_auth: "Pending Auth",
-  active: "Active", on_hold: "On Hold", discharged: "Discharged", archived: "Archived",
+  inquiry: "Inquiry",
+  intake: "Intake",
+  waitlist: "Waitlist",
+  pending_assessment: "Pending Assessment",
+  pending_treatment_auth: "Pending Auth",
+  active: "Active",
+  on_hold: "On Hold",
+  discharged: "Discharged",
+  archived: "Archived",
 };
 
 export const CLIENT_STATUS_VARIANT: Record<ClientStatus, "default" | "secondary" | "outline"> = {
-  inquiry: "outline", intake: "secondary", waitlist: "secondary",
-  pending_assessment: "secondary", pending_treatment_auth: "secondary",
-  active: "default", on_hold: "outline", discharged: "outline", archived: "outline",
+  inquiry: "outline",
+  intake: "secondary",
+  waitlist: "secondary",
+  pending_assessment: "secondary",
+  pending_treatment_auth: "secondary",
+  active: "default",
+  on_hold: "outline",
+  discharged: "outline",
+  archived: "outline",
 };
 
 // ── Contact Relationship Types ───────────────────────────────────────────────
 
 export const CONTACT_RELATIONSHIP_TYPES = [
-  "mother", "father", "stepmother", "stepfather",
-  "grandmother", "grandfather", "legal_guardian", "foster_parent",
-  "aunt", "uncle", "sibling", "other",
+  "mother",
+  "father",
+  "stepmother",
+  "stepfather",
+  "grandmother",
+  "grandfather",
+  "legal_guardian",
+  "foster_parent",
+  "aunt",
+  "uncle",
+  "sibling",
+  "other",
 ] as const;
 export type ContactRelationshipType = (typeof CONTACT_RELATIONSHIP_TYPES)[number];
 
 export const CONTACT_RELATIONSHIP_LABELS: Record<ContactRelationshipType, string> = {
-  mother: "Mother", father: "Father", stepmother: "Stepmother", stepfather: "Stepfather",
-  grandmother: "Grandmother", grandfather: "Grandfather", legal_guardian: "Legal Guardian",
-  foster_parent: "Foster Parent", aunt: "Aunt", uncle: "Uncle", sibling: "Sibling", other: "Other",
+  mother: "Mother",
+  father: "Father",
+  stepmother: "Stepmother",
+  stepfather: "Stepfather",
+  grandmother: "Grandmother",
+  grandfather: "Grandfather",
+  legal_guardian: "Legal Guardian",
+  foster_parent: "Foster Parent",
+  aunt: "Aunt",
+  uncle: "Uncle",
+  sibling: "Sibling",
+  other: "Other",
 };
 
 // ── Referral Sources ─────────────────────────────────────────────────────────
 
 export const REFERRAL_SOURCES = [
-  "pediatrician", "school", "self_referral", "insurance",
-  "other_provider", "website", "word_of_mouth", "other",
+  "pediatrician",
+  "school",
+  "self_referral",
+  "insurance",
+  "other_provider",
+  "website",
+  "word_of_mouth",
+  "other",
 ] as const;
 export type ReferralSource = (typeof REFERRAL_SOURCES)[number];
 
 export const REFERRAL_SOURCE_LABELS: Record<ReferralSource, string> = {
-  pediatrician: "Pediatrician", school: "School", self_referral: "Self-Referral",
-  insurance: "Insurance", other_provider: "Other Provider", website: "Website",
-  word_of_mouth: "Word of Mouth", other: "Other",
+  pediatrician: "Pediatrician",
+  school: "School",
+  self_referral: "Self-Referral",
+  insurance: "Insurance",
+  other_provider: "Other Provider",
+  website: "Website",
+  word_of_mouth: "Word of Mouth",
+  other: "Other",
+};
+
+// ── Verification Statuses ────────────────────────────────────────────────────
+
+export const VERIFICATION_STATUSES = ["unverified", "verified", "failed"] as const;
+export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
+
+export const VERIFICATION_STATUS_LABELS: Record<VerificationStatus, string> = {
+  unverified: "Unverified",
+  verified: "Verified",
+  failed: "Failed",
+};
+
+// ── Payer Type Labels ────────────────────────────────────────────────────────
+
+export const PAYER_TYPE_LABELS: Record<PayerType, string> = {
+  commercial: "Commercial",
+  medicaid: "Medicaid",
+  medicare: "Medicare",
+  tricare: "TRICARE",
+};
+
+// ── Subscriber Relationship Labels ──────────────────────────────────────────
+
+export const SUBSCRIBER_RELATIONSHIP_LABELS: Record<SubscriberRelationship, string> = {
+  self: "Self",
+  spouse: "Spouse",
+  child: "Child",
+  other: "Other",
+};
+
+// ── Unit Calc Method Labels ─────────────────────────────────────────────────
+
+export const UNIT_CALC_METHOD_LABELS: Record<UnitCalcMethod, string> = {
+  cms: "CMS (Medicare/Medicaid)",
+  ama: "AMA (Commercial)",
+};
+
+// ── Insurance Priority Labels ───────────────────────────────────────────────
+
+export const PRIORITY_LABELS: Record<number, string> = {
+  1: "Primary",
+  2: "Secondary",
+  3: "Tertiary",
 };
 
 // ── ABA CPT Codes ───────────────────────────────────────────────────────────
@@ -166,15 +216,13 @@ export const ABA_CPT_CODES = {
     isAssessment: true,
   },
   "97153": {
-    description:
-      "Adaptive behavior treatment by protocol (1:1 direct therapy)",
+    description: "Adaptive behavior treatment by protocol (1:1 direct therapy)",
     provider: "RBT under QHP",
     maxUnitsPerDay: 32,
     isAssessment: false,
   },
   "97154": {
-    description:
-      "Group adaptive behavior treatment by protocol (2–8 patients)",
+    description: "Group adaptive behavior treatment by protocol (2–8 patients)",
     provider: "RBT under QHP",
     maxUnitsPerDay: 18,
     isAssessment: false,
@@ -186,8 +234,7 @@ export const ABA_CPT_CODES = {
     isAssessment: false,
   },
   "97156": {
-    description:
-      "Family adaptive behavior treatment guidance (caregiver training)",
+    description: "Family adaptive behavior treatment guidance (caregiver training)",
     provider: "BCBA/QHP",
     maxUnitsPerDay: 16,
     isAssessment: false,
@@ -199,23 +246,20 @@ export const ABA_CPT_CODES = {
     isAssessment: false,
   },
   "97158": {
-    description:
-      "Group treatment with protocol modification (2–8 patients)",
+    description: "Group treatment with protocol modification (2–8 patients)",
     provider: "BCBA/QHP",
     maxUnitsPerDay: 16,
     isAssessment: false,
   },
   "0362T": {
-    description:
-      "Multi-technician behavior assessment for destructive behavior",
+    description: "Multi-technician behavior assessment for destructive behavior",
     provider: "QHP on-site",
     maxUnitsPerDay: 16,
     isAssessment: true,
     retirementDate: "2027-01-01",
   },
   "0373T": {
-    description:
-      "Multi-technician adaptive behavior treatment for destructive behavior",
+    description: "Multi-technician adaptive behavior treatment for destructive behavior",
     provider: "QHP on-site",
     maxUnitsPerDay: 32,
     isAssessment: false,
@@ -275,11 +319,4 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   billing_staff: "Billing Staff",
 };
 
-export const ROLE_HIERARCHY = [
-  "owner",
-  "admin",
-  "bcba",
-  "bcaba",
-  "rbt",
-  "billing_staff",
-] as const;
+export const ROLE_HIERARCHY = ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"] as const;

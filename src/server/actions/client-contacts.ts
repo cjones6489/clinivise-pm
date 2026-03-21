@@ -1,16 +1,13 @@
 "use server";
 
 import { authActionClient } from "@/lib/safe-action";
-import {
-  createContactSchema,
-  updateContactSchema,
-} from "@/lib/validators/client-contacts";
+import { createContactSchema, updateContactSchema } from "@/lib/validators/client-contacts";
 import { idSchema } from "@/lib/validators";
 import { db } from "@/server/db";
 import { clients, clientContacts } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { undefinedToNull } from "@/lib/utils";
+import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
 
 const WRITE_ROLES = ["owner", "admin", "bcba"];
@@ -42,7 +39,7 @@ export const createContact = authActionClient
     const [contact] = await db
       .insert(clientContacts)
       .values({
-        ...undefinedToNull(parsedInput),
+        ...stripUndefined(parsedInput),
         organizationId: ctx.organizationId,
       })
       .returning();
@@ -65,12 +62,7 @@ export const updateContact = authActionClient
     const [existing] = await db
       .select({ id: clientContacts.id, clientId: clientContacts.clientId })
       .from(clientContacts)
-      .where(
-        and(
-          eq(clientContacts.id, id),
-          eq(clientContacts.organizationId, ctx.organizationId),
-        ),
-      )
+      .where(and(eq(clientContacts.id, id), eq(clientContacts.organizationId, ctx.organizationId)))
       .limit(1);
 
     if (!existing) {
@@ -80,7 +72,7 @@ export const updateContact = authActionClient
     const [contact] = await db
       .update(clientContacts)
       .set(undefinedToNull(updates) as Partial<typeof clientContacts.$inferInsert>)
-      .where(eq(clientContacts.id, id))
+      .where(and(eq(clientContacts.id, id), eq(clientContacts.organizationId, ctx.organizationId)))
       .returning();
 
     revalidatePath(`/clients/${existing.clientId}`);
@@ -112,7 +104,12 @@ export const deleteContact = authActionClient
 
     await db
       .delete(clientContacts)
-      .where(eq(clientContacts.id, parsedInput.id));
+      .where(
+        and(
+          eq(clientContacts.id, parsedInput.id),
+          eq(clientContacts.organizationId, ctx.organizationId),
+        ),
+      );
 
     revalidatePath(`/clients/${existing.clientId}`);
     return { success: true as const };

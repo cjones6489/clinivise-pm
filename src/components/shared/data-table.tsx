@@ -83,22 +83,16 @@ function DataTableRenderer<TData>({
   return (
     <div className="space-y-3">
       {children}
-      <div className="rounded-lg border border-border">
+      <div className="border-border rounded-lg border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="bg-muted/50">
                 {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="px-3 py-2 text-xs font-semibold"
-                  >
+                  <TableHead key={header.id} className="px-3 py-2 text-xs font-semibold">
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -110,10 +104,7 @@ function DataTableRenderer<TData>({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-3 py-2 text-xs">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -122,7 +113,7 @@ function DataTableRenderer<TData>({
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="h-24 text-center text-xs text-muted-foreground"
+                  className="text-muted-foreground h-24 text-center text-xs"
                 >
                   No results.
                 </TableCell>

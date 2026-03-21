@@ -55,16 +55,14 @@ export function ProviderTable({ data }: { data: Provider[] }) {
 
   return (
     <div className="space-y-3">
-      <DataTableToolbar
-        table={table}
-        searchKey="name"
-        searchPlaceholder="Search providers..."
-      />
+      <DataTableToolbar table={table} searchKey="name" searchPlaceholder="Search providers..." />
       <DataTable table={table} />
       <DataTablePagination table={table} />
       <ConfirmDialog
         open={!!archiveTarget}
-        onOpenChange={(open) => { if (!open) setArchiveTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setArchiveTarget(null);
+        }}
         title="Archive provider"
         description={
           archiveTarget

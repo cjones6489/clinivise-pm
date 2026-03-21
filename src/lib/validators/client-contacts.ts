@@ -31,8 +31,26 @@ export const createContactSchema = z.object({
 });
 
 export const updateContactSchema = createContactSchema
+  .omit({
+    isLegalGuardian: true,
+    isEmergencyContact: true,
+    isBillingResponsible: true,
+    canReceivePhi: true,
+    canPickup: true,
+    livesWithClient: true,
+    priority: true,
+  })
   .partial()
-  .extend({ id: idSchema });
+  .extend({
+    id: idSchema,
+    isLegalGuardian: z.boolean().optional(),
+    isEmergencyContact: z.boolean().optional(),
+    isBillingResponsible: z.boolean().optional(),
+    canReceivePhi: z.boolean().optional(),
+    canPickup: z.boolean().optional(),
+    livesWithClient: z.boolean().optional(),
+    priority: z.coerce.number().int().min(1).optional(),
+  });
 
 export type CreateContactInput = z.input<typeof createContactSchema>;
 export type UpdateContactInput = z.input<typeof updateContactSchema>;

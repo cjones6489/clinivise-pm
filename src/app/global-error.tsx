@@ -21,9 +21,7 @@ export default function GlobalError({
             padding: "1rem",
           }}
         >
-          <h2 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>
-            Something went wrong
-          </h2>
+          <h2 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>Something went wrong</h2>
           <p style={{ fontSize: "0.875rem", color: "#6b7280", margin: 0 }}>
             An unexpected error occurred. Please try again.
           </p>

@@ -1,11 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  boolean,
-  index,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 
@@ -24,9 +17,7 @@ export const users = pgTable(
     lastName: text("last_name").notNull(),
     role: text("role").notNull().default("rbt"),
     isActive: boolean("is_active").default(true).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -35,9 +26,6 @@ export const users = pgTable(
   (table) => [
     index("users_org_idx").on(table.organizationId),
     index("users_clerk_idx").on(table.clerkUserId),
-    uniqueIndex("users_clerk_org_idx").on(
-      table.clerkUserId,
-      table.organizationId,
-    ),
+    uniqueIndex("users_clerk_org_idx").on(table.clerkUserId, table.organizationId),
   ],
 );

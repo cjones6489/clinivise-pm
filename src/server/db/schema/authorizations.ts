@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  index,
-  date,
-  integer,
-  numeric,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, date, integer, numeric } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 import { clients, clientInsurance } from "./clients";
@@ -42,9 +34,7 @@ export const authorizations = pgTable(
       scale: 2,
     }),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -77,9 +67,7 @@ export const authorizationServices = pgTable(
     maxUnitsPerDay: integer("max_units_per_day"),
     maxUnitsPerWeek: integer("max_units_per_week"),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

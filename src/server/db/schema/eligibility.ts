@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  index,
-  jsonb,
-  boolean,
-  numeric,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, jsonb, boolean, numeric } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 import { clients, clientInsurance } from "./clients";
@@ -55,12 +47,8 @@ export const eligibilityChecks = pgTable(
     }),
     abaSpecificBenefits: jsonb("aba_specific_benefits"),
     aiInterpretation: text("ai_interpretation"),
-    checkedAt: timestamp("checked_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    checkedAt: timestamp("checked_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

@@ -14,6 +14,7 @@ import {
   CLIENT_STATUSES,
   CONTACT_RELATIONSHIP_TYPES,
   REFERRAL_SOURCES,
+  VERIFICATION_STATUSES,
 } from "@/lib/constants";
 
 // ── Enum Schemas ────────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ export const unitCalcMethodSchema = z.enum(UNIT_CALC_METHODS);
 export const clientStatusSchema = z.enum(CLIENT_STATUSES);
 export const contactRelationshipSchema = z.enum(CONTACT_RELATIONSHIP_TYPES);
 export const referralSourceSchema = z.enum(REFERRAL_SOURCES);
+export const verificationStatusSchema = z.enum(VERIFICATION_STATUSES);
 
 // ── Common Field Schemas ────────────────────────────────────────────────────
 
@@ -49,11 +51,7 @@ export const dateStringSchema = z
 export const moneySchema = z.string().regex(/^-?\d+(\.\d{1,2})?$/);
 export const phoneSchema = z.string().min(1).optional();
 export const emailSchema = z.email().optional();
-export const npiSchema = z
-  .string()
-  .length(10)
-  .regex(/^\d+$/)
-  .optional();
+export const npiSchema = z.string().length(10).regex(/^\d+$/).optional();
 
 // ── Pagination Schema ───────────────────────────────────────────────────────
 

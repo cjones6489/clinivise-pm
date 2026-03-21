@@ -7,33 +7,15 @@ import { toast } from "sonner";
 import type { ClientContact } from "@/server/queries/clients";
 import { deleteContact } from "@/server/actions/client-contacts";
 import { ClientContactForm } from "./client-contact-form";
-import {
-  CONTACT_RELATIONSHIP_LABELS,
-  type ContactRelationshipType,
-} from "@/lib/constants";
+import { CONTACT_RELATIONSHIP_LABELS, type ContactRelationshipType } from "@/lib/constants";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardAction,
-} from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  UserMultipleIcon,
-  PencilEdit01Icon,
-  Delete01Icon,
-} from "@hugeicons/core-free-icons";
+import { UserMultipleIcon, PencilEdit01Icon, Delete01Icon } from "@hugeicons/core-free-icons";
 
 export function ClientContactsCard({
   contacts,
@@ -89,14 +71,14 @@ export function ClientContactsCard({
         <CardContent>
           {contacts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="mb-3 rounded-lg bg-muted p-3">
+              <div className="bg-muted mb-3 rounded-lg p-3">
                 <HugeiconsIcon
                   icon={UserMultipleIcon}
                   size={24}
                   className="text-muted-foreground"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 No contacts yet. Add a parent or guardian.
               </p>
             </div>
@@ -105,7 +87,7 @@ export function ClientContactsCard({
               {contacts.map((contact) => (
                 <div
                   key={contact.id}
-                  className="flex items-start justify-between rounded-md border border-border p-3"
+                  className="border-border flex items-start justify-between rounded-md border p-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -118,29 +100,17 @@ export function ClientContactsCard({
                         ] ?? contact.relationship}
                       </Badge>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
                       {contact.phone && <span>{contact.phone}</span>}
                       {contact.email && <span>{contact.email}</span>}
                     </div>
                     <div className="flex flex-wrap gap-1">
-                      {contact.isLegalGuardian && (
-                        <Badge variant="outline">Guardian</Badge>
-                      )}
-                      {contact.isEmergencyContact && (
-                        <Badge variant="outline">Emergency</Badge>
-                      )}
-                      {contact.isBillingResponsible && (
-                        <Badge variant="outline">Billing</Badge>
-                      )}
-                      {contact.canReceivePhi && (
-                        <Badge variant="outline">PHI</Badge>
-                      )}
-                      {contact.canPickup && (
-                        <Badge variant="outline">Pickup</Badge>
-                      )}
-                      {contact.livesWithClient && (
-                        <Badge variant="outline">Lives With</Badge>
-                      )}
+                      {contact.isLegalGuardian && <Badge variant="outline">Guardian</Badge>}
+                      {contact.isEmergencyContact && <Badge variant="outline">Emergency</Badge>}
+                      {contact.isBillingResponsible && <Badge variant="outline">Billing</Badge>}
+                      {contact.canReceivePhi && <Badge variant="outline">PHI</Badge>}
+                      {contact.canPickup && <Badge variant="outline">Pickup</Badge>}
+                      {contact.livesWithClient && <Badge variant="outline">Lives With</Badge>}
                     </div>
                   </div>
                   {canEdit && (
@@ -159,7 +129,7 @@ export function ClientContactsCard({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-destructive hover:text-destructive"
+                            className="text-destructive hover:text-destructive h-7 w-7"
                           >
                             <HugeiconsIcon icon={Delete01Icon} size={14} />
                             <span className="sr-only">Delete</span>
@@ -185,11 +155,10 @@ export function ClientContactsCard({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {editingContact ? "Edit Contact" : "Add Contact"}
-            </DialogTitle>
+            <DialogTitle>{editingContact ? "Edit Contact" : "Add Contact"}</DialogTitle>
           </DialogHeader>
           <ClientContactForm
+            key={editingContact?.id ?? "new"}
             clientId={clientId}
             contact={editingContact}
             onSuccess={handleSuccess}

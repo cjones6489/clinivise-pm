@@ -7,18 +7,13 @@ interface DataTablePaginationProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTablePagination<TData>({
-  table,
-}: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex items-center justify-between text-xs text-muted-foreground">
-      <div>
-        {table.getFilteredRowModel().rows.length} row(s) total
-      </div>
+    <div className="text-muted-foreground flex items-center justify-between text-xs">
+      <div>{table.getFilteredRowModel().rows.length} row(s) total</div>
       <div className="flex items-center gap-2">
         <span>
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {Math.max(1, table.getPageCount())}
+          Page {table.getState().pagination.pageIndex + 1} of {Math.max(1, table.getPageCount())}
         </span>
         <Button
           variant="outline"

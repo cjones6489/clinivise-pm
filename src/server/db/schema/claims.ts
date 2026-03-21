@@ -39,14 +39,12 @@ export const claims = pgTable(
     renderingProviderId: text("rendering_provider_id")
       .notNull()
       .references(() => providers.id, { onDelete: "restrict" }),
-    billingProviderId: text("billing_provider_id").references(
-      () => providers.id,
-      { onDelete: "set null" },
-    ),
-    authorizationId: text("authorization_id").references(
-      () => authorizations.id,
-      { onDelete: "set null" },
-    ),
+    billingProviderId: text("billing_provider_id").references(() => providers.id, {
+      onDelete: "set null",
+    }),
+    authorizationId: text("authorization_id").references(() => authorizations.id, {
+      onDelete: "set null",
+    }),
     claimNumber: text("claim_number"),
     stediTransactionId: text("stedi_transaction_id"),
     status: text("status").notNull().default("draft"),
@@ -73,9 +71,7 @@ export const claims = pgTable(
     aiPreCheckResult: jsonb("ai_pre_check_result"),
     aiPreCheckAt: timestamp("ai_pre_check_at", { withTimezone: true }),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -109,8 +105,7 @@ export const claimLines = pgTable(
     cptCode: text("cpt_code").notNull(),
     modifierCodes: text("modifier_codes").array(),
     units: integer("units").notNull(),
-    chargeAmount: numeric("charge_amount", { precision: 10, scale: 2 })
-      .notNull(),
+    chargeAmount: numeric("charge_amount", { precision: 10, scale: 2 }).notNull(),
     allowedAmount: numeric("allowed_amount", { precision: 10, scale: 2 }),
     paidAmount: numeric("paid_amount", { precision: 10, scale: 2 }),
     adjustmentReasonCode: text("adjustment_reason_code"),
@@ -122,9 +117,7 @@ export const claimLines = pgTable(
     serviceDateFrom: date("service_date_from").notNull(),
     serviceDateTo: date("service_date_to"),
     renderingProviderNpi: text("rendering_provider_npi"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -157,12 +150,8 @@ export const claimResponses = pgTable(
     effectiveDate: date("effective_date"),
     checkNumber: text("check_number"),
     checkAmount: numeric("check_amount", { precision: 10, scale: 2 }),
-    receivedAt: timestamp("received_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    receivedAt: timestamp("received_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

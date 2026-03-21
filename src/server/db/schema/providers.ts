@@ -29,16 +29,13 @@ export const providers = pgTable(
     credentialType: text("credential_type").notNull(),
     credentialNumber: text("credential_number"),
     credentialExpiry: date("credential_expiry"),
-    supervisorId: text("supervisor_id").references(
-      (): AnyPgColumn => providers.id,
-      { onDelete: "set null" },
-    ),
+    supervisorId: text("supervisor_id").references((): AnyPgColumn => providers.id, {
+      onDelete: "set null",
+    }),
     modifierCode: text("modifier_code"),
     isActive: boolean("is_active").default(true).notNull(),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

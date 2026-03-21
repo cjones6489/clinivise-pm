@@ -1,20 +1,33 @@
 "use client";
 
-import type { Client, ClientContact, BcbaOption } from "@/server/queries/clients";
+import type {
+  Client,
+  ClientContact,
+  BcbaOption,
+  ClientInsuranceWithPayer,
+  PayerOption,
+} from "@/server/queries/clients";
 import { ClientForm } from "./client-form";
 import { ClientContactsCard } from "./client-contacts-card";
+import { ClientInsuranceCard } from "./client-insurance-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function ClientDetail({
   client,
   contacts,
   bcbaOptions,
+  insurance,
+  payerOptions,
   canEdit,
+  canManagePayers,
 }: {
   client: Client;
   contacts: ClientContact[];
   bcbaOptions: BcbaOption[];
+  insurance: ClientInsuranceWithPayer[];
+  payerOptions: PayerOption[];
   canEdit: boolean;
+  canManagePayers: boolean;
 }) {
   return (
     <Tabs defaultValue="overview">
@@ -27,32 +40,27 @@ export function ClientDetail({
       </TabsList>
 
       <TabsContent value="overview" className="pt-4">
-        <ClientForm
-          client={client}
-          bcbaOptions={bcbaOptions}
-          disabled={!canEdit}
-        />
+        <ClientForm client={client} bcbaOptions={bcbaOptions} disabled={!canEdit} />
       </TabsContent>
 
       <TabsContent value="contacts" className="pt-4">
-        <ClientContactsCard
-          contacts={contacts}
-          clientId={client.id}
-          canEdit={canEdit}
-        />
+        <ClientContactsCard contacts={contacts} clientId={client.id} canEdit={canEdit} />
       </TabsContent>
 
       <TabsContent value="insurance" className="pt-4">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-xs text-muted-foreground">
-            Insurance management coming in Sprint 2C.
-          </p>
-        </div>
+        <ClientInsuranceCard
+          insurance={insurance}
+          contacts={contacts}
+          clientId={client.id}
+          payerOptions={payerOptions}
+          canEdit={canEdit}
+          canManagePayers={canManagePayers}
+        />
       </TabsContent>
 
       <TabsContent value="authorizations" className="pt-4">
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Authorization tracking coming in Sprint 2D.
           </p>
         </div>
@@ -60,9 +68,7 @@ export function ClientDetail({
 
       <TabsContent value="sessions" className="pt-4">
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-xs text-muted-foreground">
-            Session history coming in Sprint 3A.
-          </p>
+          <p className="text-muted-foreground text-xs">Session history coming in Sprint 3A.</p>
         </div>
       </TabsContent>
     </Tabs>

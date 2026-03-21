@@ -12,10 +12,8 @@ export default function OverviewPage() {
         title="Dashboard"
         description="Good morning — here's what needs attention today."
       />
-      <div className="flex items-center justify-center rounded-lg border border-dashed border-border p-12">
-        <p className="text-xs text-muted-foreground">
-          Dashboard widgets coming in Sprint 3.
-        </p>
+      <div className="border-border flex items-center justify-center rounded-lg border border-dashed p-12">
+        <p className="text-muted-foreground text-xs">Dashboard widgets coming in Sprint 3.</p>
       </div>
     </div>
   );

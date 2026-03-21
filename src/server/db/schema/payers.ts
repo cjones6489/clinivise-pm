@@ -1,11 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  boolean,
-  index,
-  integer,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, integer } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 
@@ -28,9 +21,7 @@ export const payers = pgTable(
     unitCalcMethod: text("unit_calc_method").default("ama"),
     notes: text("notes"),
     isActive: boolean("is_active").default(true).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

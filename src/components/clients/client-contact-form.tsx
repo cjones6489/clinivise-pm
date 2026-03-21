@@ -6,16 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import {
-  createContactSchema,
-  type CreateContactInput,
-} from "@/lib/validators/client-contacts";
+import { createContactSchema, type CreateContactInput } from "@/lib/validators/client-contacts";
 import { createContact, updateContact } from "@/server/actions/client-contacts";
 import type { ClientContact } from "@/server/queries/clients";
-import {
-  CONTACT_RELATIONSHIP_TYPES,
-  CONTACT_RELATIONSHIP_LABELS,
-} from "@/lib/constants";
+import { CONTACT_RELATIONSHIP_TYPES, CONTACT_RELATIONSHIP_LABELS } from "@/lib/constants";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +50,7 @@ export function ClientContactForm({
       lastName: contact?.lastName ?? "",
       phone: contact?.phone ?? "",
       email: contact?.email ?? "",
-      relationship: contact?.relationship as CreateContactInput["relationship"] ?? "mother",
+      relationship: (contact?.relationship as CreateContactInput["relationship"]) ?? "mother",
       isLegalGuardian: contact?.isLegalGuardian ?? false,
       isEmergencyContact: contact?.isEmergencyContact ?? false,
       isBillingResponsible: contact?.isBillingResponsible ?? false,
@@ -68,37 +62,31 @@ export function ClientContactForm({
     },
   });
 
-  const { execute: executeCreate, isPending: isCreating } = useAction(
-    createContact,
-    {
-      onSuccess: ({ data }) => {
-        if (data?.success) {
-          setHasSubmitted(true);
-          toast.success("Contact added");
-          onSuccess();
-        }
-      },
-      onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to add contact");
-      },
+  const { execute: executeCreate, isPending: isCreating } = useAction(createContact, {
+    onSuccess: ({ data }) => {
+      if (data?.success) {
+        setHasSubmitted(true);
+        toast.success("Contact added");
+        onSuccess();
+      }
     },
-  );
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Failed to add contact");
+    },
+  });
 
-  const { execute: executeUpdate, isPending: isUpdating } = useAction(
-    updateContact,
-    {
-      onSuccess: ({ data }) => {
-        if (data?.success) {
-          setHasSubmitted(true);
-          toast.success("Contact updated");
-          onSuccess();
-        }
-      },
-      onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to update contact");
-      },
+  const { execute: executeUpdate, isPending: isUpdating } = useAction(updateContact, {
+    onSuccess: ({ data }) => {
+      if (data?.success) {
+        setHasSubmitted(true);
+        toast.success("Contact updated");
+        onSuccess();
+      }
     },
-  );
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Failed to update contact");
+    },
+  });
 
   const isPending = isCreating || isUpdating || hasSubmitted;
 
@@ -187,10 +175,7 @@ export function ClientContactForm({
               name={name}
               control={control}
               render={({ field }) => (
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               )}
             />
             <Label className="text-xs font-medium">{label}</Label>

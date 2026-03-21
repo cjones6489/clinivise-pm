@@ -27,7 +27,5 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     previousOrgId.current = orgId;
   }, [orgId, queryClient]);
 
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

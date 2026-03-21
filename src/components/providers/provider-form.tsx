@@ -179,7 +179,8 @@ export function ProviderForm({
                 </SelectItem>
                 {supervisorOptions.map((s) => (
                   <SelectItem key={s.id} value={s.id} className="text-xs">
-                    {s.lastName}, {s.firstName} ({CREDENTIAL_LABELS[s.credentialType as CredentialType] ?? s.credentialType})
+                    {s.lastName}, {s.firstName} (
+                    {CREDENTIAL_LABELS[s.credentialType as CredentialType] ?? s.credentialType})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -196,11 +197,7 @@ export function ProviderForm({
             name="isActive"
             control={control}
             render={({ field }) => (
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                size="sm"
-              />
+              <Switch checked={field.value} onCheckedChange={field.onChange} size="sm" />
             )}
           />
         </Field>

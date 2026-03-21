@@ -7,10 +7,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import {
-  createClientSchema,
-  type CreateClientInput,
-} from "@/lib/validators/clients";
+import { createClientSchema, type CreateClientInput } from "@/lib/validators/clients";
 import { createClient, updateClient } from "@/server/actions/clients";
 import type { Client } from "@/server/queries/clients";
 import type { BcbaOption } from "@/server/queries/clients";
@@ -90,37 +87,31 @@ export function ClientForm({
 
   const currentStatus = watch("status");
 
-  const { execute: executeCreate, isPending: isCreating } = useAction(
-    createClient,
-    {
-      onSuccess: ({ data }) => {
-        if (data?.success) {
-          setHasSubmitted(true);
-          toast.success("Client created");
-          router.push("/clients");
-        }
-      },
-      onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to create client");
-      },
+  const { execute: executeCreate, isPending: isCreating } = useAction(createClient, {
+    onSuccess: ({ data }) => {
+      if (data?.success) {
+        setHasSubmitted(true);
+        toast.success("Client created");
+        router.push("/clients");
+      }
     },
-  );
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Failed to create client");
+    },
+  });
 
-  const { execute: executeUpdate, isPending: isUpdating } = useAction(
-    updateClient,
-    {
-      onSuccess: ({ data }) => {
-        if (data?.success) {
-          setHasSubmitted(true);
-          toast.success("Client updated");
-          router.push(`/clients/${client!.id}`);
-        }
-      },
-      onError: ({ error }) => {
-        toast.error(error.serverError ?? "Failed to update client");
-      },
+  const { execute: executeUpdate, isPending: isUpdating } = useAction(updateClient, {
+    onSuccess: ({ data }) => {
+      if (data?.success) {
+        setHasSubmitted(true);
+        toast.success("Client updated");
+        router.push(`/clients/${client!.id}`);
+      }
     },
-  );
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Failed to update client");
+    },
+  });
 
   const isPending = isCreating || isUpdating || hasSubmitted;
 
@@ -140,20 +131,12 @@ export function ClientForm({
         <div className="grid grid-cols-2 gap-4">
           <Field>
             <Label className="text-xs font-medium">First Name</Label>
-            <Input
-              {...register("firstName")}
-              className="h-8 text-xs"
-              disabled={disabled}
-            />
+            <Input {...register("firstName")} className="h-8 text-xs" disabled={disabled} />
             <FieldError>{errors.firstName?.message}</FieldError>
           </Field>
           <Field>
             <Label className="text-xs font-medium">Last Name</Label>
-            <Input
-              {...register("lastName")}
-              className="h-8 text-xs"
-              disabled={disabled}
-            />
+            <Input {...register("lastName")} className="h-8 text-xs" disabled={disabled} />
             <FieldError>{errors.lastName?.message}</FieldError>
           </Field>
         </div>
@@ -176,9 +159,7 @@ export function ClientForm({
               render={({ field }) => (
                 <Select
                   value={field.value || NONE_VALUE}
-                  onValueChange={(v) =>
-                    field.onChange(v === NONE_VALUE ? "" : v)
-                  }
+                  onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
                   disabled={disabled}
                 >
                   <SelectTrigger className="h-8 w-full text-xs">
@@ -207,16 +188,12 @@ export function ClientForm({
               name="status"
               control={control}
               render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  disabled={disabled}
-                >
+                <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
                   <SelectTrigger className="h-8 w-full text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CLIENT_STATUSES.map((s) => (
+                    {CLIENT_STATUSES.filter((s) => s !== "archived").map((s) => (
                       <SelectItem key={s} value={s} className="text-xs">
                         {CLIENT_STATUS_LABELS[s]}
                       </SelectItem>
@@ -235,9 +212,7 @@ export function ClientForm({
               render={({ field }) => (
                 <Select
                   value={field.value || NONE_VALUE}
-                  onValueChange={(v) =>
-                    field.onChange(v === NONE_VALUE ? "" : v)
-                  }
+                  onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
                   disabled={disabled}
                 >
                   <SelectTrigger className="h-8 w-full text-xs">
@@ -266,11 +241,7 @@ export function ClientForm({
         <h3 className="text-sm font-semibold">Address</h3>
         <Field>
           <Label className="text-xs font-medium">Address Line 1</Label>
-          <Input
-            {...register("addressLine1")}
-            className="h-8 text-xs"
-            disabled={disabled}
-          />
+          <Input {...register("addressLine1")} className="h-8 text-xs" disabled={disabled} />
         </Field>
         <Field>
           <Label className="text-xs font-medium">Address Line 2</Label>
@@ -284,19 +255,11 @@ export function ClientForm({
         <div className="grid grid-cols-3 gap-4">
           <Field>
             <Label className="text-xs font-medium">City</Label>
-            <Input
-              {...register("city")}
-              className="h-8 text-xs"
-              disabled={disabled}
-            />
+            <Input {...register("city")} className="h-8 text-xs" disabled={disabled} />
           </Field>
           <Field>
             <Label className="text-xs font-medium">State</Label>
-            <Input
-              {...register("state")}
-              className="h-8 text-xs"
-              disabled={disabled}
-            />
+            <Input {...register("state")} className="h-8 text-xs" disabled={disabled} />
           </Field>
           <Field>
             <Label className="text-xs font-medium">ZIP Code</Label>
@@ -315,16 +278,10 @@ export function ClientForm({
         <div className="grid grid-cols-2 gap-4">
           <Field>
             <Label className="text-xs font-medium">Diagnosis Code</Label>
-            <Input
-              {...register("diagnosisCode")}
-              className="h-8 text-xs"
-              disabled={disabled}
-            />
+            <Input {...register("diagnosisCode")} className="h-8 text-xs" disabled={disabled} />
           </Field>
           <Field>
-            <Label className="text-xs font-medium">
-              Diagnosis Description
-            </Label>
+            <Label className="text-xs font-medium">Diagnosis Description</Label>
             <Input
               {...register("diagnosisDescription")}
               className="h-8 text-xs"
@@ -341,9 +298,7 @@ export function ClientForm({
               render={({ field }) => (
                 <Select
                   value={field.value || NONE_VALUE}
-                  onValueChange={(v) =>
-                    field.onChange(v === NONE_VALUE ? "" : v)
-                  }
+                  onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
                   disabled={disabled}
                 >
                   <SelectTrigger className="h-8 w-full text-xs">
@@ -381,20 +336,12 @@ export function ClientForm({
         <h3 className="text-sm font-semibold">Notes</h3>
         <Field>
           <Label className="text-xs font-medium">Notes</Label>
-          <Textarea
-            {...register("notes")}
-            className="text-xs"
-            disabled={disabled}
-          />
+          <Textarea {...register("notes")} className="text-xs" disabled={disabled} />
         </Field>
         {currentStatus === "on_hold" && (
           <Field>
             <Label className="text-xs font-medium">Hold Reason</Label>
-            <Textarea
-              {...register("holdReason")}
-              className="text-xs"
-              disabled={disabled}
-            />
+            <Textarea {...register("holdReason")} className="text-xs" disabled={disabled} />
             <FieldError>{errors.holdReason?.message}</FieldError>
           </Field>
         )}
@@ -402,12 +349,7 @@ export function ClientForm({
 
       {!disabled && (
         <div className="flex gap-2 pt-2">
-          <Button
-            type="submit"
-            size="sm"
-            disabled={isPending}
-            className="text-xs"
-          >
+          <Button type="submit" size="sm" disabled={isPending} className="text-xs">
             {isPending
               ? isEdit
                 ? "Saving..."
@@ -421,9 +363,7 @@ export function ClientForm({
             variant="outline"
             size="sm"
             className="text-xs"
-            onClick={() =>
-              router.push(isEdit ? `/clients/${client.id}` : "/clients")
-            }
+            onClick={() => router.push(isEdit ? `/clients/${client.id}` : "/clients")}
             disabled={isPending}
           >
             Cancel

@@ -8,7 +8,7 @@ import { providers } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { CREDENTIAL_MODIFIERS } from "@/lib/constants";
-import { undefinedToNull } from "@/lib/utils";
+import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
 
 export const createProvider = authActionClient
@@ -41,7 +41,7 @@ export const createProvider = authActionClient
     const [provider] = await db
       .insert(providers)
       .values({
-        ...undefinedToNull(parsedInput),
+        ...stripUndefined(parsedInput),
         organizationId: ctx.organizationId,
         modifierCode,
       })
@@ -106,7 +106,7 @@ export const updateProvider = authActionClient
         ...undefinedToNull(updates),
         ...modifierUpdate,
       } as Partial<typeof providers.$inferInsert>)
-      .where(eq(providers.id, id))
+      .where(and(eq(providers.id, id), eq(providers.organizationId, ctx.organizationId)))
       .returning();
 
     revalidatePath("/providers");
@@ -141,7 +141,9 @@ export const deleteProvider = authActionClient
     const [provider] = await db
       .update(providers)
       .set({ deletedAt: new Date() })
-      .where(eq(providers.id, parsedInput.id))
+      .where(
+        and(eq(providers.id, parsedInput.id), eq(providers.organizationId, ctx.organizationId)),
+      )
       .returning();
 
     revalidatePath("/providers");

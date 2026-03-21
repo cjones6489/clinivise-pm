@@ -11,9 +11,9 @@ export default function DashboardError({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-20">
-      <div className="rounded-lg bg-muted p-4">
+      <div className="bg-muted rounded-lg p-4">
         <h2 className="text-sm font-semibold">Something went wrong</h2>
-        <p className="mt-1 text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-xs">
           An error occurred loading this page. Please try again.
         </p>
       </div>

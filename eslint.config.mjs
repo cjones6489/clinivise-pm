@@ -5,18 +5,12 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "drizzle/**",
-    "next-env.d.ts",
-  ]),
+  globalIgnores([".next/**", "out/**", "build/**", "drizzle/**", "docs/**", "next-env.d.ts"]),
   {
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { argsIgnorePattern: "^_" },
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", destructuredArrayIgnorePattern: "^_" },
       ],
       "@typescript-eslint/consistent-type-imports": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],

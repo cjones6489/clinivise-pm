@@ -5,15 +5,13 @@ import {
   getClientById,
   getClientContacts,
   getBcbaOptions,
+  getClientInsurance,
+  getPayerOptions,
 } from "@/server/queries/clients";
 import { PageHeader } from "@/components/layout/page-header";
 import { ClientDetail } from "@/components/clients/client-detail";
 import { Badge } from "@/components/ui/badge";
-import {
-  CLIENT_STATUS_LABELS,
-  CLIENT_STATUS_VARIANT,
-  type ClientStatus,
-} from "@/lib/constants";
+import { CLIENT_STATUS_LABELS, CLIENT_STATUS_VARIANT, type ClientStatus } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Client | Clinivise",
@@ -21,19 +19,18 @@ export const metadata: Metadata = {
 
 const WRITE_ROLES = ["owner", "admin", "bcba"];
 
-export default async function ClientDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await requireAuth();
   const canEdit = WRITE_ROLES.includes(user.role);
+  const canManagePayers = ["owner", "admin"].includes(user.role);
 
-  const [client, contacts, bcbaOptions] = await Promise.all([
+  const [client, contacts, bcbaOptions, insurance, payerOptions] = await Promise.all([
     getClientById(user.organizationId, id),
     getClientContacts(user.organizationId, id),
     canEdit ? getBcbaOptions(user.organizationId) : Promise.resolve([]),
+    getClientInsurance(user.organizationId, id),
+    canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
   ]);
 
   if (!client) {
@@ -56,7 +53,10 @@ export default async function ClientDetailPage({
         client={client}
         contacts={contacts}
         bcbaOptions={bcbaOptions}
+        insurance={insurance}
+        payerOptions={payerOptions}
         canEdit={canEdit}
+        canManagePayers={canManagePayers}
       />
     </div>
   );

@@ -18,10 +18,7 @@ export async function getProviders(orgId: string): Promise<Provider[]> {
     .orderBy(providers.lastName, providers.firstName);
 }
 
-export async function getProviderById(
-  orgId: string,
-  id: string,
-): Promise<Provider | null> {
+export async function getProviderById(orgId: string, id: string): Promise<Provider | null> {
   const [provider] = await db
     .select()
     .from(providers)

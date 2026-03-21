@@ -23,9 +23,7 @@ export async function getCurrentUser() {
   const [user] = await db
     .select()
     .from(users)
-    .where(
-      and(eq(users.clerkUserId, userId), eq(users.organizationId, org.id)),
-    )
+    .where(and(eq(users.clerkUserId, userId), eq(users.organizationId, org.id)))
     .limit(1);
 
   return user ?? null;

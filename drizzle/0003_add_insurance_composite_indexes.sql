@@ -1,0 +1,2 @@
+CREATE INDEX "client_insurance_org_client_deleted_idx" ON "client_insurance" USING btree ("organization_id","client_id","deleted_at");--> statement-breakpoint
+CREATE INDEX "client_insurance_org_payer_deleted_idx" ON "client_insurance" USING btree ("organization_id","payer_id","deleted_at");

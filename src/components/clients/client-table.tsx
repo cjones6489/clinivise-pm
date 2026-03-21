@@ -55,16 +55,14 @@ export function ClientTable({ data, canEdit }: { data: ClientWithBcba[]; canEdit
 
   return (
     <div className="space-y-3">
-      <DataTableToolbar
-        table={table}
-        searchKey="name"
-        searchPlaceholder="Search clients..."
-      />
+      <DataTableToolbar table={table} searchKey="name" searchPlaceholder="Search clients..." />
       <DataTable table={table} />
       <DataTablePagination table={table} />
       <ConfirmDialog
         open={!!archiveTarget}
-        onOpenChange={(open) => { if (!open) setArchiveTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setArchiveTarget(null);
+        }}
         title="Archive client"
         description={
           archiveTarget

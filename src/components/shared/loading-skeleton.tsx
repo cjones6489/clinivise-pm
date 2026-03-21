@@ -22,8 +22,8 @@ export function PageSkeleton() {
 
 export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="rounded-lg border border-border">
-      <div className="border-b border-border bg-muted/50 px-3 py-2">
+    <div className="border-border rounded-lg border">
+      <div className="border-border bg-muted/50 border-b px-3 py-2">
         <div className="flex gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-4 flex-1" />
@@ -31,7 +31,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
         </div>
       </div>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="border-b border-border px-3 py-2.5 last:border-0">
+        <div key={i} className="border-border border-b px-3 py-2.5 last:border-0">
           <div className="flex gap-4">
             {Array.from({ length: 5 }).map((_, j) => (
               <Skeleton key={j} className="h-4 flex-1" />
@@ -45,7 +45,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-lg border border-border p-4">
+    <div className="border-border rounded-lg border p-4">
       <Skeleton className="mb-3 h-4 w-24" />
       <Skeleton className="mb-1 h-7 w-16" />
       <Skeleton className="h-3 w-32" />

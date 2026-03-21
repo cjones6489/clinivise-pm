@@ -15,6 +15,20 @@
       "when": 1774114882096,
       "tag": "0001_sprint_2b_client_contacts_status",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774119043619,
+      "tag": "0002_sprint_2c_insurance_verification",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774121192689,
+      "tag": "0003_add_insurance_composite_indexes",
+      "breakpoints": true
     }
   ]
 }

@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  boolean,
-  integer,
-  index,
-  date,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, index, date } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 import { providers } from "./providers";
@@ -33,9 +25,7 @@ export const clients = pgTable(
     state: text("state"),
     zipCode: text("zip_code"),
     diagnosisCode: text("diagnosis_code").default("F84.0"),
-    diagnosisDescription: text("diagnosis_description").default(
-      "Autism Spectrum Disorder",
-    ),
+    diagnosisDescription: text("diagnosis_description").default("Autism Spectrum Disorder"),
     assignedBcbaId: text("assigned_bcba_id").references(() => providers.id, {
       onDelete: "set null",
     }),
@@ -45,9 +35,7 @@ export const clients = pgTable(
     holdReason: text("hold_reason"),
     notes: text("notes"),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -56,11 +44,7 @@ export const clients = pgTable(
   (table) => [
     index("clients_org_idx").on(table.organizationId),
     index("clients_bcba_idx").on(table.assignedBcbaId),
-    index("clients_name_idx").on(
-      table.organizationId,
-      table.lastName,
-      table.firstName,
-    ),
+    index("clients_name_idx").on(table.organizationId, table.lastName, table.firstName),
     index("clients_status_idx").on(table.organizationId, table.status),
   ],
 );
@@ -86,16 +70,22 @@ export const clientInsurance = pgTable(
     subscriberLastName: text("subscriber_last_name"),
     subscriberDateOfBirth: date("subscriber_date_of_birth"),
     subscriberGender: text("subscriber_gender"),
-    relationshipToSubscriber: text("relationship_to_subscriber").default(
-      "self",
-    ),
+    planName: text("plan_name"),
+    relationshipToSubscriber: text("relationship_to_subscriber").default("self"),
+    subscriberAddressLine1: text("subscriber_address_line_1"),
+    subscriberCity: text("subscriber_city"),
+    subscriberState: text("subscriber_state"),
+    subscriberZipCode: text("subscriber_zip_code"),
     priority: integer("priority").default(1).notNull(),
     effectiveDate: date("effective_date"),
     terminationDate: date("termination_date"),
+    verificationStatus: text("verification_status").default("unverified").notNull(),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    cardFrontUrl: text("card_front_url"),
+    cardBackUrl: text("card_back_url"),
     isActive: boolean("is_active").default(true).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -105,6 +95,16 @@ export const clientInsurance = pgTable(
     index("client_insurance_org_idx").on(table.organizationId),
     index("client_insurance_client_idx").on(table.clientId),
     index("client_insurance_payer_idx").on(table.payerId),
+    index("client_insurance_org_client_deleted_idx").on(
+      table.organizationId,
+      table.clientId,
+      table.deletedAt,
+    ),
+    index("client_insurance_org_payer_deleted_idx").on(
+      table.organizationId,
+      table.payerId,
+      table.deletedAt,
+    ),
   ],
 );
 
@@ -133,9 +133,7 @@ export const clientContacts = pgTable(
     livesWithClient: boolean("lives_with_client").default(false).notNull(),
     priority: integer("priority").default(1).notNull(),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

@@ -28,9 +28,7 @@ export function timeAgo(date: string | Date): string {
  * Returns -1 if endTime is before startTime (invalid input).
  */
 export function calculateUnits(startTime: Date, endTime: Date): number {
-  const totalMinutes = Math.round(
-    (endTime.getTime() - startTime.getTime()) / 60000,
-  );
+  const totalMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
   if (totalMinutes < 0) return -1;
   if (totalMinutes < 8) return 0;
   return Math.floor(totalMinutes / 15) + (totalMinutes % 15 >= 8 ? 1 : 0);
@@ -43,6 +41,17 @@ export function undefinedToNull<T extends Record<string, unknown>>(obj: T) {
     result[key] = value === undefined ? null : value;
   }
   return result as { [K in keyof T]: T[K] extends undefined ? null : T[K] };
+}
+
+/** Strip undefined keys so DB defaults are preserved on INSERT. */
+export function stripUndefined<T extends Record<string, unknown>>(obj: T) {
+  const result = {} as Record<string, unknown>;
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  }
+  return result as { [K in keyof T]: Exclude<T[K], undefined> };
 }
 
 /**

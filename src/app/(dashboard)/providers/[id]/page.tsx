@@ -9,11 +9,7 @@ export const metadata: Metadata = {
   title: "Edit Provider | Clinivise",
 };
 
-export default async function EditProviderPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function EditProviderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await requireRole(["owner", "admin"]);
 

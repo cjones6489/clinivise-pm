@@ -1,13 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  index,
-  date,
-  integer,
-  numeric,
-
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, date, integer, numeric } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 import { clients } from "./clients";
@@ -32,10 +23,9 @@ export const sessions = pgTable(
     supervisorId: text("supervisor_id").references(() => providers.id, {
       onDelete: "set null",
     }),
-    authorizationId: text("authorization_id").references(
-      () => authorizations.id,
-      { onDelete: "set null" },
-    ),
+    authorizationId: text("authorization_id").references(() => authorizations.id, {
+      onDelete: "set null",
+    }),
     authorizationServiceId: text("authorization_service_id").references(
       () => authorizationServices.id,
       { onDelete: "set null" },
@@ -54,9 +44,7 @@ export const sessions = pgTable(
     // (claims.ts imports sessions.ts for claimLines.sessionId).
     // Referential integrity enforced at application level in server actions.
     billedAmount: numeric("billed_amount", { precision: 10, scale: 2 }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()

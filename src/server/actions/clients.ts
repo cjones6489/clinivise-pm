@@ -7,7 +7,7 @@ import { db } from "@/server/db";
 import { clients, providers } from "@/server/db/schema";
 import { eq, and, isNull, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { undefinedToNull } from "@/lib/utils";
+import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
 
 const WRITE_ROLES = ["owner", "admin", "bcba"];
@@ -41,14 +41,12 @@ export const createClient = authActionClient
     // Auto-set intakeDate to today if status is not "inquiry" and no intake date provided
     const intakeDate =
       parsedInput.intakeDate ??
-      (parsedInput.status !== "inquiry"
-        ? new Date().toISOString().split("T")[0]
-        : undefined);
+      (parsedInput.status !== "inquiry" ? new Date().toISOString().split("T")[0] : undefined);
 
     const [client] = await db
       .insert(clients)
       .values({
-        ...undefinedToNull(parsedInput),
+        ...stripUndefined(parsedInput),
         intakeDate,
         organizationId: ctx.organizationId,
       })
@@ -105,7 +103,7 @@ export const updateClient = authActionClient
     const [client] = await db
       .update(clients)
       .set(undefinedToNull(updates) as Partial<typeof clients.$inferInsert>)
-      .where(eq(clients.id, id))
+      .where(and(eq(clients.id, id), eq(clients.organizationId, ctx.organizationId)))
       .returning();
 
     revalidatePath("/clients");
@@ -139,7 +137,7 @@ export const deleteClient = authActionClient
     const [client] = await db
       .update(clients)
       .set({ deletedAt: new Date(), status: "archived" })
-      .where(eq(clients.id, parsedInput.id))
+      .where(and(eq(clients.id, parsedInput.id), eq(clients.organizationId, ctx.organizationId)))
       .returning();
 
     revalidatePath("/clients");

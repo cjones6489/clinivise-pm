@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function Header() {
   return (
-    <header className="flex h-12 items-center gap-3 border-b border-border bg-background px-4">
+    <header className="border-border bg-background flex h-12 items-center gap-3 border-b px-4">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="h-4" />
       <div className="flex-1" />

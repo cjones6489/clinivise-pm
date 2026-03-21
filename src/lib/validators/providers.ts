@@ -6,18 +6,27 @@ export const createProviderSchema = z.object({
   lastName: z.string().trim().min(1, "Last name is required"),
   credentialType: credentialTypeSchema,
   npi: npiSchema.or(z.literal("")).transform((v) => v || undefined),
-  credentialNumber: z.string().optional().or(z.literal("")).transform((v) => v || undefined),
+  credentialNumber: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   credentialExpiry: dateStringSchema
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
-  supervisorId: z.string().optional().or(z.literal("")).transform((v) => v || undefined),
+  supervisorId: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   isActive: z.boolean().default(true),
 });
 
 export const updateProviderSchema = createProviderSchema
+  .omit({ isActive: true })
   .partial()
-  .extend({ id: idSchema })
+  .extend({ id: idSchema, isActive: z.boolean().optional() })
   .refine((d) => !d.supervisorId || d.supervisorId !== d.id, {
     message: "Cannot be own supervisor",
     path: ["supervisorId"],

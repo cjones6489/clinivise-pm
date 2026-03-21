@@ -20,17 +20,11 @@ function toDecimal(value: string | null | undefined): Decimal {
   }
 }
 
-export function addMoney(
-  a: string | null | undefined,
-  b: string | null | undefined,
-): string {
+export function addMoney(a: string | null | undefined, b: string | null | undefined): string {
   return toDecimal(a).plus(toDecimal(b)).toFixed(2);
 }
 
-export function subtractMoney(
-  a: string | null | undefined,
-  b: string | null | undefined,
-): string {
+export function subtractMoney(a: string | null | undefined, b: string | null | undefined): string {
   return toDecimal(a).minus(toDecimal(b)).toFixed(2);
 }
 
@@ -49,10 +43,7 @@ export function isZero(amount: string | null | undefined): boolean {
   return toDecimal(amount).isZero();
 }
 
-export function compareMoney(
-  a: string | null | undefined,
-  b: string | null | undefined,
-): number {
+export function compareMoney(a: string | null | undefined, b: string | null | undefined): number {
   return toDecimal(a).comparedTo(toDecimal(b));
 }
 

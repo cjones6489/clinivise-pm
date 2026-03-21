@@ -16,13 +16,8 @@ export const env = createEnv({
     SENTRY_DSN: z.string().optional(),
     SENTRY_AUTH_TOKEN: z.string().optional(),
     STEDI_API_KEY: z.string().optional(),
-    STEDI_BASE_URL: z
-      .string()
-      .url()
-      .default("https://healthcare.us.stedi.com/2024-04-01"),
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
+    STEDI_BASE_URL: z.string().url().default("https://healthcare.us.stedi.com/2024-04-01"),
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   },
 
   client: {
@@ -51,14 +46,11 @@ export const env = createEnv({
     STEDI_API_KEY: process.env.STEDI_API_KEY,
     STEDI_BASE_URL: process.env.STEDI_BASE_URL,
     NODE_ENV: process.env.NODE_ENV,
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
-      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL:
-      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL:
-      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },

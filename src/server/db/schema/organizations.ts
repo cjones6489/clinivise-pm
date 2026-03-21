@@ -20,9 +20,7 @@ export const organizations = pgTable("organizations", {
   timezone: text("timezone").default("America/New_York").notNull(),
   stediApiKey: text("stedi_api_key"),
   isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull()

@@ -11,9 +11,7 @@ export function PageHeader({
     <div className="flex items-center justify-between">
       <div>
         <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
-        {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-muted-foreground text-xs">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>

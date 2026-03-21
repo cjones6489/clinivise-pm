@@ -14,10 +14,7 @@ export default async function NewClientPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Add Client"
-        description="Create a new client record for your practice."
-      />
+      <PageHeader title="Add Client" description="Create a new client record for your practice." />
       <ClientForm bcbaOptions={bcbaOptions} />
     </div>
   );
