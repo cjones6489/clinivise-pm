@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, index, date, integer, numeric } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  index,
+  date,
+  integer,
+  numeric,
+  type AnyPgColumn,
+} from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 import { clients, clientInsurance } from "./clients";
@@ -22,6 +31,10 @@ export const authorizations = pgTable(
     clientInsuranceId: text("client_insurance_id")
       .notNull()
       .references(() => clientInsurance.id, { onDelete: "restrict" }),
+    previousAuthorizationId: text("previous_authorization_id").references(
+      (): AnyPgColumn => authorizations.id,
+      { onDelete: "set null" },
+    ),
     authorizationNumber: text("authorization_number"),
     status: text("status").notNull().default("pending"),
     startDate: date("start_date").notNull(),
@@ -45,6 +58,7 @@ export const authorizations = pgTable(
     index("auths_client_idx").on(table.clientId),
     index("auths_status_idx").on(table.organizationId, table.status),
     index("auths_end_date_idx").on(table.organizationId, table.endDate),
+    index("auths_prev_auth_idx").on(table.previousAuthorizationId),
   ],
 );
 

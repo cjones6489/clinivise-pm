@@ -1,0 +1,3 @@
+ALTER TABLE "authorizations" ADD COLUMN "previous_authorization_id" text;--> statement-breakpoint
+ALTER TABLE "authorizations" ADD CONSTRAINT "authorizations_previous_authorization_id_authorizations_id_fk" FOREIGN KEY ("previous_authorization_id") REFERENCES "public"."authorizations"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "auths_prev_auth_idx" ON "authorizations" USING btree ("previous_authorization_id");

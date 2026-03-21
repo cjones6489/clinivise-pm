@@ -22,6 +22,9 @@ const USER_FACING_ERRORS = new Set([
   "Cannot verify an expired insurance policy",
   "Organization not found",
   "User not found in this organization",
+  "Authorization not found",
+  "Client insurance not found",
+  "Cannot remove service lines that have recorded usage",
 ]);
 
 export const actionClient = createSafeActionClient({

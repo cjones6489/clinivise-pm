@@ -269,6 +269,49 @@ export const ABA_CPT_CODES = {
 
 export type CptCode = keyof typeof ABA_CPT_CODES;
 
+// ── Authorization Status Labels & Variants ──────────────────────────────────
+
+export const AUTH_STATUS_LABELS: Record<AuthStatus, string> = {
+  pending: "Pending",
+  approved: "Approved",
+  denied: "Denied",
+  expired: "Expired",
+  exhausted: "Exhausted",
+};
+
+export const AUTH_STATUS_VARIANT: Record<
+  AuthStatus,
+  "default" | "secondary" | "outline" | "destructive"
+> = {
+  pending: "secondary",
+  approved: "default",
+  denied: "destructive",
+  expired: "outline",
+  exhausted: "outline",
+};
+
+// ── CPT Code Options (for select dropdowns) ────────────────────────────────
+
+export const CPT_CODE_OPTIONS = Object.entries(ABA_CPT_CODES).map(([code, meta]) => ({
+  value: code,
+  label: `${code} — ${meta.description}`,
+  shortLabel: code,
+  maxUnitsPerDay: meta.maxUnitsPerDay,
+}));
+
+// ── Service Frequencies ─────────────────────────────────────────────────────
+
+export const SERVICE_FREQUENCIES = ["daily", "weekly", "biweekly", "monthly", "as_needed"] as const;
+export type ServiceFrequency = (typeof SERVICE_FREQUENCIES)[number];
+
+export const SERVICE_FREQUENCY_LABELS: Record<ServiceFrequency, string> = {
+  daily: "Daily",
+  weekly: "Weekly",
+  biweekly: "Biweekly",
+  monthly: "Monthly",
+  as_needed: "As Needed",
+};
+
 // ── Credential Labels ──────────────────────────────────────────────────────
 
 export const CREDENTIAL_LABELS: Record<CredentialType, string> = {

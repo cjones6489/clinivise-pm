@@ -29,6 +29,13 @@
       "when": 1774121192689,
       "tag": "0003_add_insurance_composite_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774124205795,
+      "tag": "0004_unknown_venom",
+      "breakpoints": true
     }
   ]
 }
