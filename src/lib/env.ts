@@ -1,0 +1,68 @@
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod/v4";
+
+export const env = createEnv({
+  server: {
+    DATABASE_URL: z.string().url(),
+    CLERK_SECRET_KEY: z.string().min(1),
+    CLERK_WEBHOOK_SECRET: z.string().min(1),
+    AWS_REGION: z.string().default("us-east-1"),
+    AWS_ACCESS_KEY_ID: z.string().min(1),
+    AWS_SECRET_ACCESS_KEY: z.string().min(1),
+    BEDROCK_MODEL_ID: z.string().default("anthropic.claude-sonnet-4-20250514-v1:0"),
+    BLOB_READ_WRITE_TOKEN: z.string().min(1),
+    UPSTASH_REDIS_REST_URL: z.string().url(),
+    UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+    SENTRY_DSN: z.string().optional(),
+    SENTRY_AUTH_TOKEN: z.string().optional(),
+    STEDI_API_KEY: z.string().optional(),
+    STEDI_BASE_URL: z
+      .string()
+      .url()
+      .default("https://healthcare.us.stedi.com/2024-04-01"),
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
+  },
+
+  client: {
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default("/sign-in"),
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default("/sign-up"),
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().default("/overview"),
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().default("/overview"),
+    NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+    NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
+  },
+
+  runtimeEnv: {
+    DATABASE_URL: process.env.DATABASE_URL,
+    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    BEDROCK_MODEL_ID: process.env.BEDROCK_MODEL_ID,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    SENTRY_DSN: process.env.SENTRY_DSN,
+    SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+    STEDI_API_KEY: process.env.STEDI_API_KEY,
+    STEDI_BASE_URL: process.env.STEDI_BASE_URL,
+    NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL:
+      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL:
+      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  },
+
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
+  emptyStringAsUndefined: true,
+});

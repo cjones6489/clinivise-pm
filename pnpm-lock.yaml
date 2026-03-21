@@ -35,6 +35,12 @@ importers:
       '@sentry/nextjs':
         specifier: ^10.45.0
         version: 10.45.0(@opentelemetry/context-async-hooks@2.6.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.6.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.6.0(@opentelemetry/api@1.9.0))(next@16.2.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(webpack@5.105.4(esbuild@0.27.4))
+      '@t3-oss/env-core':
+        specifier: ^0.13.10
+        version: 0.13.10(typescript@5.9.3)(zod@4.3.6)
+      '@t3-oss/env-nextjs':
+        specifier: ^0.13.10
+        version: 0.13.10(typescript@5.9.3)(zod@4.3.6)
       '@tanstack/react-query':
         specifier: ^5.91.3
         version: 5.91.3(react@19.2.4)
@@ -98,6 +104,9 @@ importers:
       recharts:
         specifier: 2.15.4
         version: 2.15.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       shadcn:
         specifier: ^4.1.0
         version: 4.1.0(@types/node@20.19.37)(typescript@5.9.3)
@@ -123,6 +132,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.2.2
+      '@tanstack/react-query-devtools':
+        specifier: ^5.91.3
+        version: 5.91.3(@tanstack/react-query@5.91.3(react@19.2.4))(react@19.2.4)
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1
@@ -2878,6 +2890,40 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
+  '@t3-oss/env-core@0.13.10':
+    resolution: {integrity: sha512-NNFfdlJ+HmPHkLi2HKy7nwuat9SIYOxei9K10lO2YlcSObDILY7mHZNSHsieIM3A0/5OOzw/P/b+yLvPdaG52g==}
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
+
+  '@t3-oss/env-nextjs@0.13.10':
+    resolution: {integrity: sha512-JfSA2WXOnvcc/uMdp31paMsfbYhhdvLLRxlwvrnlPE9bwM/n0Z+Qb9xRv48nPpvfMhOrkrTYw1I5Yc06WIKBJQ==}
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
+
   '@tabby_ai/hijri-converter@1.0.5':
     resolution: {integrity: sha512-r5bClKrcIusDoo049dSL8CawnHR6mRdDwhlQuIgZRNty68q0x8k3Lf1BtPAMxRf/GgnHBnIO4ujd3+GQdLWzxQ==}
     engines: {node: '>=16.0.0'}
@@ -2975,6 +3021,15 @@ packages:
 
   '@tanstack/query-core@5.91.2':
     resolution: {integrity: sha512-Uz2pTgPC1mhqrrSGg18RKCWT/pkduAYtxbcyIyKBhw7dTWjXZIzqmpzO2lBkyWr4hlImQgpu1m1pei3UnkFRWw==}
+
+  '@tanstack/query-devtools@5.93.0':
+    resolution: {integrity: sha512-+kpsx1NQnOFTZsw6HAFCW3HkKg0+2cepGtAWXjiiSOJJ1CtQpt72EE2nyZb+AjAbLRPoeRmPJ8MtQd8r8gsPdg==}
+
+  '@tanstack/react-query-devtools@5.91.3':
+    resolution: {integrity: sha512-nlahjMtd/J1h7IzOOfqeyDh5LNfG0eULwlltPEonYy0QL+nqrBB+nyzJfULV+moL7sZyxc2sHdNJki+vLA9BSA==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.90.20
+      react: ^18 || ^19
 
   '@tanstack/react-query@5.91.3':
     resolution: {integrity: sha512-D8jsCexxS5crZxAeiH6VlLHOUzmHOxeW5c11y8rZu0c34u/cy18hUKQXA/gn1Ila3ZIFzP+Pzv76YnliC0EtZQ==}
@@ -9262,6 +9317,18 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@t3-oss/env-core@0.13.10(typescript@5.9.3)(zod@4.3.6)':
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 4.3.6
+
+  '@t3-oss/env-nextjs@0.13.10(typescript@5.9.3)(zod@4.3.6)':
+    dependencies:
+      '@t3-oss/env-core': 0.13.10(typescript@5.9.3)(zod@4.3.6)
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 4.3.6
+
   '@tabby_ai/hijri-converter@1.0.5': {}
 
   '@tailwindcss/node@4.2.2':
@@ -9336,6 +9403,14 @@ snapshots:
   '@tanstack/query-core@5.90.16': {}
 
   '@tanstack/query-core@5.91.2': {}
+
+  '@tanstack/query-devtools@5.93.0': {}
+
+  '@tanstack/react-query-devtools@5.91.3(@tanstack/react-query@5.91.3(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@tanstack/query-devtools': 5.93.0
+      '@tanstack/react-query': 5.91.3(react@19.2.4)
+      react: 19.2.4
 
   '@tanstack/react-query@5.91.3(react@19.2.4)':
     dependencies:

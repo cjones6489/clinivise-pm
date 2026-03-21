@@ -1,0 +1,119 @@
+# Clinivise — ABA Practice Management & AI-Native Billing Platform
+
+## Project Context
+Clinivise is a free ABA (Applied Behavior Analysis) therapy practice management tool
+monetized through 2-4% of collected revenue on billing services. It's an operations
+and back-office platform — NOT clinical. Target users are small to mid-size ABA
+practices (1-50 staff) that are price-sensitive and currently using spreadsheets or
+overpriced legacy software.
+
+## Tech Stack
+- Framework: Next.js 16 (App Router) with TypeScript 5.9 (strict mode)
+- Database: Neon Postgres (Scale plan, HIPAA) with Drizzle ORM
+- Hosting: Vercel with HIPAA BAA
+- Auth: Clerk (Pro plan, organizations, RBAC, MFA)
+- UI: Tailwind CSS v4 + shadcn/ui (Mira style preset)
+- AI: AWS Bedrock (Claude Sonnet) — NOT direct Anthropic API (HIPAA)
+- Billing EDI: Stedi API (Phase 2) — JSON-first clearinghouse
+- Forms: React Hook Form + Zod v4
+- Data Fetching: Server Components for reads, Server Actions (next-safe-action) for mutations
+- File Storage: Vercel Blob (HIPAA under Vercel BAA)
+- Rate Limiting: Upstash Redis + Ratelimit
+
+## Architecture Rules
+
+### Multi-Tenancy
+- Every table has `organization_id` column — NO EXCEPTIONS
+- Every query MUST filter by `organization_id`
+- Use `authActionClient` for all server actions — it injects `ctx.organizationId`
+- Never trust client-provided org IDs — always derive from Clerk session
+- Phase 2: Add Postgres RLS as defense-in-depth on sensitive tables
+
+### Server vs Client
+- Default to Server Components — use "use client" only when needed (interactivity, hooks)
+- Data fetching: Server Components call db directly with Drizzle
+- Mutations: Server Actions via next-safe-action with `authActionClient`
+- Client-side optimistic updates: TanStack Query for mutation-heavy pages (sessions, billing)
+- Never import `db` or server code in client components
+
+### Database Patterns
+- Use Drizzle query builder, not raw SQL
+- Always use parameterized queries (Drizzle handles this)
+- Use `nanoid()` for IDs, not UUIDs (shorter, URL-safe, 21 chars = 149 bits of entropy)
+- Timestamps always with timezone: `timestamp("col", { withTimezone: true })`
+- Monetary values: `numeric(10, 2)` — never floating point
+- All dates as `date()` type (ISO string, no time component)
+- Create indexes for every column used in WHERE clauses
+
+### Naming Conventions
+- Files: kebab-case (auth-form.tsx, use-debounce.ts)
+- Components: PascalCase (AuthForm, SessionTable)
+- Variables/functions: camelCase
+- Database columns: snake_case (organization_id, created_at)
+- Route segments: kebab-case (/clients/[id]/sessions)
+- Server actions: verb-noun (createClient, updateSession, deleteAuthorization)
+- Types: PascalCase with descriptive suffixes (ClientFormValues, SessionWithProvider)
+
+### UI Patterns
+- Use shadcn/ui components — never build custom when shadcn has it
+- Toast notifications via Sonner for all action feedback
+- Data tables via shared DataTable component wrapping TanStack Table
+- Forms: React Hook Form + Zod schema + shadcn Form component
+- Loading states: Skeleton components, never spinners for page loads
+- Empty states: Always provide helpful empty state with CTA
+- Modals: Dialog for confirm actions, Sheet for forms, Drawer for detail panels
+- Sidebar navigation with role-based item visibility
+
+### Error Handling
+- Server Actions: Return `{ success: boolean, error?: string, data?: T }`
+- Never throw from server actions — return error objects
+- Use Sentry for error tracking (auto-configured via @sentry/nextjs)
+- Show user-friendly errors via toast, log technical details to Sentry
+- Wrap async operations in try-catch
+
+### Security (HIPAA)
+- Never log PHI (patient names, DOBs, insurance IDs) to console or Sentry
+- Audit log all data access and mutations via audit service
+- 15-minute session timeout (configure in Clerk)
+- Rate limit all API routes via Upstash
+- Validate all inputs with Zod on both client and server
+- Clerk handles CSRF protection for Server Actions
+- File uploads: validate file type and size server-side
+
+### AI (Bedrock/Claude) Patterns
+- All AI calls go through src/server/services/ai.ts
+- Never send PHI to any service without a BAA (Bedrock has one)
+- Structure prompts as system + user messages
+- Parse AI responses with Zod schemas — never trust raw output
+- Include confidence scores in AI-parsed data
+- Always offer manual override for AI-extracted fields
+
+### ABA-Specific Business Logic
+- All session durations in 15-minute units using CMS 8-minute rule
+- Authorization utilization: track used vs approved units per service line
+- Alert on authorizations expiring within 30 days
+- Alert on utilization >80% and >95%
+- Validate CPT code + provider credential compatibility
+- Support concurrent billing (97153 + 97155 by different providers)
+- Default diagnosis code: F84.0 (Autism Spectrum Disorder)
+- Auto-flag sessions as "flagged" when logged for a client with inactive insurance
+- Alert on low utilization (<50% used with >50% of auth period elapsed)
+
+## Phase Roadmap
+- Phase 1 (NOW): Auth, multi-tenant setup, client CRUD, provider management,
+  authorization tracking with AI letter parsing, session logging, dashboard with
+  alerts and metrics
+- Phase 2 (2 weeks): Stedi eligibility integration, claims submission, ERA
+  processing, payment reconciliation, billing dashboard, denial management, pre-claim AI
+- Phase 3 (future): Analytics, payer benchmarking, clinical integrations
+  (Motivity/Hi Rasmus), parent portal
+
+## File Organization
+- Page components in /src/app/(group)/route/page.tsx — keep thin, delegate to components
+- Feature components in /src/components/[feature]/
+- Shared/reusable components in /src/components/shared/
+- Server actions in /src/server/actions/[entity].ts
+- Business logic services in /src/server/services/
+- Database schema split by entity in /src/db/schema/
+- Shared validators in /src/lib/validators.ts
+- Constants (CPT codes, modifiers) in /src/lib/constants.ts
