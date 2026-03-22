@@ -8,11 +8,13 @@ import type {
   PayerOption,
 } from "@/server/queries/clients";
 import type { AuthorizationListItem } from "@/server/queries/authorizations";
+import type { SessionListItem } from "@/server/queries/sessions";
 import { ClientOverview } from "./client-overview";
 import { ClientForm } from "./client-form";
 import { ClientContactsCard } from "./client-contacts-card";
 import { ClientInsuranceCard } from "./client-insurance-card";
 import { ClientAuthorizationsCard } from "./client-authorizations-card";
+import { ClientSessionsCard } from "./client-sessions-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function ClientDetail({
@@ -22,6 +24,7 @@ export function ClientDetail({
   insurance,
   payerOptions,
   authorizations,
+  sessions,
   canEdit,
   canManagePayers,
   bcbaName,
@@ -32,6 +35,7 @@ export function ClientDetail({
   insurance: ClientInsuranceWithPayer[];
   payerOptions: PayerOption[];
   authorizations: AuthorizationListItem[];
+  sessions: SessionListItem[];
   canEdit: boolean;
   canManagePayers: boolean;
   bcbaName: string | null;
@@ -52,6 +56,7 @@ export function ClientDetail({
           client={client}
           contacts={contacts}
           insurance={insurance}
+          authorizations={authorizations}
           bcbaName={bcbaName}
         />
       </TabsContent>
@@ -80,9 +85,7 @@ export function ClientDetail({
       </TabsContent>
 
       <TabsContent value="sessions" className="pt-4">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-muted-foreground text-xs">Session history coming in Sprint 3A.</p>
-        </div>
+        <ClientSessionsCard sessions={sessions} clientId={client.id} canEdit={canEdit} />
       </TabsContent>
 
       {canEdit && (

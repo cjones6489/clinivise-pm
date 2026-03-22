@@ -363,3 +363,38 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 export const ROLE_HIERARCHY = ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"] as const;
+
+// ── Session Status Labels & Variants ────────────────────────────────────────
+
+export const SESSION_STATUS_LABELS: Record<SessionStatus, string> = {
+  scheduled: "Scheduled",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  no_show: "No Show",
+  flagged: "Flagged",
+};
+
+export const SESSION_STATUS_VARIANT: Record<
+  SessionStatus,
+  "default" | "secondary" | "outline" | "destructive"
+> = {
+  scheduled: "secondary",
+  completed: "default",
+  cancelled: "outline",
+  no_show: "destructive",
+  flagged: "destructive",
+};
+
+// ── Valid Session Status Transitions ────────────────────────────────────────
+
+export const VALID_SESSION_TRANSITIONS: Record<SessionStatus, readonly SessionStatus[]> = {
+  scheduled: ["completed", "cancelled", "no_show"],
+  completed: ["cancelled", "flagged"],
+  cancelled: [],
+  no_show: [],
+  flagged: ["completed", "cancelled"],
+};
+
+// ── RBT Supervised CPT Codes (require supervisor for billing) ───────────────
+
+export const RBT_SUPERVISED_CPT_CODES = ["97152", "97153", "97154"] as const;

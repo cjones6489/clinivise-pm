@@ -38,6 +38,8 @@ export const sessions = pgTable(
     units: integer("units").notNull(),
     placeOfService: text("place_of_service").notNull().default("12"),
     status: text("status").notNull().default("completed"),
+    actualMinutes: integer("actual_minutes"),
+    unitCalcMethod: text("unit_calc_method"),
     notes: text("notes"),
     claimId: text("claim_id"),
     // Note: FK to claims.id intentionally omitted here due to circular import

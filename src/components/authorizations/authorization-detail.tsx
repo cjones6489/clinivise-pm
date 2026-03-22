@@ -2,7 +2,9 @@
 
 import type { AuthorizationWithServices, ClientOption } from "@/server/queries/authorizations";
 import type { ClientInsuranceOption, AuthorizationOption } from "@/server/queries/authorizations";
+import type { SessionListItem } from "@/server/queries/sessions";
 import { AuthorizationForm } from "./authorization-form";
+import { AuthSessionsCard } from "./auth-sessions-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { utilizationPercent } from "@/lib/utils";
 import {
@@ -17,12 +19,14 @@ export function AuthorizationDetail({
   clientOptions,
   insuranceOptions,
   authorizationOptions,
+  sessions,
   canEdit,
 }: {
   authorization: AuthorizationWithServices;
   clientOptions: ClientOption[];
   insuranceOptions: ClientInsuranceOption[];
   authorizationOptions: AuthorizationOption[];
+  sessions: SessionListItem[];
   canEdit: boolean;
 }) {
   return (
@@ -105,9 +109,7 @@ export function AuthorizationDetail({
       </TabsContent>
 
       <TabsContent value="sessions" className="pt-4">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-muted-foreground text-xs">Session history coming in Sprint 3A.</p>
-        </div>
+        <AuthSessionsCard sessions={sessions} clientId={authorization.clientId} canEdit={canEdit} />
       </TabsContent>
 
       <TabsContent value="documents" className="pt-4">

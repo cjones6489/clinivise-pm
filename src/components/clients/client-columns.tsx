@@ -34,21 +34,28 @@ export function getClientColumns(opts: {
   return [
     {
       id: "name",
-      accessorFn: (row) => `${row.lastName}, ${row.firstName}`,
-      header: "Name",
-      cell: ({ getValue }) => <span className="font-medium">{getValue<string>()}</span>,
-    },
-    {
-      accessorKey: "dateOfBirth",
-      header: "DOB",
-      cell: ({ getValue }) => {
-        const dob = getValue<string>();
+      accessorFn: (row) => `${row.lastName} ${row.firstName}`,
+      header: "Client",
+      cell: ({ row }) => {
+        const { firstName, lastName, dateOfBirth, diagnosisCode } = row.original;
         return (
-          <span className="tabular-nums">
-            {formatDate(dob)} ({calculateAge(dob)})
-          </span>
+          <div>
+            <div className="font-medium">
+              {firstName} {lastName}
+            </div>
+            <div className="text-muted-foreground text-[11px]">
+              DOB: {formatDate(dateOfBirth)} · {diagnosisCode ?? "F84.0"}
+            </div>
+          </div>
         );
       },
+    },
+    {
+      id: "age",
+      header: "Age",
+      cell: ({ row }) => (
+        <span className="tabular-nums">{calculateAge(row.original.dateOfBirth)}</span>
+      ),
     },
     {
       accessorKey: "status",
@@ -67,32 +74,39 @@ export function getClientColumns(opts: {
       header: "BCBA",
       cell: ({ row }) => {
         const { bcbaLastName, bcbaFirstName } = row.original;
-        return bcbaLastName ? `${bcbaLastName}, ${bcbaFirstName}` : "—";
+        if (!bcbaLastName) return <span className="text-muted-foreground">—</span>;
+        return (
+          <span>
+            {bcbaFirstName} {bcbaLastName}
+          </span>
+        );
       },
     },
     {
       id: "actions",
       header: "",
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
-              <span className="sr-only">Actions</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => opts.onView(row.original)}>View</DropdownMenuItem>
-            {opts.onArchive && (
-              <DropdownMenuItem
-                onClick={() => opts.onArchive!(row.original)}
-                className="text-destructive focus:text-destructive"
-              >
-                Archive
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
+                <span className="sr-only">Actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => opts.onView(row.original)}>View</DropdownMenuItem>
+              {opts.onArchive && (
+                <DropdownMenuItem
+                  onClick={() => opts.onArchive!(row.original)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  Archive
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       ),
     },
   ];

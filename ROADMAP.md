@@ -192,20 +192,40 @@ Key fixes applied across all audit rounds:
 - Prettier: formatted 77 files across entire codebase
 - Vitest config: created `vitest.config.ts` with `@/` path alias
 
-### 2D — Authorizations
+### 2D-1 — Authorization CRUD
 
-| #   | Task                                                        | Files                                                 | Status |
-| --- | ----------------------------------------------------------- | ----------------------------------------------------- | ------ |
-| 76  | Authorization list page (filterable, expiry alerts)         | `src/app/(dashboard)/authorizations/page.tsx`         | `[ ]`  |
-| 77  | Authorization table component                               | `src/components/authorizations/auth-table.tsx`        | `[ ]`  |
-| 78  | Authorization create/edit form                              | `src/components/authorizations/auth-form.tsx`         | `[ ]`  |
-| 79  | Authorization detail page (services, utilization, docs)     | `src/app/(dashboard)/authorizations/[id]/page.tsx`    | `[ ]`  |
-| 80  | Authorization service lines (add CPT code + approved units) | `src/components/authorizations/auth-services.tsx`     | `[ ]`  |
-| 81  | Utilization tracker (used vs approved, visual bar)          | `src/components/authorizations/auth-utilization.tsx`  | `[ ]`  |
-| 82  | Expiry alert card                                           | `src/components/authorizations/auth-expiry-alert.tsx` | `[ ]`  |
-| 83  | Authorization server actions (CRUD + utilization calc)      | `src/server/actions/authorizations.ts`                | `[ ]`  |
-| 84  | Authorization Zod validators                                | `src/lib/validators/authorizations.ts`                | `[ ]`  |
-| 85  | Authorization read queries                                  | `src/server/queries/authorizations.ts`                | `[ ]`  |
+> Foundation: list, create, detail, service lines. Follows Providers (2A) and Clients (2B) patterns.
+
+| #   | Task | Files | Status |
+| --- | ---- | ----- | ------ |
+| 76  | Schema migration: add `previousAuthorizationId` (self-ref FK), `ratePerUnit` (numeric 10,2) on auth_services | `drizzle/0004_sprint_2d_auth_enhancements.sql` | `[ ]` |
+| 77  | Authorization constants (status labels, status variants, CPT code options for select) | `src/lib/constants.ts` | `[ ]` |
+| 78  | Authorization Zod validators (create, update, service line create/update) | `src/lib/validators/authorizations.ts` | `[ ]` |
+| 79  | Authorization read queries (list with client+payer JOIN, detail with service lines, client-scoped list) | `src/server/queries/authorizations.ts` | `[ ]` |
+| 80  | Authorization server actions (create with service lines, update, archive/soft-delete) | `src/server/actions/authorizations.ts` | `[ ]` |
+| 81  | Authorization service line server actions (add, update, remove) | `src/server/actions/authorization-services.ts` | `[ ]` |
+| 82  | Authorization list page (DataTable, status filter, client search, payer filter) | `src/app/(dashboard)/authorizations/page.tsx` | `[ ]` |
+| 83  | Authorization table + columns (status badge, client name, payer, date range, service line count) | `src/components/authorizations/auth-table.tsx`, `auth-columns.tsx` | `[ ]` |
+| 84  | Authorization create page + form (client selector → auto-populate payer/insurance, date range, diagnosis, service lines inline) | `src/app/(dashboard)/authorizations/new/page.tsx`, `src/components/authorizations/auth-form.tsx` | `[ ]` |
+| 85  | Authorization service line manager component (add/edit/remove CPT lines with approved units, rate per unit) | `src/components/authorizations/auth-service-lines.tsx` | `[ ]` |
+| 86  | Authorization detail page (header card + service lines table + placeholder tabs for sessions/documents/history) | `src/app/(dashboard)/authorizations/[id]/page.tsx`, `src/components/authorizations/auth-detail.tsx` | `[ ]` |
+| 87  | Authorization status badge component (reusable, follows CLIENT_STATUS_VARIANT pattern) | `src/components/authorizations/auth-status-badge.tsx` | `[ ]` |
+| 88  | Client detail: wire Authorizations tab (filtered auth list for this client) | `src/components/clients/client-detail.tsx` | `[ ]` |
+| 89  | Unit tests: authorization validators, service line validators | `src/lib/validators/authorizations.test.ts` | `[ ]` |
+
+### 2D-2 — Authorization Intelligence (visual layer)
+
+> Utilization tracking and expiry alerts. Only features that work with auth data alone (no session dependency).
+
+| #   | Task | Files | Status |
+| --- | ---- | ----- | ------ |
+| 90  | Utilization bar component (reusable, color-coded: emerald <80%, amber 80-95%, red >95%, remaining units text) | `src/components/shared/utilization-bar.tsx` | `[ ]` |
+| 91  | Add inline utilization mini-bars to auth list table columns | `src/components/authorizations/auth-columns.tsx` | `[ ]` |
+| 92  | Auth detail: per-service-line utilization bars on detail page | `src/components/authorizations/auth-detail.tsx` | `[ ]` |
+| 93  | Auth detail: header card (status, dates, payer, client, diagnosis, days remaining, overall utilization) | `src/components/authorizations/auth-header-card.tsx` | `[ ]` |
+| 94  | Expiry badge column on auth list + sort by days-until-expiry | `src/components/authorizations/auth-columns.tsx` | `[ ]` |
+| 95  | Expiry alert banner on auth detail page (30/14/7-day thresholds, severity-coded) | `src/components/authorizations/auth-detail.tsx` | `[ ]` |
+| 96  | Client detail: auth status dot in header (amber if any auth expiring <14d or >95% utilized, red if expired/exhausted) | `src/components/clients/client-detail.tsx` | `[ ]` |
 
 ---
 
@@ -213,30 +233,40 @@ Key fixes applied across all audit rounds:
 
 ### 3A — Session Logging
 
-| #   | Task                                                               | Files                                        | Status |
-| --- | ------------------------------------------------------------------ | -------------------------------------------- | ------ |
-| 77  | Session log form (provider, client, CPT, units, POS, date/time)    | `src/components/sessions/session-form.tsx`   | `[ ]`  |
-| 78  | Auto-calculate units from start/end time (CMS 8-min rule)          | Built into session form + `calculateUnits()` | `[ ]`  |
-| 79  | Auto-populate modifier codes from provider credential type         | Built into session form                      | `[ ]`  |
-| 80  | Auth enforcement: warn/block if exceeding authorized units         | Built into session form                      | `[ ]`  |
-| 81  | Session list page with filters (date, provider, client, status)    | `src/app/(dashboard)/sessions/page.tsx`      | `[ ]`  |
-| 82  | Session table component                                            | `src/components/sessions/session-table.tsx`  | `[ ]`  |
-| 83  | New session page                                                   | `src/app/(dashboard)/sessions/new/page.tsx`  | `[ ]`  |
-| 84  | Auto-decrement auth utilization on session save (atomic increment) | `src/server/actions/sessions.ts`             | `[ ]`  |
-| 85  | Session server actions (CRUD)                                      | `src/server/actions/sessions.ts`             | `[ ]`  |
-| 86  | Session Zod validators                                             | `src/lib/validators/sessions.ts`             | `[ ]`  |
-| 87  | Session read queries                                               | `src/server/queries/sessions.ts`             | `[ ]`  |
+| #   | Task | Files | Status |
+| --- | ---- | ----- | ------ |
+| S1  | Session Zod validators (create, update, with date/time/unit refinements) | `src/lib/validators/sessions.ts` | `[ ]` |
+| S2  | Session read queries (list with client+provider+auth JOINs, detail) | `src/server/queries/sessions.ts` | `[ ]` |
+| S3  | Session server actions (create with atomic auth unit decrement, update, cancel) | `src/server/actions/sessions.ts` | `[ ]` |
+| S4  | Session log form (provider, client, CPT, units, POS, date/time, auth picker) | `src/components/sessions/session-form.tsx` | `[ ]` |
+| S5  | Auto-calculate units from start/end time (CMS 8-min rule via `calculateUnits()`) | Built into session form | `[ ]` |
+| S6  | Auto-populate modifier codes from provider credential type | Built into session form | `[ ]` |
+| S7  | Card-based auth picker in session form (FIFO auto-select, visible utilization, manual override) | `src/components/sessions/auth-picker.tsx` | `[ ]` |
+| S8  | Auth enforcement: warn if nearing limit, block if exceeding authorized units | Built into session form | `[ ]` |
+| S9  | Session list page with filters (date, provider, client, status) | `src/app/(dashboard)/sessions/page.tsx` | `[ ]` |
+| S10 | Session table + columns (date, client, provider, CPT, units, status) | `src/components/sessions/session-table.tsx`, `session-columns.tsx` | `[ ]` |
+| S11 | New session page | `src/app/(dashboard)/sessions/new/page.tsx` | `[ ]` |
+| S12 | Client detail: wire Sessions tab (filtered session list for this client) | `src/components/clients/client-detail.tsx` | `[ ]` |
+| S13 | Auth detail: wire Sessions tab (sessions logged against this auth) | `src/components/authorizations/auth-detail.tsx` | `[ ]` |
+| S14 | Unit tests: session validators, unit calculation edge cases | `src/lib/validators/sessions.test.ts` | `[ ]` |
 
-### 3B — Dashboard Overview
+### 3B — Dashboard + Auth Intelligence (requires session data)
 
-| #   | Task                                                     | Files                                                 | Status |
-| --- | -------------------------------------------------------- | ----------------------------------------------------- | ------ |
-| 88  | Dashboard overview page                                  | `src/app/(dashboard)/overview/page.tsx`               | `[ ]`  |
-| 89  | Metrics cards (sessions this week, active clients, etc.) | `src/components/dashboard/metrics-cards.tsx`          | `[ ]`  |
-| 90  | Expiring authorizations widget                           | `src/components/dashboard/expiring-auths-widget.tsx`  | `[ ]`  |
-| 91  | Utilization warning alerts (80%/95% thresholds)          | `src/components/dashboard/utilization-alerts.tsx`     | `[ ]`  |
-| 92  | Recent sessions widget                                   | `src/components/dashboard/recent-sessions-widget.tsx` | `[ ]`  |
-| 93  | Dashboard read queries (aggregations)                    | `src/server/queries/dashboard.ts`                     | `[ ]`  |
+> Dashboard overview AND the auth intelligence features that depend on session history (burndown, pacing, revenue-at-risk). These were deferred from 2D-2 because they show empty data without sessions.
+
+| #   | Task | Files | Status |
+| --- | ---- | ----- | ------ |
+| 97  | Schema migration: add `ratePerUnit` (numeric 10,2, nullable) to `authorization_services` | `drizzle/` | `[ ]` |
+| 98  | Dashboard overview page (Suspense streaming, staggered boundaries) | `src/app/(dashboard)/overview/page.tsx` | `[ ]` |
+| 99  | Metrics cards (sessions this week, active clients, active auths, providers) | `src/components/dashboard/metrics-cards.tsx` | `[ ]` |
+| 100 | Expiring authorizations widget (7/14/30d pipeline, severity-sorted) | `src/components/dashboard/expiring-auths-widget.tsx` | `[ ]` |
+| 101 | Utilization warning alerts widget (80%/95%/100%+ thresholds across all auths) | `src/components/dashboard/utilization-alerts.tsx` | `[ ]` |
+| 102 | Recent sessions widget | `src/components/dashboard/recent-sessions-widget.tsx` | `[ ]` |
+| 103 | Dashboard read queries (aggregations, alert detection) | `src/server/queries/dashboard.ts` | `[ ]` |
+| 104 | Predictive burndown on auth detail ("At current pace, exhausts on [date]") — uses session burn rate | `src/components/authorizations/auth-detail.tsx` | `[ ]` |
+| 105 | Under-utilization pacing alert (<50% used with >50% period elapsed) — uses session history | `src/components/authorizations/auth-detail.tsx` | `[ ]` |
+| 106 | Revenue-at-risk calculation ((approved - used) × ratePerUnit for auths expiring within 30d) | `src/server/queries/dashboard.ts` | `[ ]` |
+| 107 | Auth health composite score (utilization pacing + expiry proximity + gap risk) | `src/server/queries/authorization-alerts.ts` | `[ ]` |
 
 ---
 

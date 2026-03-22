@@ -83,13 +83,16 @@ function DataTableRenderer<TData>({
   return (
     <div className="space-y-3">
       {children}
-      <div className="border-border rounded-lg border">
+      <div className="fade-in border-border bg-card overflow-hidden rounded-xl border shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted/50">
+              <TableRow key={headerGroup.id} className="bg-muted/40 hover:bg-muted/40">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="px-3 py-2 text-xs font-semibold">
+                  <TableHead
+                    key={header.id}
+                    className="text-muted-foreground px-3 py-2.5 text-[11px] font-semibold tracking-wide uppercase"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -101,9 +104,12 @@ function DataTableRenderer<TData>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className="hover:bg-accent/50 cursor-default transition-colors"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-3 py-2 text-xs">
+                    <TableCell key={cell.id} className="px-3 py-2.5 text-xs">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -113,7 +119,7 @@ function DataTableRenderer<TData>({
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="text-muted-foreground h-24 text-center text-xs"
+                  className="text-muted-foreground h-32 text-center text-xs"
                 >
                   No results.
                 </TableCell>

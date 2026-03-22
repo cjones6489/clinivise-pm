@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/layout/page-header";
+import { requireAuth } from "@/lib/auth";
+import { getClients } from "@/server/queries/clients";
+import { getAuthorizations } from "@/server/queries/authorizations";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
 
 export const metadata: Metadata = {
   title: "Overview | Clinivise",
 };
 
-export default function OverviewPage() {
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Dashboard"
-        description="Good morning — here's what needs attention today."
-      />
-      <div className="border-border flex items-center justify-center rounded-lg border border-dashed p-12">
-        <p className="text-muted-foreground text-xs">Dashboard widgets coming in Sprint 3.</p>
-      </div>
-    </div>
-  );
+export default async function OverviewPage() {
+  const user = await requireAuth();
+
+  const [clients, authorizations] = await Promise.all([
+    getClients(user.organizationId),
+    getAuthorizations(user.organizationId),
+  ]);
+
+  return <DashboardView clients={clients} authorizations={authorizations} />;
 }

@@ -2,6 +2,123 @@
 
 > This file is loaded by the `/design` skill. It contains concrete tokens, spacing rules, and component patterns. All values come from the project's `globals.css` (shadcn Mira style) and `components.json`.
 
+## Page Design Framework (READ FIRST)
+
+**Before writing ANY page or component code, answer these questions. This is not optional.**
+
+### 1. Who is on this page and what are they trying to do?
+Identify the persona (RBT, BCBA, billing staff, admin). What did they just do before arriving here? What's the task they're trying to complete? What's their most likely *next* action after this page?
+
+### 2. What's the hero moment?
+Every page needs ONE piece of information or action that's visually dominant. Not a form. Not a table header. The single thing the user cares about most.
+- **Dashboard**: Today's action items count
+- **Client detail**: The client's key stats (age, diagnosis, auth status) at a glance
+- **Client list**: The table with rich, scannable rows
+- **Authorization**: Utilization progress bars
+- **Session form**: The auto-calculated units display
+
+### 3. What actions belong on this page?
+What does the user DO from here? Put the primary action in a visible button. Don't make users navigate elsewhere to perform the obvious next step.
+- Client detail → "Log Session", "Upload Auth Letter"
+- Session list → "Log Session"
+- Authorization detail → "Renew", "Add Service"
+
+### 4. What's the information hierarchy?
+Assign every element to one of three visual tiers:
+- **Primary** (what the eye hits first): Hero numbers (`text-2xl font-bold`), page titles, primary action buttons, status badges
+- **Secondary** (supporting context): Section cards with title bars, key-value pairs, table columns
+- **Tertiary** (metadata): Timestamps, IDs, muted helper text (`text-muted-foreground`)
+
+Three tiers. No more. If everything is the same weight, nothing stands out.
+
+### 5. Reference the wireframe
+Check `docs/design/clinivise-wireframes.jsx` for the page you're building. The wireframe shows the *intended layout, data density, and visual hierarchy*. Match its structure — metric card rows, section card grids, key-value pairs, action button placement — even if the exact data differs.
+
+## Visual Quality Standards
+
+These rules prevent generic, mechanical UI output. Every page should feel intentionally designed, not auto-generated.
+
+### Section Cards (not naked headings)
+Every group of related information gets a card with a titled header bar containing the section name and an optional action. Never use a bare `<h3>` followed by loose content — always wrap in a bordered card with a header row.
+
+```tsx
+// GOOD: Section card with title bar
+<div className="overflow-hidden rounded-lg border border-border bg-card">
+  <div className="flex items-center justify-between border-b border-border/40 px-4 py-3">
+    <span className="text-[13px] font-semibold">Insurance</span>
+    <Button size="sm" variant="ghost">Edit</Button>
+  </div>
+  <div className="p-4">{content}</div>
+</div>
+
+// BAD: Naked heading with loose content
+<h3 className="text-sm font-semibold">Insurance</h3>
+<div>{content}</div>
+```
+
+### Metric Cards (for key numbers)
+Use uppercase labels, large bold values, and subtle sub-text. This pattern creates the "dashboard" feel.
+
+```tsx
+<div className="rounded-lg border border-border bg-card px-4 py-3.5">
+  <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+    {label}
+  </div>
+  <div className="mt-1 text-2xl font-bold tracking-tight tabular-nums">
+    {value}
+  </div>
+  <div className="mt-0.5 text-[11px] text-muted-foreground">{subtitle}</div>
+</div>
+```
+
+### Key-Value Pairs (for detail views)
+When DISPLAYING information (not editing), use horizontal rows with muted labels left and values right, separated by subtle bottom borders. Far more scannable than disabled form inputs.
+
+```tsx
+<div className="flex items-baseline justify-between border-b border-border/40 py-[5px] last:border-0">
+  <span className="text-[13px] text-muted-foreground">{label}</span>
+  <span className="text-[13px] font-medium">{value}</span>
+</div>
+```
+
+### Rich Table Rows
+Table rows should show contextual data inline — not just the field name. Combine primary + secondary info in the same cell.
+
+```tsx
+// GOOD: Rich table cell with inline context
+<div>
+  <div className="font-medium">Ethan Miller</div>
+  <div className="text-[11px] text-muted-foreground">DOB: Mar 15, 2018 · F84.0</div>
+</div>
+
+// BAD: Just the name
+<span>Ethan Miller</span>
+```
+
+### Avatar Initials (for people)
+Show initials in a colored square for providers, guardians, and team members. Creates visual rhythm and makes lists scannable.
+
+```tsx
+<div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-[13px] font-semibold text-primary">
+  SC
+</div>
+```
+
+### Progress Bars (for utilization)
+Color-coded by threshold. Always show the label and percentage alongside the bar.
+
+### Page Headers
+Match the wireframe pattern: large bold name, subtitle line with contextual metadata (DOB, age, diagnosis), optional second line (guardian info), badges on the right.
+
+## Anti-Patterns That Create "Generic AI" UI
+
+- **Form-as-overview**: Showing a form with disabled inputs instead of a designed read-only view. Use key-value pairs and section cards for display, reserve forms for the Edit action.
+- **Naked data**: Dumping fields on a page without visual grouping, hierarchy, or context. Every piece of data needs a home in a section card.
+- **Missing actions**: Pages that display data but give no way to act on it. Every page needs at least one contextual action button.
+- **Flat tables**: Table rows with 3-4 plain text columns when the wireframe shows rich cells with inline badges, metadata, and status indicators.
+- **Placeholder stubs**: "Coming in Sprint X" messages in dashed borders. If a section isn't built yet, either omit it entirely or show a designed empty state with an icon and helpful text.
+- **Uniform visual weight**: Every element at `text-xs text-muted-foreground`. Create contrast between primary numbers, secondary labels, and tertiary metadata.
+
 ## Configuration
 
 - **Style**: radix-mira (ultra-compact, data-dense)

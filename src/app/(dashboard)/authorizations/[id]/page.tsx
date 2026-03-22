@@ -8,6 +8,7 @@ import {
   getClientInsuranceOptions,
   getAuthorizationOptions,
 } from "@/server/queries/authorizations";
+import { getAuthorizationSessions } from "@/server/queries/sessions";
 import { PageHeader } from "@/components/layout/page-header";
 import { AuthorizationDetail } from "@/components/authorizations/authorization-detail";
 import { AuthStatusBadge } from "@/components/authorizations/auth-status-badge";
@@ -33,10 +34,11 @@ export default async function AuthorizationDetailPage({
     notFound();
   }
 
-  const [clientOptions, insuranceOptions, authorizationOptions] = await Promise.all([
+  const [clientOptions, insuranceOptions, authorizationOptions, sessions] = await Promise.all([
     canEdit ? getClientOptions(user.organizationId) : Promise.resolve([]),
     getClientInsuranceOptions(user.organizationId, authorization.clientId),
     getAuthorizationOptions(user.organizationId, authorization.clientId),
+    getAuthorizationSessions(user.organizationId, id),
   ]);
 
   return (
@@ -65,6 +67,7 @@ export default async function AuthorizationDetailPage({
         clientOptions={clientOptions}
         insuranceOptions={insuranceOptions}
         authorizationOptions={authorizationOptions}
+        sessions={sessions}
         canEdit={canEdit}
       />
     </div>

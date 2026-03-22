@@ -43,7 +43,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <AppSidebar userRole={user.role} />
       <SidebarInset>
         <Header />
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 bg-background p-4 md:p-6">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

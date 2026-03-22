@@ -7,6 +7,22 @@ globs: src/components/**, src/app/**
 
 > Clinivise's UI is a core competitive advantage. ABA practitioners hate their current tools (CentralReach, AlohaABA) — we win by being fast, clean, and consistent. For full design guidance, see `/design` skill and `.claude/skills/design/references/design-system.md`.
 
+## Workflow-First Design (MANDATORY)
+
+Before building any page component, answer these questions (not optional):
+1. **Who** is on this page and what are they trying to do?
+2. **What's the hero moment** — the ONE visually dominant element?
+3. **What actions** belong on this page? Add contextual action buttons.
+4. **What's the information hierarchy** — primary/secondary/tertiary visual weight?
+5. **Does the wireframe** (`docs/design/clinivise-wireframes.jsx`) show a layout for this page? Match it.
+
+Never build a page that's just a form or a bare table. Every page needs:
+- A rich header with contextual metadata (not just a title)
+- Section cards with title bars (not naked headings)
+- Key-value pairs for detail display (not disabled form inputs)
+- Metric cards for important numbers
+- At least one contextual action button
+
 ## Design System Enforcement
 
 - ONLY use semantic color tokens (`bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, etc.) — never hardcode `text-white`, `bg-black`, `text-gray-500`

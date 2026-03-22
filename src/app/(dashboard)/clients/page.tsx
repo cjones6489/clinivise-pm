@@ -23,7 +23,7 @@ export default async function ClientsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Clients"
-        description="Manage your practice's clients and their information."
+        description={`${clients.length} client${clients.length !== 1 ? "s" : ""} in your practice`}
         actions={
           canCreate ? (
             <Button asChild size="sm" className="text-xs">

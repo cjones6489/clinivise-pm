@@ -4,6 +4,35 @@ ABA therapy practice management & AI-native billing platform. HIPAA-compliant, m
 
 @AGENTS.md
 
+## Development Philosophy: Workflow-First
+
+**The interface IS the product.** Backend and frontend are not separate phases — they are two sides of the same user workflow, designed together.
+
+### How we build features
+
+Every feature follows this sequence. Steps 1-2 happen BEFORE any code is written.
+
+**Step 1 — User Story**: Who does what, when, and why? Write a concrete scenario.
+> *"A BCBA opens a client's page Monday morning to check if their authorization is running low before scheduling this week's sessions."*
+
+**Step 2 — Page Design**: What do they see? What do they click? What data appears where? Reference the wireframe (`docs/design/clinivise-wireframes.jsx`) for layout patterns. Describe:
+- The page layout (metric cards, section cards, tables, action buttons)
+- The information hierarchy (what's the hero moment? what's secondary? what's metadata?)
+- The user's primary and secondary actions from this page
+- All states: empty, loading, populated, error, edge cases
+
+**Step 3 — Data & Actions**: What schema, queries, and mutations power the page design from Step 2? The schema serves the UI, not the other way around.
+
+**Step 4 — Build**: Implement schema + actions + UI as one integrated vertical slice. The page component is not an afterthought — it's built WITH the same care as the data layer.
+
+### Why this order matters
+
+When you start with the schema and "slap a form on top," you get a database admin panel. When you start with the user's workflow, the schema naturally follows and the UI reflects actual usage patterns. Jeff Atwood: *"Before writing a single line of code, you need to have a clear idea of what the user interface will look like first."*
+
+### Design quality standard
+
+Every page must have: a rich header with contextual metadata, section cards with title bars (not naked headings), key-value pairs for detail display (not disabled form inputs), metric cards for important numbers, at least one contextual action button, and three tiers of visual hierarchy. See `.claude/skills/design/references/design-system.md` for the full Page Design Framework.
+
 ## Tech Stack
 
 | Layer | Technology | Notes |
@@ -98,8 +127,10 @@ src/
 ## Documentation
 
 All project docs are indexed in `docs/INDEX.md`. Key references:
-- `docs/engineering-spec.md` — Full DB schema, config files, task breakdown
-- `docs/research-spec.md` — Technology decisions, pricing, ABA billing codes, HIPAA analysis
+- `docs/specs/product-spec.md` — **Page-by-page product spec.** Every page defined with user stories, layouts, data requirements, actions, and MVP scope. **Read the relevant page entry before building or redesigning any page.**
+- `docs/design/clinivise-wireframes.jsx` — Interactive wireframes showing intended page layouts, data density, and visual hierarchy. **Reference this alongside the product spec.**
+- `docs/specs/engineering-spec.md` — Full DB schema, config files, task breakdown
+- `docs/specs/research-spec.md` — Technology decisions, pricing, ABA billing codes, HIPAA analysis
 - `ROADMAP.md` — Phase 1 working roadmap with task tracking
 
 ## MCP Servers

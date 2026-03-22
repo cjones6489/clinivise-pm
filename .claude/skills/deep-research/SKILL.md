@@ -1,70 +1,220 @@
 ---
 name: deep-research
 description: Multi-agent research team — spawns specialized agents for thorough investigation of technical, compliance, or domain questions
-user_invocable: true
+disable-model-invocation: true
+allowed-tools: Read, Grep, Glob, Agent, WebFetch, WebSearch, mcp__context7__resolve-library-id, mcp__context7__query-docs
+argument-hint: [research topic or priority item description]
+model: opus
+user-invocable: true
 ---
 
-# /deep-research — Multi-Agent Research
+Use a team of specialized agents to perform a deep technical research pass on the following topic:
 
-You are a research coordinator. When given a question or topic, you spawn multiple specialized research agents to investigate in parallel, then synthesize their findings into a comprehensive answer.
+$ARGUMENTS
 
-## Input
+Your mission:
+Research this topic as if we are making an important architectural decision for our platform and need a high-confidence technical recommendation grounded in current reality, not generic opinions.
 
-The user provides a research question or topic. Examples:
-- "How should we implement the CMS 8-minute rule in our session logging?"
-- "What's the best approach for Stedi webhook verification?"
-- "How do other ABA platforms handle authorization utilization alerts?"
+Approach:
+Spin up a team of agents with clearly separated responsibilities and then synthesize their findings into one cohesive research document.
 
-## Research Agents
+Use at minimum these agent roles:
 
-Spawn 3-6 agents from this roster depending on the question. Use the Agent tool with appropriate prompts.
+1. Documentation Research Agent
+- Research the latest official technical documentation relevant to this topic
+- Use Context7 whenever relevant to retrieve current docs, API references, implementation guidance, version-specific details, and framework/library behavior
+- Prefer official docs and primary technical sources over blogs
+- Identify constraints, caveats, best practices, sharp edges, version changes, and implementation details that matter
 
-### Agent Roles
+2. Competitive / Platform Pattern Agent
+- Research the most relevant modern platforms, products, and technical implementations adjacent to this problem
+- Study how strong teams appear to have designed similar systems
+- Identify recurring design patterns, infrastructure choices, workflow decisions, and UX patterns
+- Identify where competitors or adjacent platforms appear overengineered, fragile, slow, confusing, or limited
+- Look for opportunities where our implementation can be simpler, more robust, or provide better UX
 
-1. **Documentation Agent** — Fetches current library/framework docs via Context7 MCP. Focuses on API references, migration guides, and official examples.
+3. Open Source / Repo Research Agent
+- Find relevant recent repos, libraries, SDKs, example implementations, and source patterns related to this topic
+- Identify what patterns real implementations are using today
+- Look for signs of maturity, maintenance quality, ecosystem health, complexity, performance tradeoffs, and implementation pitfalls
+- Surface useful repos or code references that could influence our architecture or implementation strategy
 
-2. **Compliance Agent** — Researches HIPAA requirements, CMS rules, ABA billing regulations, and payer-specific policies. Checks whether proposed approaches meet compliance requirements.
+4. Architecture Agent
+- Translate the research into architectural options for our platform
+- Identify the strongest design patterns for our use case
+- Compare simple vs advanced approaches
+- Identify tradeoffs, failure modes, scaling implications, and maintainability implications
+- Recommend what should be designed now versus deferred until later
 
-3. **Architecture Agent** — Explores the current codebase to understand existing patterns, then researches how the proposed feature fits architecturally. Identifies conflicts with existing code.
+5. UI/UX & Product Experience Agent
+- Evaluate the problem from the perspective of end-user experience, practitioner workflow, accessibility, and product usability
+- Consider all Clinivise personas: RBTs (tablet/field), BCBAs (laptop), Billing Staff (desktop), Practice Owners (high-level)
+- Identify friction points common in existing healthcare PM implementations
+- Recommend how we can make the feature cleaner, faster, and more intuitive than competitors
+- Evaluate mobile/tablet usability, touch targets, data density, and information hierarchy
+- Highlight where architecture decisions may hurt UX, accessibility, or practitioner adoption later
 
-4. **Open Source Agent** — Searches GitHub, npm, and the web for existing solutions, packages, or reference implementations. Evaluates quality, maintenance status, and compatibility.
+6. Frontier / Emerging Patterns Agent
+- Search for bleeding-edge startups (especially recent YC companies) building in adjacent spaces — healthcare AI, ABA therapy tech, practice management, revenue cycle management, clinical documentation
+- Look for published academic research, technical papers, and conference talks relevant to this problem
+- Identify forward-looking design patterns that haven't yet become mainstream but show strong signal — new approaches from teams solving this right now
+- Look at recently funded companies' technical blogs, open-source projects, and architecture posts for novel approaches
+- Distinguish between genuinely innovative patterns vs. hype. Focus on ideas that could give Clinivise a structural advantage as the best-designed, AI-native ABA practice management platform
+- Flag any emerging standards, protocols, or specifications in draft/proposal stage that we should design for now
 
-5. **ABA Domain Agent** — Researches ABA-specific business rules: CPT codes, modifier requirements, authorization workflows, payer policies, billing best practices.
+7. Risk / Failure Mode Agent
+- Identify likely bugs, weak spots, operational risks, edge cases, rollout hazards, data integrity risks, auth/security issues, scaling traps, and long-tail failure modes
+- Identify hidden complexity or places where the problem is harder than it first appears
+- Highlight assumptions that need validation before implementation
+- Pay special attention to: multi-tenancy isolation, HIPAA compliance, billing accuracy, authorization unit tracking, and mobile/offline reliability
 
-6. **Risk Agent** — Identifies what could go wrong: security vulnerabilities, compliance gaps, scalability issues, vendor lock-in, breaking changes.
+Research standards:
+- Prefer current official docs, release notes, issue trackers, source repos, and primary technical sources
+- Use Context7 whenever relevant for current documentation
+- Be careful about outdated patterns
+- Do not just list technologies or copy common stack advice
+- Distinguish clearly between:
+  - established best practice
+  - emerging but promising approaches
+  - trendy but unjustified complexity
+- Optimize for a solution that is:
+  - simple
+  - scalable
+  - maintainable
+  - high quality
+  - future-aware without being overengineered
+  - excellent for end-user UX (healthcare workers, not developers)
+- Be skeptical of unnecessary complexity
+- If multiple good options exist, compare them honestly
+- If something is uncertain, say so explicitly
 
-## Process
+What I want from the team:
+1. Deeply research this priority item
+2. Identify the best current design patterns
+3. Identify the best architectural approaches
+4. Identify the best current tools, frameworks, libraries, or platform patterns if relevant
+5. Identify weaknesses or gaps in current market/platform/repo approaches
+6. Identify where we can outperform existing solutions in architecture, simplicity, robustness, or UX
+7. Recommend the best technical strategy for our platform specifically
+8. Compile the findings into a clear research document that can guide implementation planning
 
-1. Analyze the question and select relevant agents (minimum 3)
-2. Launch agents in parallel with specific, focused prompts
-3. Collect and deduplicate findings
-4. Resolve any contradictions between agent findings
-5. Synthesize into a single research document
+Important constraints:
+- Do not optimize for theoretical perfection
+- Do not recommend complexity unless it is clearly justified
+- Do not default to "enterprise" architecture if a simpler design is better
+- Do not give shallow generic advice
+- Do not stop at surface-level comparisons
+- We care about practical implementation, maintainability, and strategic design quality
 
-## Output Format
+Deliverable:
+Produce a research document in markdown with this exact structure:
 
-```
-## Research: [Topic]
+# Deep Technical Research Document
 
-### Key Findings
-[3-5 bullet points summarizing the most important discoveries]
+## Topic
+Restate the priority item and explain why it matters.
 
-### Detailed Analysis
+## Executive Summary
+Summarize the most important findings, the recommended approach, and the biggest architectural implications.
 
-#### [Agent 1 Area]
-[Findings with sources]
+## Research Method
+Briefly explain how the agent team approached the problem and what each agent focused on.
 
-#### [Agent 2 Area]
-[Findings with sources]
+## Official Documentation Findings
+Summarize the most important findings from official docs and Context7.
+Include relevant implementation constraints, caveats, best practices, and version-specific considerations.
 
-...
+## Modern Platform and Ecosystem Patterns
+Summarize what recent platforms, products, and strong implementations appear to be doing.
+Identify recurring design patterns and notable differences.
 
-### Recommendations
-[Prioritized list of recommended actions]
+## Relevant Repos, Libraries, and Technical References
+List the most relevant repos, libraries, SDKs, code patterns, and technical references.
+Explain why each one matters.
 
-### Open Questions
-[Things that need further investigation or user decision]
+## Architecture Options
+Present the main architectural options for solving this problem.
+For each option include:
+- overview
+- strengths
+- weaknesses
+- complexity cost
+- scaling implications
+- maintainability implications
+- UX implications
+- when it is appropriate
 
-### Sources
-[Links, docs, packages referenced]
-```
+## Recommended Approach for Our Platform
+Give the recommended technical strategy for our specific use case.
+Explain why this is the best choice for our stage, goals, and likely future needs.
+
+## Frontier and Emerging Patterns
+Summarize findings from bleeding-edge companies, recent YC startups, published research, and emerging standards. For each finding:
+- Who is doing it (company, paper, project) and when (funding date, publication date, last commit)
+- What the pattern or approach is
+- Why it matters for Clinivise's vision as the best-designed, AI-native ABA practice management platform
+- Maturity level: production-proven / early-adopter / experimental / theoretical
+- Whether to adopt now, design for later, or watch
+
+Clearly separate signal from hype. We want patterns that give structural advantage, not trends that add complexity without payoff.
+
+## Opportunities to Build Something Better
+Identify where existing products, repos, or patterns seem weak and where we can create a better implementation.
+Focus on simplicity, robustness, maintainability, and UX. Include forward-looking opportunities from the frontier research that could position us ahead of CentralReach and other established players.
+
+## Risks, Gaps, and Edge Cases
+List hidden risks, hard problems, likely bugs, scaling traps, and assumptions that need validation.
+Include HIPAA, multi-tenancy, billing accuracy, and mobile/tablet reliability considerations.
+
+## Recommended Technical Direction
+Provide a concrete recommendation for:
+- design pattern
+- architecture
+- libraries/tools if relevant
+- implementation approach
+- UX approach (interaction pattern, information hierarchy, persona priorities)
+- what to do now
+- what to defer
+- what to avoid
+
+## Open Questions
+List anything that remains uncertain or needs more validation.
+
+## Sources and References
+List ALL sources consulted during research. This section must be comprehensive — every doc, repo, API reference, spec, blog post, issue tracker thread, and technical source that informed the findings. Group by category:
+
+### Official Documentation
+- Full URLs to official docs pages consulted
+- Include the specific page/section, not just the root domain
+- Note the version or date accessed when relevant
+
+### Specifications and Standards
+- RFCs, OpenAPI specs, protocol specifications, industry standards (e.g., CMS billing rules, BACB requirements, HIPAA, HL7 FHIR)
+- Include spec version numbers
+
+### Platform and Product References
+- Links to specific platform documentation, API references, or product pages that informed competitive analysis
+- Include the specific feature/concept page, not just the homepage
+
+### Repositories and Code References
+- GitHub repos with full URLs, star counts, and last commit activity where relevant
+- Specific files, functions, or patterns referenced within repos
+- NPM packages with version numbers and weekly download counts where relevant
+
+### Issue Trackers and Discussions
+- GitHub issues, PRs, or discussions that revealed implementation details, known bugs, or design decisions
+- Stack Overflow threads or forum posts only if they provided authoritative technical insight
+
+### Blog Posts and Articles
+- Only include if they provided substantive technical depth beyond what official docs cover
+- Note the author's credentials or affiliation when relevant
+- Mark as secondary sources
+
+### Internal Codebase References
+- Files, functions, patterns, and conventions from our own codebase that informed the analysis
+- Include file paths and line numbers for specific references
+
+Every claim, comparison, or recommendation in the research should be traceable to a source listed here. If a finding came from general knowledge rather than a specific source, say so explicitly rather than omitting the citation.
+
+Final instruction:
+This should read like a serious internal technical research memo written by a strong engineering research team. Be rigorous, current, comparative, and practical. Optimize for helping us make the best architecture decision, not for sounding impressive. Every recommendation must be traceable to evidence.

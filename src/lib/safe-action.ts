@@ -25,6 +25,11 @@ const USER_FACING_ERRORS = new Set([
   "Authorization not found",
   "Client insurance not found",
   "Cannot remove service lines that have recorded usage",
+  "Session not found",
+  "Invalid status transition",
+  "Cannot reverse more units than are recorded",
+  "Provider not active",
+  "Authorization service not found",
 ]);
 
 export const actionClient = createSafeActionClient({

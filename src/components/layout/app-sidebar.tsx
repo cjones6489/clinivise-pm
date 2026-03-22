@@ -37,30 +37,31 @@ const iconMap: Record<string, typeof DashboardSquare01Icon> = {
 export function AppSidebar({ userRole }: { userRole?: string }) {
   const pathname = usePathname();
 
-  // Filter nav items by role. Show all items if role not yet loaded (SSR/loading).
   const filteredItems = userRole
     ? navItems.filter((item) => item.roles.includes(userRole as (typeof item.roles)[number]))
     : navItems;
 
   return (
     <Sidebar>
-      <SidebarHeader className="border-border border-b px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold">
+      <SidebarHeader className="border-sidebar-border border-b px-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-500 text-sm font-bold text-white shadow-sm shadow-blue-400/20">
             C
           </div>
           <div>
-            <div className="text-sm font-semibold">Clinivise</div>
-            <p className="text-muted-foreground text-xs tracking-wider uppercase">
+            <div className="text-sm font-bold tracking-tight">Clinivise</div>
+            <p className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
               Practice Management
             </p>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="px-2 pt-2">
         <SidebarGroup>
-          <SidebarGroupLabel>Core</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-muted-foreground/70 mb-1 px-3 text-[10px] font-semibold tracking-widest uppercase">
+            Core
+          </SidebarGroupLabel>
           <SidebarMenu>
             {filteredItems.map((item) => {
               const Icon = iconMap[item.iconName];
@@ -68,10 +69,25 @@ export function AppSidebar({ userRole }: { userRole?: string }) {
 
               return (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={isActive}>
-                    <Link href={item.href}>
-                      {Icon && <HugeiconsIcon icon={Icon} size={16} strokeWidth={1.5} />}
-                      <span>{item.title}</span>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    className={
+                      isActive
+                        ? "h-9 bg-accent font-medium text-primary shadow-sm"
+                        : "h-9 text-sidebar-foreground/75 hover:bg-accent/50 hover:text-sidebar-foreground"
+                    }
+                  >
+                    <Link href={item.href} className="gap-3">
+                      {Icon && (
+                        <HugeiconsIcon
+                          icon={Icon}
+                          size={18}
+                          strokeWidth={isActive ? 2 : 1.5}
+                          className={isActive ? "text-primary" : ""}
+                        />
+                      )}
+                      <span className="text-sm">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -81,18 +97,17 @@ export function AppSidebar({ userRole }: { userRole?: string }) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-border border-t p-3">
-        <div className="flex items-center justify-between">
-          <OrganizationSwitcher
-            hidePersonal
-            appearance={{
-              elements: {
-                rootBox: "w-full",
-                organizationSwitcherTrigger: "w-full justify-start px-2 py-1.5 text-xs",
-              },
-            }}
-          />
-        </div>
+      <SidebarFooter className="border-sidebar-border border-t p-3">
+        <OrganizationSwitcher
+          hidePersonal
+          appearance={{
+            elements: {
+              rootBox: "w-full",
+              organizationSwitcherTrigger:
+                "w-full justify-start px-2 py-1.5 text-xs rounded-lg hover:bg-accent transition-colors",
+            },
+          }}
+        />
       </SidebarFooter>
     </Sidebar>
   );

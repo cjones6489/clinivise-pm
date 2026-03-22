@@ -10,6 +10,7 @@ import {
   getPayerOptions,
 } from "@/server/queries/clients";
 import { getClientAuthorizations } from "@/server/queries/authorizations";
+import { getClientSessions } from "@/server/queries/sessions";
 import { getProviderById } from "@/server/queries/providers";
 import { ClientDetail } from "@/components/clients/client-detail";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +38,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const canEdit = WRITE_ROLES.includes(user.role);
   const canManagePayers = ["owner", "admin"].includes(user.role);
 
-  const [client, contacts, bcbaOptions, insurance, payerOptions, authorizations] =
+  const [client, contacts, bcbaOptions, insurance, payerOptions, authorizations, sessions] =
     await Promise.all([
       getClientById(user.organizationId, id),
       getClientContacts(user.organizationId, id),
@@ -45,6 +46,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       getClientInsurance(user.organizationId, id),
       canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
       getClientAuthorizations(user.organizationId, id),
+      getClientSessions(user.organizationId, id),
     ]);
 
   if (!client) {
@@ -115,6 +117,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         insurance={insurance}
         payerOptions={payerOptions}
         authorizations={authorizations}
+        sessions={sessions}
         canEdit={canEdit}
         canManagePayers={canManagePayers}
         bcbaName={bcbaName}

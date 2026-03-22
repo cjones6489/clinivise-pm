@@ -1,0 +1,542 @@
+"use server";
+
+import { authActionClient } from "@/lib/safe-action";
+import {
+  createSessionSchema,
+  updateSessionSchema,
+  cancelSessionSchema,
+} from "@/lib/validators/sessions";
+import { idSchema } from "@/lib/validators";
+import { db } from "@/server/db";
+import {
+  sessions,
+  clients,
+  providers,
+  authorizationServices,
+  authorizations,
+} from "@/server/db/schema";
+import { eq, and, sql, lt, lte, gte, asc, isNull } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { z } from "zod/v4";
+import { logAudit } from "@/server/audit";
+import {
+  computeModifierCodes,
+  computeActualMinutes,
+  isValidStatusTransition,
+  computeCreateAccountingOps,
+  computeUpdateAccountingOps,
+  computeCancelAccountingOps,
+} from "@/lib/session-helpers";
+
+const WRITE_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt"];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+async function validateSessionForeignKeys(
+  orgId: string,
+  input: {
+    clientId: string;
+    providerId: string;
+    supervisorId?: string;
+    authorizationServiceId?: string;
+  },
+) {
+  const [client] = await db
+    .select({ id: clients.id })
+    .from(clients)
+    .where(
+      and(
+        eq(clients.id, input.clientId),
+        eq(clients.organizationId, orgId),
+        isNull(clients.deletedAt),
+      ),
+    )
+    .limit(1);
+
+  if (!client) throw new Error("Client not found");
+
+  const [provider] = await db
+    .select({
+      id: providers.id,
+      credentialType: providers.credentialType,
+      supervisorId: providers.supervisorId,
+      isActive: providers.isActive,
+    })
+    .from(providers)
+    .where(
+      and(
+        eq(providers.id, input.providerId),
+        eq(providers.organizationId, orgId),
+        isNull(providers.deletedAt),
+      ),
+    )
+    .limit(1);
+
+  if (!provider) throw new Error("Provider not found");
+  if (!provider.isActive) throw new Error("Provider not active");
+
+  if (input.supervisorId) {
+    const [supervisor] = await db
+      .select({ id: providers.id })
+      .from(providers)
+      .where(
+        and(
+          eq(providers.id, input.supervisorId),
+          eq(providers.organizationId, orgId),
+          isNull(providers.deletedAt),
+        ),
+      )
+      .limit(1);
+
+    if (!supervisor) throw new Error("Supervisor not found");
+  }
+
+  let authorizationId: string | null = null;
+
+  if (input.authorizationServiceId) {
+    const [authSvc] = await db
+      .select({
+        id: authorizationServices.id,
+        authorizationId: authorizationServices.authorizationId,
+        clientId: authorizations.clientId,
+      })
+      .from(authorizationServices)
+      .innerJoin(authorizations, eq(authorizationServices.authorizationId, authorizations.id))
+      .where(
+        and(
+          eq(authorizationServices.id, input.authorizationServiceId),
+          eq(authorizationServices.organizationId, orgId),
+        ),
+      )
+      .limit(1);
+
+    if (!authSvc) throw new Error("Authorization service not found");
+
+    // Verify auth belongs to the same client
+    if (input.clientId && authSvc.clientId !== input.clientId) {
+      throw new Error("Authorization service not found");
+    }
+
+    authorizationId = authSvc.authorizationId;
+  }
+
+  return { provider, authorizationId };
+}
+
+// ── Create Session ───────────────────────────────────────────────────────────
+
+export const createSession = authActionClient
+  .schema(createSessionSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    if (!WRITE_ROLES.includes(ctx.userRole)) {
+      throw new Error("Forbidden: insufficient role");
+    }
+
+    const { provider, authorizationId } = await validateSessionForeignKeys(
+      ctx.organizationId,
+      parsedInput,
+    );
+
+    // Auto-set supervisor from provider if RBT and not provided
+    let supervisorId = parsedInput.supervisorId ?? null;
+    if (
+      !supervisorId &&
+      (provider.credentialType === "rbt" || provider.credentialType === "bcaba") &&
+      provider.supervisorId
+    ) {
+      supervisorId = provider.supervisorId;
+    }
+
+    // Compute modifiers
+    const modifierCodes = computeModifierCodes(
+      provider.credentialType,
+      parsedInput.placeOfService,
+      parsedInput.modifierCodes,
+    );
+
+    // Compute actual minutes from times
+    const { startTimestamp, endTimestamp, actualMinutes } = computeActualMinutes(
+      parsedInput.sessionDate,
+      parsedInput.startTime,
+      parsedInput.endTime,
+    );
+
+    // FIFO auto-select authorization if none provided
+    let authServiceId = parsedInput.authorizationServiceId ?? null;
+    let resolvedAuthId = authorizationId;
+
+    if (!authServiceId) {
+      const [match] = await db
+        .select({
+          id: authorizationServices.id,
+          authorizationId: authorizationServices.authorizationId,
+        })
+        .from(authorizationServices)
+        .innerJoin(authorizations, eq(authorizationServices.authorizationId, authorizations.id))
+        .where(
+          and(
+            eq(authorizations.organizationId, ctx.organizationId),
+            eq(authorizations.clientId, parsedInput.clientId),
+            eq(authorizations.status, "approved"),
+            isNull(authorizations.deletedAt),
+            eq(authorizationServices.cptCode, parsedInput.cptCode),
+            lte(authorizations.startDate, parsedInput.sessionDate),
+            gte(authorizations.endDate, parsedInput.sessionDate),
+            lt(authorizationServices.usedUnits, authorizationServices.approvedUnits),
+          ),
+        )
+        .orderBy(asc(authorizations.endDate))
+        .limit(1);
+
+      if (match) {
+        authServiceId = match.id;
+        resolvedAuthId = match.authorizationId;
+      }
+    }
+
+    const accountingOp = computeCreateAccountingOps(
+      parsedInput.status,
+      authServiceId,
+      parsedInput.units,
+    );
+
+    const result = await db.transaction(async (tx) => {
+      const [session] = await tx
+        .insert(sessions)
+        .values({
+          organizationId: ctx.organizationId,
+          clientId: parsedInput.clientId,
+          providerId: parsedInput.providerId,
+          supervisorId,
+          authorizationId: resolvedAuthId,
+          authorizationServiceId: authServiceId,
+          sessionDate: parsedInput.sessionDate,
+          startTime: startTimestamp,
+          endTime: endTimestamp,
+          cptCode: parsedInput.cptCode,
+          modifierCodes: modifierCodes.length > 0 ? modifierCodes : null,
+          units: parsedInput.units,
+          actualMinutes,
+          unitCalcMethod: "ama",
+          placeOfService: parsedInput.placeOfService,
+          status: parsedInput.status,
+          notes: parsedInput.notes ?? null,
+        })
+        .returning();
+
+      if (!session) throw new Error("Failed to create session");
+
+      if (accountingOp.type === "increment") {
+        await tx
+          .update(authorizationServices)
+          .set({
+            usedUnits: sql`${authorizationServices.usedUnits} + ${accountingOp.units}`,
+          })
+          .where(
+            and(
+              eq(authorizationServices.id, accountingOp.authServiceId),
+              eq(authorizationServices.organizationId, ctx.organizationId),
+            ),
+          );
+      }
+
+      return session;
+    });
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "create",
+      entityType: "session",
+      entityId: result.id,
+      metadata: {
+        cptCode: parsedInput.cptCode,
+        units: parsedInput.units,
+        status: parsedInput.status,
+        authServiceId,
+      },
+    });
+
+    revalidatePath("/sessions");
+    revalidatePath(`/clients/${parsedInput.clientId}`);
+    if (resolvedAuthId) revalidatePath(`/authorizations/${resolvedAuthId}`);
+    return { success: true as const, data: result };
+  });
+
+// ── Update Session ───────────────────────────────────────────────────────────
+
+export const updateSession = authActionClient
+  .schema(updateSessionSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    if (!WRITE_ROLES.includes(ctx.userRole)) {
+      throw new Error("Forbidden: insufficient role");
+    }
+
+    const { id, clientId: _submittedClientId, ...inputFields } = parsedInput;
+
+    // Load existing session
+    const [existing] = await db
+      .select()
+      .from(sessions)
+      .where(and(eq(sessions.id, id), eq(sessions.organizationId, ctx.organizationId)))
+      .limit(1);
+
+    if (!existing) throw new Error("Session not found");
+
+    // Client cannot be changed after creation — lock to existing value
+    const input = { ...inputFields, clientId: existing.clientId };
+
+    // Validate status transition
+    if (!isValidStatusTransition(existing.status, input.status)) {
+      throw new Error("Invalid status transition");
+    }
+
+    const { provider, authorizationId } = await validateSessionForeignKeys(
+      ctx.organizationId,
+      input,
+    );
+
+    // Auto-set supervisor
+    let supervisorId = input.supervisorId ?? null;
+    if (
+      !supervisorId &&
+      (provider.credentialType === "rbt" || provider.credentialType === "bcaba") &&
+      provider.supervisorId
+    ) {
+      supervisorId = provider.supervisorId;
+    }
+
+    const modifierCodes = computeModifierCodes(
+      provider.credentialType,
+      input.placeOfService,
+      input.modifierCodes,
+    );
+
+    const { startTimestamp, endTimestamp, actualMinutes } = computeActualMinutes(
+      input.sessionDate,
+      input.startTime,
+      input.endTime,
+    );
+
+    const newAuthServiceId = input.authorizationServiceId ?? null;
+    const resolvedAuthId = authorizationId;
+
+    const { reverse, apply } = computeUpdateAccountingOps(
+      existing.status,
+      existing.authorizationServiceId,
+      existing.units,
+      input.status,
+      newAuthServiceId,
+      input.units,
+    );
+
+    await db.transaction(async (tx) => {
+      // Step A: REVERSE old units
+      if (reverse.type === "decrement") {
+        const [reversed] = await tx
+          .update(authorizationServices)
+          .set({
+            usedUnits: sql`${authorizationServices.usedUnits} - ${reverse.units}`,
+          })
+          .where(
+            and(
+              eq(authorizationServices.id, reverse.authServiceId),
+              eq(authorizationServices.organizationId, ctx.organizationId),
+              sql`${authorizationServices.usedUnits} >= ${reverse.units}`,
+            ),
+          )
+          .returning({ id: authorizationServices.id });
+
+        if (!reversed) {
+          throw new Error("Cannot reverse more units than are recorded");
+        }
+      }
+
+      // Step B: APPLY new units
+      if (apply.type === "increment") {
+        await tx
+          .update(authorizationServices)
+          .set({
+            usedUnits: sql`${authorizationServices.usedUnits} + ${apply.units}`,
+          })
+          .where(
+            and(
+              eq(authorizationServices.id, apply.authServiceId),
+              eq(authorizationServices.organizationId, ctx.organizationId),
+            ),
+          );
+      }
+
+      // UPDATE session row
+      await tx
+        .update(sessions)
+        .set({
+          clientId: input.clientId,
+          providerId: input.providerId,
+          supervisorId,
+          authorizationId: resolvedAuthId,
+          authorizationServiceId: newAuthServiceId,
+          sessionDate: input.sessionDate,
+          startTime: startTimestamp,
+          endTime: endTimestamp,
+          cptCode: input.cptCode,
+          modifierCodes: modifierCodes.length > 0 ? modifierCodes : null,
+          units: input.units,
+          actualMinutes,
+          placeOfService: input.placeOfService,
+          status: input.status,
+          notes: input.notes ?? null,
+        })
+        .where(and(eq(sessions.id, id), eq(sessions.organizationId, ctx.organizationId)));
+    });
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "update",
+      entityType: "session",
+      entityId: id,
+      metadata: {
+        oldStatus: existing.status,
+        newStatus: input.status,
+        oldUnits: existing.units,
+        newUnits: input.units,
+      },
+    });
+
+    revalidatePath("/sessions");
+    revalidatePath(`/sessions/${id}`);
+    revalidatePath(`/clients/${input.clientId}`);
+    if (existing.authorizationId) revalidatePath(`/authorizations/${existing.authorizationId}`);
+    if (resolvedAuthId && resolvedAuthId !== existing.authorizationId)
+      revalidatePath(`/authorizations/${resolvedAuthId}`);
+    return { success: true as const };
+  });
+
+// ── Cancel Session ───────────────────────────────────────────────────────────
+
+export const cancelSession = authActionClient
+  .schema(cancelSessionSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    if (!WRITE_ROLES.includes(ctx.userRole)) {
+      throw new Error("Forbidden: insufficient role");
+    }
+
+    const [existing] = await db
+      .select()
+      .from(sessions)
+      .where(and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)))
+      .limit(1);
+
+    if (!existing) throw new Error("Session not found");
+
+    // Validate transition
+    if (!isValidStatusTransition(existing.status, "cancelled")) {
+      throw new Error("Invalid status transition");
+    }
+
+    const cancelOp = computeCancelAccountingOps(
+      existing.status,
+      existing.authorizationServiceId,
+      existing.units,
+    );
+
+    await db.transaction(async (tx) => {
+      if (cancelOp.type === "decrement") {
+        const [reversed] = await tx
+          .update(authorizationServices)
+          .set({
+            usedUnits: sql`${authorizationServices.usedUnits} - ${cancelOp.units}`,
+          })
+          .where(
+            and(
+              eq(authorizationServices.id, cancelOp.authServiceId),
+              eq(authorizationServices.organizationId, ctx.organizationId),
+              sql`${authorizationServices.usedUnits} >= ${cancelOp.units}`,
+            ),
+          )
+          .returning({ id: authorizationServices.id });
+
+        if (!reversed) {
+          throw new Error("Cannot reverse more units than are recorded");
+        }
+      }
+
+      await tx
+        .update(sessions)
+        .set({
+          status: "cancelled",
+          notes: parsedInput.reason
+            ? `${existing.notes ? existing.notes + "\n" : ""}Cancellation reason: ${parsedInput.reason}`
+            : existing.notes,
+        })
+        .where(
+          and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)),
+        );
+    });
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "cancel",
+      entityType: "session",
+      entityId: parsedInput.id,
+      metadata: {
+        previousStatus: existing.status,
+        reason: parsedInput.reason,
+      },
+    });
+
+    revalidatePath("/sessions");
+    revalidatePath(`/sessions/${parsedInput.id}`);
+    revalidatePath(`/clients/${existing.clientId}`);
+    if (existing.authorizationId) revalidatePath(`/authorizations/${existing.authorizationId}`);
+    return { success: true as const };
+  });
+
+// ── Fetch Matching Authorizations (for form cascade) ────────────────────────
+
+export const fetchMatchingAuthorizations = authActionClient
+  .schema(
+    z.object({
+      clientId: idSchema,
+      cptCode: z.string().min(1),
+      sessionDate: z.string().min(1),
+    }),
+  )
+  .action(async ({ parsedInput, ctx }) => {
+    const rows = await db
+      .select({
+        authServiceId: authorizationServices.id,
+        authorizationId: authorizations.id,
+        authorizationNumber: authorizations.authorizationNumber,
+        cptCode: authorizationServices.cptCode,
+        approvedUnits: authorizationServices.approvedUnits,
+        usedUnits: authorizationServices.usedUnits,
+        startDate: authorizations.startDate,
+        endDate: authorizations.endDate,
+        maxUnitsPerDay: authorizationServices.maxUnitsPerDay,
+      })
+      .from(authorizationServices)
+      .innerJoin(authorizations, eq(authorizationServices.authorizationId, authorizations.id))
+      .where(
+        and(
+          eq(authorizations.organizationId, ctx.organizationId),
+          eq(authorizations.clientId, parsedInput.clientId),
+          eq(authorizations.status, "approved"),
+          isNull(authorizations.deletedAt),
+          eq(authorizationServices.cptCode, parsedInput.cptCode),
+          lte(authorizations.startDate, parsedInput.sessionDate),
+          gte(authorizations.endDate, parsedInput.sessionDate),
+          lt(authorizationServices.usedUnits, authorizationServices.approvedUnits),
+        ),
+      )
+      .orderBy(asc(authorizations.endDate));
+
+    const data = rows.map((r) => ({
+      ...r,
+      remainingUnits: r.approvedUnits - r.usedUnits,
+    }));
+
+    return { success: true as const, data };
+  });
