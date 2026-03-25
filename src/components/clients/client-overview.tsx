@@ -10,7 +10,8 @@ import {
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
 import { MetricCard } from "@/components/shared/metric-card";
-import { UtilizationBar } from "@/components/shared/utilization-bar";
+import { UtilizationBar, getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
+import { getExpiryLevel } from "@/components/shared/expiry-badge";
 
 function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -69,21 +70,14 @@ export function ClientOverview({
   const utilizationPct = totalApproved > 0 ? Math.round((totalUsed / totalApproved) * 100) : 0;
   const daysLeft = activeAuth ? daysUntilExpiry(activeAuth.endDate) : 0;
 
-  const utilizationColor =
-    utilizationPct >= 95
-      ? "var(--color-red-600, #dc2626)"
-      : utilizationPct >= 80
-        ? "var(--color-amber-600, #d97706)"
-        : utilizationPct > 0
-          ? "var(--color-emerald-600, #059669)"
-          : undefined;
+  const utilizationLevel = getUtilizationLevel(utilizationPct);
+  const utilizationAccent = utilizationPct > 0 ? LEVEL_COLORS[utilizationLevel].text : undefined;
 
-  const daysLeftColor =
-    daysLeft <= 7
-      ? "var(--color-red-600, #dc2626)"
-      : daysLeft <= 30
-        ? "var(--color-amber-600, #d97706)"
-        : "var(--color-emerald-600, #059669)";
+  const expiryLevel = getExpiryLevel(daysLeft, false);
+  const daysLeftAccent =
+    expiryLevel === "critical" ? "text-red-600 dark:text-red-400"
+    : expiryLevel === "warning" ? "text-amber-600 dark:text-amber-400"
+    : "text-emerald-600 dark:text-emerald-400";
 
   return (
     <div className="space-y-3">
@@ -102,7 +96,7 @@ export function ClientOverview({
           label="Used"
           value={activeAuth ? `${((totalUsed * 15) / 60).toFixed(0)} hrs` : "—"}
           sub={activeAuth ? `${utilizationPct}% utilized` : "No active authorization"}
-          color={utilizationColor}
+          accent={utilizationAccent}
         />
         <MetricCard
           label="Diagnosis"
@@ -117,7 +111,7 @@ export function ClientOverview({
               ? `Auth expires ${formatDate(activeAuth.endDate)}`
               : "No active authorization"
           }
-          color={activeAuth ? daysLeftColor : undefined}
+          accent={activeAuth ? daysLeftAccent : undefined}
         />
       </div>
 

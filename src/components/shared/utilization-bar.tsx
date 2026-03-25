@@ -88,6 +88,7 @@ export function UtilizationBar({
         aria-valuemax={approvedUnits}
         aria-valuenow={usedUnits}
         aria-valuetext={valueText}
+        aria-label={label ? `${label} utilization` : "Authorization utilization"}
         className={cn("text-xs font-semibold tabular-nums", colors.text)}
       >
         {pct}%

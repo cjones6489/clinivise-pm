@@ -1,4 +1,5 @@
 import { cn, formatDate, daysUntilExpiry } from "@/lib/utils";
+import { startOfDay } from "date-fns";
 import { AUTH_ALERT_THRESHOLDS } from "@/lib/constants";
 
 const { EXPIRY_WARNING_DAYS } = AUTH_ALERT_THRESHOLDS;
@@ -56,11 +57,10 @@ export function ExpiryBadge({
   /** Show full formatted date alongside days remaining (for detail pages) */
   showFullDate?: boolean;
 }) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = startOfDay(new Date());
 
   // Check if authorization hasn't started yet
-  const isFuture = startDate ? new Date(startDate) > today : false;
+  const isFuture = startDate ? startOfDay(new Date(startDate)) > today : false;
   const daysLeft = daysUntilExpiry(endDate);
   const level = getExpiryLevel(daysLeft, isFuture);
   const styles = LEVEL_STYLES[level];

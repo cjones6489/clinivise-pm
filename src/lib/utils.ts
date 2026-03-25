@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { format, formatDistanceToNow, differenceInDays } from "date-fns";
+import { format, formatDistanceToNow, differenceInCalendarDays, startOfDay } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -14,8 +14,13 @@ export function formatDateTime(date: string | Date): string {
   return format(new Date(date), "MMM d, yyyy h:mm a");
 }
 
+/**
+ * Calendar days remaining until an authorization expires.
+ * Uses `differenceInCalendarDays` (counts calendar-day boundaries) instead of
+ * `differenceInDays` (compares timestamps) to avoid timezone off-by-one errors.
+ */
 export function daysUntilExpiry(endDate: string | Date): number {
-  return differenceInDays(new Date(endDate), new Date());
+  return differenceInCalendarDays(startOfDay(new Date(endDate)), startOfDay(new Date()));
 }
 
 export function timeAgo(date: string | Date): string {
