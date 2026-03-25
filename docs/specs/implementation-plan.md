@@ -10,7 +10,8 @@
 > - Wireframes: [`../design/clinivise-wireframes.jsx`](../design/clinivise-wireframes.jsx) — interactive layouts
 > - Design system: [`.claude/skills/design/references/design-system.md`](../../.claude/skills/design/references/design-system.md) — tokens, typography, components
 >
-> **Review**: This plan was reviewed against 11 architectural findings backed by 5 industry research dives. See [Architecture Decisions](#architecture-decisions-reference) and [Research Findings](#research-findings-reference) at the bottom.
+> **Review**: This plan was reviewed against 11 architectural findings backed by 5 industry research dives, plus Phase 1-Core implementation research (60+ sources). See [Architecture Decisions](#architecture-decisions-reference) and [Research Findings](#research-findings-reference) at the bottom.
+> - Implementation research: [`../research/phase-1-implementation-research.md`](../research/phase-1-implementation-research.md) — billing compliance, dashboard UX, auth visualization, technical patterns
 
 ---
 
@@ -93,79 +94,173 @@ Tests:
 > *Product spec §8 (Log Session), §7 (Sessions List), UI/UX guide §3 (Session Log Form), session form patterns research.*
 > **The single most frequent action in the entire app.** Target: form completion in <30 seconds.
 
-#### Session Backend
+#### What's Already Built
 
-Schema:
-- [ ] Verify session schema has correct time handling per Phase 0D
-- [ ] Ensure `authorization_service_id` FK is correct and nullable (sessions without auth = flagged)
+The session backend is substantially complete. This table tracks what exists vs what's needed.
 
-Validators:
-- [ ] `createSessionSchema` — client, provider, date, startTime, endTime, cptCode, placeOfService, notes, status
-- [ ] `updateSessionSchema` — same fields + `id` + `updatedAt` for optimistic locking
-- [ ] Date/time refinements: endTime > startTime, date not in future (allow backdated)
-- [ ] Unit calculation validation: auto-calculated units match time range
+| Component | File | Status |
+|-----------|------|--------|
+| Session schema (all fields, 9 indexes, FKs) | `src/server/db/schema/sessions.ts` | Done |
+| `createSessionSchema` / `updateSessionSchema` / `cancelSessionSchema` | `src/lib/validators/sessions.ts` | Done (126 lines, refinements for time pairing, end > start, units required) |
+| `createSession` action (FIFO, atomic units, audit) | `src/server/actions/sessions.ts` | Done (lines 128-263) |
+| `updateSession` action (optimistic locking, two-step accounting) | `src/server/actions/sessions.ts` | Done (lines 267-422) |
+| `cancelSession` action (privileged, reason, conditional decrement) | `src/server/actions/sessions.ts` | Done (lines 426-501) |
+| `fetchMatchingAuthorizations` action (form cascade) | `src/server/actions/sessions.ts` | Done (lines 505-548) |
+| `getSessions`, `getSessionById`, `getClientSessions`, `getAuthorizationSessions` | `src/server/queries/sessions.ts` | Done (paginated) |
+| `getProviderOptions`, `getMatchingAuthorizationServices` | `src/server/queries/sessions.ts` | Done |
+| Session helpers (unit accounting, modifiers, time parsing) | `src/lib/session-helpers.ts` | Done (127 lines, 82 tests) |
+| Time/unit utilities (`parseTimeToMinutes`, `calculateUnitsFromMinutes`) | `src/lib/utils.ts` | Done (30 tests) |
+| `session-form.tsx` (553 lines — RHF, cascading auth select, combobox) | `src/components/sessions/session-form.tsx` | Done |
+| `session-table.tsx`, `session-columns.tsx`, `session-status-badge.tsx` | `src/components/sessions/` | Done |
+| Session list page, new session page, detail page, edit page | `src/app/(dashboard)/sessions/` | Done (4 routes) |
+| Constants (CPT codes, statuses, transitions, modifiers, POS) | `src/lib/constants.ts` | Done |
 
-Actions (three separate actions — see [Architecture Decision #9](#architecture-decisions-reference)):
-- [ ] `createSession` — validate, find matching auth (FIFO), atomic `SET used_units = used_units + N`, create session, audit log. When status is `cancelled` or `no_show`, skip auth resolution and unit increment (no service was rendered).
-- [ ] `updateSession` — with optimistic locking (`updatedAt` check), ordered locking on auth service rows by ID to prevent deadlocks, adjust auth units (atomic decrement old + increment new if auth changed). Audit log captures **all changed fields** (before/after state for CPT, provider, auth, date, units — not just status), per CMS 3.3.2.5 requirements. See [Architecture Decision #5](#architecture-decisions-reference).
-- [ ] `cancelSession` — separate privileged action (owner/admin/bcba only) for retroactive void of completed sessions. Requires `reason` field. Atomic `SET used_units = used_units - N WHERE used_units >= N` on linked auth service. Only decrements if previous status was `completed`. Terminal state — cancelled sessions cannot transition out. See [Architecture Decision #9](#architecture-decisions-reference).
-- [ ] Auth resolution logic: find active auths for client + CPT where `start_date <= sessionDate <= end_date`, pick earliest expiry (FIFO)
+**What's remaining** — three focused sub-sprints:
 
-Queries:
-- [ ] `getSessions(orgId, filters)` — list with client + provider + auth JOINs, filter by date/provider/client/status
-- [ ] `getSessionById(id, orgId)` — detail with all JOINs
-- [ ] `getClientSessions(clientId, orgId)` — for client detail Sessions tab
-- [ ] `getProviderRecentSessions(providerId, orgId, limit)` — for Quick Log feature (used in 1-Polish)
-- [ ] `getActiveAuthsForSession(clientId, cptCode, sessionDate, orgId)` — for auth picker
+---
 
-Tests:
-- [ ] Session validators: valid session, invalid times, future date, CMS 8-min rule edge cases
-- [ ] Unit calculation: 0 minutes, 8 minutes (1 unit), 15 minutes (1 unit), 23 minutes (2 units), 480 minutes (32 units)
-- [ ] FIFO auth selection: given two active auths for same CPT, picks earlier expiry
-- [ ] Atomic unit decrement: `createSession` increments used_units, `cancelSession` decrements
-- [ ] Org isolation: session actions with wrong org context return error / empty
-- [ ] `createSession` with status `cancelled` does NOT link auth or increment units
-- [ ] `cancelSession` on a non-completed session does NOT decrement units
+#### 1A-1 — Billing Compliance Fixes + Validator Tests
 
-#### Session List Page
+> Close 3 gaps identified by implementation research. These are correctness issues that must be fixed before sessions are used with real data.
 
-Frontend:
-- [ ] Page header: "Sessions" + "{N} sessions logged this month" + "Log Session" button (primary)
-- [ ] 4 metric cards: This Week (hours), Sessions 7d (count), Flagged (count, red if >0), Unbilled (count, "—" for MVP)
-- [ ] Data table: Date, Client, Provider, CPT (monospace), Units (tabular-nums), POS, Status (badge)
-- [ ] Filter tabs: All | This Week | Flagged
-- [ ] Row click → session detail dialog (key-value display, edit button)
-- [ ] Empty state: "No sessions logged yet. Log your first session to start tracking hours." CTA: "Log Session"
+**Fix 1: Required start/end times for completed sessions**
 
-Backend:
-- [ ] Session list metrics query (hours this week, count 7d, flagged count)
+> Nearly every payer requires start/end times for billing compliance (CMS-1500 Box 24A). Our validator allows completed sessions with no times. See [Research §1](../research/phase-1-implementation-research.md#required-fields-for-billable-sessions).
 
-Tests:
-- [ ] Metrics query: correct hours/count with mixed session statuses (cancelled sessions excluded from hours)
+File: `src/lib/validators/sessions.ts`
+- [ ] Add `timesRequiredWhenCompleted` refinement to `createSessionSchema` and `updateSessionSchema`: when `status === "completed"`, both `startTime` and `endTime` must be present. `cancelled`/`no_show`/`scheduled` sessions remain optional.
 
-#### Log Session Form
+**Fix 2: CPT-credential blocking for RBTs/BCaBAs**
 
-> Core form + auth integration. The form must work and correctly debit authorizations. Pre-fill, Quick Log, validation warnings, and draft persistence are Phase 1-Polish.
+> RBTs billing QHP-only codes (97151, 97155-97158) results in denied claims. Must be a hard block, not a warning. See [Research §1](../research/phase-1-implementation-research.md#cpt-credential-matching-rules).
 
-**Core Form:**
-- [ ] Two-column layout: Client (combobox) + Provider (select, pre-fill if RBT) — Row 1
-- [ ] Date (pre-fill today) + Start Time + End Time — Row 2
-- [ ] CPT Code (select with code + description) + Place of Service (select with code + label) — Row 3
-- [ ] **Auto-calculated card** (blue/info): Duration, Units (CMS 8-min rule), Modifier (from provider credential) — real-time as user types
-- [ ] Notes textarea (optional)
-- [ ] Status field (default: completed, options: completed/cancelled/no_show) — hide time fields when cancelled/no_show
-- [ ] Cancel + Save Session buttons, disable Save during submission (`isPending`)
-- [ ] Success: redirect to `/sessions` with toast
+File: `src/server/actions/sessions.ts` (in `createSession` and `updateSession`, after provider lookup)
+- [ ] After loading the provider record (which includes `credentialType`), check: if credential is `rbt` or `bcaba` and CPT is in `[97151, 97155, 97156, 97157, 97158]`, throw `ConflictError("CPT {code} requires a qualified healthcare professional (BCBA/BCBA-D). {credential} providers cannot bill this code.")`.
+- [ ] Extract QHP-only codes list to `src/lib/constants.ts` as `QHP_ONLY_CPT_CODES` for reuse in client-side form warnings.
 
-**Auth Integration:**
-- [ ] **Authorization Check card**: selected auth + remaining units before/after
-  - Green: "Auth AUTH-0891 has 38 units remaining. This session uses 12 units → 26 remaining."
-  - Amber: remaining units < 20% of approved → "Low remaining units"
-  - Red: insufficient units → "This session exceeds remaining authorized units"
-  - Gray: no active auth → "No active authorization for this CPT code"
-- [ ] **Auth picker**: auto-select FIFO (earliest expiry), show "Change" link for manual override, compact card with utilization
-- [ ] Wire `createSession` to resolve auth and atomically increment `used_units`
-- [ ] Fresh `used_units` fetch on client/CPT selection (bypass TanStack Query cache)
+File: `src/components/sessions/session-form.tsx`
+- [ ] Add client-side warning: when selected provider credential is RBT/BCaBA and CPT is QHP-only, show amber warning inline below CPT selector before the user submits.
+
+**Fix 3: `SELECT ... FOR UPDATE` on auth service row**
+
+> Without a row lock, two concurrent sessions can both read `usedUnits < approvedUnits` as true, then both increment, over-allocating the auth. The fix is one SQL statement. See [Research §1](../research/phase-1-implementation-research.md#authorization-tracking--race-condition-fix).
+
+File: `src/server/actions/sessions.ts` (in `createSession` transaction, before unit increment)
+- [ ] Add `SELECT ... FOR UPDATE` on the auth service row within the transaction, before the `UPDATE` that increments `usedUnits`. Lock both in `createSession` (before increment) and `cancelSession` (before decrement). In `updateSession`, the existing ordered locking pattern already serializes; add `FOR UPDATE` to the individual auth service selects there too.
+
+**Tests** (`src/lib/validators/sessions.test.ts` — new file):
+
+| # | Test | Input | Expected |
+|---|------|-------|----------|
+| 1 | Valid completed session passes | `{status: "completed", startTime: "09:00", endTime: "12:00", units: 12, ...requiredFields}` | Passes validation |
+| 2 | Completed session without times rejected | `{status: "completed", units: 12, ...requiredFields}` (no startTime/endTime) | Error on startTime: "Start and end times are required for completed sessions" |
+| 3 | Cancelled session without times accepted | `{status: "cancelled", units: 0, ...requiredFields}` (no times) | Passes |
+| 4 | No-show session without times accepted | `{status: "no_show", units: 0, ...requiredFields}` (no times) | Passes |
+| 5 | Scheduled session without times accepted | `{status: "scheduled", units: 0, ...requiredFields}` (no times) | Passes |
+| 6 | Start time without end time rejected | `{startTime: "09:00", endTime: undefined}` | Error: "Both start time and end time must be provided together" |
+| 7 | End time before start time rejected | `{startTime: "12:00", endTime: "09:00"}` | Error: "End time must be after start time" |
+| 8 | Zero units for completed rejected | `{status: "completed", units: 0}` | Error: "At least 1 unit required for completed sessions" |
+| 9 | Valid cancel schema with reason | `{id: "abc", reason: "Client no-show"}` | Passes |
+| 10 | Cancel reason over 2000 chars rejected | `{id: "abc", reason: "x".repeat(2001)}` | Error on reason |
+| 11 | Update schema requires id + updatedAt | `{...validSession}` (no id) | Error: id required |
+| 12 | Invalid CPT code rejected | `{cptCode: "99999"}` | Error: "Select a CPT code" |
+| 13 | Invalid time format rejected | `{startTime: "9:00"}` | Error: "Time must be HH:MM format" |
+| 14 | Invalid date format rejected | `{sessionDate: "03/25/2026"}` | Error on sessionDate |
+| 15 | Notes over 5000 chars rejected | `{notes: "x".repeat(5001)}` | Error on notes |
+
+---
+
+#### 1A-2 — Session List Page Enhancement
+
+> The session list page exists but is minimal (59 lines) — table + empty state + "Log Session" button. No metric cards, no filter tabs, no dynamic header.
+
+**Backend** (`src/server/queries/sessions.ts`):
+- [ ] `getSessionListMetrics(orgId)` — single SQL query using `FILTER (WHERE ...)`:
+  - `hoursThisWeek`: `coalesce(sum(units) filter (where session_date >= weekStart and status = 'completed'), 0) * 15.0 / 60`
+  - `sessions7d`: `count(*) filter (where session_date >= now - 7d and status != 'cancelled')`
+  - `flaggedCount`: `count(*) filter (where status = 'flagged')`
+  - `thisMonthCount`: `count(*) filter (where session_date >= monthStart)` (for header subtitle)
+- [ ] **Extend `getSessions` with composable server-side filters** — URL search params are the source of truth. Single query function with a `filters` object, dynamic WHERE clauses via Drizzle `and()`. This is the standard pattern (Linear, Notion, Vercel dashboard examples) and the only approach that scales with pagination (client-side filtering only works within the current page).
+  ```typescript
+  type SessionFilters = {
+    status?: string;       // "flagged", "completed", etc.
+    dateFrom?: string;     // ISO date (e.g., week start)
+    dateTo?: string;       // ISO date
+    clientId?: string;
+    providerId?: string;
+  }
+  // getSessions(orgId, { page, pageSize, filters })
+  ```
+  Filter tabs map to preset filter combinations: "This Week" → `{ dateFrom: weekStart }`, "Flagged" → `{ status: "flagged" }`.
+
+**Frontend** (`src/app/(dashboard)/sessions/page.tsx`):
+- [ ] Update `PageHeader` description: "{N} sessions logged this month" (dynamic from `thisMonthCount`)
+- [ ] Add 4 metric cards between header and table:
+  - This Week: `hoursThisWeek` hours (large number, "hours logged" subtitle)
+  - Sessions 7d: count (large number, "past 7 days" subtitle)
+  - Flagged: `flaggedCount` (red accent if > 0, "needs review" subtitle)
+  - Unbilled: "—" with "Phase 2" subtitle (placeholder, no query yet)
+- [ ] Add filter tabs above table: All | This Week | Flagged
+  - Tabs render as links with search params (`?filter=week`, `?filter=flagged`)
+  - Server component reads `searchParams`, maps to `SessionFilters`, passes to `getSessions`
+  - Active tab highlighted based on current search params
+  - Pagination resets to page 0 when filter changes
+
+**Tests** (`src/server/queries/sessions.test.ts` — new file, or add to existing):
+
+| # | Test | Setup | Expected |
+|---|------|-------|----------|
+| 1 | Hours this week correct | 3 completed sessions this week (12 + 8 + 4 units) | `hoursThisWeek = 6.0` (24 units * 15 / 60) |
+| 2 | Cancelled sessions excluded from hours | 1 completed (12 units) + 1 cancelled (8 units) this week | `hoursThisWeek = 3.0` (12 units only) |
+| 3 | Flagged count correct | 2 flagged + 3 completed | `flaggedCount = 2` |
+| 4 | Sessions 7d excludes cancelled | 3 completed + 1 cancelled in 7d | `sessions7d = 3` |
+| 5 | Org isolation | Sessions from org_A and org_B | Query with org_A returns only org_A sessions |
+
+---
+
+#### 1A-3 — Log Session Form Polish
+
+> The form works and correctly debits auths. This sprint upgrades the UX to match the product spec — auto-calculated card, visual auth check card, and status-conditional fields. Pre-fill, Quick Log, validation warnings, and draft persistence remain Phase 1-Polish.
+
+**Auto-calculated card** (`src/components/sessions/session-form.tsx`):
+- [ ] Add a styled info card (blue/info background) below the time inputs that shows in real-time:
+  - Duration: "{X}h {Y}m" (from `parseTimeToMinutes(end) - parseTimeToMinutes(start)`)
+  - Units: auto-calculated via CMS 8-min rule
+  - Modifier: from provider credential (e.g., "HM (RBT)")
+  - Only visible when both start and end time are filled. Hidden when status is `cancelled`/`no_show`.
+
+**Authorization Check card** (`src/components/sessions/session-form.tsx`):
+- [ ] Replace current auth dropdown with a visual card showing utilization impact:
+  - **Green**: "Auth #{number} has {remaining} units remaining. This session uses {units} units → {remaining - units} remaining."
+  - **Amber**: remaining units < 20% of approved → "Low remaining units" warning
+  - **Red**: units > remaining → "This session exceeds remaining authorized units"
+  - **Gray**: no active auth found → "No active authorization for this CPT code. Session will be flagged."
+  - Keep "Change" link for manual auth override (opens existing Select with auth options)
+
+**Status-conditional fields** (`src/components/sessions/session-form.tsx`):
+- [ ] When status is `cancelled` or `no_show`: hide start/end time inputs, auto-calc card, and auth check card. Show optional "Reason" textarea instead.
+- [ ] When status is `scheduled`: hide auto-calc card (no times yet)
+
+**Session detail sheet** (industry standard: Linear, Notion, Vercel dashboard):
+- [ ] `src/components/sessions/session-detail-sheet.tsx` — shadcn `Sheet` (side panel) with read-only key-value session detail. Triggered by row click in `SessionTable`. Shows: status badge, client, provider, date, times, CPT + modifier, units, POS, auth info (utilization impact), notes. Footer: "Open" link (→ `/sessions/[id]`), "Edit" button (→ `/sessions/[id]/edit`), "Cancel" button (if canCancel).
+- [ ] Keep existing `/sessions/[id]` page as the canonical full-page view for direct URLs, bookmarks, and sharing.
+- [ ] Future upgrade path: Next.js intercepting routes (`(.)sessions/[id]`) + parallel routes (`@modal`) for URL-synced sheets — not needed now.
+
+**Tests** (component — `src/components/sessions/session-form.test.tsx`):
+
+| # | Test | Action | Expected |
+|---|------|--------|----------|
+| 1 | Auto-calc card shows correct values | Set start="09:00", end="12:00" | Card shows "3h 0m", "12 units", modifier from provider |
+| 2 | Auto-calc card hidden when no times | Leave start/end empty | No auto-calc card visible |
+| 3 | Auto-calc card hidden for cancelled | Set status="cancelled" | Time fields and auto-calc hidden |
+| 4 | Auth check card green state | Auth has 38 remaining, session uses 12 | Green card: "26 remaining after" |
+| 5 | Auth check card amber state | Auth has 6 remaining of 30 approved (20%) | Amber card: "Low remaining units" |
+| 6 | Auth check card red state | Auth has 4 remaining, session uses 12 | Red card: "exceeds remaining" |
+| 7 | Auth check card gray state | No matching auths | Gray card: "No active authorization" |
+| 8 | Detail sheet opens on row click | Click session row in table | Sheet opens with correct session data |
+| 9 | Detail sheet shows edit/cancel actions | Open sheet for completed session | "Edit" and "Cancel" buttons visible |
+
+**Phase 1A Checkpoint**: Sessions log correctly with billing-compliant validation. The list page shows at-a-glance metrics with server-side filtering. The form gives real-time feedback on units and auth impact. Row click opens a detail sheet without losing list context. All backed by 112 existing helper/utility tests + ~29 new tests.
 
 ---
 
@@ -176,13 +271,21 @@ Tests:
 
 #### Shared Utilization Components
 
+> See [Research §3: Auth Utilization — Visualization Standards](../research/phase-1-implementation-research.md#3-auth-utilization--visualization-standards) for evidence behind these choices.
+
 Frontend (reusable):
-- [ ] `src/components/shared/utilization-bar.tsx` — color-coded progress bar (emerald <80%, amber 80-95%, red >95%), shows "{used}/{approved} ({pct}%)" text, accepts `usedUnits`, `approvedUnits` props
-- [ ] `src/components/shared/expiry-badge.tsx` — "{N}d" with color coding (green >30d, amber 7-30d, red <7d, "Expired" if past), accepts `endDate` prop
+- [ ] `src/components/shared/utilization-bar.tsx` — **linear bar** (not circular — NNGroup: "length" is most effective preattentive attribute for quantitative comparison). Color-coded: emerald <80%, amber 80-95%, red >95%. Shows "{used}/{approved} ({pct}%)" text alongside remaining hours. Accepts `usedUnits`, `approvedUnits` props.
+  - **Accessibility**: Use `role="meter"` (not `progressbar` — meters depict static value ranges). Required attributes: `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` (e.g., "67% — 12.5 hours remaining"). Never rely on color alone — each threshold needs a secondary indicator (text label or icon) for color vision deficiency (~8% of men).
+  - **Over-utilization (>100%)**: Cap bar fill at 100%, show actual percentage in red bold text, change bar track to `bg-red-100`, add "Over-utilized" label.
+  - **Responsive**: 120px minimum bar width. Mobile: stack vertically (label on top, bar full-width below, percentage aligned right). Narrow table cells: fall back to colored percentage text.
+- [ ] `src/components/shared/expiry-badge.tsx` — "{N}d" with color coding (green >30d, amber 7-30d, red <7d, "Expired" if past). Full date on detail pages ("Expires Jun 18, 2026") alongside days remaining. Future auths: blue/info badge "Starts {date}". Accepts `endDate` prop.
 - [ ] `src/components/authorizations/auth-status-badge.tsx` — reusable badge (Active=green, Expiring=amber, Expired=red, Pending=outline, Denied=red, Exhausted=muted)
+- [ ] Display hours preferred over units for readability (BCBAs think in hours: `units * 15 / 60`). Show `(X units)` annotation on detail pages for power users.
 
 Tests:
 - [ ] Utilization bar: correct colors at 50%, 80%, 95%, 100%, 110%
+- [ ] Utilization bar: over-utilization renders capped bar with red track and actual percentage
+- [ ] Utilization bar: `role="meter"` and aria attributes present
 - [ ] Expiry badge: correct colors at 60d, 30d, 14d, 7d, 0d, -3d
 
 #### Authorization List Enhancement
@@ -205,9 +308,12 @@ Tests:
 #### Client Detail Overview Tab
 
 > **Decision**: Uses Suspense boundaries with async server components (Vercel Tier 1 pattern). See [Architecture Decision #6](#architecture-decisions-reference).
+> See [Research §3: Client Detail — Missing from Current Implementation](../research/phase-1-implementation-research.md#client-detail--missing-from-current-implementation-vs-product-spec) for gap analysis vs product spec.
 
 Page shell (critical data, `Promise.all`):
 - [ ] Load client record + guardian contact together — renders header immediately, `notFound()` if missing
+- [ ] **Auth status badge in header**: "Auth: Active" (green), "Auth: 14d left" (amber), "Auth: Expired" (red) — derived from nearest expiring active auth
+- [ ] **Action buttons row** below header: Log Session, Upload Auth Letter (primary actions on every client page)
 
 Suspense boundary 1 — Insurance & Care Team:
 - [ ] `getClientPrimaryInsurance(clientId, orgId)` — single JOIN, fast
@@ -218,17 +324,19 @@ Suspense boundary 1 — Insurance & Care Team:
 Suspense boundary 2 — Authorization Utilization:
 - [ ] `getClientAuthUtilization(clientId, orgId)` — aggregate query across auth services
 - [ ] **Metric cards** (4): Total Approved (hours), Used (hours + % utilized), Weekly Avg, Days Left — with color coding per product spec §3
-- [ ] **Authorized Services card**: per-CPT utilization bars with progress, remaining hours, color thresholds
+- [ ] **Per-CPT utilization bars** in Authorized Services card (not aggregate-only) — each service line gets its own bar with progress, remaining hours, color thresholds
+- [ ] **Under-utilization detection**: amber when <50% used with >50% of authorization period elapsed — flag for review
 - [ ] Compute hours from units: `units * 15 / 60` for display
 
 Suspense boundary 3 — Recent Sessions:
 - [ ] Recent sessions table (last 5), or "No sessions yet" empty state
 
 Skeleton loaders:
-- [ ] Content-shaped skeletons for each Suspense boundary (not spinners)
+- [ ] Content-shaped skeletons for each Suspense boundary matching exact content dimensions (not spinners)
 
 Tests:
 - [ ] Hours-from-units computation: 0 units → 0 hrs, 4 units → 1 hr, 32 units → 8 hrs
+- [ ] Under-utilization: 30% used at 60% elapsed → triggers warning; 70% used at 60% elapsed → no warning
 - [ ] Each query returns correct shape and respects org isolation
 
 #### Authorization Detail Enhancement
@@ -248,30 +356,41 @@ Frontend:
 
 #### Dashboard Backend
 
-Queries:
-- [ ] `getDashboardMetrics(orgId)` — active client count, avg utilization, hours this week, action item count
-- [ ] `getDashboardAlerts(orgId)` — expiring auths (30/14/7d), high utilization (>=80%), expired auths, expired provider credentials, terminated insurance with active auth, flagged sessions
-- [ ] `getClientOverviewForDashboard(orgId)` — clients with inline payer, BCBA, auth utilization, auth status, days remaining
+> See [Research §2: Dashboard — Design Patterns & Alert Systems](../research/phase-1-implementation-research.md#2-dashboard--design-patterns--alert-systems) and [Research §4: Technical Implementation Patterns](../research/phase-1-implementation-research.md#4-technical-implementation-patterns).
+
+Queries (use **SQL aggregation** — `FILTER (WHERE ...)`, `coalesce`, `nullif(... , 0)` — not fetch-all-rows-and-compute-in-JS):
+- [ ] `getDashboardMetrics(orgId)` — active client count, avg utilization, hours this week, action item count. Use Postgres `FILTER` for conditional counts in a single query.
+- [ ] `getDashboardAlerts(orgId)` — expiring auths (30/14/7d), high utilization (>=80%), expired auths, expired provider credentials, terminated insurance with active auth, flagged sessions. **Escalating severity**: same alert changes from info → warning → critical as deadline approaches. **Aggregate similar alerts**: "3 auths expiring within 14d" (one row), not 3 separate rows.
+- [ ] `getClientOverviewForDashboard(orgId)` — clients with inline payer, BCBA, auth utilization, auth status, days remaining. Use subquery for auth utilization per client (avoid N+1). **Sort by urgency** (most critical auth status first), not alphabetically.
 
 Tests:
 - [ ] Alert detection: expiring auth within 7 days returns critical severity
 - [ ] Alert detection: terminated insurance with active auth returns critical
-- [ ] Metric aggregation: avg utilization correctly weights across auths
+- [ ] Alert aggregation: 3 expiring auths within 14d produce single aggregated alert row
+- [ ] Metric aggregation: avg utilization correctly weights across auths, uses `coalesce`/`nullif` for NULL/zero safety
+- [ ] Client overview: results sorted by auth urgency (expired → expiring → low utilization → healthy)
 - [ ] Org isolation: dashboard queries only return data for the authenticated org
 
 #### Dashboard Frontend
 
+> See [Research §2: Alert Fatigue Prevention](../research/phase-1-implementation-research.md#alert-fatigue-prevention-critical-research) — healthcare alert fatigue causes 49-96% of alerts to be overridden (AHRQ). Follow the "5 Rights" framework.
+
 Layout (match wireframe):
 - [ ] **Header**: "Dashboard" + date + description + action buttons (Log Session)
-- [ ] **4 metric cards**: Active Clients, Avg Utilization (color-coded), Hours This Week, Action Items (with critical count)
-- [ ] **Priority Alerts card**: color-coded rows (red=critical, amber=warning), each with entity name, description, action button (Verify/Renew/Review)
-- [ ] **Client Overview table**: client name+diagnosis+age, payer, eligibility (— for MVP), auth utilization bar, auth status badge with days remaining, clickable rows → client detail
+- [ ] **4 metric cards**: Active Clients, Avg Utilization (color-coded), Hours This Week, Action Items (with critical count). 4 is optimal — scannable in one eye sweep per preattentive processing research.
+- [ ] **Priority Alerts card**: color-coded left border (red=critical, amber=warning), each with entity name, description, action button (Verify/Renew/Review). **Max 3-5 visible alerts** before "View all (N)" link. Aggregate similar alerts into single rows.
+- [ ] **Client Overview table**: client name+diagnosis+age, payer, eligibility (— for MVP), auth utilization bar, auth status badge with days remaining, clickable rows → client detail. **Sort by urgency** (most critical auth first), not alphabetically. Default: "Only showing items needing attention" filter, with "Show all" toggle.
+- [ ] **"Everything is fine" state**: When no alerts, show "All authorizations on track. No action items." with checkmark — confirms system is working, not that data is missing.
 
 Design quality:
-- [ ] Suspense boundaries for staggered loading (metric cards load independently of table)
-- [ ] Individual skeleton states per section
+- [ ] **Per-section Suspense boundaries** — metrics load first, alerts second, table last. Each is an async server component fetching independently.
+- [ ] **ErrorBoundary wraps each Suspense** — one failing query doesn't break the whole dashboard. Pattern: `<SectionErrorBoundary><Suspense fallback={<Skeleton />}><AsyncSection /></Suspense></SectionErrorBoundary>`
+- [ ] Individual skeleton states per section matching exact content dimensions
 - [ ] Exception-based alerting: only surface problems, not happy paths
+- [ ] **60-30-10 color rule**: 60% default/muted (things that are fine), 30% accent/structure, 10% signal colors (things needing attention)
+- [ ] **3-second rule**: clinician should know what needs attention within 3 seconds of page load
 - [ ] Use section cards with title bars (not naked headings)
+- [ ] Max 3 levels of visual hierarchy per section: card title (uppercase 11px), content (13px medium), metadata (11px muted)
 
 ---
 
@@ -514,6 +633,9 @@ Key decisions from the plan review, backed by industry research. Refer to these 
 | 9 | **Three separate session actions** (create, update, cancel) | Industry standard: void is a separate privileged action (CentralReach "Void" button, not part of "Edit"). Different permissions, side effects, and audit trail. `cancelSession` is a terminal state operation. |
 | 10 | **NPI Luhn validation + display-first settings UI** | NPI errors are #1 cause of claim rejections. Luhn check with 80840 prefix catches typos at entry. Display-first (key-value pairs) matches industry pattern for rarely-edited settings. Progressive disclosure: name + timezone minimum, billing identifiers as soft nudge. |
 | 11 | **Synthetic eval set from public templates, grow via HITL** | Standard healthcare AI bootstrapping. Public payer auth letter templates exist (Aetna, Cigna, BCBS, Medicaid). >98% extraction accuracy proven with 50 synthetic docs. HITL correction feedback loop grows eval set organically. |
+| 12 | **`SELECT ... FOR UPDATE` on auth service during session creation** | Concurrent session creation against the same auth service can over-allocate units. Row-level lock serializes writes. Low contention for small practices, essential for correctness. See [Research §1](../research/phase-1-implementation-research.md#authorization-tracking--race-condition-fix). |
+| 13 | **Linear utilization bars with `role="meter"` accessibility** | NNGroup: "length" is the most effective preattentive attribute for quantitative comparison. W3C ARIA APG: `role="meter"` for static value ranges (not `progressbar`). ~8% of men have color vision deficiency — never rely on color alone. See [Research §3](../research/phase-1-implementation-research.md#3-auth-utilization--visualization-standards). |
+| 14 | **Hard-block RBTs from QHP-only CPT codes** | 97151/97155-97158 are QHP-only per ABA billing rules. Logging these under an RBT credential results in denied claims. Block at the validator level, not just a warning. See [Research §1](../research/phase-1-implementation-research.md#cpt-credential-matching-rules). |
 
 ---
 
@@ -591,13 +713,29 @@ Detailed findings from 5 industry research dives conducted during plan review. T
 
 **Sources**: CMS NPI Standard, NPPES Registry API (live-tested), NUCC Taxonomy Codes v25.1, CMS-1500/837P billing field requirements, CentralReach/SimplePractice/TherapyNotes settings docs.
 
+### Research 7: Phase 1 Implementation Research (supports Decisions #12, #13, #14)
+
+**Finding**: Consolidated findings from 4 parallel research agents (60+ sources) covering billing compliance, dashboard UX, auth visualization, and technical patterns. Full document: [`../research/phase-1-implementation-research.md`](../research/phase-1-implementation-research.md).
+
+Key findings incorporated into the plan:
+- **Billing compliance**: CMS 8-minute rule formula, MUE limits per CPT, CPT-credential matching rules (RBTs blocked from QHP-only codes), required fields for billable sessions (start/end times mandatory for completed sessions), session validation checklist.
+- **Auth race condition**: `SELECT ... FOR UPDATE` on auth service row during session creation prevents concurrent over-allocation.
+- **Alert fatigue**: AHRQ "5 Rights" framework — right information, person, format, channel, time. Max 3-5 visible alerts, aggregate similar, escalating severity, exception-based only.
+- **Utilization visualization**: Linear bars outperform circular (NNGroup). `role="meter"` (not `progressbar`). Over-utilization: cap bar at 100%, red track, bold percentage. Hours preferred over units for BCBAs. 120px minimum bar width for readability.
+- **Accessibility**: `aria-valuetext` for screen readers (not just percentage). Never rely on color alone — secondary indicator required for each threshold.
+- **Dashboard data density**: 60-30-10 color rule, 3-second scanning rule, max 3 hierarchy levels per section, 4 metric cards optimal.
+- **Client detail gaps vs product spec**: auth badge in header, action buttons row, per-CPT utilization bars (not aggregate-only), under-utilization detection.
+- **Technical patterns**: Drizzle `FILTER (WHERE ...)` for conditional aggregation, `coalesce`/`nullif` for NULL/zero safety, subqueries for inline metrics, ErrorBoundary wrapping Suspense, Neon partial indexes for hot queries.
+
+**Sources**: CMS Transmittal AB-01-56, ABA Coding Coalition, AHRQ PSNet (alert fatigue), NNGroup (preattentive processing), W3C ARIA APG, 11+ competitor analyses, Next.js 16 docs, Drizzle ORM docs, Neon Postgres docs, 60+ industry sources.
+
 ---
 
 ## Risk Register
 
 | Risk | Severity | When to Address |
 |------|----------|-----------------|
-| Concurrent auth unit corruption | High | Phase 4 (ordered locking) — or sooner if you see issues |
+| Concurrent auth unit corruption | High | **Phase 1-Core** (`SELECT ... FOR UPDATE` in `createSession`) — see Decision #12 |
 | Stale data overwrites | High | Phase 4 (optimistic locking) — low risk with few users |
 | Duplicate session creation | Medium | Phase 4 (idempotency keys) — UI `isPending` guard is sufficient early on |
 | AI extraction garbage on bad docs | Medium | Phase 3 (pre-validate, graceful fallback) |
@@ -610,4 +748,5 @@ Detailed findings from 5 industry research dives conducted during plan review. T
 
 *Created: 2026-03-25*
 *Reviewed: 2026-03-25 — 11 architectural findings, 5 industry research dives*
+*Updated: 2026-03-25 — Incorporated Phase 1 implementation research (60+ sources, 14 architecture decisions, 7 research findings)*
 *Status: Flexible roadmap. Start with Phase 0, then build the product.*

@@ -10,6 +10,8 @@ describe("createSessionSchema", () => {
     units: 4,
     placeOfService: "12",
     status: "completed",
+    startTime: "09:00",
+    endTime: "10:00",
   };
 
   it("accepts valid minimal input", () => {
@@ -91,6 +93,7 @@ describe("createSessionSchema", () => {
     const result = createSessionSchema.safeParse({
       ...validBase,
       startTime: "09:00",
+      endTime: "",
     });
     expect(result.success).toBe(false);
   });
@@ -98,6 +101,7 @@ describe("createSessionSchema", () => {
   it("rejects endTime without startTime", () => {
     const result = createSessionSchema.safeParse({
       ...validBase,
+      startTime: "",
       endTime: "10:00",
     });
     expect(result.success).toBe(false);
@@ -249,6 +253,65 @@ describe("createSessionSchema", () => {
       expect(result.data.placeOfService).toBe("12");
     }
   });
+
+  // Times required for completed sessions (billing compliance)
+  it("rejects completed session without start/end times", () => {
+    const result = createSessionSchema.safeParse({
+      ...validBase,
+      startTime: "",
+      endTime: "",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const messages = result.error.issues.map((i) => i.message);
+      expect(messages).toContain("Start and end times are required for completed sessions");
+    }
+  });
+
+  it("accepts cancelled session without times", () => {
+    const result = createSessionSchema.safeParse({
+      ...validBase,
+      status: "cancelled",
+      units: 0,
+      startTime: "",
+      endTime: "",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts no_show session without times", () => {
+    const result = createSessionSchema.safeParse({
+      ...validBase,
+      status: "no_show",
+      units: 0,
+      startTime: "",
+      endTime: "",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts scheduled session without times", () => {
+    const result = createSessionSchema.safeParse({
+      ...validBase,
+      status: "scheduled",
+      units: 0,
+      startTime: "",
+      endTime: "",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects notes over 5000 characters", () => {
+    const result = createSessionSchema.safeParse({
+      ...validBase,
+      notes: "x".repeat(5001),
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const messages = result.error.issues.map((i) => i.message);
+      expect(messages).toContain("Notes must be 5,000 characters or fewer");
+    }
+  });
 });
 
 describe("updateSessionSchema", () => {
@@ -261,6 +324,8 @@ describe("updateSessionSchema", () => {
     units: 4,
     placeOfService: "12",
     status: "completed",
+    startTime: "09:00",
+    endTime: "10:00",
     updatedAt: "2026-03-21T12:00:00.000Z",
   };
 
@@ -278,6 +343,19 @@ describe("updateSessionSchema", () => {
   it("rejects empty id", () => {
     const result = updateSessionSchema.safeParse({ ...validUpdate, id: "" });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects completed update without times", () => {
+    const result = updateSessionSchema.safeParse({
+      ...validUpdate,
+      startTime: "",
+      endTime: "",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const messages = result.error.issues.map((i) => i.message);
+      expect(messages).toContain("Start and end times are required for completed sessions");
+    }
   });
 });
 
@@ -314,5 +392,17 @@ describe("cancelSessionSchema", () => {
   it("rejects empty id", () => {
     const result = cancelSessionSchema.safeParse({ id: "" });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects reason over 2000 characters", () => {
+    const result = cancelSessionSchema.safeParse({
+      id: "session_abc",
+      reason: "x".repeat(2001),
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const messages = result.error.issues.map((i) => i.message);
+      expect(messages).toContain("Reason must be 2,000 characters or fewer");
+    }
   });
 });

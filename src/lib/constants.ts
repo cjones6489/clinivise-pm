@@ -398,3 +398,10 @@ export const VALID_SESSION_TRANSITIONS: Record<SessionStatus, readonly SessionSt
 // ── RBT Supervised CPT Codes (require supervisor for billing) ───────────────
 
 export const RBT_SUPERVISED_CPT_CODES = ["97152", "97153", "97154"] as const;
+
+// ── QHP-Only CPT Codes (RBTs and BCaBAs CANNOT bill these) ──────────────────
+// These codes require a Qualified Healthcare Professional (BCBA/BCBA-D).
+// Billing under RBT/BCaBA credentials results in claim denial.
+// See: ABA Coding Coalition CPT-credential matching rules.
+
+export const QHP_ONLY_CPT_CODES = ["97151", "97155", "97156", "97157", "97158"] as const;

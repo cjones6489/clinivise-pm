@@ -76,6 +76,15 @@ function endTimeAfterStartTime(data: { startTime?: string; endTime?: string }) {
   return data.endTime > data.startTime;
 }
 
+function timesRequiredWhenCompleted(data: {
+  status: string;
+  startTime?: string;
+  endTime?: string;
+}) {
+  if (data.status === "completed" && (!data.startTime || !data.endTime)) return false;
+  return true;
+}
+
 function unitsRequiredWhenCompleted(data: { status: string; units: number }) {
   if (data.status === "completed" && data.units < 1) return false;
   return true;
@@ -89,6 +98,10 @@ export const createSessionSchema = sessionFieldsSchema
   .refine(endTimeAfterStartTime, {
     message: "End time must be after start time",
     path: ["endTime"],
+  })
+  .refine(timesRequiredWhenCompleted, {
+    message: "Start and end times are required for completed sessions",
+    path: ["startTime"],
   })
   .refine(unitsRequiredWhenCompleted, {
     message: "At least 1 unit required for completed sessions",
@@ -104,6 +117,10 @@ export const updateSessionSchema = sessionFieldsSchema
   .refine(endTimeAfterStartTime, {
     message: "End time must be after start time",
     path: ["endTime"],
+  })
+  .refine(timesRequiredWhenCompleted, {
+    message: "Start and end times are required for completed sessions",
+    path: ["startTime"],
   })
   .refine(unitsRequiredWhenCompleted, {
     message: "At least 1 unit required for completed sessions",

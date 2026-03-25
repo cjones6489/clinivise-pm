@@ -29,6 +29,8 @@ import {
 } from "@/lib/session-helpers";
 import { requirePermission } from "@/lib/permissions";
 import { NotFoundError, StaleDataError, ConflictError } from "@/lib/errors";
+import { QHP_ONLY_CPT_CODES, CREDENTIAL_LABELS } from "@/lib/constants";
+import type { CredentialType } from "@/lib/constants";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -123,6 +125,19 @@ async function validateSessionForeignKeys(
   return { provider, authorizationId };
 }
 
+/** Block RBTs and BCaBAs from billing QHP-only CPT codes (97151, 97155-97158). */
+function validateCptCredential(credentialType: string, cptCode: string) {
+  if (
+    (credentialType === "rbt" || credentialType === "bcaba") &&
+    (QHP_ONLY_CPT_CODES as readonly string[]).includes(cptCode)
+  ) {
+    const label = CREDENTIAL_LABELS[credentialType as CredentialType] ?? credentialType;
+    throw new ConflictError(
+      `CPT ${cptCode} requires a qualified healthcare professional (BCBA/BCBA-D). ${label} providers cannot bill this code.`,
+    );
+  }
+}
+
 // ── Create Session ───────────────────────────────────────────────────────────
 
 export const createSession = authActionClient
@@ -134,6 +149,9 @@ export const createSession = authActionClient
       ctx.organizationId,
       parsedInput,
     );
+
+    // Block RBTs/BCaBAs from QHP-only CPT codes
+    validateCptCredential(provider.credentialType, parsedInput.cptCode);
 
     // Auto-set supervisor from provider if RBT and not provided
     let supervisorId = parsedInput.supervisorId ?? null;
@@ -199,6 +217,15 @@ export const createSession = authActionClient
     );
 
     const result = await db.transaction(async (tx) => {
+      // Lock auth service row to prevent concurrent over-allocation
+      if (accountingOp.type === "increment") {
+        await tx
+          .select({ id: authorizationServices.id })
+          .from(authorizationServices)
+          .where(eq(authorizationServices.id, accountingOp.authServiceId))
+          .for("update");
+      }
+
       const [session] = await tx
         .insert(sessions)
         .values({
@@ -293,6 +320,9 @@ export const updateSession = authActionClient
       input,
     );
 
+    // Block RBTs/BCaBAs from QHP-only CPT codes
+    validateCptCredential(provider.credentialType, input.cptCode);
+
     // Auto-set supervisor
     let supervisorId = input.supervisorId ?? null;
     if (
@@ -328,6 +358,21 @@ export const updateSession = authActionClient
     );
 
     await db.transaction(async (tx) => {
+      // Lock auth service rows to prevent concurrent over-allocation (ordered by ID to prevent deadlocks)
+      const lockIds = [
+        reverse.type === "decrement" ? reverse.authServiceId : null,
+        apply.type === "increment" ? apply.authServiceId : null,
+      ]
+        .filter((id): id is string => id !== null)
+        .sort();
+      for (const lockId of [...new Set(lockIds)]) {
+        await tx
+          .select({ id: authorizationServices.id })
+          .from(authorizationServices)
+          .where(eq(authorizationServices.id, lockId))
+          .for("update");
+      }
+
       // Step A: REVERSE old units
       if (reverse.type === "decrement") {
         const [reversed] = await tx
@@ -448,7 +493,14 @@ export const cancelSession = authActionClient
     );
 
     await db.transaction(async (tx) => {
+      // Lock auth service row to prevent concurrent modification
       if (cancelOp.type === "decrement") {
+        await tx
+          .select({ id: authorizationServices.id })
+          .from(authorizationServices)
+          .where(eq(authorizationServices.id, cancelOp.authServiceId))
+          .for("update");
+
         const [reversed] = await tx
           .update(authorizationServices)
           .set({
