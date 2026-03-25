@@ -82,11 +82,9 @@ Tests:
 
 ---
 
-## Phase 1: The Product (Sessions + Auth Intelligence + Dashboard)
+## Phase 1-Core: Make It Work (Sessions + Auth Visuals + Dashboard)
 
-> **This is the product.** These three features — session logging, auth utilization visibility, and the dashboard — are what makes a BCBA think "this is better than CentralReach." Build them end-to-end: each feature delivers its query, action, component, and page together.
->
-> The order below is logical (sessions feed the dashboard, auth intelligence gives context to sessions), but build what makes sense in the moment. The features are interleaved, not sequential.
+> **Ship this before first users see the product.** The minimum to make a BCBA think "this is better than what I have." Build end-to-end: each feature delivers its query, action, component, and page together.
 
 ---
 
@@ -117,7 +115,7 @@ Queries:
 - [ ] `getSessions(orgId, filters)` — list with client + provider + auth JOINs, filter by date/provider/client/status
 - [ ] `getSessionById(id, orgId)` — detail with all JOINs
 - [ ] `getClientSessions(clientId, orgId)` — for client detail Sessions tab
-- [ ] `getProviderRecentSessions(providerId, orgId, limit)` — for Quick Log feature
+- [ ] `getProviderRecentSessions(providerId, orgId, limit)` — for Quick Log feature (used in 1-Polish)
 - [ ] `getActiveAuthsForSession(clientId, cptCode, sessionDate, orgId)` — for auth picker
 
 Tests:
@@ -145,12 +143,12 @@ Backend:
 Tests:
 - [ ] Metrics query: correct hours/count with mixed session statuses (cancelled sessions excluded from hours)
 
-#### Log Session Form — build incrementally
+#### Log Session Form
 
-> **Decision**: Split into 4 increments. Each is independently shippable and testable. See [Architecture Decision #2](#architecture-decisions-reference).
+> Core form + auth integration. The form must work and correctly debit authorizations. Pre-fill, Quick Log, validation warnings, and draft persistence are Phase 1-Polish.
 
-**Increment 1 — Core Form:**
-- [ ] Two-column layout: Client (combobox) + Provider (select) — Row 1
+**Core Form:**
+- [ ] Two-column layout: Client (combobox) + Provider (select, pre-fill if RBT) — Row 1
 - [ ] Date (pre-fill today) + Start Time + End Time — Row 2
 - [ ] CPT Code (select with code + description) + Place of Service (select with code + label) — Row 3
 - [ ] **Auto-calculated card** (blue/info): Duration, Units (CMS 8-min rule), Modifier (from provider credential) — real-time as user types
@@ -159,7 +157,7 @@ Tests:
 - [ ] Cancel + Save Session buttons, disable Save during submission (`isPending`)
 - [ ] Success: redirect to `/sessions` with toast
 
-**Increment 2 — Auth Integration:**
+**Auth Integration:**
 - [ ] **Authorization Check card**: selected auth + remaining units before/after
   - Green: "Auth AUTH-0891 has 38 units remaining. This session uses 12 units → 26 remaining."
   - Amber: remaining units < 20% of approved → "Low remaining units"
@@ -169,23 +167,9 @@ Tests:
 - [ ] Wire `createSession` to resolve auth and atomically increment `used_units`
 - [ ] Fresh `used_units` fetch on client/CPT selection (bypass TanStack Query cache)
 
-**Increment 3 — Intelligence & Pre-fill:**
-- [ ] **Pre-fill logic**: date=today, provider=current user's linked provider, CPT=last used for client, POS=last used for client
-- [ ] **Quick Log section** (above form): last 3-5 sessions as compact cards with "Log Again" button
-- [ ] **Validation warnings** (competitive differentiator):
-  - CPT-credential mismatch (e.g., BCBA logging 97153 should be RBT)
-  - maxUnitsPerDay enforcement (e.g., 97153 max 32 units/day)
-  - Session overlap detection (provider already has a session at this time)
-  - Auto-unit mismatch (user manually overrides calculated units)
-  - No active auth (session saved as "flagged")
-
-**Increment 4 — Resilience:**
-- [ ] **Draft persistence**: save form state to localStorage keyed by `draft-session-{orgId}`, show resume/discard banner on return
-- [ ] Cancellation/no-show: when status is `cancelled` or `no_show`, hide time fields, show optional cancellation reason field
-
 ---
 
-### 1B — Auth Intelligence
+### 1B — Auth Intelligence (Visual Layer)
 
 > *Product spec §5 (Auth List), §3 (Client Detail Overview), UI/UX guide §5 (Authorizations).*
 > **The "aha moment"** — the user sees auth utilization at a glance. No ABA competitor shows this on the client page.
@@ -220,7 +204,7 @@ Tests:
 
 #### Client Detail Overview Tab
 
-> **Decision**: Uses Suspense boundaries with async server components (Vercel Tier 1 pattern). Critical data loads in the page shell, section data streams in via 3 Suspense boundaries. See [Architecture Decision #6](#architecture-decisions-reference).
+> **Decision**: Uses Suspense boundaries with async server components (Vercel Tier 1 pattern). See [Architecture Decision #6](#architecture-decisions-reference).
 
 Page shell (critical data, `Promise.all`):
 - [ ] Load client record + guardian contact together — renders header immediately, `notFound()` if missing
@@ -238,7 +222,7 @@ Suspense boundary 2 — Authorization Utilization:
 - [ ] Compute hours from units: `units * 15 / 60` for display
 
 Suspense boundary 3 — Recent Sessions:
-- [ ] Recent sessions table (last 5), or "No sessions yet" empty state before sessions are built
+- [ ] Recent sessions table (last 5), or "No sessions yet" empty state
 
 Skeleton loaders:
 - [ ] Content-shaped skeletons for each Suspense boundary (not spinners)
@@ -255,20 +239,6 @@ Frontend:
 - [ ] **Expiry alert banner**: 30/14/7-day severity-coded banner at top of page
 - [ ] Client detail: wire Authorizations tab (filtered auth list with "Add Authorization" button)
 
-#### Auth Intelligence — Session-Dependent Features
-
-> These features require session history. Build after sessions are logging.
->
-> **Decision**: Predictive burndown and pacing alerts only. Revenue-at-risk deferred (requires fee schedule data). Composite health score deferred to Phase 2+ pending practitioner validation. See [Architecture Decision #7](#architecture-decisions-reference).
-
-- [ ] **Predictive burndown** on auth detail: "At current pace, exhausts on {date}" — uses session burn rate over last 4 weeks. Calculation: `remaining_units / (units_used_last_4_weeks / 4) = weeks_remaining`
-- [ ] **Under-utilization pacing alert**: "<50% used with >50% period elapsed" — flag for review on auth detail and dashboard alerts
-
-Tests:
-- [ ] Burndown projection: 10 units/week burn rate, 40 units remaining → exhausts in 4 weeks
-- [ ] Pacing alert: 30% used at 60% elapsed → triggers under-utilization warning
-- [ ] Pacing alert: 70% used at 60% elapsed → no warning (on pace)
-
 ---
 
 ### 1C — Dashboard
@@ -282,7 +252,6 @@ Queries:
 - [ ] `getDashboardMetrics(orgId)` — active client count, avg utilization, hours this week, action item count
 - [ ] `getDashboardAlerts(orgId)` — expiring auths (30/14/7d), high utilization (>=80%), expired auths, expired provider credentials, terminated insurance with active auth, flagged sessions
 - [ ] `getClientOverviewForDashboard(orgId)` — clients with inline payer, BCBA, auth utilization, auth status, days remaining
-- [ ] `getUserSessionsToday(providerId, orgId)` — for "Your Sessions Today" widget
 
 Tests:
 - [ ] Alert detection: expiring auth within 7 days returns critical severity
@@ -293,11 +262,10 @@ Tests:
 #### Dashboard Frontend
 
 Layout (match wireframe):
-- [ ] **Header**: "Dashboard" + date + description + action buttons (Log Session, Export)
+- [ ] **Header**: "Dashboard" + date + description + action buttons (Log Session)
 - [ ] **4 metric cards**: Active Clients, Avg Utilization (color-coded), Hours This Week, Action Items (with critical count)
 - [ ] **Priority Alerts card**: color-coded rows (red=critical, amber=warning), each with entity name, description, action button (Verify/Renew/Review)
 - [ ] **Client Overview table**: client name+diagnosis+age, payer, eligibility (— for MVP), auth utilization bar, auth status badge with days remaining, clickable rows → client detail
-- [ ] **Your Sessions Today card**: compact card for current user's sessions today, "Log Session" CTA. Only visible when user has a linked provider.
 
 Design quality:
 - [ ] Suspense boundaries for staggered loading (metric cards load independently of table)
@@ -305,17 +273,9 @@ Design quality:
 - [ ] Exception-based alerting: only surface problems, not happy paths
 - [ ] Use section cards with title bars (not naked headings)
 
-#### First-Time Experience
-
-> When a new practice signs up, the dashboard must guide setup — not show a wall of zeroes.
-
-- [ ] **Getting Started card**: 3-step checklist (Add practice info → Add first provider → Add first client). Links to relevant pages. Checkmarks when complete. Disappears when provider + client exist.
-- [ ] **Post-creation redirect**: after first client, show setup checklist on client detail (Add guardian → Add insurance → Enter authorization)
-- [ ] Empty states on all list pages (already built, verify quality)
-
 ---
 
-### 1D — Integration Points
+### 1D — Integration & Fixes
 
 > Wire everything together.
 
@@ -332,13 +292,51 @@ Tests:
 - [ ] Edge case: cancel completed session → used_units decremented
 - [ ] Edge case: cancel non-completed session → no unit adjustment
 
-**Phase 1 Checkpoint**: A BCBA can log in, see their dashboard with real alerts, navigate to a client, see auth utilization at a glance, log a session in under 30 seconds, and watch the utilization update. **This is the product.**
+**Phase 1-Core Checkpoint**: A BCBA can log in, see their dashboard with real alerts, navigate to a client, see auth utilization at a glance, log a session, and watch the utilization update. **This is the minimum product.**
 
 ---
 
-## Phase 2: First Users + Polish
+## Phase 1-Polish: Make It Delightful (after first user feedback)
 
-> Ship to a handful of ABA practices. Gather feedback. Polish based on what actually matters.
+> Ship these after 2-3 pilot practices are using the core product. Validate that the designs match real workflows before investing in polish. Some of these may change based on feedback.
+
+### Session Intelligence & Resilience
+
+- [ ] **Quick Log section** (above form): last 3-5 sessions as compact cards with "Log Again" button that pre-fills entire form
+- [ ] **Pre-fill logic**: provider=current user's linked provider, CPT=last used for client, POS=last used for client
+- [ ] **Validation warnings** (competitive differentiator):
+  - CPT-credential mismatch (e.g., BCBA logging 97153 should be RBT)
+  - maxUnitsPerDay enforcement (e.g., 97153 max 32 units/day)
+  - Session overlap detection (provider already has a session at this time)
+  - Auto-unit mismatch (user manually overrides calculated units)
+  - No active auth (session saved as "flagged")
+- [ ] **Draft persistence**: save form state to localStorage keyed by `draft-session-{orgId}`, show resume/discard banner on return
+- [ ] **Cancellation reason field**: optional textarea when status is `cancelled` or `no_show`
+
+### Auth Intelligence — Predictive Features
+
+- [ ] **Predictive burndown** on auth detail: "At current pace, exhausts on {date}" — uses session burn rate over last 4 weeks. Calculation: `remaining_units / (units_used_last_4_weeks / 4) = weeks_remaining`
+- [ ] **Under-utilization pacing alert**: "<50% used with >50% period elapsed" — flag for review on auth detail and dashboard alerts
+
+Tests:
+- [ ] Burndown projection: 10 units/week burn rate, 40 units remaining → exhausts in 4 weeks
+- [ ] Pacing alert: 30% used at 60% elapsed → triggers under-utilization warning
+- [ ] Pacing alert: 70% used at 60% elapsed → no warning (on pace)
+
+### Dashboard Enhancements
+
+- [ ] **Your Sessions Today card**: compact card for current user's sessions today, "Log Session" CTA. Only visible when user has a linked provider. Query: `getUserSessionsToday(providerId, orgId)`
+- [ ] **Getting Started card**: 3-step checklist (Add practice info → Add first provider → Add first client). Links to relevant pages. Checkmarks when complete. Disappears when provider + client exist.
+- [ ] **Post-creation redirect**: after first client, show setup checklist on client detail (Add guardian → Add insurance → Enter authorization)
+- [ ] Empty states on all list pages (already built, verify quality)
+
+**Phase 1-Polish Checkpoint**: Sessions log in <15 seconds with Quick Log. Validation warnings catch billing errors before they happen. Dashboard guides new practices through setup. Auth projections surface under-utilization proactively.
+
+---
+
+## Phase 2: Deploy + Settings + Design Pass
+
+> Deploy after Phase 1-Core. Run Phase 1-Polish in parallel with Phase 2 based on user feedback.
 
 ### Deploy & Onboard
 - [ ] Deploy to production (Vercel)
