@@ -206,16 +206,34 @@ Healthcare alert fatigue causes **49-96% of alerts to be overridden** (AHRQ PSNe
 ### Display Format
 
 - **Hours preferred** over units for readability. BCBAs think in hours. Display: `units * 15 / 60`.
-- **Units for precision** on detail pages and billing contexts.
+- **Units for precision** on detail pages and billing contexts. Consider `(X units)` annotation next to hours for power users.
 - **Progress bar + percentage** is the most common pattern (CentralReach, TherapyPMS, our spec).
+- **Linear bars outperform circular** — NNGroup confirms "length" is the most effective preattentive attribute for quantitative comparison.
 - **Color thresholds**: emerald (<80%), amber (80-95%), red (>95%). Our spec is aligned.
-- **Over-utilization (>100%)**: Show bar at 100% with red overflow indicator. Text shows actual percentage.
+- **Over-utilization (>100%)**: Cap bar fill at 100%, show actual percentage in red bold text, change bar track background to `bg-red-100`, add "Over-utilized" label.
+- **Bar direction**: Show used/approved (bar grows left→right as usage increases). Empty space = what's left. Show remaining hours as prominent text label alongside.
 
 ### Expiry Display
 
 - **Days remaining as number** ("62d") in table columns. Color: green >30d, amber 7-30d, red <7d, "Expired" if past.
 - **Full date** ("Expires Jun 18, 2026") on detail pages alongside days remaining.
 - **Lead times**: 30d (info), 14d (warning), 7d (critical). Our spec matches.
+- **Future auths**: Blue/info badge "Starts {date}" for pending auths with future start dates.
+
+### Utilization Bar Accessibility (W3C ARIA APG)
+
+- Use `role="meter"` (not `progressbar`) — meters depict static value ranges, progress bars show task completion. Auth utilization is a meter.
+- Required attributes: `aria-valuemin`, `aria-valuemax`, `aria-valuenow`
+- `aria-valuetext`: descriptive text like "67% (12.5 hours) remaining" — screen readers announcing just "67%" is not useful
+- **Never rely on color alone** — ~8% of men have color vision deficiency. Each threshold needs a secondary indicator: text label ("On track", "Nearing limit"), icon, or the percentage number itself.
+- Color contrast: all text labels must meet WCAG 2.1 AA (4.5:1). Verify dark mode variants.
+
+### Utilization Bar Responsive Design
+
+- **Minimum bar width**: 120px. Below this, bar is unreadable.
+- **Mobile**: Stack vertically — label on top, bar full-width below, percentage aligned right.
+- **Table cells**: Replace inline bars with colored percentage text or colored dot + percentage on narrow screens.
+- **Touch targets**: If bar is clickable, ensure `min-h-11 min-w-11` (44px).
 
 ### Client Detail Overview — Data Architecture
 
@@ -227,6 +245,23 @@ Use **3 Suspense boundaries** (Vercel Tier 1 pattern):
 4. **Suspense 3**: Recent sessions (may be slower, loads last)
 
 Each section is an async server component fetching independently. Skeleton loaders match content shape.
+
+### Client Detail — Missing from Current Implementation (vs Product Spec)
+
+- Auth status badge in header ("Auth: 14d left" amber or "Auth: Active" green)
+- Action buttons row below header (Log Session, Upload Auth Letter)
+- Weekly Avg metric card (currently showing Diagnosis — lower priority for hero row)
+- Per-CPT utilization bars in overview (currently aggregate only)
+- Under-utilization detection (amber when <50% used with >50% period elapsed)
+- Expiry badge in client list table
+
+### Data Density — Healthcare Dashboard UX
+
+- **Preattentive processing** handles 4-7 distinct items simultaneously → 4 metric cards optimal
+- **60-30-10 rule**: 60% default/muted (things that are fine), 30% accent/structure, 10% signal colors (things needing attention)
+- **"Everything is fine" state**: Show "All authorizations on track. No action items." with checkmark — confirms system is working, not that data is missing
+- **Max 3 levels of visual hierarchy** per section: card title (uppercase 11px), content (13px medium), metadata (11px muted)
+- **3-second rule**: Clinician should know what needs attention within 3 seconds of page load
 
 ---
 
