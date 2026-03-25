@@ -8,6 +8,7 @@ import { clients, clientContacts } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
+import { NotFoundError, StaleDataError } from "@/lib/errors";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
@@ -31,7 +32,7 @@ export const createContact = authActionClient
       .limit(1);
 
     if (!client) {
-      throw new Error("Client not found");
+      throw new NotFoundError("Client");
     }
 
     const [contact] = await db
@@ -70,7 +71,7 @@ export const updateContact = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Contact not found");
+      throw new NotFoundError("Contact");
     }
 
     const [contact] = await db
@@ -86,7 +87,7 @@ export const updateContact = authActionClient
       .returning();
 
     if (!contact) {
-      throw new Error("Record was modified by another user. Please refresh and try again.");
+      throw new StaleDataError();
     }
 
     await logAudit({
@@ -119,7 +120,7 @@ export const deleteContact = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Contact not found");
+      throw new NotFoundError("Contact");
     }
 
     await db

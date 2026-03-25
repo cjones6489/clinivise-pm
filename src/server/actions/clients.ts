@@ -8,6 +8,7 @@ import { clients, providers } from "@/server/db/schema";
 import { eq, and, isNull, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
+import { NotFoundError, StaleDataError } from "@/lib/errors";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
@@ -32,7 +33,7 @@ export const createClient = authActionClient
         )
         .limit(1);
       if (!bcba) {
-        throw new Error("BCBA not found");
+        throw new NotFoundError("BCBA");
       }
     }
 
@@ -82,7 +83,7 @@ export const updateClient = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Client not found");
+      throw new NotFoundError("Client");
     }
 
     if (updates.assignedBcbaId) {
@@ -100,7 +101,7 @@ export const updateClient = authActionClient
         )
         .limit(1);
       if (!bcba) {
-        throw new Error("BCBA not found");
+        throw new NotFoundError("BCBA");
       }
     }
 
@@ -117,7 +118,7 @@ export const updateClient = authActionClient
       .returning();
 
     if (!client) {
-      throw new Error("Record was modified by another user. Please refresh and try again.");
+      throw new StaleDataError();
     }
 
     await logAudit({
@@ -151,7 +152,7 @@ export const deleteClient = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Client not found");
+      throw new NotFoundError("Client");
     }
 
     const [client] = await db

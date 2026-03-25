@@ -1,4 +1,5 @@
 import type { UserRole } from "./constants";
+import { ForbiddenError } from "./errors";
 
 export const PERMISSIONS = {
   "clients.write": ["owner", "admin", "bcba"],
@@ -24,6 +25,6 @@ export function hasPermission(role: string, permission: Permission): boolean {
  */
 export function requirePermission(role: string, permission: Permission): void {
   if (!hasPermission(role, permission)) {
-    throw new Error("Forbidden: insufficient role");
+    throw new ForbiddenError();
   }
 }

@@ -8,6 +8,7 @@ import { payers, clientInsurance } from "@/server/db/schema";
 import { eq, and, isNull, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
+import { NotFoundError, StaleDataError, ConflictError } from "@/lib/errors";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
@@ -52,7 +53,7 @@ export const updatePayer = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Payer not found");
+      throw new NotFoundError("Payer");
     }
 
     const [payer] = await db
@@ -68,7 +69,7 @@ export const updatePayer = authActionClient
       .returning();
 
     if (!payer) {
-      throw new Error("Record was modified by another user. Please refresh and try again.");
+      throw new StaleDataError();
     }
 
     await logAudit({
@@ -96,7 +97,7 @@ export const deletePayer = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Payer not found");
+      throw new NotFoundError("Payer");
     }
 
     // Check for active insurance policies referencing this payer (org-scoped)
@@ -112,7 +113,7 @@ export const deletePayer = authActionClient
       );
 
     if ((countResult[0]?.activeCount ?? 0) > 0) {
-      throw new Error("Cannot delete payer with active insurance policies");
+      throw new ConflictError("Cannot delete payer with active insurance policies");
     }
 
     // Deactivate rather than hard delete for FK integrity

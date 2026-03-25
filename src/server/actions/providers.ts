@@ -8,6 +8,7 @@ import { providers } from "@/server/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { CREDENTIAL_MODIFIERS } from "@/lib/constants";
+import { NotFoundError, StaleDataError } from "@/lib/errors";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
@@ -32,7 +33,7 @@ export const createProvider = authActionClient
         )
         .limit(1);
       if (!supervisor) {
-        throw new Error("Supervisor not found");
+        throw new NotFoundError("Supervisor");
       }
     }
 
@@ -80,7 +81,7 @@ export const updateProvider = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Provider not found");
+      throw new NotFoundError("Provider");
     }
 
     // Validate supervisorId exists in the same org if provided
@@ -97,7 +98,7 @@ export const updateProvider = authActionClient
         )
         .limit(1);
       if (!supervisor) {
-        throw new Error("Supervisor not found");
+        throw new NotFoundError("Supervisor");
       }
     }
 
@@ -122,7 +123,7 @@ export const updateProvider = authActionClient
       .returning();
 
     if (!provider) {
-      throw new Error("Record was modified by another user. Please refresh and try again.");
+      throw new StaleDataError();
     }
 
     await logAudit({
@@ -157,7 +158,7 @@ export const deleteProvider = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Provider not found");
+      throw new NotFoundError("Provider");
     }
 
     const [provider] = await db

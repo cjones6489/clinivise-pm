@@ -28,6 +28,7 @@ import {
   computeCancelAccountingOps,
 } from "@/lib/session-helpers";
 import { requirePermission } from "@/lib/permissions";
+import { NotFoundError, StaleDataError, ConflictError } from "@/lib/errors";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -52,7 +53,7 @@ async function validateSessionForeignKeys(
     )
     .limit(1);
 
-  if (!client) throw new Error("Client not found");
+  if (!client) throw new NotFoundError("Client");
 
   const [provider] = await db
     .select({
@@ -71,8 +72,8 @@ async function validateSessionForeignKeys(
     )
     .limit(1);
 
-  if (!provider) throw new Error("Provider not found");
-  if (!provider.isActive) throw new Error("Provider not active");
+  if (!provider) throw new NotFoundError("Provider");
+  if (!provider.isActive) throw new ConflictError("Provider not active");
 
   if (input.supervisorId) {
     const [supervisor] = await db
@@ -87,7 +88,7 @@ async function validateSessionForeignKeys(
       )
       .limit(1);
 
-    if (!supervisor) throw new Error("Supervisor not found");
+    if (!supervisor) throw new NotFoundError("Supervisor");
   }
 
   let authorizationId: string | null = null;
@@ -109,11 +110,11 @@ async function validateSessionForeignKeys(
       )
       .limit(1);
 
-    if (!authSvc) throw new Error("Authorization service not found");
+    if (!authSvc) throw new NotFoundError("Authorization service");
 
     // Verify auth belongs to the same client
     if (input.clientId && authSvc.clientId !== input.clientId) {
-      throw new Error("Authorization service not found");
+      throw new NotFoundError("Authorization service");
     }
 
     authorizationId = authSvc.authorizationId;
@@ -222,7 +223,7 @@ export const createSession = authActionClient
         })
         .returning();
 
-      if (!session) throw new Error("Failed to create session");
+      if (!session) throw new ConflictError("Failed to create session");
 
       if (accountingOp.type === "increment") {
         await tx
@@ -277,14 +278,14 @@ export const updateSession = authActionClient
       .where(and(eq(sessions.id, id), eq(sessions.organizationId, ctx.organizationId)))
       .limit(1);
 
-    if (!existing) throw new Error("Session not found");
+    if (!existing) throw new NotFoundError("Session");
 
     // Client cannot be changed after creation — lock to existing value
     const input = { ...inputFields, clientId: existing.clientId };
 
     // Validate status transition
     if (!isValidStatusTransition(existing.status, input.status)) {
-      throw new Error("Invalid status transition");
+      throw new ConflictError("Invalid status transition");
     }
 
     const { provider, authorizationId } = await validateSessionForeignKeys(
@@ -344,7 +345,7 @@ export const updateSession = authActionClient
           .returning({ id: authorizationServices.id });
 
         if (!reversed) {
-          throw new Error("Cannot reverse more units than are recorded");
+          throw new ConflictError("Cannot reverse more units than are recorded");
         }
       }
 
@@ -393,7 +394,7 @@ export const updateSession = authActionClient
         .returning();
 
       if (!updated) {
-        throw new Error("Record was modified by another user. Please refresh and try again.");
+        throw new StaleDataError();
       }
     });
 
@@ -433,11 +434,11 @@ export const cancelSession = authActionClient
       .where(and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)))
       .limit(1);
 
-    if (!existing) throw new Error("Session not found");
+    if (!existing) throw new NotFoundError("Session");
 
     // Validate transition
     if (!isValidStatusTransition(existing.status, "cancelled")) {
-      throw new Error("Invalid status transition");
+      throw new ConflictError("Invalid status transition");
     }
 
     const cancelOp = computeCancelAccountingOps(
@@ -463,7 +464,7 @@ export const cancelSession = authActionClient
           .returning({ id: authorizationServices.id });
 
         if (!reversed) {
-          throw new Error("Cannot reverse more units than are recorded");
+          throw new ConflictError("Cannot reverse more units than are recorded");
         }
       }
 

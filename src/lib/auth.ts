@@ -5,6 +5,7 @@ import { db } from "@/server/db";
 import { users, organizations } from "@/server/db/schema";
 import { eq, and } from "drizzle-orm";
 import type { UserRole } from "@/lib/constants";
+import { UnauthorizedError, ForbiddenError } from "@/lib/errors";
 
 /**
  * Dev-only: auto-provision org + user from Clerk session.
@@ -103,14 +104,14 @@ export async function getCurrentUser() {
 
 export async function requireAuth() {
   const user = await getCurrentUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) throw new UnauthorizedError();
   return user;
 }
 
 export async function requireRole(allowedRoles: UserRole[]) {
   const user = await requireAuth();
   if (!allowedRoles.includes(user.role as UserRole)) {
-    throw new Error("Forbidden: insufficient role");
+    throw new ForbiddenError();
   }
   return user;
 }

@@ -15,6 +15,7 @@ import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
+import { NotFoundError, StaleDataError, ConflictError } from "@/lib/errors";
 
 export const createInsurance = authActionClient
   .schema(createInsuranceSchema)
@@ -35,7 +36,7 @@ export const createInsurance = authActionClient
       .limit(1);
 
     if (!client) {
-      throw new Error("Client not found");
+      throw new NotFoundError("Client");
     }
 
     // Verify payer exists in org and is active
@@ -52,7 +53,7 @@ export const createInsurance = authActionClient
       .limit(1);
 
     if (!payer) {
-      throw new Error("Payer not found");
+      throw new NotFoundError("Payer");
     }
 
     // Auto-calculate next priority in a transaction to prevent races
@@ -84,7 +85,7 @@ export const createInsurance = authActionClient
 
       const activeCount = capacityRow?.activeCount ?? 0;
       if (activeCount >= 3) {
-        throw new Error("Maximum of 3 insurance policies allowed");
+        throw new ConflictError("Maximum of 3 insurance policies allowed");
       }
       // Use MAX to avoid colliding with surviving non-contiguous priorities
       const nextPriority = (maxRow?.maxPriority ?? 0) + 1;
@@ -139,7 +140,7 @@ export const updateInsurance = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Insurance policy not found");
+      throw new NotFoundError("Insurance policy");
     }
 
     // If payerId changed, verify new payer exists in org
@@ -157,7 +158,7 @@ export const updateInsurance = authActionClient
         .limit(1);
 
       if (!payer) {
-        throw new Error("Payer not found");
+        throw new NotFoundError("Payer");
       }
     }
 
@@ -202,7 +203,7 @@ export const updateInsurance = authActionClient
           .returning();
 
         if (!txUpdated) {
-          throw new Error("Record was modified by another user. Please refresh and try again.");
+          throw new StaleDataError();
         }
       });
     } else {
@@ -219,7 +220,7 @@ export const updateInsurance = authActionClient
         .returning();
 
       if (!directUpdated) {
-        throw new Error("Record was modified by another user. Please refresh and try again.");
+        throw new StaleDataError();
       }
     }
 
@@ -253,7 +254,7 @@ export const deleteInsurance = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Insurance policy not found");
+      throw new NotFoundError("Insurance policy");
     }
 
     await db.transaction(async (tx) => {
@@ -328,7 +329,7 @@ export const verifyInsurance = authActionClient
       .limit(1);
 
     if (!existing) {
-      throw new Error("Insurance policy not found");
+      throw new NotFoundError("Insurance policy");
     }
 
     // Reject verifying expired policies
@@ -337,7 +338,7 @@ export const verifyInsurance = authActionClient
       existing.terminationDate &&
       new Date(existing.terminationDate) < new Date()
     ) {
-      throw new Error("Cannot verify an expired insurance policy");
+      throw new ConflictError("Cannot verify an expired insurance policy");
     }
 
     const verifiedAt = parsedInput.verificationStatus === "verified" ? new Date() : null;

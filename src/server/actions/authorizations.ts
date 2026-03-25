@@ -20,6 +20,7 @@ import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
+import { NotFoundError, StaleDataError, ConflictError } from "@/lib/errors";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -44,7 +45,7 @@ async function validateForeignKeys(
     )
     .limit(1);
 
-  if (!client) throw new Error("Client not found");
+  if (!client) throw new NotFoundError("Client");
 
   const [payer] = await db
     .select({ id: payers.id })
@@ -58,7 +59,7 @@ async function validateForeignKeys(
     )
     .limit(1);
 
-  if (!payer) throw new Error("Payer not found");
+  if (!payer) throw new NotFoundError("Payer");
 
   const [insurance] = await db
     .select({ id: clientInsurance.id })
@@ -73,7 +74,7 @@ async function validateForeignKeys(
     )
     .limit(1);
 
-  if (!insurance) throw new Error("Client insurance not found");
+  if (!insurance) throw new NotFoundError("Client insurance");
 
   if (input.previousAuthorizationId) {
     const [prevAuth] = await db
@@ -88,7 +89,7 @@ async function validateForeignKeys(
       )
       .limit(1);
 
-    if (!prevAuth) throw new Error("Authorization not found");
+    if (!prevAuth) throw new NotFoundError("Authorization");
   }
 }
 
@@ -112,7 +113,7 @@ export const createAuthorization = authActionClient
         })
         .returning();
 
-      if (!auth) throw new Error("Failed to create authorization");
+      if (!auth) throw new ConflictError("Failed to create authorization");
 
       if (services.length > 0) {
         await tx.insert(authorizationServices).values(
@@ -166,7 +167,7 @@ export const updateAuthorization = authActionClient
       )
       .limit(1);
 
-    if (!existing) throw new Error("Authorization not found");
+    if (!existing) throw new NotFoundError("Authorization");
 
     // Client cannot be changed after creation — strip it from the update payload
     // and use the existing clientId for FK validation and revalidation
@@ -191,7 +192,7 @@ export const updateAuthorization = authActionClient
         .returning();
 
       if (!updatedAuth) {
-        throw new Error("Record was modified by another user. Please refresh and try again.");
+        throw new StaleDataError();
       }
 
       // Reconcile service lines: update existing, insert new, delete removed
@@ -212,7 +213,7 @@ export const updateAuthorization = authActionClient
         .limit(1);
 
       if (removedWithUsage.length > 0) {
-        throw new Error("Cannot remove service lines that have recorded usage");
+        throw new ConflictError("Cannot remove service lines that have recorded usage");
       }
 
       // Delete removed service lines (org-scoped for defense-in-depth)
@@ -297,7 +298,7 @@ export const archiveAuthorization = authActionClient
       )
       .limit(1);
 
-    if (!existing) throw new Error("Authorization not found");
+    if (!existing) throw new NotFoundError("Authorization");
 
     await db
       .update(authorizations)
