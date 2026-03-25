@@ -8,7 +8,7 @@ import {
   authorizations,
   authorizationServices,
 } from "@/server/db/schema";
-import { eq, and, asc, desc, lte, gte, lt, isNull, sql } from "drizzle-orm";
+import { eq, and, asc, desc, lte, gte, lt, isNull, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 // ── Self-join alias for supervisor ──────────────────────────────────────────
@@ -76,7 +76,24 @@ export type AuthServiceMatch = {
   maxUnitsPerDay: number | null;
 };
 
+// ── Filters ─────────────────────────────────────────────────────────────────
+
+export type SessionFilters = {
+  status?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  clientId?: string;
+  providerId?: string;
+};
+
 // ── Queries ──────────────────────────────────────────────────────────────────
+
+export type SessionListMetrics = {
+  hoursThisWeek: number;
+  sessions7d: number;
+  flaggedCount: number;
+  thisMonthCount: number;
+};
 
 export type SessionsPage = {
   data: SessionListItem[];
@@ -123,23 +140,91 @@ function sessionListBase() {
     .leftJoin(authorizations, eq(sessions.authorizationId, authorizations.id));
 }
 
+export async function getSessionListMetrics(orgId: string): Promise<SessionListMetrics> {
+  const now = new Date();
+  // Monday of this week (ISO week)
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  const weekStartStr = weekStart.toISOString().slice(0, 10);
+  // First of this month
+  const monthStartStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  // 7 days ago
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(now.getDate() - 7);
+  const sevenDaysAgoStr = sevenDaysAgo.toISOString().slice(0, 10);
+
+  const [result] = await db
+    .select({
+      hoursThisWeek: sql<number>`coalesce(
+        sum(${sessions.units}) filter (
+          where ${sessions.sessionDate} >= ${weekStartStr}
+          and ${sessions.status} = 'completed'
+        ), 0
+      )::numeric * 15.0 / 60`,
+      sessions7d: sql<number>`count(*) filter (
+        where ${sessions.sessionDate} >= ${sevenDaysAgoStr}
+        and ${sessions.status} != 'cancelled'
+      )::int`,
+      flaggedCount: sql<number>`count(*) filter (
+        where ${sessions.status} = 'flagged'
+      )::int`,
+      thisMonthCount: sql<number>`count(*) filter (
+        where ${sessions.sessionDate} >= ${monthStartStr}
+      )::int`,
+    })
+    .from(sessions)
+    .where(eq(sessions.organizationId, orgId));
+
+  return {
+    hoursThisWeek: Number(result?.hoursThisWeek ?? 0),
+    sessions7d: result?.sessions7d ?? 0,
+    flaggedCount: result?.flaggedCount ?? 0,
+    thisMonthCount: result?.thisMonthCount ?? 0,
+  };
+}
+
+/** Build dynamic WHERE conditions from filter params. */
+function buildFilterConditions(orgId: string, filters?: SessionFilters): SQL[] {
+  const conditions: SQL[] = [sql`${sessions.organizationId} = ${orgId}`];
+
+  if (filters?.status) {
+    conditions.push(sql`${sessions.status} = ${filters.status}`);
+  }
+  if (filters?.dateFrom) {
+    conditions.push(sql`${sessions.sessionDate} >= ${filters.dateFrom}`);
+  }
+  if (filters?.dateTo) {
+    conditions.push(sql`${sessions.sessionDate} <= ${filters.dateTo}`);
+  }
+  if (filters?.clientId) {
+    conditions.push(sql`${sessions.clientId} = ${filters.clientId}`);
+  }
+  if (filters?.providerId) {
+    conditions.push(sql`${sessions.providerId} = ${filters.providerId}`);
+  }
+
+  return conditions;
+}
+
 export async function getSessions(
   orgId: string,
-  opts: { page?: number; pageSize?: number } = {},
+  opts: { page?: number; pageSize?: number; filters?: SessionFilters } = {},
 ): Promise<SessionsPage> {
   const page = opts.page ?? 0;
   const pageSize = Math.min(opts.pageSize ?? 50, 100);
+  const whereConditions = buildFilterConditions(orgId, opts.filters);
+  const whereClause = and(...whereConditions);
 
   const [rows, countResult] = await Promise.all([
     sessionListBase()
-      .where(eq(sessions.organizationId, orgId))
+      .where(whereClause)
       .orderBy(desc(sessions.sessionDate), desc(sessions.createdAt))
       .limit(pageSize)
       .offset(page * pageSize),
     db
       .select({ count: sql<number>`count(*)::int` })
       .from(sessions)
-      .where(eq(sessions.organizationId, orgId)),
+      .where(whereClause),
   ]);
 
   return {

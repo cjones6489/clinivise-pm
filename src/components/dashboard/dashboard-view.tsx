@@ -10,39 +10,7 @@ import { formatDate, daysUntilExpiry } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
-// ── Metric Card ──────────────────────────────────────────────────────────────
-
-function MetricCard({
-  label,
-  value,
-  sub,
-  color,
-  icon,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  color?: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="card-hover border-border bg-card rounded-xl border px-4 py-4 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-          {label}
-        </div>
-        {icon}
-      </div>
-      <div
-        className="mt-2 text-2xl font-bold tracking-tight tabular-nums"
-        style={color ? { color } : undefined}
-      >
-        {value}
-      </div>
-      {sub && <div className="text-muted-foreground mt-1 text-[11px]">{sub}</div>}
-    </div>
-  );
-}
+import { MetricCard } from "@/components/shared/metric-card";
 
 // ── Section Card ─────────────────────────────────────────────────────────────
 
@@ -94,13 +62,17 @@ function AlertRow({
   const icon = severity === "critical" ? "text-red-600" : "text-amber-600";
 
   return (
-    <div className={`flex items-center gap-3 border-b ${border} ${bg} px-4 py-2.5 last:border-b-0`}>
-      <HugeiconsIcon icon={Alert02Icon} size={16} className={icon} />
-      <div className="min-w-0 flex-1">
-        <span className="text-[13px] font-semibold">{title}</span>
-        <span className="text-muted-foreground ml-1.5 text-[12px]">{description}</span>
+    <div
+      className={`flex flex-col gap-2 border-b ${border} ${bg} px-4 py-2.5 last:border-b-0 sm:flex-row sm:items-center sm:gap-3`}
+    >
+      <div className="flex min-w-0 flex-1 items-start gap-2 sm:items-center">
+        <HugeiconsIcon icon={Alert02Icon} size={16} className={`shrink-0 ${icon}`} />
+        <div className="min-w-0 flex-1">
+          <span className="text-[13px] font-semibold">{title}</span>
+          <span className="text-muted-foreground ml-1.5 text-[12px]">{description}</span>
+        </div>
       </div>
-      <Button asChild size="sm" variant="outline" className="h-7 shrink-0 text-xs">
+      <Button asChild size="sm" variant="outline" className="h-7 w-full shrink-0 text-xs sm:w-auto">
         <Link href={actionHref}>{actionLabel}</Link>
       </Button>
     </div>
@@ -125,63 +97,117 @@ function ClientOverviewRow({
   return (
     <Link
       href={`/clients/${client.id}`}
-      className="border-border/40 hover:bg-muted/30 grid grid-cols-[2fr_1fr_1fr_1.5fr_0.8fr_24px] items-center gap-2 border-b px-4 py-2.5 text-[13px] transition-colors last:border-b-0"
+      className="border-border/40 hover:bg-muted/30 block border-b px-4 py-2.5 text-[13px] transition-colors last:border-b-0"
     >
-      <div>
-        <span className="font-semibold">
-          {client.firstName} {client.lastName}
-        </span>
-        <span className="text-muted-foreground ml-1.5 text-[11px]">
-          · {client.diagnosisCode ?? "F84.0"} · Age{" "}
-          {new Date().getFullYear() - new Date(client.dateOfBirth).getFullYear()}
-        </span>
+      {/* Desktop: grid layout */}
+      <div className="hidden items-center gap-2 sm:grid sm:grid-cols-[2fr_1fr_1fr_1.5fr_0.8fr_24px]">
+        <div>
+          <span className="font-semibold">
+            {client.firstName} {client.lastName}
+          </span>
+          <span className="text-muted-foreground ml-1.5 text-[11px]">
+            · {client.diagnosisCode ?? "F84.0"} · Age{" "}
+            {new Date().getFullYear() - new Date(client.dateOfBirth).getFullYear()}
+          </span>
+        </div>
+        <div className="text-muted-foreground">
+          {client.bcbaLastName ? `${client.bcbaFirstName} ${client.bcbaLastName}` : "—"}
+        </div>
+        <div>
+          {auth ? (
+            <Badge
+              variant={auth.status === "approved" ? "default" : "outline"}
+              className="text-[10px]"
+            >
+              {auth.status === "approved" ? "Active" : auth.status}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+        </div>
+        <div>
+          {auth && auth.totalApproved > 0 ? (
+            <div className="space-y-0.5">
+              <Progress value={Math.min(pct, 100)} className={`h-1.5 ${barColor}`} />
+              <div className="text-muted-foreground text-[11px]">
+                {hours(auth.totalUsed)}/{hours(auth.totalApproved)} hrs
+              </div>
+            </div>
+          ) : (
+            <span className="text-muted-foreground text-[11px]">—</span>
+          )}
+        </div>
+        <div>
+          {daysLeft !== null ? (
+            <Badge
+              variant="outline"
+              className={
+                daysLeft <= 0
+                  ? "border-red-200 bg-red-50 text-red-700"
+                  : daysLeft <= 14
+                    ? "border-amber-200 bg-amber-50 text-amber-700"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-700"
+              }
+            >
+              {daysLeft <= 0 ? "Expired" : `${daysLeft}d`}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+        </div>
+        <HugeiconsIcon icon={ArrowRight01Icon} size={14} className="text-muted-foreground" />
       </div>
-      <div className="text-muted-foreground">
-        {client.bcbaLastName ? `${client.bcbaFirstName} ${client.bcbaLastName}` : "—"}
-      </div>
-      <div>
-        {auth ? (
-          <Badge
-            variant={auth.status === "approved" ? "default" : "outline"}
-            className="text-[10px]"
-          >
-            {auth.status === "approved" ? "Active" : auth.status}
-          </Badge>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
-      </div>
-      <div>
+
+      {/* Mobile: stacked card layout */}
+      <div className="flex flex-col gap-1.5 sm:hidden">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="font-semibold">
+              {client.firstName} {client.lastName}
+            </span>
+            <span className="text-muted-foreground ml-1.5 text-[11px]">
+              · {client.diagnosisCode ?? "F84.0"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {auth ? (
+              <Badge
+                variant={auth.status === "approved" ? "default" : "outline"}
+                className="text-[10px]"
+              >
+                {auth.status === "approved" ? "Active" : auth.status}
+              </Badge>
+            ) : null}
+            {daysLeft !== null ? (
+              <Badge
+                variant="outline"
+                className={`text-[10px] ${
+                  daysLeft <= 0
+                    ? "border-red-200 bg-red-50 text-red-700"
+                    : daysLeft <= 14
+                      ? "border-amber-200 bg-amber-50 text-amber-700"
+                      : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                }`}
+              >
+                {daysLeft <= 0 ? "Expired" : `${daysLeft}d`}
+              </Badge>
+            ) : null}
+          </div>
+        </div>
         {auth && auth.totalApproved > 0 ? (
           <div className="space-y-0.5">
             <Progress value={Math.min(pct, 100)} className={`h-1.5 ${barColor}`} />
             <div className="text-muted-foreground text-[11px]">
               {hours(auth.totalUsed)}/{hours(auth.totalApproved)} hrs
+              {client.bcbaLastName ? ` · ${client.bcbaFirstName} ${client.bcbaLastName}` : ""}
             </div>
           </div>
         ) : (
-          <span className="text-muted-foreground text-[11px]">—</span>
+          <div className="text-muted-foreground text-[11px]">
+            {client.bcbaLastName ? `${client.bcbaFirstName} ${client.bcbaLastName}` : "No auth"}
+          </div>
         )}
       </div>
-      <div>
-        {daysLeft !== null ? (
-          <Badge
-            variant="outline"
-            className={
-              daysLeft <= 0
-                ? "border-red-200 bg-red-50 text-red-700"
-                : daysLeft <= 14
-                  ? "border-amber-200 bg-amber-50 text-amber-700"
-                  : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }
-          >
-            {daysLeft <= 0 ? "Expired" : `${daysLeft}d`}
-          </Badge>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
-      </div>
-      <HugeiconsIcon icon={ArrowRight01Icon} size={14} className="text-muted-foreground" />
     </Link>
   );
 }
@@ -284,14 +310,14 @@ export function DashboardView({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground text-xs">
             Good morning — here&apos;s what needs attention today.
           </p>
         </div>
-        <Button asChild size="sm" className="text-xs">
+        <Button asChild size="sm" className="w-full text-xs sm:w-auto">
           <Link href="/clients/new">Add Client</Link>
         </Button>
       </div>
@@ -394,8 +420,8 @@ export function DashboardView({
           noPad
         >
           <div>
-            {/* Table header */}
-            <div className="border-border bg-muted/50 grid grid-cols-[2fr_1fr_1fr_1.5fr_0.8fr_24px] gap-2 border-b px-4 py-2">
+            {/* Table header — hidden on mobile where rows use card layout */}
+            <div className="border-border bg-muted/50 hidden grid-cols-[2fr_1fr_1fr_1.5fr_0.8fr_24px] gap-2 border-b px-4 py-2 sm:grid">
               <span className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
                 Client
               </span>
