@@ -269,83 +269,166 @@ File: `src/server/actions/sessions.ts` (in `createSession` transaction, before u
 > *Product spec §5 (Auth List), §3 (Client Detail Overview), UI/UX guide §5 (Authorizations).*
 > **The "aha moment"** — the user sees auth utilization at a glance. No ABA competitor shows this on the client page.
 
-#### Shared Utilization Components
+#### What's Already Built
 
-> See [Research §3: Auth Utilization — Visualization Standards](../research/phase-1-implementation-research.md#3-auth-utilization--visualization-standards) for evidence behind these choices.
+| Component | File | Status |
+|-----------|------|--------|
+| Auth status badge (pending/approved/denied/expired/exhausted) | `src/components/authorizations/auth-status-badge.tsx` | Done (12 lines) |
+| Auth pages (list, detail, create, edit) | `src/app/(dashboard)/authorizations/` | Done (4 routes) |
+| Auth table columns (text utilization: `{used}/{approved} ({pct}%)`) | `src/components/authorizations/authorization-columns.tsx` | Done (98 lines, no bars) |
+| Auth detail (tab view, services table, color-coded text) | `src/components/authorizations/authorization-detail.tsx` | Done (125 lines, no bars) |
+| Auth form (CRUD with cascade dropdowns, service lines) | `src/components/authorizations/authorization-form.tsx` | Done (601 lines) |
+| Auth queries (list, detail, client auths, alert counts) | `src/server/queries/authorizations.ts` | Done (302 lines) |
+| Auth actions (create, update, archive) | `src/server/actions/authorizations.ts` | Done (379 lines) — no new actions needed |
+| Client overview with inline UtilizationBar | `src/components/clients/client-overview.tsx` | Done (319 lines — uses shadcn `Progress`, not `role="meter"`) |
+| Client authorizations card (text utilization) | `src/components/clients/client-authorizations-card.tsx` | Done (100 lines, no bars) |
+| Utility functions (`utilizationPercent`, `daysUntilExpiry`) | `src/lib/utils.ts` | Done |
 
-Frontend (reusable):
-- [ ] `src/components/shared/utilization-bar.tsx` — **linear bar** (not circular — NNGroup: "length" is most effective preattentive attribute for quantitative comparison). Color-coded: emerald <80%, amber 80-95%, red >95%. Shows "{used}/{approved} ({pct}%)" text alongside remaining hours. Accepts `usedUnits`, `approvedUnits` props.
-  - **Accessibility**: Use `role="meter"` (not `progressbar` — meters depict static value ranges). Required attributes: `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` (e.g., "67% — 12.5 hours remaining"). Never rely on color alone — each threshold needs a secondary indicator (text label or icon) for color vision deficiency (~8% of men).
-  - **Over-utilization (>100%)**: Cap bar fill at 100%, show actual percentage in red bold text, change bar track to `bg-red-100`, add "Over-utilized" label.
-  - **Responsive**: 120px minimum bar width. Mobile: stack vertically (label on top, bar full-width below, percentage aligned right). Narrow table cells: fall back to colored percentage text.
-- [ ] `src/components/shared/expiry-badge.tsx` — "{N}d" with color coding (green >30d, amber 7-30d, red <7d, "Expired" if past). Full date on detail pages ("Expires Jun 18, 2026") alongside days remaining. Future auths: blue/info badge "Starts {date}". Accepts `endDate` prop.
-- [ ] `src/components/authorizations/auth-status-badge.tsx` — reusable badge (Active=green, Expiring=amber, Expired=red, Pending=outline, Denied=red, Exhausted=muted)
-- [ ] Display hours preferred over units for readability (BCBAs think in hours: `units * 15 / 60`). Show `(X units)` annotation on detail pages for power users.
+**What's remaining** — four focused sub-sprints:
 
-Tests:
-- [ ] Utilization bar: correct colors at 50%, 80%, 95%, 100%, 110%
-- [ ] Utilization bar: over-utilization renders capped bar with red track and actual percentage
-- [ ] Utilization bar: `role="meter"` and aria attributes present
-- [ ] Expiry badge: correct colors at 60d, 30d, 14d, 7d, 0d, -3d
+---
 
-#### Authorization List Enhancement
+#### 1B-1 — Shared Utilization Components + Tests
 
-Frontend:
-- [ ] Add inline utilization mini-bar column to auth table
-- [ ] Add expiry badge column with sort-by-days-until-expiry
-- [ ] Add 4 metric cards above table: Active (green), Expiring 30d (amber), Expired (red), Avg Utilization (themed)
-- [ ] Add filter tabs: All | Active | Expiring Soon | Expired | Pending
-- [ ] Match wireframe layout from UI/UX guide §5
+> Build the two reusable visual primitives that every other 1B sprint depends on. Replace the inline `UtilizationBar` in `client-overview.tsx` (which uses shadcn `Progress` / `role="progressbar"`) with a proper `role="meter"` component per research findings.
+> See [Research §3: Auth Utilization — Visualization Standards](../research/phase-1-implementation-research.md#3-auth-utilization--visualization-standards).
 
-Backend:
-- [ ] Aggregation query for auth list metrics (counts by status, avg utilization)
-- [ ] Filter support in auth list query (by status category)
+**UtilizationBar** (`src/components/shared/utilization-bar.tsx` — new file):
+- [ ] **Linear bar** (not circular — NNGroup: "length" is most effective preattentive attribute). Custom `div`-based bar, NOT shadcn `<Progress>`.
+- [ ] Color-coded: emerald <80%, amber 80-95%, red >95%. Shows "{used}/{approved} ({pct}%)" text alongside remaining hours.
+- [ ] **Accessibility**: `role="meter"` (not `progressbar`). Required: `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` (e.g., "67% — 12.5 hours remaining"). Text label per threshold ("On track", "Nearing limit", "Over-utilized") for color-blind users.
+- [ ] **Over-utilization (>100%)**: Cap bar fill at 100%, show actual percentage in red bold, change track to `bg-red-100`, add "Over-utilized" label.
+- [ ] **Responsive**: 120px min width. Mobile: stack vertically (label top, bar full-width, percentage right). Narrow table cells: fall back to colored percentage text via `compact` prop variant.
+- [ ] Props: `usedUnits: number`, `approvedUnits: number`, `showHours?: boolean` (default true), `compact?: boolean` (for table cells).
+- [ ] Display hours preferred over units: `units * 15 / 60`. Show `(X units)` annotation when `showHours` is true.
 
-Tests:
-- [ ] Aggregation query returns correct counts and averages for mixed auth states
-- [ ] Filter by "Expiring Soon" returns only auths with `end_date` within 30 days
+**ExpiryBadge** (`src/components/shared/expiry-badge.tsx` — new file):
+- [ ] "{N}d" with color: emerald >30d, amber 7-30d, red <7d, muted "Expired" if past.
+- [ ] `showFullDate` prop: shows "Expires Jun 18, 2026" alongside days remaining (for detail pages).
+- [ ] Future auths: blue/info badge "Starts {date}" when `startDate > today`.
+- [ ] Props: `endDate: string`, `startDate?: string`, `showFullDate?: boolean`.
 
-#### Client Detail Overview Tab
+**Update existing code:**
+- [ ] Replace inline `UtilizationBar` in `src/components/clients/client-overview.tsx` with the shared component.
 
+**Tests** (`src/components/shared/utilization-bar.test.tsx`, `expiry-badge.test.tsx`):
+
+| # | Test | Input | Expected |
+|---|------|-------|----------|
+| 1 | Green at 50% | `used=20, approved=40` | Emerald bar, "On track" label |
+| 2 | Amber at 80% | `used=32, approved=40` | Amber bar, "Nearing limit" label |
+| 3 | Amber at 95% | `used=38, approved=40` | Red bar (>95%), no longer amber |
+| 4 | Red at 100% | `used=40, approved=40` | Red bar, 100% |
+| 5 | Over-utilization at 110% | `used=44, approved=40` | Bar capped at 100%, red bold "110%", "Over-utilized" label |
+| 6 | `role="meter"` present | Any | `role="meter"`, `aria-valuemin=0`, `aria-valuemax`, `aria-valuenow` |
+| 7 | `aria-valuetext` descriptive | `used=20, approved=40` | `aria-valuetext` contains "50%" and hours remaining |
+| 8 | Compact mode | `compact=true` | Renders percentage text only, no full bar |
+| 9 | Expiry green >30d | `endDate` 60 days out | Green "60d" badge |
+| 10 | Expiry amber 7-30d | `endDate` 14 days out | Amber "14d" badge |
+| 11 | Expiry red <7d | `endDate` 3 days out | Red "3d" badge |
+| 12 | Expiry past | `endDate` 5 days ago | Muted "Expired" badge |
+| 13 | Future auth | `startDate` in future | Blue "Starts {date}" badge |
+| 14 | Full date mode | `showFullDate=true` | Shows "Expires Jun 18, 2026" alongside days |
+
+---
+
+#### 1B-2 — Authorization List Enhancement
+
+> Mirror the session list pattern from 1A-2: metric cards, server-side filters, visual bars in table. The auth list page exists (53 lines) with a basic table. Upgrade it.
+
+**Backend** (`src/server/queries/authorizations.ts`):
+- [ ] `getAuthListMetrics(orgId)` — single SQL query using `FILTER (WHERE ...)`:
+  - `activeCount`: approved + end_date > today + not deleted
+  - `expiring30dCount`: approved + end_date within 30 days + not deleted
+  - `expiredCount`: status = 'expired' OR (approved + end_date < today) + not deleted
+  - `avgUtilization`: `coalesce(round(sum(used) / nullif(sum(approved), 0) * 100), 0)` across active auths
+- [ ] **Extend `getAuthorizations` with composable filters** — same `SessionFilters`-style pattern:
+  ```typescript
+  type AuthFilters = {
+    statusCategory?: "active" | "expiring" | "expired" | "pending";
+  }
+  ```
+  Filter tabs map to preset WHERE clauses. "Active" = approved + end_date > today. "Expiring Soon" = approved + end_date within 30 days. "Expired" = expired OR past end_date. "Pending" = pending status.
+
+**Frontend** (`src/app/(dashboard)/authorizations/page.tsx`):
+- [ ] Add 4 metric cards: Active (green), Expiring 30d (amber), Expired (red), Avg Utilization (themed by threshold)
+- [ ] Add filter tabs: All | Active | Expiring Soon | Expired | Pending — as links with `?filter=` search params
+- [ ] Dynamic header: "{N} active authorizations" (from `activeCount`)
+
+**Frontend** (`src/components/authorizations/authorization-columns.tsx`):
+- [ ] Replace text utilization column with inline `UtilizationBar` (compact mode)
+- [ ] Add `ExpiryBadge` column with days remaining
+- [ ] Sort by days-until-expiry when expiry column header clicked
+
+**Tests**:
+| # | Test | Expected |
+|---|------|----------|
+| 1 | Active count correct | Counts only approved + not expired + not deleted |
+| 2 | Expiring 30d count correct | Counts approved with end_date within 30 days |
+| 3 | Avg utilization correct | Weighted average across active auth services |
+| 4 | Filter "expiring" returns correct subset | Only auths with end_date within 30 days |
+| 5 | Org isolation | Query with wrong org returns empty |
+
+---
+
+#### 1B-3 — Client Detail Overview Tab
+
+> **The biggest sub-sprint.** The client detail page exists with tabs and an overview component, but needs Suspense boundaries, new queries, and richer visual display per product spec §3.
 > **Decision**: Uses Suspense boundaries with async server components (Vercel Tier 1 pattern). See [Architecture Decision #6](#architecture-decisions-reference).
-> See [Research §3: Client Detail — Missing from Current Implementation](../research/phase-1-implementation-research.md#client-detail--missing-from-current-implementation-vs-product-spec) for gap analysis vs product spec.
 
-Page shell (critical data, `Promise.all`):
-- [ ] Load client record + guardian contact together — renders header immediately, `notFound()` if missing
+**New queries** (`src/server/queries/clients.ts` or new file):
+- [ ] `getClientPrimaryInsurance(clientId, orgId)` — single JOIN: `client_insurance` → `payers`, WHERE `priority = 1` and not terminated
+- [ ] `getClientCareTeam(clientId, orgId)` — providers assigned to this client (via sessions or explicit assignment). For MVP: primary BCBA from client record + most recent RBT from sessions.
+- [ ] `getClientAuthUtilization(clientId, orgId)` — aggregate across active auth services:
+  - Total approved hours, total used hours, utilization percent
+  - Per-CPT breakdown: `[{ cptCode, description, approvedUnits, usedUnits, remainingHours }]`
+  - Days until nearest auth expiry
+  - Under-utilization flag: `<50% used with >50% of auth period elapsed`
+
+**Page shell** (`src/app/(dashboard)/clients/[id]/page.tsx`):
 - [ ] **Auth status badge in header**: "Auth: Active" (green), "Auth: 14d left" (amber), "Auth: Expired" (red) — derived from nearest expiring active auth
-- [ ] **Action buttons row** below header: Log Session, Upload Auth Letter (primary actions on every client page)
+- [ ] **Action buttons row** below header: Log Session (→ `/sessions/new?clientId={id}`), Upload Auth Letter (outline, Phase 2 stub)
 
-Suspense boundary 1 — Insurance & Care Team:
-- [ ] `getClientPrimaryInsurance(clientId, orgId)` — single JOIN, fast
-- [ ] `getClientCareTeam(clientId, orgId)` — single query, fast
-- [ ] **Insurance snapshot card**: key-value pairs (Payer, Member ID, Group, Plan, Type, Effective Date)
-- [ ] **Care Team card**: avatar initials + provider name + role (BCBA)
+**Suspense boundary 1 — Insurance & Care Team** (async server component):
+- [ ] **Insurance snapshot card**: section card with key-value pairs (Payer, Member ID, Group, Plan, Type, Effective Date)
+- [ ] **Care Team card**: avatar initials (colored square) + provider name + role (BCBA)
+- [ ] Skeleton: 2-column card placeholders
 
-Suspense boundary 2 — Authorization Utilization:
-- [ ] `getClientAuthUtilization(clientId, orgId)` — aggregate query across auth services
+**Suspense boundary 2 — Authorization Utilization** (async server component):
 - [ ] **Metric cards** (4): Total Approved (hours), Used (hours + % utilized), Weekly Avg, Days Left — with color coding per product spec §3
-- [ ] **Per-CPT utilization bars** in Authorized Services card (not aggregate-only) — each service line gets its own bar with progress, remaining hours, color thresholds
-- [ ] **Under-utilization detection**: amber when <50% used with >50% of authorization period elapsed — flag for review
-- [ ] Compute hours from units: `units * 15 / 60` for display
+- [ ] **Authorized Services card**: per-CPT utilization bars using shared `UtilizationBar`, remaining hours, color thresholds
+- [ ] **Under-utilization detection**: amber banner when `<50% used with >50% of auth period elapsed`
+- [ ] Skeleton: 4 metric card placeholders + bar placeholders
 
-Suspense boundary 3 — Recent Sessions:
-- [ ] Recent sessions table (last 5), or "No sessions yet" empty state
+**Suspense boundary 3 — Recent Sessions** (async server component):
+- [ ] Recent sessions table (last 5) using existing `getClientSessions` query (limited), or "No sessions yet" empty state
+- [ ] Skeleton: 5-row table placeholder
 
-Skeleton loaders:
-- [ ] Content-shaped skeletons for each Suspense boundary matching exact content dimensions (not spinners)
+**Tests**:
+| # | Test | Expected |
+|---|------|----------|
+| 1 | Hours from units: 0 units | 0 hrs |
+| 2 | Hours from units: 4 units | 1 hr |
+| 3 | Hours from units: 32 units | 8 hrs |
+| 4 | Under-utilization: 30% used at 60% elapsed | Warning triggered |
+| 5 | Under-utilization: 70% used at 60% elapsed | No warning |
+| 6 | Each query respects org isolation | Wrong org returns empty |
 
-Tests:
-- [ ] Hours-from-units computation: 0 units → 0 hrs, 4 units → 1 hr, 32 units → 8 hrs
-- [ ] Under-utilization: 30% used at 60% elapsed → triggers warning; 70% used at 60% elapsed → no warning
-- [ ] Each query returns correct shape and respects org isolation
+---
 
-#### Authorization Detail Enhancement
+#### 1B-4 — Authorization Detail Enhancement
 
-Frontend:
-- [ ] **Header card**: status badge, dates, payer, client, diagnosis, days remaining, overall utilization bar
-- [ ] **Per-service-line utilization bars** in the services section
-- [ ] **Expiry alert banner**: 30/14/7-day severity-coded banner at top of page
-- [ ] Client detail: wire Authorizations tab (filtered auth list with "Add Authorization" button)
+> The auth detail page exists with tabs (Overview, Service Lines, Sessions, Documents). Upgrade the visual display with a rich header card, per-service bars, and expiry alerts.
+
+**Frontend** (`src/components/authorizations/authorization-detail.tsx` — enhance existing):
+- [ ] **Header card** (above tabs): status badge, auth number, client name, payer, diagnosis code, date range, days remaining (`ExpiryBadge` with full date), overall utilization bar (`UtilizationBar`). Key-value pairs layout per design system.
+- [ ] **Per-service-line utilization bars** in the Service Lines tab: replace text utilization with `UtilizationBar` per row. Each service line shows: CPT (monospace) + description, approved/used hours, bar, frequency, max/day.
+- [ ] **Expiry alert banner**: severity-coded banner at top of page. 30d = info (blue), 14d = warning (amber), 7d = critical (red). Dismissable for info/warning, persistent for critical.
+
+**Frontend** (`src/components/clients/client-authorizations-card.tsx` — enhance existing):
+- [ ] Wire Authorizations tab on client detail: filtered auth list with `UtilizationBar` (compact) and `ExpiryBadge` inline. "Add Authorization" button.
+
+**Phase 1B Checkpoint**: A BCBA opens a client page and immediately sees auth utilization bars, remaining hours per CPT code, and days until expiry — all at a glance. The auth list shows which auths need attention via color-coded bars and expiry badges. The auth detail page has a rich header with utilization impact. **This is the "aha moment" — no ABA competitor shows this.**
 
 ---
 
