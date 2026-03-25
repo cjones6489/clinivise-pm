@@ -66,7 +66,7 @@ export function AuthorizationTable({
         searchKey="client"
         searchPlaceholder="Search authorizations..."
       />
-      <DataTable table={table} />
+      <DataTable table={table} onRowClick={(auth) => router.push(`/authorizations/${auth.id}`)} />
       <DataTablePagination table={table} />
       <ConfirmDialog
         open={!!archiveTarget}

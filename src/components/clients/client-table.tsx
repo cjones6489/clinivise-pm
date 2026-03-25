@@ -56,7 +56,7 @@ export function ClientTable({ data, canEdit }: { data: ClientWithBcba[]; canEdit
   return (
     <div className="space-y-3">
       <DataTableToolbar table={table} searchKey="name" searchPlaceholder="Search clients..." />
-      <DataTable table={table} />
+      <DataTable table={table} onRowClick={(client) => router.push(`/clients/${client.id}`)} />
       <DataTablePagination table={table} />
       <ConfirmDialog
         open={!!archiveTarget}

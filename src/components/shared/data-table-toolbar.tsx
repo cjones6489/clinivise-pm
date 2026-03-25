@@ -28,13 +28,13 @@ export function DataTableToolbar<TData>({
   }, [debouncedSearch, searchKey, table]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
       {searchKey && (
         <Input
           placeholder={searchPlaceholder}
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          className="h-8 w-56 text-xs"
+          className="h-8 w-full text-xs sm:w-56"
         />
       )}
       {children}

@@ -23,7 +23,7 @@ export function Header() {
           className="bg-muted/50 focus:border-border focus:bg-card h-8 w-full border-transparent pl-8 text-xs"
           readOnly
         />
-        <kbd className="border-border bg-muted text-muted-foreground pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 rounded border px-1.5 py-0.5 text-[10px] font-medium">
+        <kbd className="border-border bg-muted text-muted-foreground pointer-events-none absolute top-1/2 right-2 hidden -translate-y-1/2 rounded border px-1.5 py-0.5 text-[10px] font-medium sm:inline-block">
           ⌘K
         </kbd>
       </div>

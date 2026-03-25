@@ -20,6 +20,7 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
@@ -34,7 +35,7 @@ const iconMap: Record<string, typeof DashboardSquare01Icon> = {
   Settings01Icon,
 };
 
-export function AppSidebar({ userRole }: { userRole?: string }) {
+export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertCount?: number }) {
   const pathname = usePathname();
 
   const filteredItems = userRole
@@ -90,6 +91,11 @@ export function AppSidebar({ userRole }: { userRole?: string }) {
                       <span className="text-sm">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
+                  {item.href === "/overview" && alertCount ? (
+                    <SidebarMenuBadge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400">
+                      {alertCount}
+                    </SidebarMenuBadge>
+                  ) : null}
                 </SidebarMenuItem>
               );
             })}

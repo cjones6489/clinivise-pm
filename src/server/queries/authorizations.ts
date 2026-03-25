@@ -116,6 +116,50 @@ export async function getAuthorizations(orgId: string): Promise<AuthorizationLis
   return rows;
 }
 
+/**
+ * Lightweight count of action items for sidebar badge.
+ * Counts: expired auths, expiring within 30 days, >=80% utilized.
+ */
+export async function getAlertCount(orgId: string): Promise<number> {
+  const now = new Date();
+  const thirtyDaysFromNow = new Date(now);
+  thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+  const rows = await db
+    .select({
+      endDate: authorizations.endDate,
+      totalApproved:
+        sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.mapWith(Number),
+      totalUsed:
+        sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.mapWith(Number),
+    })
+    .from(authorizations)
+    .leftJoin(authorizationServices, eq(authorizations.id, authorizationServices.authorizationId))
+    .where(
+      and(
+        eq(authorizations.organizationId, orgId),
+        isNull(authorizations.deletedAt),
+        eq(authorizations.status, "approved"),
+      ),
+    )
+    .groupBy(authorizations.id, authorizations.endDate);
+
+  let count = 0;
+  for (const row of rows) {
+    const endDate = new Date(row.endDate);
+    if (endDate < now) {
+      count++; // expired
+    } else if (endDate <= thirtyDaysFromNow) {
+      count++; // expiring soon
+    }
+    if (row.totalApproved > 0 && row.totalUsed / row.totalApproved >= 0.8) {
+      count++; // high utilization
+    }
+  }
+
+  return count;
+}
+
 export async function getAuthorizationWithServices(
   orgId: string,
   id: string,
