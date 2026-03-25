@@ -25,12 +25,14 @@ import {
 interface DataTableWithInstanceProps<TData> {
   table: TableInstance<TData>;
   children?: React.ReactNode;
+  onRowClick?: (row: TData) => void;
 }
 
 interface DataTableWithDataProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   children?: React.ReactNode;
+  onRowClick?: (row: TData) => void;
 }
 
 type DataTableProps<TData, TValue> =
@@ -45,7 +47,7 @@ function hasTable<TData, TValue>(
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   if (hasTable(props)) {
-    return <DataTableRenderer table={props.table}>{props.children}</DataTableRenderer>;
+    return <DataTableRenderer table={props.table} onRowClick={props.onRowClick}>{props.children}</DataTableRenderer>;
   }
   return <DataTableInternal {...props} />;
 }
@@ -54,6 +56,7 @@ function DataTableInternal<TData, TValue>({
   columns,
   data,
   children,
+  onRowClick,
 }: DataTableWithDataProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -70,20 +73,23 @@ function DataTableInternal<TData, TValue>({
     state: { sorting, columnFilters },
   });
 
-  return <DataTableRenderer table={table}>{children}</DataTableRenderer>;
+  return <DataTableRenderer table={table} onRowClick={onRowClick}>{children}</DataTableRenderer>;
 }
 
 function DataTableRenderer<TData>({
   table,
   children,
+  onRowClick,
 }: {
   table: TableInstance<TData>;
   children?: React.ReactNode;
+  onRowClick?: (row: TData) => void;
 }) {
   return (
     <div className="space-y-3">
       {children}
       <div className="fade-in border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -106,7 +112,8 @@ function DataTableRenderer<TData>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="hover:bg-accent/50 cursor-default transition-colors"
+                  className={`hover:bg-accent/50 transition-colors ${onRowClick ? "cursor-pointer" : "cursor-default"}`}
+                  onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-3 py-2.5 text-xs">
@@ -127,6 +134,7 @@ function DataTableRenderer<TData>({
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
     </div>
   );

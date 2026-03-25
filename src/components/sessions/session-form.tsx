@@ -26,12 +26,14 @@ import {
   PLACE_OF_SERVICE_CODES,
   PLACE_OF_SERVICE_LABELS,
   CREDENTIAL_LABELS,
+  CREDENTIAL_MODIFIERS,
   RBT_SUPERVISED_CPT_CODES,
+  QHP_ONLY_CPT_CODES,
   type CredentialType,
   type PlaceOfServiceCode,
   type SessionStatus,
 } from "@/lib/constants";
-import { parseTimeToMinutes, calculateUnitsFromMinutes } from "@/lib/utils";
+import { parseTimeToMinutes, calculateUnitsFromMinutes, cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -260,6 +262,41 @@ export function SessionForm({
     return [currentStatus, ...validTargets] as readonly SessionStatus[];
   }, [isEdit, session]);
 
+  const watchedStatus = watch("status");
+  const watchedUnits = watch("units");
+  const isNonBillableStatus = watchedStatus === "cancelled" || watchedStatus === "no_show";
+
+  // Auto-calculated values for info card
+  const autoCalc = useMemo(() => {
+    if (!startTime || !endTime || isNonBillableStatus) return null;
+    const minutes = parseTimeToMinutes(endTime) - parseTimeToMinutes(startTime);
+    if (minutes <= 0) return null;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const units = calculateUnitsFromMinutes(minutes);
+    const modifier = selectedProvider
+      ? CREDENTIAL_MODIFIERS[selectedProvider.credentialType] ?? null
+      : null;
+    const credLabel = selectedProvider
+      ? CREDENTIAL_LABELS[selectedProvider.credentialType as CredentialType] ?? null
+      : null;
+    return { hours, mins, units, modifier, credLabel };
+  }, [startTime, endTime, isNonBillableStatus, selectedProvider]);
+
+  // Auth check card state
+  const selectedAuthServiceId = watch("authorizationServiceId");
+  const selectedAuth = useMemo(
+    () => authMatches.find((m) => m.authServiceId === selectedAuthServiceId) ?? null,
+    [authMatches, selectedAuthServiceId],
+  );
+  const [showAuthPicker, setShowAuthPicker] = useState(false);
+
+  // QHP-only CPT warning for RBT/BCaBA
+  const showQhpWarning =
+    selectedProvider &&
+    (selectedProvider.credentialType === "rbt" || selectedProvider.credentialType === "bcaba") &&
+    (QHP_ONLY_CPT_CODES as readonly string[]).includes(selectedCptCode);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
       {/* Section 1: Client & Provider */}
@@ -419,28 +456,11 @@ export function SessionForm({
           </Field>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <Field>
-            <Label className="text-xs font-medium">Start Time</Label>
-            <Input type="time" {...register("startTime")} className="h-8 text-xs" />
-            <FieldError>{errors.startTime?.message}</FieldError>
-          </Field>
-          <Field>
-            <Label className="text-xs font-medium">End Time</Label>
-            <Input type="time" {...register("endTime")} className="h-8 text-xs" />
-            <FieldError>{errors.endTime?.message}</FieldError>
-          </Field>
-          <Field>
-            <Label className="text-xs font-medium">Units</Label>
-            <Input
-              type="number"
-              min={0}
-              {...register("units")}
-              className="h-8 text-xs tabular-nums"
-            />
-            <FieldError>{errors.units?.message}</FieldError>
-          </Field>
-        </div>
+        {showQhpWarning && (
+          <p className="text-xs font-medium text-red-600">
+            CPT {selectedCptCode} requires a BCBA/BCBA-D. {CREDENTIAL_LABELS[selectedProvider!.credentialType as CredentialType]} providers cannot bill this code.
+          </p>
+        )}
 
         <Field>
           <Label className="text-xs font-medium">Status</Label>
@@ -464,59 +484,184 @@ export function SessionForm({
           />
           <FieldError>{errors.status?.message}</FieldError>
         </Field>
-      </div>
 
-      {/* Section 3: Authorization */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-semibold">Authorization</h3>
-        {selectedClientId && selectedCptCode && selectedSessionDate ? (
-          authLoading ? (
-            <p className="text-muted-foreground text-xs">Loading matching authorizations...</p>
-          ) : authMatches.length > 0 ? (
+        {/* Time fields — hidden for cancelled/no_show */}
+        {!isNonBillableStatus && (
+          <div className="grid grid-cols-3 gap-4">
             <Field>
-              <Label className="text-xs font-medium">Matching Authorization</Label>
-              <Controller
-                name="authorizationServiceId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value || NONE_VALUE}
-                    onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
-                  >
-                    <SelectTrigger className="h-8 w-full text-xs">
-                      <SelectValue placeholder="Select authorization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={NONE_VALUE} className="text-xs">
-                        No authorization
-                      </SelectItem>
-                      {authMatches.map((m) => (
-                        <SelectItem
-                          key={m.authServiceId}
-                          value={m.authServiceId}
-                          className="text-xs"
-                        >
-                          Auth #{m.authorizationNumber ?? m.authorizationId.slice(0, 8)} —{" "}
-                          {m.remainingUnits} units remaining
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+              <Label className="text-xs font-medium">Start Time</Label>
+              <Input type="time" {...register("startTime")} className="h-8 text-xs" />
+              <FieldError>{errors.startTime?.message}</FieldError>
             </Field>
-          ) : (
-            <p className="text-xs text-amber-600">
-              No matching authorization found for this client, CPT code, and date. The session will
-              be created without an authorization link.
-            </p>
-          )
-        ) : (
-          <p className="text-muted-foreground text-xs">
-            Select a client, CPT code, and date to find matching authorizations.
-          </p>
+            <Field>
+              <Label className="text-xs font-medium">End Time</Label>
+              <Input type="time" {...register("endTime")} className="h-8 text-xs" />
+              <FieldError>{errors.endTime?.message}</FieldError>
+            </Field>
+            <Field>
+              <Label className="text-xs font-medium">Units</Label>
+              <Input
+                type="number"
+                min={0}
+                {...register("units")}
+                className="h-8 text-xs tabular-nums"
+              />
+              <FieldError>{errors.units?.message}</FieldError>
+            </Field>
+          </div>
+        )}
+
+        {/* Auto-calculated card */}
+        {autoCalc && (
+          <div className="flex items-center gap-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-800 dark:bg-blue-950/30">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Duration</div>
+              <div className="text-sm font-semibold tabular-nums">{autoCalc.hours}h {autoCalc.mins}m</div>
+            </div>
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Units</div>
+              <div className="text-sm font-semibold tabular-nums">{autoCalc.units}</div>
+            </div>
+            {autoCalc.modifier && (
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Modifier</div>
+                <div className="text-sm font-semibold">{autoCalc.modifier}{autoCalc.credLabel ? ` (${autoCalc.credLabel})` : ""}</div>
+              </div>
+            )}
+          </div>
         )}
       </div>
+
+      {/* Section 3: Authorization Check */}
+      {!isNonBillableStatus && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Authorization</h3>
+            {selectedAuth && authMatches.length > 1 && !showAuthPicker && (
+              <button
+                type="button"
+                onClick={() => setShowAuthPicker(true)}
+                className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+              >
+                Change
+              </button>
+            )}
+          </div>
+
+          {selectedClientId && selectedCptCode && selectedSessionDate ? (
+            authLoading ? (
+              <div className="rounded-lg border border-border bg-muted/30 px-4 py-3">
+                <p className="text-muted-foreground text-xs">Loading matching authorizations...</p>
+              </div>
+            ) : selectedAuth && !showAuthPicker ? (
+              // Visual auth check card
+              (() => {
+                const remaining = selectedAuth.remainingUnits;
+                const units = Number(watchedUnits) || 0;
+                const afterSession = remaining - units;
+                const pctRemaining = selectedAuth.approvedUnits > 0
+                  ? (remaining / selectedAuth.approvedUnits) * 100
+                  : 0;
+                const isLow = pctRemaining <= 20 && pctRemaining > 0;
+                const isExceeded = afterSession < 0;
+
+                const borderColor = isExceeded
+                  ? "border-red-200 dark:border-red-800"
+                  : isLow
+                    ? "border-amber-200 dark:border-amber-800"
+                    : "border-emerald-200 dark:border-emerald-800";
+                const bgColor = isExceeded
+                  ? "bg-red-50 dark:bg-red-950/30"
+                  : isLow
+                    ? "bg-amber-50 dark:bg-amber-950/30"
+                    : "bg-emerald-50 dark:bg-emerald-950/30";
+                const textColor = isExceeded
+                  ? "text-red-700 dark:text-red-400"
+                  : isLow
+                    ? "text-amber-700 dark:text-amber-400"
+                    : "text-emerald-700 dark:text-emerald-400";
+
+                return (
+                  <div className={cn("rounded-lg border px-4 py-3", borderColor, bgColor)}>
+                    <div className={cn("text-xs font-medium", textColor)}>
+                      {isExceeded ? (
+                        <>This session exceeds remaining authorized units</>
+                      ) : isLow ? (
+                        <>Low remaining units</>
+                      ) : (
+                        <>Authorization linked</>
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs">
+                      Auth #{selectedAuth.authorizationNumber ?? selectedAuth.authorizationId.slice(0, 8)} has{" "}
+                      <span className="font-semibold tabular-nums">{remaining}</span> units remaining.
+                      {units > 0 && (
+                        <>
+                          {" "}This session uses <span className="font-semibold tabular-nums">{units}</span> units
+                          {" → "}<span className={cn("font-semibold tabular-nums", isExceeded && "text-red-700 dark:text-red-400")}>{afterSession}</span> remaining.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                );
+              })()
+            ) : authMatches.length > 0 ? (
+              // Auth picker (FIFO auto-select, or user clicked "Change")
+              <Field>
+                <Label className="text-xs font-medium">Select Authorization</Label>
+                <Controller
+                  name="authorizationServiceId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || NONE_VALUE}
+                      onValueChange={(v) => {
+                        field.onChange(v === NONE_VALUE ? "" : v);
+                        setShowAuthPicker(false);
+                      }}
+                    >
+                      <SelectTrigger className="h-8 w-full text-xs">
+                        <SelectValue placeholder="Select authorization" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={NONE_VALUE} className="text-xs">
+                          No authorization
+                        </SelectItem>
+                        {authMatches.map((m) => (
+                          <SelectItem
+                            key={m.authServiceId}
+                            value={m.authServiceId}
+                            className="text-xs"
+                          >
+                            Auth #{m.authorizationNumber ?? m.authorizationId.slice(0, 8)} —{" "}
+                            {m.remainingUnits} units remaining
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </Field>
+            ) : (
+              // No matching auth — gray state
+              <div className="rounded-lg border border-border bg-muted/30 px-4 py-3">
+                <div className="text-xs font-medium text-muted-foreground">
+                  No active authorization for this CPT code
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  No matching authorization found for this client, CPT code, and date. The session will be flagged for review.
+                </p>
+              </div>
+            )
+          ) : (
+            <div className="rounded-lg border border-border bg-muted/30 px-4 py-3">
+              <p className="text-muted-foreground text-xs">
+                Select a client, CPT code, and date to find matching authorizations.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Section 4: Notes */}
       <div className="space-y-4">
