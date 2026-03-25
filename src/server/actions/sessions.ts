@@ -27,8 +27,7 @@ import {
   computeUpdateAccountingOps,
   computeCancelAccountingOps,
 } from "@/lib/session-helpers";
-
-const WRITE_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt"];
+import { requirePermission } from "@/lib/permissions";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -128,9 +127,7 @@ async function validateSessionForeignKeys(
 export const createSession = authActionClient
   .schema(createSessionSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "sessions.write");
 
     const { provider, authorizationId } = await validateSessionForeignKeys(
       ctx.organizationId,
@@ -221,6 +218,7 @@ export const createSession = authActionClient
           placeOfService: parsedInput.placeOfService,
           status: parsedInput.status,
           notes: parsedInput.notes ?? null,
+          idempotencyKey: parsedInput.idempotencyKey ?? null,
         })
         .returning();
 
@@ -268,11 +266,9 @@ export const createSession = authActionClient
 export const updateSession = authActionClient
   .schema(updateSessionSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "sessions.write");
 
-    const { id, clientId: _submittedClientId, ...inputFields } = parsedInput;
+    const { id, clientId: _submittedClientId, updatedAt, ...inputFields } = parsedInput;
 
     // Load existing session
     const [existing] = await db
@@ -368,7 +364,7 @@ export const updateSession = authActionClient
       }
 
       // UPDATE session row
-      await tx
+      const [updated] = await tx
         .update(sessions)
         .set({
           clientId: input.clientId,
@@ -387,7 +383,18 @@ export const updateSession = authActionClient
           status: input.status,
           notes: input.notes ?? null,
         })
-        .where(and(eq(sessions.id, id), eq(sessions.organizationId, ctx.organizationId)));
+        .where(
+          and(
+            eq(sessions.id, id),
+            eq(sessions.organizationId, ctx.organizationId),
+            eq(sessions.updatedAt, new Date(updatedAt)),
+          ),
+        )
+        .returning();
+
+      if (!updated) {
+        throw new Error("Record was modified by another user. Please refresh and try again.");
+      }
     });
 
     await logAudit({
@@ -418,9 +425,7 @@ export const updateSession = authActionClient
 export const cancelSession = authActionClient
   .schema(cancelSessionSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "sessions.write");
 
     const [existing] = await db
       .select()

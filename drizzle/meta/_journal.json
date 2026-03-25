@@ -43,6 +43,13 @@
       "when": 1774137100194,
       "tag": "0005_perfect_marauders",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774148645012,
+      "tag": "0006_cloudy_harpoon",
+      "breakpoints": true
     }
   ]
 }

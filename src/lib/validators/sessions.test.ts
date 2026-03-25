@@ -261,6 +261,7 @@ describe("updateSessionSchema", () => {
     units: 4,
     placeOfService: "12",
     status: "completed",
+    updatedAt: "2026-03-21T12:00:00.000Z",
   };
 
   it("accepts valid update input", () => {

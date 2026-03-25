@@ -30,6 +30,7 @@ const USER_FACING_ERRORS = new Set([
   "Cannot reverse more units than are recorded",
   "Provider not active",
   "Authorization service not found",
+  "Record was modified by another user. Please refresh and try again.",
 ]);
 
 export const actionClient = createSafeActionClient({

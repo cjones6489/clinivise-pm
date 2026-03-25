@@ -89,7 +89,7 @@ export function ProviderForm({
 
   function onSubmit(data: CreateProviderInput) {
     if (isEdit) {
-      executeUpdate({ ...data, id: provider.id });
+      executeUpdate({ ...data, id: provider.id, updatedAt: provider.updatedAt.toISOString() });
     } else {
       executeCreate(data);
     }

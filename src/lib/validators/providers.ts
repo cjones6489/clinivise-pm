@@ -1,5 +1,11 @@
 import { z } from "zod/v4";
-import { credentialTypeSchema, idSchema, npiSchema, dateStringSchema } from "./index";
+import {
+  credentialTypeSchema,
+  idSchema,
+  npiSchema,
+  dateStringSchema,
+  updatedAtSchema,
+} from "./index";
 
 export const createProviderSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
@@ -26,7 +32,7 @@ export const createProviderSchema = z.object({
 export const updateProviderSchema = createProviderSchema
   .omit({ isActive: true })
   .partial()
-  .extend({ id: idSchema, isActive: z.boolean().optional() })
+  .extend({ id: idSchema, updatedAt: updatedAtSchema, isActive: z.boolean().optional() })
   .refine((d) => !d.supervisorId || d.supervisorId !== d.id, {
     message: "Cannot be own supervisor",
     path: ["supervisorId"],

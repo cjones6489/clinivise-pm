@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, index, date, integer, numeric } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, uniqueIndex, date, integer, numeric } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 import { clients } from "./clients";
@@ -40,6 +41,7 @@ export const sessions = pgTable(
     status: text("status").notNull().default("completed"),
     actualMinutes: integer("actual_minutes"),
     unitCalcMethod: text("unit_calc_method"),
+    idempotencyKey: text("idempotency_key"),
     notes: text("notes"),
     claimId: text("claim_id"),
     // Note: FK to claims.id intentionally omitted here due to circular import
@@ -61,5 +63,8 @@ export const sessions = pgTable(
     index("sessions_date_idx").on(table.organizationId, table.sessionDate),
     index("sessions_claim_idx").on(table.claimId),
     index("sessions_status_idx").on(table.organizationId, table.status),
+    uniqueIndex("sessions_idempotency_idx")
+      .on(table.organizationId, table.idempotencyKey)
+      .where(sql`idempotency_key IS NOT NULL`),
   ],
 );

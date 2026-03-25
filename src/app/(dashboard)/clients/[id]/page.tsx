@@ -16,19 +16,11 @@ import { ClientDetail } from "@/components/clients/client-detail";
 import { Badge } from "@/components/ui/badge";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_VARIANT, type ClientStatus } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
+import { differenceInYears } from "date-fns";
 
 export const metadata: Metadata = {
   title: "Client | Clinivise",
 };
-
-function calculateAge(dob: string): number {
-  const birth = new Date(dob);
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-  return age;
-}
 
 const WRITE_ROLES = ["owner", "admin", "bcba"];
 
@@ -54,7 +46,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   }
 
   const status = client.status as ClientStatus;
-  const age = calculateAge(client.dateOfBirth);
+  const age = differenceInYears(new Date(), new Date(client.dateOfBirth));
   const guardian = contacts.find((c) => c.isLegalGuardian);
 
   // Resolve BCBA name

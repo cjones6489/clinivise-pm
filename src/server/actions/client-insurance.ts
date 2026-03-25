@@ -13,15 +13,13 @@ import { eq, and, isNull, count, max, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
-
-const WRITE_ROLES = ["owner", "admin", "bcba"];
+import { logAudit } from "@/server/audit";
+import { requirePermission } from "@/lib/permissions";
 
 export const createInsurance = authActionClient
   .schema(createInsuranceSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "clients.write");
 
     // Verify client exists in org
     const [client] = await db
@@ -103,6 +101,14 @@ export const createInsurance = authActionClient
       return created;
     });
 
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "create",
+      entityType: "client_insurance",
+      entityId: insurance?.id,
+    });
+
     revalidatePath(`/clients/${parsedInput.clientId}`);
     return { success: true as const, data: insurance };
   });
@@ -110,11 +116,9 @@ export const createInsurance = authActionClient
 export const updateInsurance = authActionClient
   .schema(updateInsuranceSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "clients.write");
 
-    const { id, clientId: _clientId, ...updates } = parsedInput;
+    const { id, updatedAt, clientId: _clientId, ...updates } = parsedInput;
 
     // Verify ownership
     const [existing] = await db
@@ -185,21 +189,47 @@ export const updateInsurance = authActionClient
             );
         }
 
-        await tx
+        const [txUpdated] = await tx
           .update(clientInsurance)
           .set(undefinedToNull(updates) as Partial<typeof clientInsurance.$inferInsert>)
           .where(
-            and(eq(clientInsurance.id, id), eq(clientInsurance.organizationId, ctx.organizationId)),
-          );
+            and(
+              eq(clientInsurance.id, id),
+              eq(clientInsurance.organizationId, ctx.organizationId),
+              eq(clientInsurance.updatedAt, new Date(updatedAt)),
+            ),
+          )
+          .returning();
+
+        if (!txUpdated) {
+          throw new Error("Record was modified by another user. Please refresh and try again.");
+        }
       });
     } else {
-      await db
+      const [directUpdated] = await db
         .update(clientInsurance)
         .set(undefinedToNull(updates) as Partial<typeof clientInsurance.$inferInsert>)
         .where(
-          and(eq(clientInsurance.id, id), eq(clientInsurance.organizationId, ctx.organizationId)),
-        );
+          and(
+            eq(clientInsurance.id, id),
+            eq(clientInsurance.organizationId, ctx.organizationId),
+            eq(clientInsurance.updatedAt, new Date(updatedAt)),
+          ),
+        )
+        .returning();
+
+      if (!directUpdated) {
+        throw new Error("Record was modified by another user. Please refresh and try again.");
+      }
     }
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "update",
+      entityType: "client_insurance",
+      entityId: id,
+    });
 
     revalidatePath(`/clients/${existing.clientId}`);
     return { success: true as const };
@@ -208,9 +238,7 @@ export const updateInsurance = authActionClient
 export const deleteInsurance = authActionClient
   .schema(z.object({ id: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "clients.write");
 
     const [existing] = await db
       .select({ id: clientInsurance.id, clientId: clientInsurance.clientId })
@@ -266,6 +294,14 @@ export const deleteInsurance = authActionClient
       }
     });
 
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "archive",
+      entityType: "client_insurance",
+      entityId: parsedInput.id,
+    });
+
     revalidatePath(`/clients/${existing.clientId}`);
     return { success: true as const };
   });
@@ -273,9 +309,7 @@ export const deleteInsurance = authActionClient
 export const verifyInsurance = authActionClient
   .schema(verifyInsuranceSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "clients.write");
 
     const [existing] = await db
       .select({
@@ -320,6 +354,15 @@ export const verifyInsurance = authActionClient
           eq(clientInsurance.organizationId, ctx.organizationId),
         ),
       );
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "verify",
+      entityType: "client_insurance",
+      entityId: parsedInput.id,
+      metadata: { verificationStatus: parsedInput.verificationStatus },
+    });
 
     revalidatePath(`/clients/${existing.clientId}`);
     return { success: true as const };

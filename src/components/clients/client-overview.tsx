@@ -8,7 +8,7 @@ import {
   type ContactRelationshipType,
   type PayerType,
 } from "@/lib/constants";
-import { formatDate } from "@/lib/utils";
+import { formatDate, daysUntilExpiry } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 
 function MetricCard({
@@ -122,15 +122,13 @@ export function ClientOverview({
 
   // Find the active authorization (approved + not expired)
   const activeAuth = authorizations.find(
-    (a) => a.status === "approved" && new Date(a.endDate) >= new Date(),
+    (a) => a.status === "approved" && daysUntilExpiry(a.endDate) >= 0,
   );
 
   const totalApproved = activeAuth?.totalApproved ?? 0;
   const totalUsed = activeAuth?.totalUsed ?? 0;
   const utilizationPct = totalApproved > 0 ? Math.round((totalUsed / totalApproved) * 100) : 0;
-  const daysLeft = activeAuth
-    ? Math.ceil((new Date(activeAuth.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    : 0;
+  const daysLeft = activeAuth ? daysUntilExpiry(activeAuth.endDate) : 0;
 
   const utilizationColor =
     utilizationPct >= 95

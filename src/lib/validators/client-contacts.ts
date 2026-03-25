@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { idSchema, contactRelationshipSchema } from "./index";
+import { idSchema, contactRelationshipSchema, updatedAtSchema } from "./index";
 
 export const createContactSchema = z.object({
   clientId: idSchema,
@@ -43,6 +43,7 @@ export const updateContactSchema = createContactSchema
   .partial()
   .extend({
     id: idSchema,
+    updatedAt: updatedAtSchema,
     isLegalGuardian: z.boolean().optional(),
     isEmergencyContact: z.boolean().optional(),
     isBillingResponsible: z.boolean().optional(),

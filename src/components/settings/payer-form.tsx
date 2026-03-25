@@ -85,7 +85,7 @@ export function PayerForm({ payer, onSuccess }: { payer?: Payer; onSuccess: () =
 
   function onSubmit(data: CreatePayerInput) {
     if (isEdit) {
-      executeUpdate({ ...data, id: payer.id });
+      executeUpdate({ ...data, id: payer.id, updatedAt: payer.updatedAt.toISOString() });
     } else {
       executeCreate(data);
     }

@@ -112,18 +112,25 @@ describe("createPayerSchema", () => {
 
 describe("updatePayerSchema", () => {
   it("requires id", () => {
-    const result = updatePayerSchema.safeParse({ name: "Updated" });
+    const result = updatePayerSchema.safeParse({
+      name: "Updated",
+      updatedAt: "2026-03-21T12:00:00.000Z",
+    });
     expect(result.success).toBe(false);
   });
 
   it("accepts partial update with only id", () => {
-    const result = updatePayerSchema.safeParse({ id: "payer_123" });
+    const result = updatePayerSchema.safeParse({
+      id: "payer_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
+    });
     expect(result.success).toBe(true);
   });
 
   it("does not silently reset payerType when omitted", () => {
     const result = updatePayerSchema.safeParse({
       id: "payer_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
       name: "Updated",
     });
     expect(result.success).toBe(true);
@@ -135,6 +142,7 @@ describe("updatePayerSchema", () => {
   it("does not silently reset unitCalcMethod when omitted", () => {
     const result = updatePayerSchema.safeParse({
       id: "payer_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
     });
     expect(result.success).toBe(true);
     if (result.success) {
@@ -145,6 +153,7 @@ describe("updatePayerSchema", () => {
   it("does not silently reset isActive when omitted", () => {
     const result = updatePayerSchema.safeParse({
       id: "payer_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
     });
     expect(result.success).toBe(true);
     if (result.success) {
@@ -155,6 +164,7 @@ describe("updatePayerSchema", () => {
   it("accepts isActive toggle", () => {
     const result = updatePayerSchema.safeParse({
       id: "payer_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
       isActive: false,
     });
     expect(result.success).toBe(true);

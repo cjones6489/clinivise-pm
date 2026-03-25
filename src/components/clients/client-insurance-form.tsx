@@ -141,7 +141,7 @@ export function ClientInsuranceForm({
 
   function onSubmit(data: CreateInsuranceInput) {
     if (isEdit) {
-      executeUpdate({ ...data, id: insurance.id });
+      executeUpdate({ ...data, id: insurance.id, updatedAt: insurance.updatedAt.toISOString() });
     } else {
       executeCreate(data);
     }

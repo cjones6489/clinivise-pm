@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { idSchema, dateStringSchema, authStatusSchema } from "./index";
+import { idSchema, dateStringSchema, authStatusSchema, updatedAtSchema } from "./index";
 import { ABA_CPT_CODES, SERVICE_FREQUENCIES } from "@/lib/constants";
 
 const cptCodes = Object.keys(ABA_CPT_CODES) as [string, ...string[]];
@@ -83,7 +83,7 @@ export const createAuthorizationSchema = authorizationFieldsSchema
   });
 
 export const updateAuthorizationSchema = authorizationFieldsSchema
-  .extend({ id: idSchema })
+  .extend({ id: idSchema, updatedAt: updatedAtSchema })
   .refine(endDateAfterStartDate, {
     message: "End date must be on or after start date",
     path: ["endDate"],

@@ -117,7 +117,7 @@ export function ClientForm({
 
   function onSubmit(data: CreateClientInput) {
     if (isEdit) {
-      executeUpdate({ ...data, id: client.id });
+      executeUpdate({ ...data, id: client.id, updatedAt: client.updatedAt.toISOString() });
     } else {
       executeCreate(data);
     }

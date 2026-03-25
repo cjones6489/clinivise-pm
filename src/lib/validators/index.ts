@@ -53,6 +53,9 @@ export const phoneSchema = z.string().min(1).optional();
 export const emailSchema = z.email().optional();
 export const npiSchema = z.string().length(10).regex(/^\d+$/).optional();
 
+/** ISO datetime string for optimistic locking — client sends back the updatedAt it loaded. */
+export const updatedAtSchema = z.string().datetime({ offset: true });
+
 // ── Pagination Schema ───────────────────────────────────────────────────────
 
 export const paginationSchema = z.object({

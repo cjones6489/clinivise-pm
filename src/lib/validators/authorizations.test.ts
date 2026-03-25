@@ -331,7 +331,7 @@ describe("createAuthorizationSchema", () => {
 });
 
 describe("updateAuthorizationSchema", () => {
-  const validUpdate = { ...validInput, id: "auth_123" };
+  const validUpdate = { ...validInput, id: "auth_123", updatedAt: "2026-03-21T12:00:00.000Z" };
 
   it("accepts valid update input", () => {
     const result = updateAuthorizationSchema.safeParse(validUpdate);
@@ -426,12 +426,13 @@ describe("undefinedToNull interaction (action layer contract)", () => {
   it("cleared optional fields become null via undefinedToNull", () => {
     const result = updateAuthorizationSchema.safeParse({
       ...{ ...validInput, id: "auth_123" },
+      updatedAt: "2026-03-21T12:00:00.000Z",
       authorizationNumber: "",
       notes: "",
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      const { id, services, ...authFields } = result.data;
+      const { id: _id, services: _services, ...authFields } = result.data;
       const nulled = undefinedToNull(authFields);
       expect(nulled.authorizationNumber).toBeNull();
       expect(nulled.notes).toBeNull();
@@ -450,7 +451,7 @@ describe("undefinedToNull interaction (action layer contract)", () => {
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      const { services, ...authFields } = result.data;
+      const { services: _services, ...authFields } = result.data;
       const stripped = stripUndefined(authFields);
       expect("authorizationNumber" in stripped).toBe(false);
       expect("diagnosisCode" in stripped).toBe(false);
@@ -461,6 +462,7 @@ describe("undefinedToNull interaction (action layer contract)", () => {
   it("service line reconciliation: existingIds extraction", () => {
     const result = updateAuthorizationSchema.safeParse({
       ...{ ...validInput, id: "auth_123" },
+      updatedAt: "2026-03-21T12:00:00.000Z",
       services: [
         { ...validService, id: "svc_1" },
         { ...validService, id: "svc_2", cptCode: "97155" },

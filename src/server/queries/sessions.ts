@@ -46,6 +46,7 @@ export type SessionListItem = {
 };
 
 export type SessionDetail = SessionListItem & {
+  updatedAt: Date;
   supervisorId: string | null;
   unitCalcMethod: string | null;
   authServiceApprovedUnits: number | null;
@@ -179,6 +180,7 @@ export async function getSessionById(orgId: string, id: string): Promise<Session
       status: sessions.status,
       notes: sessions.notes,
       createdAt: sessions.createdAt,
+      updatedAt: sessions.updatedAt,
       authServiceApprovedUnits: authorizationServices.approvedUnits,
       authServiceUsedUnits: authorizationServices.usedUnits,
       authStartDate: authorizations.startDate,

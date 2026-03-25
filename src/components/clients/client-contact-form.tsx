@@ -92,7 +92,7 @@ export function ClientContactForm({
 
   function onSubmit(data: CreateContactInput) {
     if (isEdit) {
-      executeUpdate({ ...data, id: contact.id });
+      executeUpdate({ ...data, id: contact.id, updatedAt: contact.updatedAt.toISOString() });
     } else {
       executeCreate(data);
     }

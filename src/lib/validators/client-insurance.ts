@@ -5,6 +5,7 @@ import {
   subscriberRelationshipSchema,
   genderSchema,
   verificationStatusSchema,
+  updatedAtSchema,
 } from "./index";
 
 const optionalString = z
@@ -49,6 +50,7 @@ export const updateInsuranceSchema = insuranceFieldsSchema
   .partial()
   .extend({
     id: idSchema,
+    updatedAt: updatedAtSchema,
     relationshipToSubscriber: subscriberRelationshipSchema.optional(),
     priority: z.coerce.number().int().min(1).max(3).optional(),
   });

@@ -218,7 +218,7 @@ export function AuthorizationForm({
   // and the server action re-validates — so passing input type is safe
   function onSubmit(data: CreateAuthorizationInput) {
     if (isEdit) {
-      executeUpdate({ ...data, id: authorization.id });
+      executeUpdate({ ...data, id: authorization.id, updatedAt: authorization.updatedAt.toISOString() });
     } else {
       executeCreate(data);
     }

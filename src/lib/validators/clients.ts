@@ -5,6 +5,7 @@ import {
   clientStatusSchema,
   referralSourceSchema,
   genderSchema,
+  updatedAtSchema,
 } from "./index";
 
 const NONE_VALUE = "__none__";
@@ -106,7 +107,7 @@ export const createClientSchema = clientFieldsSchema.refine(
 export const updateClientSchema = clientFieldsSchema
   .omit({ status: true })
   .partial()
-  .extend({ id: idSchema, status: clientStatusSchema.optional() })
+  .extend({ id: idSchema, updatedAt: updatedAtSchema, status: clientStatusSchema.optional() })
   .refine(holdReasonRefinement, holdReasonRefinementConfig);
 
 export type CreateClientInput = z.input<typeof createClientSchema>;

@@ -19,8 +19,7 @@ import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
-
-const WRITE_ROLES = ["owner", "admin", "bcba"];
+import { requirePermission } from "@/lib/permissions";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -98,9 +97,7 @@ async function validateForeignKeys(
 export const createAuthorization = authActionClient
   .schema(createAuthorizationSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "authorizations.write");
 
     const { services, ...authFields } = parsedInput;
 
@@ -117,13 +114,17 @@ export const createAuthorization = authActionClient
 
       if (!auth) throw new Error("Failed to create authorization");
 
-      for (const svc of services) {
-        const { id: _id, ...svcFields } = svc;
-        await tx.insert(authorizationServices).values({
-          ...stripUndefined(svcFields),
-          authorizationId: auth.id,
-          organizationId: ctx.organizationId,
-        });
+      if (services.length > 0) {
+        await tx.insert(authorizationServices).values(
+          services.map((svc) => {
+            const { id: _id, ...svcFields } = svc;
+            return {
+              ...stripUndefined(svcFields),
+              authorizationId: auth.id,
+              organizationId: ctx.organizationId,
+            };
+          }),
+        );
       }
 
       return auth;
@@ -148,11 +149,9 @@ export const createAuthorization = authActionClient
 export const updateAuthorization = authActionClient
   .schema(updateAuthorizationSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "authorizations.write");
 
-    const { id, services, ...authFields } = parsedInput;
+    const { id, updatedAt, services, ...authFields } = parsedInput;
 
     // Verify ownership
     const [existing] = await db
@@ -179,12 +178,21 @@ export const updateAuthorization = authActionClient
     await db.transaction(async (tx) => {
       // Update the authorization record (undefinedToNull so cleared fields become NULL)
       // clientId is excluded — it's locked to the original value
-      await tx
+      const [updatedAuth] = await tx
         .update(authorizations)
         .set(undefinedToNull(updatableFields) as Partial<typeof authorizations.$inferInsert>)
         .where(
-          and(eq(authorizations.id, id), eq(authorizations.organizationId, ctx.organizationId)),
-        );
+          and(
+            eq(authorizations.id, id),
+            eq(authorizations.organizationId, ctx.organizationId),
+            eq(authorizations.updatedAt, new Date(updatedAt)),
+          ),
+        )
+        .returning();
+
+      if (!updatedAuth) {
+        throw new Error("Record was modified by another user. Please refresh and try again.");
+      }
 
       // Reconcile service lines: update existing, insert new, delete removed
       const existingIds = services.filter((s) => s.id).map((s) => s.id!);
@@ -275,9 +283,7 @@ export const updateAuthorization = authActionClient
 export const archiveAuthorization = authActionClient
   .schema(z.object({ id: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "authorizations.write");
 
     const [existing] = await db
       .select({ id: authorizations.id, clientId: authorizations.clientId })

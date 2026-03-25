@@ -9,15 +9,13 @@ import { eq, and, isNull, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
-
-const WRITE_ROLES = ["owner", "admin", "bcba"];
+import { logAudit } from "@/server/audit";
+import { requirePermission } from "@/lib/permissions";
 
 export const createClient = authActionClient
   .schema(createClientSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "clients.write");
 
     if (parsedInput.assignedBcbaId) {
       const [bcba] = await db
@@ -52,6 +50,14 @@ export const createClient = authActionClient
       })
       .returning();
 
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "create",
+      entityType: "client",
+      entityId: client?.id,
+    });
+
     revalidatePath("/clients");
     return { success: true as const, data: client };
   });
@@ -59,11 +65,9 @@ export const createClient = authActionClient
 export const updateClient = authActionClient
   .schema(updateClientSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "clients.write");
 
-    const { id, ...updates } = parsedInput;
+    const { id, updatedAt, ...updates } = parsedInput;
 
     const [existing] = await db
       .select({ id: clients.id })
@@ -103,8 +107,26 @@ export const updateClient = authActionClient
     const [client] = await db
       .update(clients)
       .set(undefinedToNull(updates) as Partial<typeof clients.$inferInsert>)
-      .where(and(eq(clients.id, id), eq(clients.organizationId, ctx.organizationId)))
+      .where(
+        and(
+          eq(clients.id, id),
+          eq(clients.organizationId, ctx.organizationId),
+          eq(clients.updatedAt, new Date(updatedAt)),
+        ),
+      )
       .returning();
+
+    if (!client) {
+      throw new Error("Record was modified by another user. Please refresh and try again.");
+    }
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "update",
+      entityType: "client",
+      entityId: id,
+    });
 
     revalidatePath("/clients");
     revalidatePath(`/clients/${id}`);
@@ -114,9 +136,7 @@ export const updateClient = authActionClient
 export const deleteClient = authActionClient
   .schema(z.object({ id: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
-    if (!WRITE_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "clients.write");
 
     const [existing] = await db
       .select({ id: clients.id })
@@ -139,6 +159,14 @@ export const deleteClient = authActionClient
       .set({ deletedAt: new Date(), status: "archived" })
       .where(and(eq(clients.id, parsedInput.id), eq(clients.organizationId, ctx.organizationId)))
       .returning();
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "archive",
+      entityType: "client",
+      entityId: parsedInput.id,
+    });
 
     revalidatePath("/clients");
     return { success: true as const, data: client };

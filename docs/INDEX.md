@@ -19,6 +19,7 @@ Central index of all project documentation.
 | **Product Spec**         | [`specs/product-spec.md`](specs/product-spec.md)                 | **Page-by-page product spec** — every page defined with user stories, layouts, data requirements, actions, MVP scope, and future phases. The source of truth for what to build. |
 | Engineering Spec         | [`specs/engineering-spec.md`](specs/engineering-spec.md)         | Full DB schema (12 tables), config files, file structure, task breakdown                                                                                               |
 | Research Spec            | [`specs/research-spec.md`](specs/research-spec.md)               | Technology decisions, pricing model, ABA billing codes, HIPAA analysis, competitor research                                                                            |
+| **Implementation Plan**  | [`specs/implementation-plan.md`](specs/implementation-plan.md)   | **Central execution plan** — 7 phased build combining backend + frontend, incremental sub-phases with checkpoints, dependency graph, validation protocol. References all other specs. |
 | **Competitive Strategy** | [`specs/competitive-strategy.md`](specs/competitive-strategy.md) | 7 strategic moves, competitor exploit map (CentralReach/AlohaABA/Theralytics/Raven Health), positioning by persona, success metrics by phase, what we don't compete on |
 
 ## Research

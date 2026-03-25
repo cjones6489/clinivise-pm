@@ -1,5 +1,11 @@
 import { z } from "zod/v4";
-import { idSchema, dateStringSchema, sessionStatusSchema, placeOfServiceSchema } from "./index";
+import {
+  idSchema,
+  dateStringSchema,
+  sessionStatusSchema,
+  placeOfServiceSchema,
+  updatedAtSchema,
+} from "./index";
 import { ABA_CPT_CODES } from "@/lib/constants";
 
 const cptCodes = Object.keys(ABA_CPT_CODES) as [string, ...string[]];
@@ -51,6 +57,11 @@ const sessionFieldsSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
+  idempotencyKey: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
 });
 
 function timePairingValid(data: { startTime?: string; endTime?: string }) {
@@ -85,7 +96,7 @@ export const createSessionSchema = sessionFieldsSchema
   });
 
 export const updateSessionSchema = sessionFieldsSchema
-  .extend({ id: idSchema })
+  .extend({ id: idSchema, updatedAt: updatedAtSchema })
   .refine(timePairingValid, {
     message: "Both start time and end time must be provided together",
     path: ["endTime"],

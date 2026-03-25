@@ -7,6 +7,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { nanoid } from "nanoid";
 
 import { createSessionSchema, type CreateSessionInput } from "@/lib/validators/sessions";
 import {
@@ -83,6 +84,7 @@ export function SessionForm({
   const [authLoading, setAuthLoading] = useState(false);
 
   const today = format(new Date(), "yyyy-MM-dd");
+  const idempotencyKey = useMemo(() => nanoid(), []);
 
   const {
     register,
@@ -106,6 +108,7 @@ export function SessionForm({
       placeOfService: (session?.placeOfService ?? "12") as CreateSessionInput["placeOfService"],
       status: (session?.status ?? "completed") as CreateSessionInput["status"],
       notes: session?.notes ?? "",
+      idempotencyKey: "",
     },
   });
 
@@ -235,9 +238,9 @@ export function SessionForm({
 
   function onSubmit(data: CreateSessionInput) {
     if (isEdit) {
-      executeUpdate({ ...data, id: session.id });
+      executeUpdate({ ...data, id: session.id, updatedAt: session.updatedAt.toISOString() });
     } else {
-      executeCreate(data);
+      executeCreate({ ...data, idempotencyKey });
     }
   }
 

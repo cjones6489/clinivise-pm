@@ -10,13 +10,13 @@ import { revalidatePath } from "next/cache";
 import { CREDENTIAL_MODIFIERS } from "@/lib/constants";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
+import { logAudit } from "@/server/audit";
+import { requirePermission } from "@/lib/permissions";
 
 export const createProvider = authActionClient
   .schema(createProviderSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (ctx.userRole !== "owner" && ctx.userRole !== "admin") {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "providers.write");
 
     // Validate supervisorId exists in the same org if provided
     if (parsedInput.supervisorId) {
@@ -47,6 +47,14 @@ export const createProvider = authActionClient
       })
       .returning();
 
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "create",
+      entityType: "provider",
+      entityId: provider?.id,
+    });
+
     revalidatePath("/providers");
     return { success: true as const, data: provider };
   });
@@ -54,11 +62,9 @@ export const createProvider = authActionClient
 export const updateProvider = authActionClient
   .schema(updateProviderSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (ctx.userRole !== "owner" && ctx.userRole !== "admin") {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "providers.write");
 
-    const { id, ...updates } = parsedInput;
+    const { id, updatedAt, ...updates } = parsedInput;
 
     // Verify ownership
     const [existing] = await db
@@ -106,8 +112,26 @@ export const updateProvider = authActionClient
         ...undefinedToNull(updates),
         ...modifierUpdate,
       } as Partial<typeof providers.$inferInsert>)
-      .where(and(eq(providers.id, id), eq(providers.organizationId, ctx.organizationId)))
+      .where(
+        and(
+          eq(providers.id, id),
+          eq(providers.organizationId, ctx.organizationId),
+          eq(providers.updatedAt, new Date(updatedAt)),
+        ),
+      )
       .returning();
+
+    if (!provider) {
+      throw new Error("Record was modified by another user. Please refresh and try again.");
+    }
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "update",
+      entityType: "provider",
+      entityId: id,
+    });
 
     revalidatePath("/providers");
     revalidatePath(`/providers/${id}`);
@@ -117,9 +141,7 @@ export const updateProvider = authActionClient
 export const deleteProvider = authActionClient
   .schema(z.object({ id: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
-    if (ctx.userRole !== "owner" && ctx.userRole !== "admin") {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "providers.write");
 
     // Verify ownership
     const [existing] = await db
@@ -145,6 +167,14 @@ export const deleteProvider = authActionClient
         and(eq(providers.id, parsedInput.id), eq(providers.organizationId, ctx.organizationId)),
       )
       .returning();
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "archive",
+      entityType: "provider",
+      entityId: parsedInput.id,
+    });
 
     revalidatePath("/providers");
     return { success: true as const, data: provider };

@@ -9,15 +9,13 @@ import { eq, and, isNull, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
-
-const ADMIN_ROLES = ["owner", "admin"];
+import { logAudit } from "@/server/audit";
+import { requirePermission } from "@/lib/permissions";
 
 export const createPayer = authActionClient
   .schema(createPayerSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!ADMIN_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "payers.write");
 
     const [payer] = await db
       .insert(payers)
@@ -27,6 +25,14 @@ export const createPayer = authActionClient
       })
       .returning();
 
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "create",
+      entityType: "payer",
+      entityId: payer?.id,
+    });
+
     revalidatePath("/settings");
     return { success: true as const, data: payer };
   });
@@ -34,11 +40,9 @@ export const createPayer = authActionClient
 export const updatePayer = authActionClient
   .schema(updatePayerSchema)
   .action(async ({ parsedInput, ctx }) => {
-    if (!ADMIN_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "payers.write");
 
-    const { id, ...updates } = parsedInput;
+    const { id, updatedAt, ...updates } = parsedInput;
 
     // Verify ownership
     const [existing] = await db
@@ -54,8 +58,26 @@ export const updatePayer = authActionClient
     const [payer] = await db
       .update(payers)
       .set(undefinedToNull(updates) as Partial<typeof payers.$inferInsert>)
-      .where(and(eq(payers.id, id), eq(payers.organizationId, ctx.organizationId)))
+      .where(
+        and(
+          eq(payers.id, id),
+          eq(payers.organizationId, ctx.organizationId),
+          eq(payers.updatedAt, new Date(updatedAt)),
+        ),
+      )
       .returning();
+
+    if (!payer) {
+      throw new Error("Record was modified by another user. Please refresh and try again.");
+    }
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "update",
+      entityType: "payer",
+      entityId: id,
+    });
 
     revalidatePath("/settings");
     return { success: true as const, data: payer };
@@ -64,9 +86,7 @@ export const updatePayer = authActionClient
 export const deletePayer = authActionClient
   .schema(z.object({ id: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
-    if (!ADMIN_ROLES.includes(ctx.userRole)) {
-      throw new Error("Forbidden: insufficient role");
-    }
+    requirePermission(ctx.userRole, "payers.write");
 
     // Verify ownership
     const [existing] = await db
@@ -100,6 +120,14 @@ export const deletePayer = authActionClient
       .update(payers)
       .set({ isActive: false })
       .where(and(eq(payers.id, parsedInput.id), eq(payers.organizationId, ctx.organizationId)));
+
+    await logAudit({
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      action: "deactivate",
+      entityType: "payer",
+      entityId: parsedInput.id,
+    });
 
     revalidatePath("/settings");
     return { success: true as const };

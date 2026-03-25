@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { idSchema, payerTypeSchema, unitCalcMethodSchema } from "./index";
+import { idSchema, payerTypeSchema, unitCalcMethodSchema, updatedAtSchema } from "./index";
 
 const optionalString = z
   .string()
@@ -28,6 +28,7 @@ export const updatePayerSchema = createPayerSchema
   .partial()
   .extend({
     id: idSchema,
+    updatedAt: updatedAtSchema,
     payerType: payerTypeSchema.optional(),
     unitCalcMethod: unitCalcMethodSchema.optional(),
     isActive: z.boolean().optional(),

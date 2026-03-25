@@ -6,7 +6,7 @@ import type { AuthorizationListItem } from "@/server/queries/authorizations";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { formatDate } from "@/lib/utils";
+import { formatDate, daysUntilExpiry } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
@@ -118,9 +118,7 @@ function ClientOverviewRow({
 }) {
   const pct =
     auth && auth.totalApproved > 0 ? Math.round((auth.totalUsed / auth.totalApproved) * 100) : 0;
-  const daysLeft = auth
-    ? Math.ceil((new Date(auth.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    : null;
+  const daysLeft = auth ? daysUntilExpiry(auth.endDate) : null;
   const hours = (units: number) => ((units * 15) / 60).toFixed(0);
   const barColor = pct >= 95 ? "[&>div]:bg-red-500" : pct >= 80 ? "[&>div]:bg-amber-500" : "";
 
@@ -231,19 +229,15 @@ export function DashboardView({
   // Expiring auths (within 30 days)
   activeAuths
     .filter((a) => {
-      const daysLeft = Math.ceil(
-        (new Date(a.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-      );
-      return daysLeft > 0 && daysLeft <= 30;
+      const remaining = daysUntilExpiry(a.endDate);
+      return remaining > 0 && remaining <= 30;
     })
     .forEach((a) => {
-      const daysLeft = Math.ceil(
-        (new Date(a.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-      );
+      const remaining = daysUntilExpiry(a.endDate);
       alerts.push({
-        severity: daysLeft <= 7 ? "critical" : "warning",
+        severity: remaining <= 7 ? "critical" : "warning",
         title: `${a.clientFirstName} ${a.clientLastName}`,
-        description: `Auth expires in ${daysLeft} days`,
+        description: `Auth expires in ${remaining} days`,
         actionLabel: "Renew",
         actionHref: `/clients/${a.clientId}`,
       });

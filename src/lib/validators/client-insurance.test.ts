@@ -168,6 +168,7 @@ describe("updateInsuranceSchema", () => {
   it("requires id", () => {
     const result = updateInsuranceSchema.safeParse({
       memberId: "NEW001",
+      updatedAt: "2026-03-21T12:00:00.000Z",
     });
     expect(result.success).toBe(false);
   });
@@ -175,6 +176,7 @@ describe("updateInsuranceSchema", () => {
   it("accepts partial update with only id", () => {
     const result = updateInsuranceSchema.safeParse({
       id: "ins_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
     });
     expect(result.success).toBe(true);
   });
@@ -182,6 +184,7 @@ describe("updateInsuranceSchema", () => {
   it("accepts partial memberId update", () => {
     const result = updateInsuranceSchema.safeParse({
       id: "ins_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
       memberId: "NEW001",
     });
     expect(result.success).toBe(true);
@@ -193,6 +196,7 @@ describe("updateInsuranceSchema", () => {
   it("does not silently reset relationshipToSubscriber when omitted", () => {
     const result = updateInsuranceSchema.safeParse({
       id: "ins_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
       memberId: "NEW001",
     });
     expect(result.success).toBe(true);
@@ -205,6 +209,7 @@ describe("updateInsuranceSchema", () => {
   it("does not silently reset priority when omitted", () => {
     const result = updateInsuranceSchema.safeParse({
       id: "ins_123",
+      updatedAt: "2026-03-21T12:00:00.000Z",
     });
     expect(result.success).toBe(true);
     if (result.success) {
