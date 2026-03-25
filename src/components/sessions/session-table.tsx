@@ -31,10 +31,12 @@ export function SessionTable({
   data,
   canEdit,
   pagination,
+  activeFilter,
 }: {
   data: SessionListItem[];
   canEdit: boolean;
   pagination?: ServerPagination;
+  activeFilter?: string;
 }) {
   const router = useRouter();
   const [cancelTarget, setCancelTarget] = useState<SessionListItem | null>(null);
@@ -75,6 +77,13 @@ export function SessionTable({
     : 1;
   const currentPage = pagination?.page ?? 0;
 
+  function paginationHref(page: number) {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    if (activeFilter && activeFilter !== "all") params.set("filter", activeFilter);
+    return `/sessions?${params.toString()}`;
+  }
+
   return (
     <div className="space-y-3">
       <DataTableToolbar table={table} searchKey="client" searchPlaceholder="Search sessions..." />
@@ -82,7 +91,7 @@ export function SessionTable({
 
       {/* Server-side pagination */}
       {pagination ? (
-        <div className="text-muted-foreground flex items-center justify-between text-xs">
+        <div className="text-muted-foreground flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between">
           <div>{pagination.total} session(s) total</div>
           <div className="flex items-center gap-2">
             <span>
@@ -91,7 +100,7 @@ export function SessionTable({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => router.push(`/sessions?page=${currentPage - 1}`)}
+              onClick={() => router.push(paginationHref(currentPage - 1))}
               disabled={currentPage <= 0}
               className="h-7 px-2 text-xs"
             >
@@ -100,7 +109,7 @@ export function SessionTable({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => router.push(`/sessions?page=${currentPage + 1}`)}
+              onClick={() => router.push(paginationHref(currentPage + 1))}
               disabled={currentPage >= totalPages - 1}
               className="h-7 px-2 text-xs"
             >

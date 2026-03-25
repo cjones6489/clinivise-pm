@@ -170,6 +170,7 @@ export async function getSessionListMetrics(orgId: string): Promise<SessionListM
       )::int`,
       thisMonthCount: sql<number>`count(*) filter (
         where ${sessions.sessionDate} >= ${monthStartStr}
+        and ${sessions.status} != 'cancelled'
       )::int`,
     })
     .from(sessions)

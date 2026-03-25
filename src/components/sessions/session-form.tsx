@@ -149,13 +149,27 @@ export function SessionForm({
   // Cascade 2: Client + CPT + Date → fetch matching authorizations
   const { executeAsync: loadAuthMatches } = useAction(fetchMatchingAuthorizations);
 
+  // Track initial edit values to skip only the very first load
+  const [editInitialFetched, setEditInitialFetched] = useState(false);
+
   useEffect(() => {
     if (!selectedClientId || !selectedCptCode || !selectedSessionDate) return;
-    // Don't refetch for initial edit load
-    if (isEdit && selectedClientId === session?.clientId && initialAuthMatches) return;
+    // Skip only the initial mount in edit mode when we already have matches
+    if (
+      isEdit &&
+      !editInitialFetched &&
+      selectedClientId === session?.clientId &&
+      selectedCptCode === session?.cptCode &&
+      selectedSessionDate === session?.sessionDate &&
+      initialAuthMatches
+    ) {
+      setEditInitialFetched(true);
+      return;
+    }
 
     let cancelled = false;
     setAuthLoading(true);
+    setShowAuthPicker(false);
 
     loadAuthMatches({
       clientId: selectedClientId,
@@ -167,12 +181,15 @@ export function SessionForm({
         if (result?.data?.data) {
           const matches = result.data.data;
           setAuthMatches(matches);
-          // FIFO auto-select first match (only for new sessions)
-          if (!isEdit && matches.length > 0) {
+          // FIFO auto-select first match
+          if (matches.length > 0) {
             setValue("authorizationServiceId", matches[0]!.authServiceId);
+          } else {
+            setValue("authorizationServiceId", "");
           }
         } else {
           setAuthMatches([]);
+          setValue("authorizationServiceId", "");
         }
       })
       .catch(() => {
@@ -200,6 +217,18 @@ export function SessionForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startTime, endTime]);
+
+  // Cascade 4: Status change → clear times/units for non-billable statuses
+  const watchedStatusForClear = watch("status");
+  useEffect(() => {
+    if (watchedStatusForClear === "cancelled" || watchedStatusForClear === "no_show") {
+      setValue("startTime", "");
+      setValue("endTime", "");
+      setValue("units", 0);
+      setValue("authorizationServiceId", "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedStatusForClear]);
 
   const filteredClients = useMemo(() => {
     if (!clientInputValue) return clientOptions;
@@ -562,7 +591,7 @@ export function SessionForm({
                 const pctRemaining = selectedAuth.approvedUnits > 0
                   ? (remaining / selectedAuth.approvedUnits) * 100
                   : 0;
-                const isLow = pctRemaining <= 20 && pctRemaining > 0;
+                const isLow = pctRemaining <= 20;
                 const isExceeded = afterSession < 0;
 
                 const borderColor = isExceeded

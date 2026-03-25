@@ -103,25 +103,29 @@ export function getSessionColumns(opts: {
             row.original.status === "flagged");
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
-                <span className="sr-only">Actions</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => opts.onView(row.original)}>View</DropdownMenuItem>
-              {canCancel && (
-                <DropdownMenuItem
-                  onClick={() => opts.onCancel!(row.original)}
-                  className="text-destructive focus:text-destructive"
-                >
-                  Cancel
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          // Stop propagation to prevent row click (detail sheet) from firing
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+          <div onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
+                  <span className="sr-only">Actions</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => opts.onView(row.original)}>View</DropdownMenuItem>
+                {canCancel && (
+                  <DropdownMenuItem
+                    onClick={() => opts.onCancel!(row.original)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    Cancel
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         );
       },
     },

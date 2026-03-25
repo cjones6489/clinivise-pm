@@ -128,15 +128,23 @@ export default async function SessionsPage({
       )}
 
       {sessions.length > 0 || page > 0 ? (
-        <SessionTable data={sessions} canEdit={canCreate} pagination={{ page, pageSize, total }} />
+        <SessionTable data={sessions} canEdit={canCreate} pagination={{ page, pageSize, total }} activeFilter={activeTab} />
       ) : hasAnySessions ? (
         <EmptyState
           icon={Clock01Icon}
-          title={activeTab === "flagged" ? "No flagged sessions" : "No sessions this week"}
+          title={
+            activeTab === "flagged"
+              ? "No flagged sessions"
+              : activeTab === "week"
+                ? "No sessions this week"
+                : "No sessions found"
+          }
           description={
             activeTab === "flagged"
               ? "All sessions have valid authorizations. Nice work."
-              : "No sessions match the current filter."
+              : activeTab === "week"
+                ? "No sessions logged this week yet."
+                : "No sessions match the current view."
           }
         />
       ) : (

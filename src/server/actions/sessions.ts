@@ -177,48 +177,50 @@ export const createSession = authActionClient
       parsedInput.endTime,
     );
 
-    // FIFO auto-select authorization if none provided
+    // Initial auth context from explicit selection
     let authServiceId = parsedInput.authorizationServiceId ?? null;
     let resolvedAuthId = authorizationId;
 
-    if (!authServiceId) {
-      const [match] = await db
-        .select({
-          id: authorizationServices.id,
-          authorizationId: authorizationServices.authorizationId,
-        })
-        .from(authorizationServices)
-        .innerJoin(authorizations, eq(authorizationServices.authorizationId, authorizations.id))
-        .where(
-          and(
-            eq(authorizations.organizationId, ctx.organizationId),
-            eq(authorizations.clientId, parsedInput.clientId),
-            eq(authorizations.status, "approved"),
-            isNull(authorizations.deletedAt),
-            eq(authorizationServices.cptCode, parsedInput.cptCode),
-            lte(authorizations.startDate, parsedInput.sessionDate),
-            gte(authorizations.endDate, parsedInput.sessionDate),
-            lt(authorizationServices.usedUnits, authorizationServices.approvedUnits),
-          ),
-        )
-        .orderBy(asc(authorizations.endDate))
-        .limit(1);
-
-      if (match) {
-        authServiceId = match.id;
-        resolvedAuthId = match.authorizationId;
-      }
-    }
-
-    const accountingOp = computeCreateAccountingOps(
-      parsedInput.status,
-      authServiceId,
-      parsedInput.units,
-    );
-
     const result = await db.transaction(async (tx) => {
-      // Lock auth service row to prevent concurrent over-allocation
-      if (accountingOp.type === "increment") {
+      // FIFO auto-select authorization inside transaction to prevent race conditions
+      if (!authServiceId) {
+        const [match] = await tx
+          .select({
+            id: authorizationServices.id,
+            authorizationId: authorizationServices.authorizationId,
+          })
+          .from(authorizationServices)
+          .innerJoin(authorizations, eq(authorizationServices.authorizationId, authorizations.id))
+          .where(
+            and(
+              eq(authorizations.organizationId, ctx.organizationId),
+              eq(authorizations.clientId, parsedInput.clientId),
+              eq(authorizations.status, "approved"),
+              isNull(authorizations.deletedAt),
+              eq(authorizationServices.cptCode, parsedInput.cptCode),
+              lte(authorizations.startDate, parsedInput.sessionDate),
+              gte(authorizations.endDate, parsedInput.sessionDate),
+              lt(authorizationServices.usedUnits, authorizationServices.approvedUnits),
+            ),
+          )
+          .orderBy(asc(authorizations.endDate))
+          .for("update")
+          .limit(1);
+
+        if (match) {
+          authServiceId = match.id;
+          resolvedAuthId = match.authorizationId;
+        }
+      }
+
+      const accountingOp = computeCreateAccountingOps(
+        parsedInput.status,
+        authServiceId,
+        parsedInput.units,
+      );
+
+      // Lock explicitly selected auth service row
+      if (accountingOp.type === "increment" && parsedInput.authorizationServiceId) {
         await tx
           .select({ id: authorizationServices.id })
           .from(authorizationServices)
@@ -520,7 +522,7 @@ export const cancelSession = authActionClient
         }
       }
 
-      await tx
+      const [cancelledRow] = await tx
         .update(sessions)
         .set({
           status: "cancelled",
@@ -529,8 +531,17 @@ export const cancelSession = authActionClient
             : existing.notes,
         })
         .where(
-          and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)),
-        );
+          and(
+            eq(sessions.id, parsedInput.id),
+            eq(sessions.organizationId, ctx.organizationId),
+            eq(sessions.updatedAt, existing.updatedAt),
+          ),
+        )
+        .returning({ id: sessions.id });
+
+      if (!cancelledRow) {
+        throw new StaleDataError();
+      }
     });
 
     await logAudit({
