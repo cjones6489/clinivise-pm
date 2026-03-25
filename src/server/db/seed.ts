@@ -270,6 +270,9 @@ async function seed() {
   await db.insert(schema.authorizations).values(authValues).onConflictDoNothing();
 
   // 9. Authorization services (97153 for all, 97155 for first 5)
+  // NOTE: usedUnits are pre-calculated from authProfiles[i].usedPct, NOT derived
+  // from the seeded sessions below. In production, usedUnits are atomically
+  // incremented by createSession. The seed data is for visual testing only.
   console.log("  Authorization services...");
   let svcIdx = 0;
   const svcValues: Array<{

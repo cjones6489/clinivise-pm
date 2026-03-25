@@ -31,7 +31,7 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   const user = await getCurrentUser();
 
   if (!user) {
-    throw new NotFoundError("User in this organization");
+    throw new NotFoundError("User");
   }
 
   return next({
