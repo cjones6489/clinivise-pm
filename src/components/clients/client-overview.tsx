@@ -9,34 +9,8 @@ import {
   type PayerType,
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
-import { Progress } from "@/components/ui/progress";
-
-function MetricCard({
-  label,
-  value,
-  sub,
-  color,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  color?: string;
-}) {
-  return (
-    <div className="card-hover border-border bg-card rounded-xl border px-4 py-4 shadow-sm">
-      <div className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-        {label}
-      </div>
-      <div
-        className="mt-2 text-2xl font-bold tracking-tight tabular-nums"
-        style={color ? { color } : undefined}
-      >
-        {value}
-      </div>
-      {sub && <div className="text-muted-foreground mt-1 text-[11px]">{sub}</div>}
-    </div>
-  );
-}
+import { MetricCard } from "@/components/shared/metric-card";
+import { UtilizationBar } from "@/components/shared/utilization-bar";
 
 function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -65,41 +39,6 @@ function SectionCard({
         {action}
       </div>
       <div className="p-4">{children}</div>
-    </div>
-  );
-}
-
-function UtilizationBar({
-  used,
-  approved,
-  label,
-}: {
-  used: number;
-  approved: number;
-  label: string;
-}) {
-  const pct = approved > 0 ? Math.round((used / approved) * 100) : 0;
-  const hours = (val: number) => ((val * 15) / 60).toFixed(1);
-  const colorClass = pct >= 95 ? "text-red-600" : pct >= 80 ? "text-amber-600" : "text-emerald-600";
-  const barColor = pct >= 95 ? "[&>div]:bg-red-500" : pct >= 80 ? "[&>div]:bg-amber-500" : "";
-
-  return (
-    <div>
-      <div className="mb-1 flex items-baseline justify-between">
-        <div>
-          <span className="text-primary font-mono text-[13px] font-semibold">{label}</span>
-        </div>
-        <span className="text-muted-foreground text-[11px]">
-          {hours(approved - used)} hrs remaining
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <Progress value={Math.min(pct, 100)} className={`h-1.5 flex-1 ${barColor}`} />
-        <span className={`text-[11px] font-semibold tabular-nums ${colorClass}`}>{pct}%</span>
-      </div>
-      <div className="text-muted-foreground mt-0.5 text-[11px]">
-        {hours(used)}/{hours(approved)} hrs
-      </div>
     </div>
   );
 }
@@ -292,8 +231,8 @@ export function ClientOverview({
         {activeAuth && activeAuth.totalApproved > 0 ? (
           <div className="space-y-4">
             <UtilizationBar
-              used={activeAuth.totalUsed}
-              approved={activeAuth.totalApproved}
+              usedUnits={activeAuth.totalUsed}
+              approvedUnits={activeAuth.totalApproved}
               label={activeAuth.authorizationNumber ?? "Authorization"}
             />
           </div>
