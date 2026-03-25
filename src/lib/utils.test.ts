@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { undefinedToNull, stripUndefined } from "./utils";
+import { undefinedToNull, stripUndefined, parseTimeToMinutes, calculateUnitsFromMinutes } from "./utils";
 
 describe("undefinedToNull", () => {
   it("converts undefined values to null", () => {
@@ -69,5 +69,81 @@ describe("stripUndefined", () => {
   it("returns empty object when all values are undefined", () => {
     const result = stripUndefined({ a: undefined, b: undefined });
     expect(result).toEqual({});
+  });
+});
+
+// ── parseTimeToMinutes ──────────────────────────────────────────────────────
+
+describe("parseTimeToMinutes", () => {
+  it("parses midnight", () => {
+    expect(parseTimeToMinutes("00:00")).toBe(0);
+  });
+
+  it("parses morning time", () => {
+    expect(parseTimeToMinutes("09:30")).toBe(570);
+  });
+
+  it("parses noon", () => {
+    expect(parseTimeToMinutes("12:00")).toBe(720);
+  });
+
+  it("parses afternoon time", () => {
+    expect(parseTimeToMinutes("14:30")).toBe(870);
+  });
+
+  it("parses end of day", () => {
+    expect(parseTimeToMinutes("23:59")).toBe(1439);
+  });
+
+  it("parses single-digit minutes", () => {
+    expect(parseTimeToMinutes("08:05")).toBe(485);
+  });
+});
+
+// ── calculateUnitsFromMinutes (CMS 8-minute rule) ───────────────────────────
+
+describe("calculateUnitsFromMinutes", () => {
+  it("0 minutes = 0 units", () => {
+    expect(calculateUnitsFromMinutes(0)).toBe(0);
+  });
+
+  it("7 minutes = 0 units (below 8-minute threshold)", () => {
+    expect(calculateUnitsFromMinutes(7)).toBe(0);
+  });
+
+  it("8 minutes = 1 unit (meets threshold)", () => {
+    expect(calculateUnitsFromMinutes(8)).toBe(1);
+  });
+
+  it("15 minutes = 1 unit (exact unit)", () => {
+    expect(calculateUnitsFromMinutes(15)).toBe(1);
+  });
+
+  it("22 minutes = 1 unit (15 + 7 remainder below threshold)", () => {
+    expect(calculateUnitsFromMinutes(22)).toBe(1);
+  });
+
+  it("23 minutes = 2 units (15 + 8 remainder meets threshold)", () => {
+    expect(calculateUnitsFromMinutes(23)).toBe(2);
+  });
+
+  it("30 minutes = 2 units", () => {
+    expect(calculateUnitsFromMinutes(30)).toBe(2);
+  });
+
+  it("60 minutes = 4 units", () => {
+    expect(calculateUnitsFromMinutes(60)).toBe(4);
+  });
+
+  it("120 minutes = 8 units", () => {
+    expect(calculateUnitsFromMinutes(120)).toBe(8);
+  });
+
+  it("180 minutes = 12 units (typical 3-hour ABA session)", () => {
+    expect(calculateUnitsFromMinutes(180)).toBe(12);
+  });
+
+  it("negative minutes = -1 (invalid)", () => {
+    expect(calculateUnitsFromMinutes(-30)).toBe(-1);
   });
 });

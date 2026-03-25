@@ -23,15 +23,33 @@ export function timeAgo(date: string | Date): string {
 }
 
 /**
- * Calculate 15-minute units from duration using the CMS 8-minute rule (AMA method).
- * Each 15-minute unit requires >= 8 minutes to bill.
- * Returns -1 if endTime is before startTime (invalid input).
+ * Parse "HH:MM" time string to total minutes since midnight.
+ * Pure arithmetic — no Date objects, no timezone involvement.
  */
-export function calculateUnits(startTime: Date, endTime: Date): number {
-  const totalMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+export function parseTimeToMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return h! * 60 + m!;
+}
+
+/**
+ * Calculate 15-minute units from a duration in minutes using the CMS 8-minute rule (AMA method).
+ * Each 15-minute unit requires >= 8 minutes to bill.
+ * Returns -1 if totalMinutes is negative (invalid input).
+ */
+export function calculateUnitsFromMinutes(totalMinutes: number): number {
   if (totalMinutes < 0) return -1;
   if (totalMinutes < 8) return 0;
   return Math.floor(totalMinutes / 15) + (totalMinutes % 15 >= 8 ? 1 : 0);
+}
+
+/**
+ * Calculate 15-minute units from start/end Date objects.
+ * Convenience wrapper for client-side form calculation.
+ * @deprecated Prefer calculateUnitsFromMinutes with parseTimeToMinutes for timezone safety.
+ */
+export function calculateUnits(startTime: Date, endTime: Date): number {
+  const totalMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+  return calculateUnitsFromMinutes(totalMinutes);
 }
 
 /** Convert undefined values to null so Drizzle includes them in UPDATE queries. */

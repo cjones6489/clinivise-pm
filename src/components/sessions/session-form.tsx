@@ -31,7 +31,7 @@ import {
   type PlaceOfServiceCode,
   type SessionStatus,
 } from "@/lib/constants";
-import { calculateUnits } from "@/lib/utils";
+import { parseTimeToMinutes, calculateUnitsFromMinutes } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -188,12 +188,11 @@ export function SessionForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClientId, selectedCptCode, selectedSessionDate]);
 
-  // Cascade 3: StartTime + EndTime → calculate units
+  // Cascade 3: StartTime + EndTime → calculate units (timezone-safe string arithmetic)
   useEffect(() => {
     if (!startTime || !endTime) return;
-    const start = new Date(`2000-01-01T${startTime}:00`);
-    const end = new Date(`2000-01-01T${endTime}:00`);
-    const units = calculateUnits(start, end);
+    const minutes = parseTimeToMinutes(endTime) - parseTimeToMinutes(startTime);
+    const units = calculateUnitsFromMinutes(minutes);
     if (units >= 0) {
       setValue("units", units);
     }

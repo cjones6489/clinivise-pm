@@ -1,4 +1,5 @@
 import { CREDENTIAL_MODIFIERS, VALID_SESSION_TRANSITIONS, type SessionStatus } from "./constants";
+import { parseTimeToMinutes } from "./utils";
 
 /**
  * Auto-compute billing modifier codes from provider credential and place of service.
@@ -23,7 +24,12 @@ export function computeModifierCodes(
 }
 
 /**
- * Combine session date + time strings into timestamps and compute duration.
+ * Compute session duration from time strings and build storage timestamps.
+ *
+ * Duration uses pure string arithmetic (parseTimeToMinutes) — no timezone involvement.
+ * Timestamps are constructed for storage only; the actualMinutes value is the
+ * authoritative duration for billing, regardless of server timezone.
+ *
  * Time strings are "HH:MM" format from `<input type="time">`.
  * Returns nulls if either time is missing.
  */
@@ -36,9 +42,12 @@ export function computeActualMinutes(
     return { startTimestamp: null, endTimestamp: null, actualMinutes: null };
   }
 
+  // Duration via pure arithmetic — timezone-safe
+  const actualMinutes = parseTimeToMinutes(endTime) - parseTimeToMinutes(startTime);
+
+  // Timestamps for storage (display only, not used for billing math)
   const startTimestamp = new Date(`${sessionDate}T${startTime}:00`);
   const endTimestamp = new Date(`${sessionDate}T${endTime}:00`);
-  const actualMinutes = Math.round((endTimestamp.getTime() - startTimestamp.getTime()) / 60000);
 
   return { startTimestamp, endTimestamp, actualMinutes };
 }
