@@ -84,3 +84,32 @@ export function utilizationPercent(used: number, approved: number): number {
   if (approved === 0) return 0;
   return Math.round((used / approved) * 100);
 }
+
+/**
+ * Validate NPI using the Luhn algorithm with 80840 prefix.
+ * NPIs are 10-digit numbers. The check digit (last digit) is validated by:
+ * 1. Prepend "80840" to the first 9 digits
+ * 2. Run the Luhn algorithm on the resulting 14 digits
+ * 3. The result should end in 0
+ *
+ * @see CMS NPI Standard, ISO/IEC 7812
+ */
+export function isValidNpi(npi: string): boolean {
+  if (!/^\d{10}$/.test(npi)) return false;
+
+  const prefixed = "80840" + npi;
+  let sum = 0;
+  let alternate = false;
+
+  for (let i = prefixed.length - 1; i >= 0; i--) {
+    let n = parseInt(prefixed[i]!, 10);
+    if (alternate) {
+      n *= 2;
+      if (n > 9) n -= 9;
+    }
+    sum += n;
+    alternate = !alternate;
+  }
+
+  return sum % 10 === 0;
+}
