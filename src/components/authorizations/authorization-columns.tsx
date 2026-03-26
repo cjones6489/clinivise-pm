@@ -12,7 +12,8 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { AuthStatusBadge } from "./auth-status-badge";
-import { formatDate, utilizationPercent } from "@/lib/utils";
+import { UtilizationBar } from "@/components/shared/utilization-bar";
+import { ExpiryBadge } from "@/components/shared/expiry-badge";
 
 export function getAuthorizationColumns(opts: {
   onView: (auth: AuthorizationListItem) => void;
@@ -42,12 +43,10 @@ export function getAuthorizationColumns(opts: {
       cell: ({ getValue }) => <AuthStatusBadge status={getValue<string>()} />,
     },
     {
-      id: "dateRange",
-      header: "Date Range",
+      id: "expiry",
+      header: "Expiry",
       cell: ({ row }) => (
-        <span className="text-xs tabular-nums">
-          {formatDate(row.original.startDate)} — {formatDate(row.original.endDate)}
-        </span>
+        <ExpiryBadge endDate={row.original.endDate} startDate={row.original.startDate} />
       ),
     },
     {
@@ -55,11 +54,8 @@ export function getAuthorizationColumns(opts: {
       header: "Utilization",
       cell: ({ row }) => {
         const { totalUsed, totalApproved } = row.original;
-        const pct = utilizationPercent(totalUsed, totalApproved);
         return (
-          <span className="tabular-nums">
-            {totalUsed}/{totalApproved} ({pct}%)
-          </span>
+          <UtilizationBar usedUnits={totalUsed} approvedUnits={totalApproved} compact />
         );
       },
     },
@@ -72,25 +68,29 @@ export function getAuthorizationColumns(opts: {
       id: "actions",
       header: "",
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
-              <span className="sr-only">Actions</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => opts.onView(row.original)}>View</DropdownMenuItem>
-            {opts.onArchive && (
-              <DropdownMenuItem
-                onClick={() => opts.onArchive!(row.original)}
-                className="text-destructive focus:text-destructive"
-              >
-                Archive
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        // Stop propagation to prevent row click from firing
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div onClick={(e) => e.stopPropagation()}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
+                <span className="sr-only">Actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => opts.onView(row.original)}>View</DropdownMenuItem>
+              {opts.onArchive && (
+                <DropdownMenuItem
+                  onClick={() => opts.onArchive!(row.original)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  Archive
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       ),
     },
   ];

@@ -8,7 +8,7 @@ import {
   clientInsurance,
   payers,
 } from "@/server/db/schema";
-import { eq, and, isNull, sql, asc } from "drizzle-orm";
+import { eq, and, isNull, sql, asc, type SQL } from "drizzle-orm";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,7 +86,101 @@ const serviceAgg = db
   .groupBy(authorizationServices.authorizationId)
   .as("svc_agg");
 
-export async function getAuthorizations(orgId: string): Promise<AuthorizationListItem[]> {
+// ── Auth List Metrics ────────────────────────────────────────────────────────
+
+export type AuthListMetrics = {
+  activeCount: number;
+  expiring30dCount: number;
+  expiredCount: number;
+  avgUtilization: number;
+};
+
+export async function getAuthListMetrics(orgId: string): Promise<AuthListMetrics> {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const thirtyDaysStr = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+
+  const [result] = await db
+    .select({
+      activeCount: sql<number>`count(*) filter (
+        where ${authorizations.status} = 'approved'
+        and ${authorizations.endDate} >= ${todayStr}
+      )::int`,
+      expiring30dCount: sql<number>`count(*) filter (
+        where ${authorizations.status} = 'approved'
+        and ${authorizations.endDate} >= ${todayStr}
+        and ${authorizations.endDate} <= ${thirtyDaysStr}
+      )::int`,
+      expiredCount: sql<number>`count(*) filter (
+        where ${authorizations.status} = 'expired'
+        or (${authorizations.status} = 'approved' and ${authorizations.endDate} < ${todayStr})
+      )::int`,
+      avgUtilization: sql<number>`coalesce(
+        round(
+          sum(${serviceAgg.totalUsed}) filter (
+            where ${authorizations.status} = 'approved'
+            and ${authorizations.endDate} >= ${todayStr}
+          )::numeric
+          / nullif(sum(${serviceAgg.totalApproved}) filter (
+            where ${authorizations.status} = 'approved'
+            and ${authorizations.endDate} >= ${todayStr}
+          ), 0) * 100
+        ), 0
+      )::int`,
+    })
+    .from(authorizations)
+    .leftJoin(serviceAgg, eq(authorizations.id, serviceAgg.authorizationId))
+    .where(scopedWhere(orgId));
+
+  return {
+    activeCount: result?.activeCount ?? 0,
+    expiring30dCount: result?.expiring30dCount ?? 0,
+    expiredCount: result?.expiredCount ?? 0,
+    avgUtilization: result?.avgUtilization ?? 0,
+  };
+}
+
+// ── Auth Filters ────────────────────────────────────────────────────────────
+
+export type AuthFilters = {
+  statusCategory?: "active" | "expiring" | "expired" | "pending";
+};
+
+function buildAuthFilterConditions(orgId: string, filters?: AuthFilters): SQL[] {
+  const conditions: SQL[] = [
+    sql`${authorizations.organizationId} = ${orgId}`,
+    sql`${authorizations.deletedAt} is null`,
+  ];
+
+  if (filters?.statusCategory) {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const thirtyDaysStr = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+
+    switch (filters.statusCategory) {
+      case "active":
+        conditions.push(sql`${authorizations.status} = 'approved'`);
+        conditions.push(sql`${authorizations.endDate} >= ${todayStr}`);
+        break;
+      case "expiring":
+        conditions.push(sql`${authorizations.status} = 'approved'`);
+        conditions.push(sql`${authorizations.endDate} >= ${todayStr}`);
+        conditions.push(sql`${authorizations.endDate} <= ${thirtyDaysStr}`);
+        break;
+      case "expired":
+        conditions.push(sql`(${authorizations.status} = 'expired' or (${authorizations.status} = 'approved' and ${authorizations.endDate} < ${todayStr}))`);
+        break;
+      case "pending":
+        conditions.push(sql`${authorizations.status} = 'pending'`);
+        break;
+    }
+  }
+
+  return conditions;
+}
+
+export async function getAuthorizations(
+  orgId: string,
+  opts?: { filters?: AuthFilters },
+): Promise<AuthorizationListItem[]> {
   const rows = await db
     .select({
       id: authorizations.id,
@@ -110,7 +204,7 @@ export async function getAuthorizations(orgId: string): Promise<AuthorizationLis
     .innerJoin(clients, eq(authorizations.clientId, clients.id))
     .innerJoin(payers, eq(authorizations.payerId, payers.id))
     .leftJoin(serviceAgg, eq(authorizations.id, serviceAgg.authorizationId))
-    .where(scopedWhere(orgId))
+    .where(and(...buildAuthFilterConditions(orgId, opts?.filters)))
     .orderBy(authorizations.endDate);
 
   return rows;
