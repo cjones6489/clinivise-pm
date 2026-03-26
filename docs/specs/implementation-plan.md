@@ -714,18 +714,31 @@ Tests:
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+**Architecture decision — invite flow**: "Outsource authentication, own your authorization." Roles live in our DB, not Clerk metadata. At invite time, pre-create a `users` row with `status: 'invited'` and the selected role. When user accepts and signs in, `getCurrentUser()` matches by email+org, updates status to `active`, links `clerkUserId`. Full audit trail, no Clerk metadata dependency, HIPAA-compliant, portable.
+
+**Schema change** (migration required):
+- [ ] Add `status` text column to `users` table: `'invited' | 'active' | 'deactivated'`, default `'active'`
+- [ ] Add `email` text column to `users` table (for matching invited users on first sign-in)
+- [ ] Add `invitedBy` text column to `users` table (FK to users.id, nullable, for audit trail)
+- [ ] Add `invitedAt` timestamp column (nullable)
+- [ ] Unique index on `(organization_id, email)` to prevent duplicate invites
+
 **Backend**:
-- [ ] `getTeamMembers(orgId)` query — users table joined with provider record (for credential type). Returns: id, name, email, role, credentialType, lastActiveAt, clerkUserId
+- [ ] `getTeamMembers(orgId)` query — users table joined with provider record (for credential type). Returns: id, name, email, role, credentialType, status, lastActiveAt, invitedAt
+- [ ] `inviteMember` action — owner/admin only. Pre-creates `users` row with `status: 'invited'`, selected role, email. Calls Clerk org invite API to send email. Audit log.
 - [ ] `updateMemberRole` action — owner/admin only. Validates: can't change own role, can't demote the last owner, can't assign owner role (only one owner). Audit log.
-- [ ] Update `PERMISSIONS` map in `src/lib/permissions.ts` to cover full matrix from research (expand from ~7 permissions to ~20 covering all features)
+- [ ] `removeMember` action — owner/admin only. Validates: can't remove last owner. Sets `status: 'deactivated'`. Calls Clerk API to revoke org membership. Audit log.
+- [ ] Update `getCurrentUser()` in `src/lib/auth.ts` — on first sign-in, match existing `users` row by email+org instead of always creating new. Update status to `'active'`, link clerkUserId.
+- [ ] Update `PERMISSIONS` map to cover full matrix from research (expand from ~7 to ~20 permissions)
 
 **Frontend**:
 - [ ] Create `/team` route with PageHeader ("Team" + "{N} members") + "Invite Member" button
-- [ ] **Members table**: name (bold + credential subtitle), email, role (Select dropdown for owner/admin, static badge for others), status badge
+- [ ] **Members table**: name (bold + credential subtitle), email, role (Select dropdown for owner/admin, static badge for others), status badge (Active/Invited/Deactivated)
 - [ ] **Role change**: inline Select dropdown per row. Only visible to owner/admin. Owner role is locked (displayed as badge, not dropdown).
-- [ ] **Invite flow**: "Invite Member" button opens a dialog that calls Clerk's invite API + sets initial role in our DB. Fields: email, role (Select from 6 options).
-- [ ] **Remove member**: action menu with "Remove" option (confirmation dialog). Calls Clerk API to revoke org membership.
-- [ ] **Role descriptions card**: collapsible section card below the table explaining what each role can access. Helps admins make informed role assignments.
+- [ ] **Invite dialog**: "Invite Member" button opens dialog. Fields: email, role (Select from 6 options). On submit: calls `inviteMember` action.
+- [ ] **Remove member**: action menu with "Remove" option (confirmation dialog). Calls `removeMember` action.
+- [ ] **Resend invite**: action menu option for `status: 'invited'` members. Re-calls Clerk invite API.
+- [ ] **Role descriptions card**: collapsible section card below the table explaining what each role can access.
 - [ ] **Empty state**: "No team members yet. Invite your first team member to get started."
 
 **Permission enforcement upgrades**:
@@ -734,11 +747,15 @@ Tests:
 - [ ] Apply `<Can>` to all action buttons, form sections, and nav items that should be role-gated
 
 Tests:
+- [ ] Invite creates user row with status='invited' and correct role
+- [ ] First sign-in matches invited row by email+org, updates to active
 - [ ] Owner can change any member's role (except own)
 - [ ] Admin can change roles but cannot assign/remove owner
 - [ ] BCBA/RBT/billing_staff cannot access /team
 - [ ] Role change persists and affects permission checks on next request
 - [ ] Cannot remove the last owner from the organization
+- [ ] Deactivated user cannot sign in (or is blocked at getCurrentUser level)
+- [ ] Duplicate invite to same email+org is rejected
 
 #### 2C — Settings Page Rebuild (`/settings`)
 
