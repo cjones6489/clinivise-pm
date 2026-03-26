@@ -9,8 +9,10 @@ import {
   getClientInsurance,
   getPayerOptions,
 } from "@/server/queries/clients";
-import { getClientAuthorizations } from "@/server/queries/authorizations";
+import { getClientAuthorizations, getClientAuthUtilization } from "@/server/queries/authorizations";
 import { getClientSessions } from "@/server/queries/sessions";
+import { ExpiryBadge } from "@/components/shared/expiry-badge";
+import { Button } from "@/components/ui/button";
 import { getProviderById } from "@/server/queries/providers";
 import { ClientDetail } from "@/components/clients/client-detail";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +32,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const canEdit = WRITE_ROLES.includes(user.role);
   const canManagePayers = ["owner", "admin"].includes(user.role);
 
-  const [client, contacts, bcbaOptions, insurance, payerOptions, authorizations, sessions] =
+  const [client, contacts, bcbaOptions, insurance, payerOptions, authorizations, sessions, authUtilization] =
     await Promise.all([
       getClientById(user.organizationId, id),
       getClientContacts(user.organizationId, id),
@@ -39,6 +41,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
       getClientAuthorizations(user.organizationId, id),
       getClientSessions(user.organizationId, id),
+      getClientAuthUtilization(user.organizationId, id),
     ]);
 
   if (!client) {
@@ -98,7 +101,20 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               Insured
             </Badge>
           )}
+          {authUtilization && (
+            <ExpiryBadge endDate={authUtilization.endDate} />
+          )}
         </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex items-center gap-2">
+        <Button asChild size="sm" className="text-xs">
+          <Link href={`/sessions/new?clientId=${id}`}>Log Session</Link>
+        </Button>
+        <Button asChild size="sm" variant="outline" className="text-xs">
+          <Link href={`/authorizations/new?clientId=${id}`}>Add Authorization</Link>
+        </Button>
       </div>
 
       {/* Tabs + content */}
@@ -113,6 +129,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         canEdit={canEdit}
         canManagePayers={canManagePayers}
         bcbaName={bcbaName}
+        authUtilization={authUtilization}
       />
     </div>
   );

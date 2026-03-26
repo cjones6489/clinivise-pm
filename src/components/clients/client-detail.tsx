@@ -7,7 +7,7 @@ import type {
   ClientInsuranceWithPayer,
   PayerOption,
 } from "@/server/queries/clients";
-import type { AuthorizationListItem } from "@/server/queries/authorizations";
+import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
 import { ClientOverview } from "./client-overview";
 import { ClientForm } from "./client-form";
@@ -28,6 +28,7 @@ export function ClientDetail({
   canEdit,
   canManagePayers,
   bcbaName,
+  authUtilization,
 }: {
   client: Client;
   contacts: ClientContact[];
@@ -39,6 +40,7 @@ export function ClientDetail({
   canEdit: boolean;
   canManagePayers: boolean;
   bcbaName: string | null;
+  authUtilization: ClientAuthUtilization | null;
 }) {
   return (
     <Tabs defaultValue="overview">
@@ -58,6 +60,7 @@ export function ClientDetail({
           insurance={insurance}
           authorizations={authorizations}
           bcbaName={bcbaName}
+          authUtilization={authUtilization}
         />
       </TabsContent>
 

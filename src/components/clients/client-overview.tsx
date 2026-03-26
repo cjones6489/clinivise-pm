@@ -1,12 +1,15 @@
 "use client";
 
 import type { Client, ClientContact, ClientInsuranceWithPayer } from "@/server/queries/clients";
-import type { AuthorizationListItem } from "@/server/queries/authorizations";
+import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import {
   CONTACT_RELATIONSHIP_LABELS,
   PAYER_TYPE_LABELS,
+  ABA_CPT_CODES,
+  AUTH_ALERT_THRESHOLDS,
   type ContactRelationshipType,
   type PayerType,
+  type CptCode,
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
 import { MetricCard } from "@/components/shared/metric-card";
@@ -50,25 +53,23 @@ export function ClientOverview({
   insurance,
   authorizations,
   bcbaName,
+  authUtilization,
 }: {
   client: Client;
   contacts: ClientContact[];
   insurance: ClientInsuranceWithPayer[];
   authorizations: AuthorizationListItem[];
   bcbaName: string | null;
+  authUtilization: ClientAuthUtilization | null;
 }) {
   const guardian = contacts.find((c) => c.isLegalGuardian);
   const primaryInsurance = insurance.find((i) => i.priority === 1);
 
-  // Find the active authorization (approved + not expired)
-  const activeAuth = authorizations.find(
-    (a) => a.status === "approved" && daysUntilExpiry(a.endDate) >= 0,
-  );
-
-  const totalApproved = activeAuth?.totalApproved ?? 0;
-  const totalUsed = activeAuth?.totalUsed ?? 0;
+  // Utilization metrics from the new per-CPT query
+  const totalApproved = authUtilization?.totalApprovedUnits ?? 0;
+  const totalUsed = authUtilization?.totalUsedUnits ?? 0;
   const utilizationPct = totalApproved > 0 ? Math.round((totalUsed / totalApproved) * 100) : 0;
-  const daysLeft = activeAuth ? daysUntilExpiry(activeAuth.endDate) : 0;
+  const daysLeft = authUtilization ? daysUntilExpiry(authUtilization.endDate) : 0;
 
   const utilizationLevel = getUtilizationLevel(utilizationPct);
   const utilizationAccent = utilizationPct > 0 ? LEVEL_COLORS[utilizationLevel].text : undefined;
@@ -79,39 +80,64 @@ export function ClientOverview({
     : expiryLevel === "warning" ? "text-amber-600 dark:text-amber-400"
     : "text-emerald-600 dark:text-emerald-400";
 
+  // Weekly average: total used hours / weeks elapsed
+  const weeksElapsed = authUtilization ? Math.max(1, authUtilization.daysElapsed / 7) : 0;
+  const weeklyAvgHours = weeksElapsed > 0 ? ((totalUsed * 15) / 60 / weeksElapsed).toFixed(1) : "0.0";
+
+  // Under-utilization detection: <50% used with >50% of auth period elapsed
+  const periodPctElapsed = authUtilization
+    ? (authUtilization.daysElapsed / authUtilization.daysTotal) * 100
+    : 0;
+  const isUnderUtilized =
+    authUtilization &&
+    utilizationPct < AUTH_ALERT_THRESHOLDS.UNDER_UTILIZATION_PCT &&
+    periodPctElapsed > 50;
+
   return (
     <div className="space-y-3">
+      {/* Under-utilization alert */}
+      {isUnderUtilized && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/30">
+          <div className="text-xs font-medium text-amber-700 dark:text-amber-400">
+            Under-utilization detected
+          </div>
+          <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400/80">
+            {utilizationPct}% of approved hours used with {Math.round(periodPctElapsed)}% of the authorization period elapsed. Consider reviewing the treatment schedule.
+          </p>
+        </div>
+      )}
+
       {/* Metric Cards */}
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <MetricCard
           label="Total Approved"
-          value={activeAuth ? `${((totalApproved * 15) / 60).toFixed(0)} hrs` : "—"}
+          value={authUtilization ? `${((totalApproved * 15) / 60).toFixed(0)} hrs` : "—"}
           sub={
-            activeAuth
-              ? `${activeAuth.serviceCount} service${activeAuth.serviceCount !== 1 ? "s" : ""}`
+            authUtilization
+              ? `${authUtilization.services.length} service${authUtilization.services.length !== 1 ? "s" : ""}`
               : "No active authorization"
           }
         />
         <MetricCard
           label="Used"
-          value={activeAuth ? `${((totalUsed * 15) / 60).toFixed(0)} hrs` : "—"}
-          sub={activeAuth ? `${utilizationPct}% utilized` : "No active authorization"}
+          value={authUtilization ? `${((totalUsed * 15) / 60).toFixed(0)} hrs` : "—"}
+          sub={authUtilization ? `${utilizationPct}% utilized` : "No active authorization"}
           accent={utilizationAccent}
         />
         <MetricCard
-          label="Diagnosis"
-          value={client.diagnosisCode ?? "—"}
-          sub={client.diagnosisDescription ?? "Not specified"}
+          label="Weekly Avg"
+          value={authUtilization ? `${weeklyAvgHours} hrs` : "—"}
+          sub={authUtilization ? "per week" : "No active authorization"}
         />
         <MetricCard
           label="Days Left"
-          value={activeAuth ? String(daysLeft) : "—"}
+          value={authUtilization ? String(daysLeft) : "—"}
           sub={
-            activeAuth
-              ? `Auth expires ${formatDate(activeAuth.endDate)}`
+            authUtilization
+              ? `Auth expires ${formatDate(authUtilization.endDate)}`
               : "No active authorization"
           }
-          accent={activeAuth ? daysLeftAccent : undefined}
+          accent={authUtilization ? daysLeftAccent : undefined}
         />
       </div>
 
@@ -143,7 +169,7 @@ export function ClientOverview({
               )}
             </>
           ) : (
-            <p className="text-muted-foreground py-2 text-[13px]">No insurance on file</p>
+            <p className="text-muted-foreground py-2 text-xs">No insurance on file</p>
           )}
         </SectionCard>
 
@@ -152,7 +178,7 @@ export function ClientOverview({
           {bcbaName ? (
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2.5">
-                <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg text-[13px] font-semibold">
+                <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold">
                   {bcbaName
                     .split(" ")
                     .map((n) => n[0])
@@ -160,13 +186,13 @@ export function ClientOverview({
                     .slice(0, 2)}
                 </div>
                 <div>
-                  <div className="text-[13px] font-medium">{bcbaName}</div>
+                  <div className="text-xs font-medium">{bcbaName}</div>
                   <div className="text-muted-foreground text-[11px]">Supervising BCBA</div>
                 </div>
               </div>
             </div>
           ) : (
-            <p className="text-muted-foreground py-2 text-[13px]">No BCBA assigned</p>
+            <p className="text-muted-foreground py-2 text-xs">No BCBA assigned</p>
           )}
         </SectionCard>
 
@@ -186,7 +212,7 @@ export function ClientOverview({
               {guardian.email && <KVRow label="Email" value={guardian.email} />}
             </>
           ) : (
-            <p className="text-muted-foreground py-2 text-[13px]">No guardian on file</p>
+            <p className="text-muted-foreground py-2 text-xs">No guardian on file</p>
           )}
         </SectionCard>
 
@@ -220,19 +246,25 @@ export function ClientOverview({
         </SectionCard>
       </div>
 
-      {/* Authorized Services — real utilization bars when auth data exists */}
+      {/* Authorized Services — per-CPT utilization bars */}
       <SectionCard title="Authorized Services">
-        {activeAuth && activeAuth.totalApproved > 0 ? (
+        {authUtilization && authUtilization.services.length > 0 ? (
           <div className="space-y-4">
-            <UtilizationBar
-              usedUnits={activeAuth.totalUsed}
-              approvedUnits={activeAuth.totalApproved}
-              label={activeAuth.authorizationNumber ?? "Authorization"}
-            />
+            {authUtilization.services.map((svc) => {
+              const cptMeta = ABA_CPT_CODES[svc.cptCode as CptCode];
+              return (
+                <UtilizationBar
+                  key={svc.cptCode}
+                  usedUnits={svc.usedUnits}
+                  approvedUnits={svc.approvedUnits}
+                  label={`${svc.cptCode}${cptMeta ? ` — ${cptMeta.description}` : ""}`}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-6 text-center">
-            <p className="text-muted-foreground text-[13px]">
+            <p className="text-muted-foreground text-xs">
               {authorizations.length === 0
                 ? "No authorizations on file. Add one to start tracking utilization."
                 : "No active authorization. All authorizations have expired or are pending."}
@@ -244,7 +276,7 @@ export function ClientOverview({
       {/* Notes */}
       {client.notes && (
         <SectionCard title="Notes">
-          <p className="text-muted-foreground text-[13px] whitespace-pre-wrap">{client.notes}</p>
+          <p className="text-muted-foreground text-xs whitespace-pre-wrap">{client.notes}</p>
         </SectionCard>
       )}
     </div>

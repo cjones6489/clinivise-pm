@@ -308,6 +308,91 @@ export async function getAuthorizationWithServices(
   return { ...auth, services };
 }
 
+// ── Client Auth Utilization (for client detail overview) ─────────────────────
+
+export type ClientAuthUtilization = {
+  authorizationId: string;
+  authorizationNumber: string | null;
+  startDate: string;
+  endDate: string;
+  daysTotal: number;
+  daysElapsed: number;
+  totalApprovedUnits: number;
+  totalUsedUnits: number;
+  services: {
+    cptCode: string;
+    approvedUnits: number;
+    usedUnits: number;
+  }[];
+};
+
+export async function getClientAuthUtilization(
+  orgId: string,
+  clientId: string,
+): Promise<ClientAuthUtilization | null> {
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  // Find the active authorization (approved, not expired, not deleted)
+  const [activeAuth] = await db
+    .select({
+      id: authorizations.id,
+      authorizationNumber: authorizations.authorizationNumber,
+      startDate: authorizations.startDate,
+      endDate: authorizations.endDate,
+    })
+    .from(authorizations)
+    .where(
+      and(
+        eq(authorizations.organizationId, orgId),
+        eq(authorizations.clientId, clientId),
+        eq(authorizations.status, "approved"),
+        isNull(authorizations.deletedAt),
+        sql`${authorizations.endDate} >= ${todayStr}`,
+      ),
+    )
+    .orderBy(asc(authorizations.endDate))
+    .limit(1);
+
+  if (!activeAuth) return null;
+
+  // Get per-CPT service lines
+  const services = await db
+    .select({
+      cptCode: authorizationServices.cptCode,
+      approvedUnits: authorizationServices.approvedUnits,
+      usedUnits: authorizationServices.usedUnits,
+    })
+    .from(authorizationServices)
+    .where(
+      and(
+        eq(authorizationServices.authorizationId, activeAuth.id),
+        eq(authorizationServices.organizationId, orgId),
+      ),
+    )
+    .orderBy(asc(authorizationServices.cptCode));
+
+  const totalApprovedUnits = services.reduce((sum, s) => sum + s.approvedUnits, 0);
+  const totalUsedUnits = services.reduce((sum, s) => sum + s.usedUnits, 0);
+
+  const startMs = new Date(activeAuth.startDate).getTime();
+  const endMs = new Date(activeAuth.endDate).getTime();
+  const nowMs = Date.now();
+  const daysTotal = Math.max(1, Math.round((endMs - startMs) / 86400000));
+  const daysElapsed = Math.max(0, Math.round((nowMs - startMs) / 86400000));
+
+  return {
+    authorizationId: activeAuth.id,
+    authorizationNumber: activeAuth.authorizationNumber,
+    startDate: activeAuth.startDate,
+    endDate: activeAuth.endDate,
+    daysTotal,
+    daysElapsed,
+    totalApprovedUnits,
+    totalUsedUnits,
+    services,
+  };
+}
+
 export async function getClientAuthorizations(
   orgId: string,
   clientId: string,
