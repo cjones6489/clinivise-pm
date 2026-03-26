@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
+import { AUTH_ALERT_THRESHOLDS } from "@/lib/constants";
 
 const MAX_VISIBLE_ROWS = 5;
 
@@ -54,17 +55,16 @@ function groupAlerts(alerts: DashboardAlert[]): AlertGroup[] {
         flagged_session: "flagged session",
       };
       const noun = typeLabels[first.type];
-      const plural = items.length > 1 ? "s" : "";
       result.push({
         type: first.type,
         severity: first.severity,
         items,
-        label: `${items.length} ${noun}${plural}`,
+        label: `${items.length} ${noun}s`,
         description:
           first.type === "expiring"
-            ? `within ${first.severity === "critical" ? "7" : "30"} days`
+            ? `within ${first.severity === "critical" ? "7" : AUTH_ALERT_THRESHOLDS.EXPIRY_WARNING_DAYS} days`
             : first.type === "high_utilization"
-              ? `at ${first.severity === "critical" ? "≥95%" : "≥80%"} utilization`
+              ? `at ≥${first.severity === "critical" ? AUTH_ALERT_THRESHOLDS.UTILIZATION_CRITICAL_PCT : AUTH_ALERT_THRESHOLDS.UTILIZATION_WARNING_PCT}% utilization`
               : "",
         // Link to the relevant list page with filter
         actionHref:
@@ -138,7 +138,7 @@ export async function DashboardAlerts({ orgId }: { orgId: string }) {
           </span>
         </div>
         <div className="flex items-center gap-3 px-4 py-6">
-          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={20} className="text-emerald-500" />
+          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={20} className="text-emerald-500 dark:text-emerald-400" />
           <div>
             <p className="text-xs font-medium">All authorizations on track. No action items.</p>
             <p className="text-xs text-muted-foreground">Everything looks good today.</p>
@@ -159,7 +159,7 @@ export async function DashboardAlerts({ orgId }: { orgId: string }) {
         </span>
         {criticalCount > 0 && (
           <Badge className="border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
-            {criticalCount} critical
+            {criticalCount} critical alert{criticalCount !== 1 ? "s" : ""}
           </Badge>
         )}
       </div>
