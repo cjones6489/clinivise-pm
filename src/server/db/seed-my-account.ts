@@ -43,13 +43,6 @@ function makeTimestamp(dateStr: string, timeStr: string): Date {
   return new Date(`${dateStr}T${timeStr}:00`);
 }
 
-function nanoid(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-  let id = "";
-  for (let i = 0; i < 21; i++) id += chars[Math.floor(Math.random() * chars.length)];
-  return id;
-}
-
 // ---------------------------------------------------------------------------
 // Fixed IDs (enables idempotency)
 // ---------------------------------------------------------------------------

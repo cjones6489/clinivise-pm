@@ -8,12 +8,11 @@ import type { UserRole } from "@/lib/constants";
 import { UnauthorizedError, ForbiddenError } from "@/lib/errors";
 
 /**
- * Dev-only: auto-provision org + user from Clerk session.
- * In production, the Clerk webhook handles this sync.
+ * Auto-provision org + user from Clerk session on first sign-in.
+ * Creates the org and user records if they don't exist yet.
+ * First user in an org gets the "owner" role.
  */
-async function devAutoProvision(clerkUserId: string, clerkOrgId: string) {
-  if (process.env.NODE_ENV !== "development") return null;
-
+async function autoProvision(clerkUserId: string, clerkOrgId: string) {
   const clerkUser = await currentUser();
   if (!clerkUser) return null;
 
@@ -29,7 +28,7 @@ async function devAutoProvision(clerkUserId: string, clerkOrgId: string) {
       .insert(organizations)
       .values({
         clerkOrgId,
-        name: "Bright Futures ABA",
+        name: "My Practice",
         npi: null,
         taxId: null,
         phone: null,
@@ -47,26 +46,58 @@ async function devAutoProvision(clerkUserId: string, clerkOrgId: string) {
 
   if (!org) return null;
 
-  // Upsert user as owner
+  // Check if user already exists (match by email + org for invited users)
+  const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
   let [user] = await db
     .select()
     .from(users)
-    .where(and(eq(users.clerkUserId, clerkUserId), eq(users.organizationId, org.id)))
+    .where(and(eq(users.email, email), eq(users.organizationId, org.id)))
     .limit(1);
 
-  if (!user) {
-    [user] = await db
-      .insert(users)
-      .values({
-        clerkUserId,
-        organizationId: org.id,
-        email: clerkUser.emailAddresses[0]?.emailAddress ?? "dev@clinivise.com",
-        firstName: clerkUser.firstName ?? "Dev",
-        lastName: clerkUser.lastName ?? "User",
-        role: "owner",
-      })
-      .returning();
+  if (user) {
+    // Link invited user to their Clerk account and activate
+    if (!user.clerkUserId || user.status === "invited") {
+      await db
+        .update(users)
+        .set({
+          clerkUserId,
+          firstName: clerkUser.firstName ?? user.firstName,
+          lastName: clerkUser.lastName ?? user.lastName,
+          status: "active",
+          isActive: true,
+        })
+        .where(eq(users.id, user.id));
+      // Re-fetch to get updated fields
+      [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1);
+    }
+    return user ?? null;
   }
+
+  // Create new user — first user in org gets owner role
+  const [existingMembers] = await db
+    .select({ count: eq(users.organizationId, org.id) })
+    .from(users)
+    .where(eq(users.organizationId, org.id))
+    .limit(1);
+
+  const isFirstUser = !existingMembers;
+
+  [user] = await db
+    .insert(users)
+    .values({
+      clerkUserId,
+      organizationId: org.id,
+      email,
+      firstName: clerkUser.firstName ?? null,
+      lastName: clerkUser.lastName ?? null,
+      role: isFirstUser ? "owner" : "rbt",
+      status: "active",
+    })
+    .returning();
 
   return user ?? null;
 }
@@ -83,11 +114,11 @@ export async function getCurrentUser() {
     .limit(1);
 
   if (!org) {
-    // Dev: auto-provision org + user on first sign-in
-    return devAutoProvision(userId, orgId);
+    // New org — auto-provision on first sign-in
+    return autoProvision(userId, orgId);
   }
 
-  // Then look up user with the internal org ID
+  // Look up user by Clerk ID
   const [user] = await db
     .select()
     .from(users)
@@ -95,8 +126,8 @@ export async function getCurrentUser() {
     .limit(1);
 
   if (!user) {
-    // Dev: auto-provision user for existing org
-    return devAutoProvision(userId, orgId);
+    // New user in existing org — auto-provision (handles invited user linking too)
+    return autoProvision(userId, orgId);
   }
 
   // Block deactivated and invited-but-not-yet-active users
