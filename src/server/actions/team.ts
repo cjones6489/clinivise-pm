@@ -22,7 +22,7 @@ const updateMemberRoleSchema = z.object({
 export const updateMemberRole = authActionClient
   .schema(updateMemberRoleSchema)
   .action(async ({ parsedInput, ctx }) => {
-    requirePermission(ctx.userRole, "settings.write");
+    requirePermission(ctx.userRole, "team.manage");
 
     const { memberId, newRole } = parsedInput;
 
@@ -83,7 +83,7 @@ const inviteMemberSchema = z.object({
 export const inviteMember = authActionClient
   .schema(inviteMemberSchema)
   .action(async ({ parsedInput, ctx }) => {
-    requirePermission(ctx.userRole, "settings.write");
+    requirePermission(ctx.userRole, "team.manage");
 
     const email = parsedInput.email.toLowerCase().trim();
     const { role } = parsedInput;
@@ -152,7 +152,7 @@ const removeMemberSchema = z.object({
 export const removeMember = authActionClient
   .schema(removeMemberSchema)
   .action(async ({ parsedInput, ctx }) => {
-    requirePermission(ctx.userRole, "settings.write");
+    requirePermission(ctx.userRole, "team.manage");
 
     const { memberId } = parsedInput;
 

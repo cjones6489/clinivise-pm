@@ -30,7 +30,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const user = await requireAuth();
   const canEdit = hasPermission(user.role, "clients.write");
-  const canManagePayers = ["owner", "admin"].includes(user.role);
+  const canManagePayers = hasPermission(user.role, "payers.write");
 
   const [client, contacts, bcbaOptions, insurance, payerOptions, authorizations, sessions, authUtilization] =
     await Promise.all([

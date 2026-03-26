@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth";
+import { PERMISSIONS } from "@/lib/permissions";
 import {
   getAuthorizationWithServices,
   getClientOptions,
@@ -20,7 +21,7 @@ export default async function EditAuthorizationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const user = await requireRole(["owner", "admin", "bcba"]);
+  const user = await requireRole([...PERMISSIONS["authorizations.write"]]);
 
   const authorization = await getAuthorizationWithServices(user.organizationId, id);
   if (!authorization) {

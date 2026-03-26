@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
+import { PERMISSIONS } from "@/lib/permissions";
 import {
   getClientOptions,
   getClientInsuranceOptions,
@@ -18,7 +19,7 @@ export default async function NewAuthorizationPage({
   searchParams: Promise<{ clientId?: string }>;
 }) {
   const { clientId } = await searchParams;
-  const user = await requireRole(["owner", "admin", "bcba"]);
+  const user = await requireRole([...PERMISSIONS["authorizations.write"]]);
   const clientOptions = await getClientOptions(user.organizationId);
 
   // If clientId is pre-selected (from client detail), load their insurance + auth options
