@@ -19,6 +19,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbS
 import { Button } from "@/components/ui/button";
 import { cn, formatDate, daysUntilExpiry } from "@/lib/utils";
 import { hasPermission } from "@/lib/permissions";
+import { unitsToHours, MS_PER_DAY } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Authorization | Clinivise",
@@ -66,8 +67,8 @@ export default async function AuthorizationDetailPage({
     ? (() => {
         const startMs = new Date(authorization.startDate).getTime();
         const endMs = new Date(authorization.endDate).getTime();
-        const weeksElapsed = Math.max(1, (Math.min(now.getTime(), endMs) - startMs) / (7 * 86400000));
-        return ((totalUsed * 15) / 60 / weeksElapsed).toFixed(1);
+        const weeksElapsed = Math.max(1, (Math.min(now.getTime(), endMs) - startMs) / (7 * MS_PER_DAY));
+        return (unitsToHours(totalUsed) / weeksElapsed).toFixed(1);
       })()
     : "0";
 
@@ -155,13 +156,13 @@ export default async function AuthorizationDetailPage({
           />
           <MetricCard
             label="Hours Used"
-            value={`${((totalUsed * 15) / 60).toFixed(1)}h`}
+            value={`${unitsToHours(totalUsed).toFixed(1)}h`}
             sub={`${utilizationPct}% utilized`}
             accent={LEVEL_COLORS[utilizationLevel].text}
           />
           <MetricCard
             label="Hours Approved"
-            value={`${((totalApproved * 15) / 60).toFixed(1)}h`}
+            value={`${unitsToHours(totalApproved).toFixed(1)}h`}
             sub={`${authorization.services.length} service line${authorization.services.length !== 1 ? "s" : ""}`}
           />
           <MetricCard

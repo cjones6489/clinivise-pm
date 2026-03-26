@@ -345,6 +345,19 @@ export const PLACE_OF_SERVICE_LABELS: Record<PlaceOfServiceCode, string> = {
   "99": "Other/Community",
 };
 
+// ── Unit / Time Conversion ─────────────────────────────────────────────────
+
+/** Each billing unit = 15 minutes per CMS 8-minute rule */
+export const MINUTES_PER_UNIT = 15;
+
+/** Milliseconds in one day */
+export const MS_PER_DAY = 86_400_000;
+
+/** Convert billing units to hours */
+export function unitsToHours(units: number): number {
+  return (units * MINUTES_PER_UNIT) / 60;
+}
+
 // ── Authorization Alert Thresholds ──────────────────────────────────────────
 
 export const AUTH_ALERT_THRESHOLDS = {

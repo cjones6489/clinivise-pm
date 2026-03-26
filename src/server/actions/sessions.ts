@@ -473,7 +473,7 @@ export const updateSession = authActionClient
 export const cancelSession = authActionClient
   .schema(cancelSessionSchema)
   .action(async ({ parsedInput, ctx }) => {
-    requirePermission(ctx.userRole, "sessions.write");
+    requirePermission(ctx.userRole, "sessions.cancel");
 
     const [existing] = await db
       .select()

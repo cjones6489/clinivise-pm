@@ -108,7 +108,7 @@ export const inviteMember = authActionClient
       await db
         .update(users)
         .set({ role, status: "invited", isActive: true, invitedBy: ctx.userId, invitedAt: new Date() })
-        .where(eq(users.id, existing.id));
+        .where(and(eq(users.id, existing.id), eq(users.organizationId, ctx.organizationId)));
       memberId = existing.id;
     } else {
       // Pre-create user row with invited status

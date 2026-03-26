@@ -3,7 +3,7 @@ import "server-only";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/server/db";
 import { users, organizations } from "@/server/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import type { UserRole } from "@/lib/constants";
 import { UnauthorizedError, ForbiddenError } from "@/lib/errors";
 
@@ -78,13 +78,12 @@ async function autoProvision(clerkUserId: string, clerkOrgId: string) {
   }
 
   // Create new user — first user in org gets owner role
-  const [existingMembers] = await db
-    .select({ count: eq(users.organizationId, org.id) })
+  const [memberCount] = await db
+    .select({ count: count() })
     .from(users)
-    .where(eq(users.organizationId, org.id))
-    .limit(1);
+    .where(eq(users.organizationId, org.id));
 
-  const isFirstUser = !existingMembers;
+  const isFirstUser = (memberCount?.count ?? 0) === 0;
 
   [user] = await db
     .insert(users)

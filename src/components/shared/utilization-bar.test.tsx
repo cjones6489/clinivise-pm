@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   getUtilizationLevel,
   LEVEL_COLORS,
-  unitsToHours,
 } from "./utilization-bar";
+import { unitsToHours } from "@/lib/constants";
 
 describe("getUtilizationLevel", () => {
   it("returns 'on-track' for utilization below 80%", () => {
@@ -61,24 +61,23 @@ describe("LEVEL_COLORS", () => {
 });
 
 describe("unitsToHours", () => {
-  it("converts 0 units to 0.0 hours", () => {
-    expect(unitsToHours(0)).toBe("0.0");
+  it("converts 0 units to 0 hours", () => {
+    expect(unitsToHours(0)).toBe(0);
   });
 
   it("converts 4 units to 1.0 hours (4 × 15 / 60)", () => {
-    expect(unitsToHours(4)).toBe("1.0");
+    expect(unitsToHours(4)).toBe(1);
   });
 
   it("converts 32 units to 8.0 hours", () => {
-    expect(unitsToHours(32)).toBe("8.0");
+    expect(unitsToHours(32)).toBe(8);
   });
 
-  it("converts 1 unit to 0.3 hours (15 min, rounded to 1 decimal)", () => {
-    // 1 × 15 / 60 = 0.25, toFixed(1) rounds to "0.3"
-    expect(unitsToHours(1)).toBe("0.3");
+  it("converts 1 unit to 0.25 hours (15 min)", () => {
+    expect(unitsToHours(1)).toBe(0.25);
   });
 
   it("converts 10 units to 2.5 hours", () => {
-    expect(unitsToHours(10)).toBe("2.5");
+    expect(unitsToHours(10)).toBe(2.5);
   });
 });

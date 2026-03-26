@@ -100,7 +100,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             {CLIENT_STATUS_LABELS[status] ?? status}
           </Badge>
           {insurance.length > 0 && (
-            <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-400">
+            <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
               Insured
             </Badge>
           )}
