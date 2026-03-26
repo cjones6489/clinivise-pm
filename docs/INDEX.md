@@ -40,6 +40,7 @@ Central index of all project documentation.
 | **Dashboard Design Patterns** | [`research/dashboard-design-research.md`](research/dashboard-design-research.md) | 11-platform competitive analysis (CentralReach/AlohaABA/Theralytics/Raven Health/SimplePractice/Jane App/Healthie/TherapyAppointment/Motivity/Artemis/Noteable), role-specific workflows (BCBA/RBT/Admin), common patterns, differentiators, detailed Clinivise dashboard layout recommendations with ASCII wireframes, ABA KPI targets, implementation priority |
 | **Session & Auth Form Patterns** | [`research/session-auth-form-patterns-research.md`](research/session-auth-form-patterns-research.md) | **Competitive research**: 7 ABA platforms analyzed (CentralReach/AlohaABA/Motivity/Raven Health/Passage Health/Artemis/ABA Matrix), session form field inventories, comparison tables, documentation time burden, authorization utilization visualization patterns, form design best practices (layout/grouping/dropdowns/save patterns), detailed Clinivise session form + auth page wireframes with field groupings, priority-ordered build recommendations |
 | **Phase 1 Implementation Research** | [`research/phase-1-implementation-research.md`](research/phase-1-implementation-research.md) | **Build-time reference**: CMS 8-minute rule details, MUE limits, CPT-credential rules, session validation checklist, alert fatigue prevention (5 Rights framework), dashboard KPIs/benchmarks, Drizzle aggregation patterns, Suspense boundary architecture, Neon optimization. 60+ sources. |
+| **ABA UX Best Practices Synthesis** | [`research/aba-ux-best-practices-synthesis.md`](research/aba-ux-best-practices-synthesis.md) | **Cross-cutting UX reference**: 10 actionable design principles, ABA-specific UX patterns (BCBA/RBT/Admin daily workflows), healthcare EHR standards (HIMSS/ONC/WCAG), data-dense dashboard design, session logging speed optimization, authorization tracking visualization, alert fatigue prevention, competitor UX failures (CentralReach/AlohaABA/RethinkBH), best-in-class SaaS patterns (Linear/Stripe/Mercury/SimplePractice). 60+ sources. |
 
 ## AI
 
@@ -58,6 +59,7 @@ Central index of all project documentation.
 | **UI/UX Design Guide** | [`design/ui-ux-guide.md`](design/ui-ux-guide.md) | **Comprehensive page-by-page design guide** with ASCII wireframes, layout specs, v0 prompts, visual design language, and navigation patterns. Based on 11+ platform competitive research. |
 | UI Wireframes | [`design/clinivise-wireframes.jsx`](design/clinivise-wireframes.jsx) | Interactive React wireframes covering all Phase 1 + Phase 2 screens |
 | Design System | [`.claude/skills/design/references/design-system.md`](../.claude/skills/design/references/design-system.md) | Mira tokens, spacing scale, typography, color tokens, component inventory |
+| **Design Pass Tracker** | [`design/design-pass-tracker.md`](design/design-pass-tracker.md) | **Active**: All UI gaps vs wireframes, organized by priority sprint. 31 items across 3 passes + 5 design decisions. |
 
 ## Rules (AI coding guidelines)
 
