@@ -123,7 +123,6 @@ async function seed() {
       phone: `(512) 555-${String(Math.floor(Math.random() * 9000) + 1000)}`,
       diagnosisCode: "F84.0",
       diagnosisDescription: "Autism Spectrum Disorder",
-      assignedBcbaId: PROV_BCBA,
       status: "active",
       addressLine1: `${Math.floor(Math.random() * 999) + 100} Oak St`,
       city: "Austin",
@@ -162,6 +161,32 @@ async function seed() {
       subscriberLastName: guardianParts[1]!,
       relationshipToSubscriber: "child",
       priority: 1,
+    }).onConflictDoNothing();
+  }
+
+  // Care team assignments
+  console.log("  Care team assignments...");
+  for (const c of clients) {
+    // Supervising BCBA (primary)
+    await db.insert(schema.clientProviders).values({
+      id: `cp_my_bcba_${c.id}`,
+      organizationId: ORG_ID,
+      clientId: c.id,
+      providerId: PROV_BCBA,
+      role: "supervising_bcba",
+      isPrimary: true,
+      startDate: relDate(-120),
+    }).onConflictDoNothing();
+
+    // RBT (direct service)
+    await db.insert(schema.clientProviders).values({
+      id: `cp_my_rbt_${c.id}`,
+      organizationId: ORG_ID,
+      clientId: c.id,
+      providerId: c.rbt,
+      role: "rbt",
+      isPrimary: false,
+      startDate: relDate(-120),
     }).onConflictDoNothing();
   }
 

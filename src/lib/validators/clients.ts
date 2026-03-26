@@ -64,11 +64,6 @@ const clientFieldsSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
-  assignedBcbaId: z
-    .string()
-    .optional()
-    .or(z.literal(""))
-    .transform((v) => (v === NONE_VALUE || !v ? undefined : v)),
   intakeDate: dateStringSchema
     .optional()
     .or(z.literal(""))

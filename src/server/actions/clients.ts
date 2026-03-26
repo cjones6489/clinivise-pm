@@ -4,8 +4,8 @@ import { authActionClient } from "@/lib/safe-action";
 import { createClientSchema, updateClientSchema } from "@/lib/validators/clients";
 import { idSchema } from "@/lib/validators";
 import { db } from "@/server/db";
-import { clients, providers, authorizations } from "@/server/db/schema";
-import { eq, and, isNull, inArray } from "drizzle-orm";
+import { clients, authorizations, clientProviders } from "@/server/db/schema";
+import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { NotFoundError, StaleDataError } from "@/lib/errors";
@@ -17,25 +17,6 @@ export const createClient = authActionClient
   .schema(createClientSchema)
   .action(async ({ parsedInput, ctx }) => {
     requirePermission(ctx.userRole, "clients.write");
-
-    if (parsedInput.assignedBcbaId) {
-      const [bcba] = await db
-        .select({ id: providers.id })
-        .from(providers)
-        .where(
-          and(
-            eq(providers.id, parsedInput.assignedBcbaId),
-            eq(providers.organizationId, ctx.organizationId),
-            isNull(providers.deletedAt),
-            inArray(providers.credentialType, ["bcba", "bcba_d"]),
-            eq(providers.isActive, true),
-          ),
-        )
-        .limit(1);
-      if (!bcba) {
-        throw new NotFoundError("BCBA");
-      }
-    }
 
     // Auto-set intakeDate to today if status is not "inquiry" and no intake date provided
     const intakeDate =
@@ -84,25 +65,6 @@ export const updateClient = authActionClient
 
     if (!existing) {
       throw new NotFoundError("Client");
-    }
-
-    if (updates.assignedBcbaId) {
-      const [bcba] = await db
-        .select({ id: providers.id })
-        .from(providers)
-        .where(
-          and(
-            eq(providers.id, updates.assignedBcbaId),
-            eq(providers.organizationId, ctx.organizationId),
-            isNull(providers.deletedAt),
-            inArray(providers.credentialType, ["bcba", "bcba_d"]),
-            eq(providers.isActive, true),
-          ),
-        )
-        .limit(1);
-      if (!bcba) {
-        throw new NotFoundError("BCBA");
-      }
     }
 
     const [client] = await db
@@ -164,6 +126,18 @@ export const deleteClient = authActionClient
             eq(authorizations.clientId, parsedInput.id),
             eq(authorizations.organizationId, ctx.organizationId),
             isNull(authorizations.deletedAt),
+          ),
+        );
+
+      // Cascade: end all active care team assignments
+      await tx
+        .update(clientProviders)
+        .set({ endDate: new Date().toISOString().slice(0, 10) })
+        .where(
+          and(
+            eq(clientProviders.clientId, parsedInput.id),
+            eq(clientProviders.organizationId, ctx.organizationId),
+            isNull(clientProviders.endDate),
           ),
         );
 

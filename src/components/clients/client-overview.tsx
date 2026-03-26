@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import type { Client, ClientInsuranceWithPayer } from "@/server/queries/clients";
+import type { Client, ClientInsuranceWithPayer, CareTeamMember } from "@/server/queries/clients";
 import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
+import { CARE_TEAM_ROLE_LABELS, type CareTeamRole } from "@/lib/constants";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import {
   CREDENTIAL_LABELS,
@@ -56,14 +57,14 @@ export function ClientOverview({
   insurance,
   authorizations,
   sessions,
-  bcbaName,
+  careTeam,
   authUtilization,
 }: {
   client: Client;
   insurance: ClientInsuranceWithPayer[];
   authorizations: AuthorizationListItem[];
   sessions: SessionListItem[];
-  bcbaName: string | null;
+  careTeam: CareTeamMember[];
   authUtilization: ClientAuthUtilization | null;
 }) {
   const primaryInsurance = insurance.find((i) => i.priority === 1);
@@ -178,24 +179,37 @@ export function ClientOverview({
 
         {/* Care Team */}
         <SectionCard title="Care Team">
-          {bcbaName ? (
+          {careTeam.length > 0 ? (
             <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-2.5">
-                <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold">
-                  {bcbaName
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </div>
-                <div>
-                  <div className="text-xs font-medium">{bcbaName}</div>
-                  <div className="text-muted-foreground text-[11px]">Supervising BCBA</div>
-                </div>
-              </div>
+              {careTeam.map((member) => {
+                const name = `${member.providerFirstName} ${member.providerLastName}`;
+                const initials = name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2);
+                return (
+                  <div key={member.id} className="flex items-center gap-2.5">
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold ${member.isPrimary ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                      {initials}
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium">
+                        {name}
+                        {member.isPrimary && (
+                          <span className="text-primary ml-1.5 text-[11px] font-normal">Primary</span>
+                        )}
+                      </div>
+                      <div className="text-muted-foreground text-[11px]">
+                        {CARE_TEAM_ROLE_LABELS[member.role as CareTeamRole] ?? member.role}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <p className="text-muted-foreground py-2 text-xs">No BCBA assigned</p>
+            <p className="text-muted-foreground py-2 text-xs">No team members assigned</p>
           )}
         </SectionCard>
 

@@ -8,6 +8,7 @@ import {
   sessions,
   providers,
   clientInsurance,
+  clientProviders,
   payers,
 } from "@/server/db/schema";
 import { eq, and, isNull, sql, asc, desc } from "drizzle-orm";
@@ -364,6 +365,24 @@ export async function getClientOverviewForDashboard(
     )
     .as("primary_ins");
 
+  // Subquery: primary BCBA from client_providers junction table
+  const primaryBcba = db
+    .select({
+      clientId: clientProviders.clientId,
+      bcbaFirstName: providers.firstName,
+      bcbaLastName: providers.lastName,
+    })
+    .from(clientProviders)
+    .innerJoin(providers, eq(clientProviders.providerId, providers.id))
+    .where(
+      and(
+        eq(clientProviders.organizationId, orgId),
+        eq(clientProviders.isPrimary, true),
+        isNull(clientProviders.endDate),
+      ),
+    )
+    .as("primary_bcba");
+
   const rows = await db
     .select({
       id: clients.id,
@@ -372,14 +391,14 @@ export async function getClientOverviewForDashboard(
       status: clients.status,
       diagnosisCode: clients.diagnosisCode,
       dateOfBirth: clients.dateOfBirth,
-      bcbaName: sql<string | null>`case when ${providers.firstName} is not null then ${providers.firstName} || ' ' || ${providers.lastName} else null end`,
+      bcbaName: sql<string | null>`case when ${primaryBcba.bcbaFirstName} is not null then ${primaryBcba.bcbaFirstName} || ' ' || ${primaryBcba.bcbaLastName} else null end`,
       payerName: primaryIns.payerName,
       totalApproved: sql<number>`coalesce(${authUtil.totalApproved}, 0)`.mapWith(Number),
       totalUsed: sql<number>`coalesce(${authUtil.totalUsed}, 0)`.mapWith(Number),
       nearestExpiry: authUtil.nearestExpiry,
     })
     .from(clients)
-    .leftJoin(providers, eq(clients.assignedBcbaId, providers.id))
+    .leftJoin(primaryBcba, eq(clients.id, primaryBcba.clientId))
     .leftJoin(authUtil, eq(clients.id, authUtil.clientId))
     .leftJoin(primaryIns, eq(clients.id, primaryIns.clientId))
     .where(

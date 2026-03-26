@@ -12,6 +12,40 @@ export type CredentialType = (typeof CREDENTIAL_TYPES)[number];
 /** Credential types that qualify as supervisors (BCBA-level or above). */
 export const SUPERVISOR_CREDENTIAL_TYPES: readonly CredentialType[] = ["bcba", "bcba_d"];
 
+// ── Care Team Roles ─────────────────────────────────────────────────────────
+
+export const CARE_TEAM_ROLES = ["supervising_bcba", "bcba", "bcaba", "lead_rbt", "rbt"] as const;
+export type CareTeamRole = (typeof CARE_TEAM_ROLES)[number];
+
+export const CARE_TEAM_ROLE_LABELS: Record<CareTeamRole, string> = {
+  supervising_bcba: "Supervising BCBA",
+  bcba: "BCBA",
+  bcaba: "BCaBA",
+  lead_rbt: "Lead RBT",
+  rbt: "RBT",
+};
+
+/** Group labels for Care Team tab sections */
+export const CARE_TEAM_ROLE_GROUPS = {
+  supervising: ["supervising_bcba", "bcba", "bcaba"] as readonly CareTeamRole[],
+  direct_service: ["lead_rbt", "rbt"] as readonly CareTeamRole[],
+};
+
+/** Auto-suggest a care team role from provider credential type */
+export function defaultCareTeamRole(credentialType: string): CareTeamRole {
+  switch (credentialType) {
+    case "bcba":
+    case "bcba_d":
+      return "supervising_bcba";
+    case "bcaba":
+      return "bcaba";
+    case "rbt":
+      return "rbt";
+    default:
+      return "rbt";
+  }
+}
+
 export const AUTH_STATUSES = ["pending", "approved", "denied", "expired", "exhausted"] as const;
 export type AuthStatus = (typeof AUTH_STATUSES)[number];
 

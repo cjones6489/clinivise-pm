@@ -85,6 +85,10 @@ const AUTH_IDS = Array.from({ length: 10 }, (_, i) => `auth_seed_${i + 1}`);
 // Authorization services (1-2 per auth)
 const AUTH_SVC_IDS = Array.from({ length: 15 }, (_, i) => `authsvc_seed_${i + 1}`);
 
+// Client-provider assignments (BCBA + RBT per client)
+const CP_BCBA_IDS = Array.from({ length: 10 }, (_, i) => `cp_seed_bcba_${i + 1}`);
+const CP_RBT_IDS = Array.from({ length: 10 }, (_, i) => `cp_seed_rbt_${i + 1}`);
+
 // Sessions (60)
 const SESSION_IDS = Array.from({ length: 60 }, (_, i) => `session_seed_${String(i + 1).padStart(2, "0")}`);
 
@@ -204,13 +208,36 @@ async function seed() {
     zipCode: "78701",
     diagnosisCode: "F84.0",
     diagnosisDescription: "Autism Spectrum Disorder",
-    assignedBcbaId: i < 5 ? PROV_BCBA : PROV_BCBA_D,
     intakeDate: relDate(-180 + i * 10),
     status: i === 8 ? "on_hold" : "active",
     referralSource: ["pediatrician", "school", "self_referral", "insurance", "other_provider"][i % 5],
     holdReason: i === 8 ? "Family vacation — returning next month" : null,
   }));
   await db.insert(schema.clients).values(clientValues).onConflictDoNothing();
+
+  // 5b. Client-provider assignments (care team)
+  console.log("  Care team assignments...");
+  const cpValues = clientData.flatMap((_, i) => [
+    {
+      id: CP_BCBA_IDS[i]!,
+      organizationId: ORG_ID,
+      clientId: CLIENT_IDS[i]!,
+      providerId: i < 5 ? PROV_BCBA : PROV_BCBA_D,
+      role: "supervising_bcba" as const,
+      isPrimary: true,
+      startDate: relDate(-180 + i * 10),
+    },
+    {
+      id: CP_RBT_IDS[i]!,
+      organizationId: ORG_ID,
+      clientId: CLIENT_IDS[i]!,
+      providerId: rbtRotation[i]!,
+      role: "rbt" as const,
+      isPrimary: false,
+      startDate: relDate(-180 + i * 10),
+    },
+  ]);
+  await db.insert(schema.clientProviders).values(cpValues).onConflictDoNothing();
 
   // 6. Client contacts (guardians)
   console.log("  Contacts...");

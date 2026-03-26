@@ -3,7 +3,7 @@
 import type {
   Client,
   ClientContact,
-  BcbaOption,
+  CareTeamMember,
   ClientInsuranceWithPayer,
   PayerOption,
 } from "@/server/queries/clients";
@@ -20,26 +20,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export function ClientDetail({
   client,
   contacts,
-  bcbaOptions,
+  careTeam,
   insurance,
   payerOptions,
   authorizations,
   sessions,
   canEdit,
   canManagePayers,
-  bcbaName,
   authUtilization,
 }: {
   client: Client;
   contacts: ClientContact[];
-  bcbaOptions: BcbaOption[];
+  careTeam: CareTeamMember[];
   insurance: ClientInsuranceWithPayer[];
   payerOptions: PayerOption[];
   authorizations: AuthorizationListItem[];
   sessions: SessionListItem[];
   canEdit: boolean;
   canManagePayers: boolean;
-  bcbaName: string | null;
   authUtilization: ClientAuthUtilization | null;
 }) {
   return (
@@ -59,7 +57,7 @@ export function ClientDetail({
           insurance={insurance}
           authorizations={authorizations}
           sessions={sessions}
-          bcbaName={bcbaName}
+          careTeam={careTeam}
           authUtilization={authUtilization}
         />
       </TabsContent>
@@ -93,7 +91,7 @@ export function ClientDetail({
 
       {canEdit && (
         <TabsContent value="edit" className="pt-4">
-          <ClientForm client={client} bcbaOptions={bcbaOptions} />
+          <ClientForm client={client} />
         </TabsContent>
       )}
     </Tabs>

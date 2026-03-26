@@ -2,6 +2,7 @@ export * from "./organizations";
 export * from "./users";
 export * from "./providers";
 export * from "./clients";
+export * from "./client-providers";
 export * from "./payers";
 export * from "./authorizations";
 export * from "./sessions";

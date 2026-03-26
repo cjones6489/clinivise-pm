@@ -1,7 +1,6 @@
 import { pgTable, text, timestamp, boolean, integer, index, date } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
-import { providers } from "./providers";
 import { payers } from "./payers";
 
 export const clients = pgTable(
@@ -26,9 +25,6 @@ export const clients = pgTable(
     zipCode: text("zip_code"),
     diagnosisCode: text("diagnosis_code").default("F84.0"),
     diagnosisDescription: text("diagnosis_description").default("Autism Spectrum Disorder"),
-    assignedBcbaId: text("assigned_bcba_id").references(() => providers.id, {
-      onDelete: "set null",
-    }),
     intakeDate: date("intake_date"),
     status: text("status").default("inquiry").notNull(),
     referralSource: text("referral_source"),
@@ -43,7 +39,6 @@ export const clients = pgTable(
   },
   (table) => [
     index("clients_org_idx").on(table.organizationId),
-    index("clients_bcba_idx").on(table.assignedBcbaId),
     index("clients_name_idx").on(table.organizationId, table.lastName, table.firstName),
     index("clients_status_idx").on(table.organizationId, table.status),
   ],

@@ -1,16 +1,21 @@
 import "server-only";
 
 import { db } from "@/server/db";
-import { clients, clientContacts, clientInsurance, payers, authorizations, authorizationServices } from "@/server/db/schema";
-import { providers } from "@/server/db/schema";
-import { eq, and, isNull, ne, inArray, asc, sql } from "drizzle-orm";
+import { clients, clientContacts, clientInsurance, clientProviders, payers, authorizations, authorizationServices, providers } from "@/server/db/schema";
+import { eq, and, isNull, ne, asc, desc, sql } from "drizzle-orm";
 
 export type Client = typeof clients.$inferSelect;
 export type ClientContact = typeof clientContacts.$inferSelect;
 
-export type ClientWithBcba = Client & {
-  bcbaFirstName: string | null;
-  bcbaLastName: string | null;
+export type CareTeamMember = {
+  id: string;
+  providerId: string;
+  providerFirstName: string;
+  providerLastName: string;
+  credentialType: string;
+  role: string;
+  isPrimary: boolean;
+  startDate: string;
 };
 
 export type ClientListItem = {
@@ -43,38 +48,10 @@ export async function hasClients(orgId: string): Promise<boolean> {
   return !!row;
 }
 
-export async function getClients(orgId: string): Promise<ClientWithBcba[]> {
+export async function getClients(orgId: string): Promise<Client[]> {
   const rows = await db
-    .select({
-      id: clients.id,
-      organizationId: clients.organizationId,
-      firstName: clients.firstName,
-      lastName: clients.lastName,
-      dateOfBirth: clients.dateOfBirth,
-      gender: clients.gender,
-      phone: clients.phone,
-      email: clients.email,
-      addressLine1: clients.addressLine1,
-      addressLine2: clients.addressLine2,
-      city: clients.city,
-      state: clients.state,
-      zipCode: clients.zipCode,
-      diagnosisCode: clients.diagnosisCode,
-      diagnosisDescription: clients.diagnosisDescription,
-      assignedBcbaId: clients.assignedBcbaId,
-      intakeDate: clients.intakeDate,
-      status: clients.status,
-      referralSource: clients.referralSource,
-      holdReason: clients.holdReason,
-      notes: clients.notes,
-      deletedAt: clients.deletedAt,
-      createdAt: clients.createdAt,
-      updatedAt: clients.updatedAt,
-      bcbaFirstName: providers.firstName,
-      bcbaLastName: providers.lastName,
-    })
+    .select()
     .from(clients)
-    .leftJoin(providers, eq(clients.assignedBcbaId, providers.id))
     .where(and(scopedWhere(orgId), ne(clients.status, "archived")))
     .orderBy(clients.lastName, clients.firstName);
 
@@ -130,6 +107,24 @@ export async function getClientsForList(orgId: string): Promise<ClientListItem[]
     )
     .as("primary_ins");
 
+  // Subquery: primary BCBA from client_providers junction table
+  const primaryBcba = db
+    .select({
+      clientId: clientProviders.clientId,
+      bcbaFirstName: providers.firstName,
+      bcbaLastName: providers.lastName,
+    })
+    .from(clientProviders)
+    .innerJoin(providers, eq(clientProviders.providerId, providers.id))
+    .where(
+      and(
+        eq(clientProviders.organizationId, orgId),
+        eq(clientProviders.isPrimary, true),
+        isNull(clientProviders.endDate),
+      ),
+    )
+    .as("primary_bcba");
+
   const rows = await db
     .select({
       id: clients.id,
@@ -138,8 +133,8 @@ export async function getClientsForList(orgId: string): Promise<ClientListItem[]
       dateOfBirth: clients.dateOfBirth,
       diagnosisCode: clients.diagnosisCode,
       status: clients.status,
-      bcbaFirstName: providers.firstName,
-      bcbaLastName: providers.lastName,
+      bcbaFirstName: primaryBcba.bcbaFirstName,
+      bcbaLastName: primaryBcba.bcbaLastName,
       payerName: primaryIns.payerName,
       totalApproved: sql<number>`coalesce(${authUtil.totalApproved}, 0)`.mapWith(Number),
       totalUsed: sql<number>`coalesce(${authUtil.totalUsed}, 0)`.mapWith(Number),
@@ -147,7 +142,7 @@ export async function getClientsForList(orgId: string): Promise<ClientListItem[]
       maxUtilizationPct: sql<number>`coalesce(${authUtil.maxUtilizationPct}, 0)`.mapWith(Number),
     })
     .from(clients)
-    .leftJoin(providers, eq(clients.assignedBcbaId, providers.id))
+    .leftJoin(primaryBcba, eq(clients.id, primaryBcba.clientId))
     .leftJoin(authUtil, eq(clients.id, authUtil.clientId))
     .leftJoin(primaryIns, eq(clients.id, primaryIns.clientId))
     .where(and(scopedWhere(orgId), ne(clients.status, "archived")))
@@ -173,29 +168,29 @@ export async function getClientContacts(orgId: string, clientId: string): Promis
     .orderBy(clientContacts.priority, clientContacts.lastName);
 }
 
-export type BcbaOption = {
-  id: string;
-  firstName: string;
-  lastName: string;
-};
-
-export async function getBcbaOptions(orgId: string): Promise<BcbaOption[]> {
+export async function getCareTeam(orgId: string, clientId: string): Promise<CareTeamMember[]> {
   return db
     .select({
-      id: providers.id,
-      firstName: providers.firstName,
-      lastName: providers.lastName,
+      id: clientProviders.id,
+      providerId: clientProviders.providerId,
+      providerFirstName: providers.firstName,
+      providerLastName: providers.lastName,
+      credentialType: providers.credentialType,
+      role: clientProviders.role,
+      isPrimary: clientProviders.isPrimary,
+      startDate: clientProviders.startDate,
     })
-    .from(providers)
+    .from(clientProviders)
+    .innerJoin(providers, eq(clientProviders.providerId, providers.id))
     .where(
       and(
-        eq(providers.organizationId, orgId),
+        eq(clientProviders.organizationId, orgId),
+        eq(clientProviders.clientId, clientId),
+        isNull(clientProviders.endDate),
         isNull(providers.deletedAt),
-        inArray(providers.credentialType, ["bcba", "bcba_d"]),
-        eq(providers.isActive, true),
       ),
     )
-    .orderBy(providers.lastName, providers.firstName);
+    .orderBy(desc(clientProviders.isPrimary), providers.lastName, providers.firstName);
 }
 
 // ── Insurance Queries ───────────────────────────────────────────────────────

@@ -5,7 +5,7 @@ import { requireAuth } from "@/lib/auth";
 import {
   getClientById,
   getClientContacts,
-  getBcbaOptions,
+  getCareTeam,
   getClientInsurance,
   getPayerOptions,
 } from "@/server/queries/clients";
@@ -13,7 +13,6 @@ import { getClientAuthorizations, getClientAuthUtilization } from "@/server/quer
 import { getClientSessions } from "@/server/queries/sessions";
 import { ExpiryBadge } from "@/components/shared/expiry-badge";
 import { Button } from "@/components/ui/button";
-import { getProviderById } from "@/server/queries/providers";
 import { ClientDetail } from "@/components/clients/client-detail";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
@@ -32,11 +31,11 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const canEdit = hasPermission(user.role, "clients.write");
   const canManagePayers = hasPermission(user.role, "payers.write");
 
-  const [client, contacts, bcbaOptions, insurance, payerOptions, authorizations, sessions, authUtilization] =
+  const [client, contacts, careTeam, insurance, payerOptions, authorizations, sessions, authUtilization] =
     await Promise.all([
       getClientById(user.organizationId, id),
       getClientContacts(user.organizationId, id),
-      canEdit ? getBcbaOptions(user.organizationId) : Promise.resolve([]),
+      getCareTeam(user.organizationId, id),
       getClientInsurance(user.organizationId, id),
       canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
       getClientAuthorizations(user.organizationId, id),
@@ -51,12 +50,6 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const status = client.status as ClientStatus;
   const age = differenceInYears(new Date(), new Date(client.dateOfBirth));
   const guardian = contacts.find((c) => c.isLegalGuardian);
-
-  // Resolve BCBA name (parallel-safe — client is already loaded)
-  const bcba = client.assignedBcbaId
-    ? await getProviderById(user.organizationId, client.assignedBcbaId)
-    : null;
-  const bcbaName = bcba ? `${bcba.firstName} ${bcba.lastName}` : null;
 
   return (
     <div className="space-y-3">
@@ -128,14 +121,13 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       <ClientDetail
         client={client}
         contacts={contacts}
-        bcbaOptions={bcbaOptions}
+        careTeam={careTeam}
         insurance={insurance}
         payerOptions={payerOptions}
         authorizations={authorizations}
         sessions={sessions}
         canEdit={canEdit}
         canManagePayers={canManagePayers}
-        bcbaName={bcbaName}
         authUtilization={authUtilization}
       />
     </div>

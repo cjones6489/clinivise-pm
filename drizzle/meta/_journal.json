@@ -64,6 +64,20 @@
       "when": 1774554454186,
       "tag": "0008_calm_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1774556639156,
+      "tag": "0009_good_jigsaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1774557522401,
+      "tag": "0010_flat_hannibal_king",
+      "breakpoints": true
     }
   ]
 }

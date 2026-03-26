@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { createClientSchema, type CreateClientInput } from "@/lib/validators/clients";
 import { createClient, updateClient } from "@/server/actions/clients";
 import type { Client } from "@/server/queries/clients";
-import type { BcbaOption } from "@/server/queries/clients";
 import type { ClientStatus } from "@/lib/constants";
 import {
   CLIENT_STATUSES,
@@ -43,11 +42,9 @@ const GENDER_LABELS: Record<string, string> = {
 
 export function ClientForm({
   client,
-  bcbaOptions,
   disabled,
 }: {
   client?: Client;
-  bcbaOptions: BcbaOption[];
   disabled?: boolean;
 }) {
   const router = useRouter();
@@ -76,7 +73,6 @@ export function ClientForm({
       zipCode: client?.zipCode ?? "",
       diagnosisCode: client?.diagnosisCode ?? "",
       diagnosisDescription: client?.diagnosisDescription ?? "",
-      assignedBcbaId: client?.assignedBcbaId ?? "",
       intakeDate: client?.intakeDate ?? "",
       status: (client?.status as ClientStatus) ?? "inquiry",
       referralSource: client?.referralSource ?? "",
@@ -290,34 +286,6 @@ export function ClientForm({
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Field>
-            <Label className="text-xs font-medium">Assigned BCBA</Label>
-            <Controller
-              name="assignedBcbaId"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value || NONE_VALUE}
-                  onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
-                  disabled={disabled}
-                >
-                  <SelectTrigger className="h-8 w-full text-xs">
-                    <SelectValue placeholder="None" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE_VALUE} className="text-xs">
-                      None
-                    </SelectItem>
-                    {bcbaOptions.map((b) => (
-                      <SelectItem key={b.id} value={b.id} className="text-xs">
-                        {b.lastName}, {b.firstName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </Field>
           <Field>
             <Label className="text-xs font-medium">Intake Date</Label>
             <Input
