@@ -89,6 +89,7 @@ const serviceAgg = db
 // ── Auth List Metrics ────────────────────────────────────────────────────────
 
 export type AuthListMetrics = {
+  totalCount: number;
   activeCount: number;
   expiring30dCount: number;
   expiredCount: number;
@@ -101,6 +102,7 @@ export async function getAuthListMetrics(orgId: string): Promise<AuthListMetrics
 
   const [result] = await db
     .select({
+      totalCount: sql<number>`count(*)::int`,
       activeCount: sql<number>`count(*) filter (
         where ${authorizations.status} = 'approved'
         and ${authorizations.endDate} >= ${todayStr}
@@ -132,6 +134,7 @@ export async function getAuthListMetrics(orgId: string): Promise<AuthListMetrics
     .where(scopedWhere(orgId));
 
   return {
+    totalCount: result?.totalCount ?? 0,
     activeCount: result?.activeCount ?? 0,
     expiring30dCount: result?.expiring30dCount ?? 0,
     expiredCount: result?.expiredCount ?? 0,

@@ -41,7 +41,8 @@ export default async function AuthorizationsPage({
   const { filter: filterParam } = await searchParams;
   const user = await requireAuth();
   const canCreate = WRITE_ROLES.includes(user.role);
-  const activeTab = (["all", "active", "expiring", "expired", "pending"].includes(filterParam ?? "") ? filterParam : "all") as FilterTab;
+  const validKeys = FILTER_TABS.map((t) => t.key);
+  const activeTab = validKeys.includes(filterParam as FilterTab) ? (filterParam as FilterTab) : "all";
   const filters = getFiltersForTab(activeTab);
 
   const [authorizations, metrics] = await Promise.all([
@@ -49,7 +50,8 @@ export default async function AuthorizationsPage({
     getAuthListMetrics(user.organizationId),
   ]);
 
-  const hasAnyAuths = metrics.activeCount > 0 || metrics.expiredCount > 0 || authorizations.length > 0;
+  // Show metric cards + filter tabs if the practice has any auth data at all (unfiltered)
+  const hasAnyAuths = metrics.totalCount > 0;
   const utilizationLevel = getUtilizationLevel(metrics.avgUtilization);
   const utilizationAccent = metrics.avgUtilization > 0 ? LEVEL_COLORS[utilizationLevel].text : undefined;
 
@@ -116,12 +118,12 @@ export default async function AuthorizationsPage({
               >
                 {tab.label}
                 {tab.key === "expiring" && metrics.expiring30dCount > 0 && (
-                  <span className="ml-1.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                  <span className="ml-1.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                     {metrics.expiring30dCount}
                   </span>
                 )}
                 {tab.key === "expired" && metrics.expiredCount > 0 && (
-                  <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold text-red-700">
+                  <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">
                     {metrics.expiredCount}
                   </span>
                 )}
