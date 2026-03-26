@@ -571,9 +571,9 @@ export function SessionForm({
 
       {/* Section 3: Authorization Check */}
       {!isNonBillableStatus && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Authorization</h3>
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-2.5">
+            <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Authorization</span>
             {selectedAuth && authMatches.length > 1 && !showAuthPicker && (
               <button
                 type="button"
@@ -584,6 +584,7 @@ export function SessionForm({
               </button>
             )}
           </div>
+          <div className="space-y-3 p-4">
 
           {selectedClientId && selectedCptCode && selectedSessionDate ? (
             authLoading ? (
@@ -697,6 +698,7 @@ export function SessionForm({
               </p>
             </div>
           )}
+          </div>
         </div>
       )}
 

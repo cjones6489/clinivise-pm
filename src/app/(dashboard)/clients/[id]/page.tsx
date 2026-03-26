@@ -74,7 +74,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
           <h1 className="text-xl font-semibold tracking-tight">
             {client.firstName} {client.lastName}
           </h1>
-          <div className="text-muted-foreground mt-0.5 text-[13px]">
+          <div className="text-muted-foreground mt-0.5 text-xs">
             DOB: {formatDate(client.dateOfBirth)} &middot; Age {age}
             {client.diagnosisCode && (
               <>
@@ -84,7 +84,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             )}
           </div>
           {guardian && (
-            <div className="text-muted-foreground text-[13px]">
+            <div className="text-muted-foreground text-xs">
               Guardian: {guardian.firstName} {guardian.lastName}
               {guardian.phone && <> &middot; {guardian.phone}</>}
               {guardian.email && <> &middot; {guardian.email}</>}
