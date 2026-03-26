@@ -9,6 +9,7 @@ import {
   payers,
 } from "@/server/db/schema";
 import { eq, and, isNull, sql, asc, type SQL } from "drizzle-orm";
+import { AUTH_ALERT_THRESHOLDS } from "@/lib/constants";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -249,7 +250,7 @@ export async function getAlertCount(orgId: string): Promise<number> {
     } else if (endDate <= thirtyDaysFromNow) {
       count++; // expiring soon
     }
-    if (row.totalApproved > 0 && row.totalUsed / row.totalApproved >= 0.8) {
+    if (row.totalApproved > 0 && row.totalUsed / row.totalApproved >= AUTH_ALERT_THRESHOLDS.UTILIZATION_WARNING_PCT / 100) {
       count++; // high utilization
     }
   }

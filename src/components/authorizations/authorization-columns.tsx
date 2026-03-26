@@ -54,6 +54,9 @@ export function getAuthorizationColumns(opts: {
       header: "Utilization",
       cell: ({ row }) => {
         const { totalUsed, totalApproved } = row.original;
+        if (totalApproved === 0) {
+          return <span className="text-xs text-muted-foreground">—</span>;
+        }
         return (
           <UtilizationBar usedUnits={totalUsed} approvedUnits={totalApproved} compact />
         );

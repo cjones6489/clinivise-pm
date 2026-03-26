@@ -91,7 +91,7 @@ export function ExpiryBadge({
   return (
     <span className="inline-flex items-center gap-1">
       <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular-nums", styles.badge)}>
-        {daysLeft}d
+        {daysLeft === 0 ? "Today" : `${daysLeft}d`}
       </span>
       {showFullDate && (
         <span className="text-[10px] text-muted-foreground">

@@ -12,9 +12,9 @@ import { getAuthorizationSessions } from "@/server/queries/sessions";
 import { AuthorizationDetail } from "@/components/authorizations/authorization-detail";
 import { AuthStatusBadge } from "@/components/authorizations/auth-status-badge";
 import { UtilizationBar } from "@/components/shared/utilization-bar";
-import { ExpiryBadge } from "@/components/shared/expiry-badge";
+import { ExpiryBadge, getExpiryLevel } from "@/components/shared/expiry-badge";
 import { Button } from "@/components/ui/button";
-import { formatDate, daysUntilExpiry } from "@/lib/utils";
+import { cn, formatDate, daysUntilExpiry } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Authorization | Clinivise",
@@ -47,12 +47,13 @@ export default async function AuthorizationDetailPage({
   const totalUsed = authorization.services.reduce((sum, s) => sum + s.usedUnits, 0);
   const daysLeft = daysUntilExpiry(authorization.endDate);
 
-  // Expiry alert severity
-  const expiryAlert =
-    daysLeft < 0 ? { severity: "critical" as const, message: "This authorization has expired." }
-    : daysLeft <= 7 ? { severity: "critical" as const, message: `This authorization expires in ${daysLeft} day${daysLeft !== 1 ? "s" : ""}. Submit a renewal request.` }
-    : daysLeft <= 14 ? { severity: "warning" as const, message: `This authorization expires in ${daysLeft} days. Plan for renewal.` }
-    : daysLeft <= 30 ? { severity: "info" as const, message: `This authorization expires in ${daysLeft} days.` }
+  // Expiry alert — derived from shared getExpiryLevel thresholds
+  const expiryLevel = getExpiryLevel(daysLeft, false);
+  const expiryMessage =
+    daysLeft < 0 ? "This authorization has expired."
+    : daysLeft === 0 ? "This authorization expires today. Submit a renewal request."
+    : expiryLevel === "critical" ? `This authorization expires in ${daysLeft} day${daysLeft !== 1 ? "s" : ""}. Submit a renewal request.`
+    : expiryLevel === "warning" ? `This authorization expires in ${daysLeft} days. Plan for renewal.`
     : null;
 
   return (
@@ -65,23 +66,24 @@ export default async function AuthorizationDetailPage({
         &larr; Back to Authorizations
       </Link>
 
-      {/* Expiry alert banner */}
-      {expiryAlert && (
-        <div className={`rounded-lg border px-4 py-3 ${
-          expiryAlert.severity === "critical"
-            ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30"
-            : expiryAlert.severity === "warning"
-              ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30"
-              : "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30"
-        }`}>
-          <p className={`text-xs font-medium ${
-            expiryAlert.severity === "critical"
+      {/* Expiry alert banner — only for critical (<=7d) and warning (8-30d) */}
+      {expiryMessage && (
+        <div
+          role="alert"
+          className={cn(
+            "rounded-lg border px-4 py-3",
+            expiryLevel === "critical" || daysLeft < 0
+              ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30"
+              : "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30",
+          )}
+        >
+          <p className={cn(
+            "text-xs font-medium",
+            expiryLevel === "critical" || daysLeft < 0
               ? "text-red-700 dark:text-red-400"
-              : expiryAlert.severity === "warning"
-                ? "text-amber-700 dark:text-amber-400"
-                : "text-blue-700 dark:text-blue-400"
-          }`}>
-            {expiryAlert.message}
+              : "text-amber-700 dark:text-amber-400",
+          )}>
+            {expiryMessage}
           </p>
         </div>
       )}

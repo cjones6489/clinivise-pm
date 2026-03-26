@@ -104,7 +104,7 @@ export default async function AuthorizationsPage({
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex gap-1 border-b border-border">
+          <div className="flex gap-1 overflow-x-auto border-b border-border">
             {FILTER_TABS.map((tab) => (
               <Link
                 key={tab.key}
