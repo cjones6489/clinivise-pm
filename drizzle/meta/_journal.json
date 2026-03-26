@@ -50,6 +50,13 @@
       "when": 1774148645012,
       "tag": "0006_cloudy_harpoon",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1774500383699,
+      "tag": "0007_clammy_red_wolf",
+      "breakpoints": true
     }
   ]
 }
