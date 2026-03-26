@@ -8,6 +8,8 @@ import {
   getProviderCaseload,
   getProviderRecentSessions,
   getProviderSupervisees,
+  getProviderSessionBreakdown,
+  getSupervisorOptions,
 } from "@/server/queries/providers";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +34,7 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
     notFound();
   }
 
-  const [metrics, caseload, recentSessions, supervisees, supervisor] = await Promise.all([
+  const [metrics, caseload, recentSessions, supervisees, supervisor, sessionBreakdown, supervisorOptions] = await Promise.all([
     getProviderMetrics(user.organizationId, id),
     getProviderCaseload(user.organizationId, id),
     getProviderRecentSessions(user.organizationId, id),
@@ -40,6 +42,8 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
     provider.supervisorId
       ? getProviderById(user.organizationId, provider.supervisorId)
       : Promise.resolve(null),
+    getProviderSessionBreakdown(user.organizationId, id),
+    canEdit ? getSupervisorOptions(user.organizationId, id) : Promise.resolve([]),
   ]);
 
   const credLabel = CREDENTIAL_LABELS[provider.credentialType as CredentialType] ?? provider.credentialType;
@@ -147,6 +151,9 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
         caseload={caseload}
         recentSessions={recentSessions}
         supervisees={supervisees}
+        sessionBreakdown={sessionBreakdown}
+        canEdit={canEdit}
+        supervisorOptions={canEdit ? supervisorOptions : []}
       />
     </div>
   );

@@ -188,6 +188,67 @@ export type ProviderSupervisee = {
   isActive: boolean;
 };
 
+// ── Session Breakdown (KPIs) ─────────────────────────────────────────────────
+
+export type ProviderSessionBreakdown = {
+  totalSessions: number;
+  completedSessions: number;
+  cancelledSessions: number;
+  noShowSessions: number;
+  flaggedSessions: number;
+  scheduledSessions: number;
+  totalHours: number;
+  avgSessionMinutes: number;
+  cptDistribution: { cptCode: string; count: number }[];
+};
+
+export async function getProviderSessionBreakdown(
+  orgId: string,
+  providerId: string,
+): Promise<ProviderSessionBreakdown> {
+  const [statusResult] = await db
+    .select({
+      totalSessions: sql<number>`count(*)::int`,
+      completedSessions: sql<number>`count(*) filter (where ${sessions.status} = 'completed')::int`,
+      cancelledSessions: sql<number>`count(*) filter (where ${sessions.status} = 'cancelled')::int`,
+      noShowSessions: sql<number>`count(*) filter (where ${sessions.status} = 'no_show')::int`,
+      flaggedSessions: sql<number>`count(*) filter (where ${sessions.status} = 'flagged')::int`,
+      scheduledSessions: sql<number>`count(*) filter (where ${sessions.status} = 'scheduled')::int`,
+      totalHours: sql<number>`coalesce(sum(${sessions.units}) filter (where ${sessions.status} = 'completed'), 0)::numeric * 15.0 / 60`,
+      avgSessionMinutes: sql<number>`coalesce(avg(${sessions.actualMinutes}) filter (where ${sessions.status} = 'completed' and ${sessions.actualMinutes} > 0), 0)::numeric`,
+    })
+    .from(sessions)
+    .where(and(eq(sessions.organizationId, orgId), eq(sessions.providerId, providerId)));
+
+  const cptDistribution = await db
+    .select({
+      cptCode: sessions.cptCode,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.providerId, providerId),
+        sql`${sessions.status} != 'cancelled'`,
+      ),
+    )
+    .groupBy(sessions.cptCode)
+    .orderBy(sql`count(*) desc`);
+
+  return {
+    totalSessions: statusResult?.totalSessions ?? 0,
+    completedSessions: statusResult?.completedSessions ?? 0,
+    cancelledSessions: statusResult?.cancelledSessions ?? 0,
+    noShowSessions: statusResult?.noShowSessions ?? 0,
+    flaggedSessions: statusResult?.flaggedSessions ?? 0,
+    scheduledSessions: statusResult?.scheduledSessions ?? 0,
+    totalHours: Number(statusResult?.totalHours ?? 0),
+    avgSessionMinutes: Math.round(Number(statusResult?.avgSessionMinutes ?? 0)),
+    cptDistribution,
+  };
+}
+
 export async function getProviderSupervisees(
   orgId: string,
   supervisorId: string,
