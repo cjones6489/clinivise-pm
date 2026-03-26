@@ -6,6 +6,7 @@ import {
   getClientById,
   getClientContacts,
   getCareTeam,
+  getAvailableProviders,
   getClientInsurance,
   getPayerOptions,
 } from "@/server/queries/clients";
@@ -31,11 +32,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const canEdit = hasPermission(user.role, "clients.write");
   const canManagePayers = hasPermission(user.role, "payers.write");
 
-  const [client, contacts, careTeam, insurance, payerOptions, authorizations, sessions, authUtilization] =
+  const [client, contacts, careTeam, availableProviders, insurance, payerOptions, authorizations, sessions, authUtilization] =
     await Promise.all([
       getClientById(user.organizationId, id),
       getClientContacts(user.organizationId, id),
       getCareTeam(user.organizationId, id),
+      canEdit ? getAvailableProviders(user.organizationId, id) : Promise.resolve([]),
       getClientInsurance(user.organizationId, id),
       canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
       getClientAuthorizations(user.organizationId, id),
@@ -122,6 +124,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         client={client}
         contacts={contacts}
         careTeam={careTeam}
+        availableProviders={availableProviders}
         insurance={insurance}
         payerOptions={payerOptions}
         authorizations={authorizations}

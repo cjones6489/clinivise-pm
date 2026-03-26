@@ -4,12 +4,14 @@ import type {
   Client,
   ClientContact,
   CareTeamMember,
+  AvailableProvider,
   ClientInsuranceWithPayer,
   PayerOption,
 } from "@/server/queries/clients";
 import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
 import { ClientOverview } from "./client-overview";
+import { ClientCareTeam } from "./client-care-team";
 import { ClientForm } from "./client-form";
 import { ClientContactsCard } from "./client-contacts-card";
 import { ClientInsuranceCard } from "./client-insurance-card";
@@ -21,6 +23,7 @@ export function ClientDetail({
   client,
   contacts,
   careTeam,
+  availableProviders,
   insurance,
   payerOptions,
   authorizations,
@@ -32,6 +35,7 @@ export function ClientDetail({
   client: Client;
   contacts: ClientContact[];
   careTeam: CareTeamMember[];
+  availableProviders: AvailableProvider[];
   insurance: ClientInsuranceWithPayer[];
   payerOptions: PayerOption[];
   authorizations: AuthorizationListItem[];
@@ -44,6 +48,7 @@ export function ClientDetail({
     <Tabs defaultValue="overview">
       <TabsList>
         <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="care-team">Care Team</TabsTrigger>
         <TabsTrigger value="contacts">Contacts</TabsTrigger>
         <TabsTrigger value="insurance">Insurance</TabsTrigger>
         <TabsTrigger value="authorizations">Authorizations</TabsTrigger>
@@ -59,6 +64,15 @@ export function ClientDetail({
           sessions={sessions}
           careTeam={careTeam}
           authUtilization={authUtilization}
+        />
+      </TabsContent>
+
+      <TabsContent value="care-team" className="pt-4">
+        <ClientCareTeam
+          clientId={client.id}
+          careTeam={careTeam}
+          availableProviders={availableProviders}
+          canEdit={canEdit}
         />
       </TabsContent>
 

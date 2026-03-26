@@ -193,6 +193,51 @@ export async function getCareTeam(orgId: string, clientId: string): Promise<Care
     .orderBy(desc(clientProviders.isPrimary), providers.lastName, providers.firstName);
 }
 
+export type AvailableProvider = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  credentialType: string;
+};
+
+/** Active providers not already on this client's care team */
+export async function getAvailableProviders(
+  orgId: string,
+  clientId: string,
+): Promise<AvailableProvider[]> {
+  // Get IDs of providers already on this client's active team
+  const currentTeamIds = db
+    .select({ providerId: clientProviders.providerId })
+    .from(clientProviders)
+    .where(
+      and(
+        eq(clientProviders.organizationId, orgId),
+        eq(clientProviders.clientId, clientId),
+        isNull(clientProviders.endDate),
+      ),
+    );
+
+  const rows = await db
+    .select({
+      id: providers.id,
+      firstName: providers.firstName,
+      lastName: providers.lastName,
+      credentialType: providers.credentialType,
+    })
+    .from(providers)
+    .where(
+      and(
+        eq(providers.organizationId, orgId),
+        isNull(providers.deletedAt),
+        eq(providers.isActive, true),
+        sql`${providers.id} NOT IN (${currentTeamIds})`,
+      ),
+    )
+    .orderBy(providers.lastName, providers.firstName);
+
+  return rows;
+}
+
 // ── Insurance Queries ───────────────────────────────────────────────────────
 
 export type ClientInsuranceWithPayer = {
