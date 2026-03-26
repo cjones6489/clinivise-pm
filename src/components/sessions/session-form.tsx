@@ -20,9 +20,6 @@ import type { SessionDetail, ProviderOption } from "@/server/queries/sessions";
 import type { ClientOption } from "@/server/queries/authorizations";
 import type { AuthServiceMatch } from "@/server/queries/sessions";
 import {
-  SESSION_STATUSES,
-  SESSION_STATUS_LABELS,
-  VALID_SESSION_TRANSITIONS,
   CPT_CODE_OPTIONS,
   PLACE_OF_SERVICE_CODES,
   PLACE_OF_SERVICE_LABELS,
@@ -34,7 +31,6 @@ import {
   MAX_MODIFIERS_PER_LINE,
   type CredentialType,
   type PlaceOfServiceCode,
-  type SessionStatus,
 } from "@/lib/constants";
 import { parseTimeToMinutes, calculateUnitsFromMinutes, cn } from "@/lib/utils";
 
@@ -368,14 +364,7 @@ export function SessionForm({
     ) &&
     !watch("supervisorId");
 
-  // In edit mode, only show current status + valid transitions
-  const availableStatuses = useMemo(() => {
-    if (!isEdit || !session) return SESSION_STATUSES;
-    const currentStatus = session.status as SessionStatus;
-    const validTargets = VALID_SESSION_TRANSITIONS[currentStatus] ?? [];
-    return [currentStatus, ...validTargets] as readonly SessionStatus[];
-  }, [isEdit, session]);
-
+  // Logged sessions are always "completed" — status changes (cancel) happen via dedicated action
   const watchedStatus = watch("status");
   const watchedUnits = watch("units");
   const isNonBillableStatus = watchedStatus === "cancelled" || watchedStatus === "no_show";
@@ -399,11 +388,12 @@ export function SessionForm({
   );
   const [showAuthPicker, setShowAuthPicker] = useState(false);
 
-  // QHP-only CPT warning for RBT/BCaBA
+  // QHP-only CPT checks: hard block for RBT, soft warning for BCaBA
+  const isQhpCode = (QHP_ONLY_CPT_CODES as readonly string[]).includes(selectedCptCode);
+  const showQhpBlock =
+    selectedProvider && selectedProvider.credentialType === "rbt" && isQhpCode;
   const showQhpWarning =
-    selectedProvider &&
-    (selectedProvider.credentialType === "rbt" || selectedProvider.credentialType === "bcaba") &&
-    (QHP_ONLY_CPT_CODES as readonly string[]).includes(selectedCptCode);
+    selectedProvider && selectedProvider.credentialType === "bcaba" && isQhpCode;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
@@ -575,34 +565,21 @@ export function SessionForm({
           </Field>
         </div>
 
-        {showQhpWarning && (
+        {showQhpBlock && (
           <p className="text-xs font-medium text-red-600 dark:text-red-400">
-            CPT {selectedCptCode} requires a BCBA/BCBA-D. {CREDENTIAL_LABELS[selectedProvider!.credentialType as CredentialType]} providers cannot bill this code.
+            CPT {selectedCptCode} requires a qualified healthcare professional (BCBA/BCBA-D). RBT providers cannot bill this code. This session will be blocked.
           </p>
         )}
 
-        <Field>
-          <Label className="text-xs font-medium">Status</Label>
-          <Controller
-            name="status"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="h-8 w-48 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableStatuses.map((s) => (
-                    <SelectItem key={s} value={s} className="text-xs">
-                      {SESSION_STATUS_LABELS[s as SessionStatus]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FieldError>{errors.status?.message}</FieldError>
-        </Field>
+        {showQhpWarning && (
+          <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+            CPT {selectedCptCode} typically requires a BCBA/BCBA-D. BCaBA eligibility varies by payer — verify with the client&apos;s insurance before billing.
+          </p>
+        )}
+
+        {/* Status is always "completed" for logged sessions.
+            Cancellation happens via the dedicated "Cancel Session" action on the detail page. */}
+        <input type="hidden" {...register("status")} />
 
         {/* Time fields — hidden for cancelled/no_show */}
         {!isNonBillableStatus && (

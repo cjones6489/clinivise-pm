@@ -486,3 +486,6 @@ export const RBT_SUPERVISED_CPT_CODES = ["97152", "97153", "97154"] as const;
 // See: ABA Coding Coalition CPT-credential matching rules.
 
 export const QHP_ONLY_CPT_CODES = ["97151", "97155", "97156", "97157", "97158"] as const;
+
+/** Group therapy codes — multiple clients simultaneously, so overlapping sessions for the same provider are valid. */
+export const GROUP_CPT_CODES = ["97154", "97157", "97158"] as const;

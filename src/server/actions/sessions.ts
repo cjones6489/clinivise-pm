@@ -29,8 +29,7 @@ import {
 } from "@/lib/session-helpers";
 import { requirePermission } from "@/lib/permissions";
 import { NotFoundError, StaleDataError, ConflictError } from "@/lib/errors";
-import { QHP_ONLY_CPT_CODES, CREDENTIAL_LABELS } from "@/lib/constants";
-import type { CredentialType } from "@/lib/constants";
+import { QHP_ONLY_CPT_CODES, GROUP_CPT_CODES } from "@/lib/constants";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -125,15 +124,59 @@ async function validateSessionForeignKeys(
   return { provider, authorizationId };
 }
 
-/** Block RBTs and BCaBAs from billing QHP-only CPT codes (97151, 97155-97158). */
+/** Block RBTs from billing QHP-only CPT codes (97151, 97155-97158).
+ *  BCaBAs are NOT blocked — they are considered QHPs by some payers/states.
+ *  The session form shows a warning for BCaBAs, but the server does not block. */
 function validateCptCredential(credentialType: string, cptCode: string) {
   if (
-    (credentialType === "rbt" || credentialType === "bcaba") &&
+    credentialType === "rbt" &&
     (QHP_ONLY_CPT_CODES as readonly string[]).includes(cptCode)
   ) {
-    const label = CREDENTIAL_LABELS[credentialType as CredentialType] ?? credentialType;
     throw new ConflictError(
-      `CPT ${cptCode} requires a qualified healthcare professional (BCBA/BCBA-D). ${label} providers cannot bill this code.`,
+      `CPT ${cptCode} requires a qualified healthcare professional (BCBA/BCBA-D). RBT providers cannot bill this code.`,
+    );
+  }
+}
+
+/** Block same-provider overlapping 1:1 sessions (different clients, same time).
+ *  Group codes (97154, 97157, 97158) are exempt — they serve multiple clients simultaneously.
+ *  Skips cancelled sessions. Optionally excludes a session ID (for update checks). */
+async function checkSessionOverlap(
+  orgId: string,
+  providerId: string,
+  sessionDate: string,
+  startTime: string,
+  endTime: string,
+  cptCode: string,
+  excludeSessionId?: string,
+) {
+  // Group codes are allowed to overlap
+  if ((GROUP_CPT_CODES as readonly string[]).includes(cptCode)) return;
+
+  const startTimestamp = `${sessionDate}T${startTime}:00`;
+  const endTimestamp = `${sessionDate}T${endTime}:00`;
+
+  const overlapping = await db
+    .select({ id: sessions.id, clientId: sessions.clientId })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.providerId, providerId),
+        eq(sessions.sessionDate, sessionDate),
+        sql`${sessions.status} != 'cancelled'`,
+        // Time overlap: existing.start < new.end AND existing.end > new.start
+        sql`${sessions.startTime} < ${endTimestamp}`,
+        sql`${sessions.endTime} > ${startTimestamp}`,
+        // Exclude the session being updated (if editing)
+        excludeSessionId ? sql`${sessions.id} != ${excludeSessionId}` : sql`true`,
+      ),
+    )
+    .limit(1);
+
+  if (overlapping.length > 0) {
+    throw new ConflictError(
+      "This provider already has a session at this time. A provider cannot deliver 1:1 services to two clients simultaneously.",
     );
   }
 }
@@ -150,8 +193,20 @@ export const createSession = authActionClient
       parsedInput,
     );
 
-    // Block RBTs/BCaBAs from QHP-only CPT codes
+    // Block RBTs from QHP-only CPT codes (BCaBAs get a warning only, not blocked)
     validateCptCredential(provider.credentialType, parsedInput.cptCode);
+
+    // Block overlapping 1:1 sessions for the same provider
+    if (parsedInput.startTime && parsedInput.endTime) {
+      await checkSessionOverlap(
+        ctx.organizationId,
+        parsedInput.providerId,
+        parsedInput.sessionDate,
+        parsedInput.startTime,
+        parsedInput.endTime,
+        parsedInput.cptCode,
+      );
+    }
 
     // Auto-set supervisor from provider if RBT and not provided
     let supervisorId = parsedInput.supervisorId ?? null;
@@ -324,8 +379,21 @@ export const updateSession = authActionClient
       input,
     );
 
-    // Block RBTs/BCaBAs from QHP-only CPT codes
+    // Block RBTs from QHP-only CPT codes (BCaBAs get a warning only)
     validateCptCredential(provider.credentialType, input.cptCode);
+
+    // Block overlapping 1:1 sessions (exclude the session being updated)
+    if (input.startTime && input.endTime) {
+      await checkSessionOverlap(
+        ctx.organizationId,
+        input.providerId,
+        input.sessionDate,
+        input.startTime,
+        input.endTime,
+        input.cptCode,
+        id,
+      );
+    }
 
     // Auto-set supervisor
     let supervisorId = input.supervisorId ?? null;
