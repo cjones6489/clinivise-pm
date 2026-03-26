@@ -118,6 +118,7 @@ export async function getProviderMetrics(
 }
 
 export type ProviderCaseloadItem = {
+  assignmentId: string;
   clientId: string;
   clientFirstName: string;
   clientLastName: string;
@@ -153,6 +154,7 @@ export async function getProviderCaseload(
 
   return db
     .select({
+      assignmentId: clientProviders.id,
       clientId: clients.id,
       clientFirstName: clients.firstName,
       clientLastName: clients.lastName,
@@ -302,4 +304,50 @@ export async function getProviderSupervisees(
       ),
     )
     .orderBy(providers.lastName, providers.firstName);
+}
+
+// ── Available Clients (for provider caseload assignment) ─────────────────────
+
+export type AvailableClient = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+  diagnosisCode: string | null;
+};
+
+/** Active clients not already assigned to this provider */
+export async function getAvailableClients(
+  orgId: string,
+  providerId: string,
+): Promise<AvailableClient[]> {
+  const currentClientIds = db
+    .select({ clientId: clientProviders.clientId })
+    .from(clientProviders)
+    .where(
+      and(
+        eq(clientProviders.organizationId, orgId),
+        eq(clientProviders.providerId, providerId),
+        isNull(clientProviders.endDate),
+      ),
+    );
+
+  return db
+    .select({
+      id: clients.id,
+      firstName: clients.firstName,
+      lastName: clients.lastName,
+      status: clients.status,
+      diagnosisCode: clients.diagnosisCode,
+    })
+    .from(clients)
+    .where(
+      and(
+        eq(clients.organizationId, orgId),
+        isNull(clients.deletedAt),
+        ne(clients.status, "archived"),
+        sql`${clients.id} NOT IN (${currentClientIds})`,
+      ),
+    )
+    .orderBy(clients.lastName, clients.firstName);
 }

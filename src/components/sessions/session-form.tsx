@@ -749,21 +749,22 @@ export function SessionForm({
                   ? (remaining / selectedAuth.approvedUnits) * 100
                   : 0;
                 const isLow = pctRemaining <= 20;
-                const isExceeded = afterSession < 0;
+                const isExceeded = units > 0 && afterSession < 0;
+                const isAtLimit = units > 0 && afterSession === 0;
 
                 const borderColor = isExceeded
                   ? "border-red-200 dark:border-red-800"
-                  : isLow
+                  : (isLow || isAtLimit)
                     ? "border-amber-200 dark:border-amber-800"
                     : "border-emerald-200 dark:border-emerald-800";
                 const bgColor = isExceeded
                   ? "bg-red-50 dark:bg-red-950/30"
-                  : isLow
+                  : (isLow || isAtLimit)
                     ? "bg-amber-50 dark:bg-amber-950/30"
                     : "bg-emerald-50 dark:bg-emerald-950/30";
                 const textColor = isExceeded
                   ? "text-red-700 dark:text-red-400"
-                  : isLow
+                  : (isLow || isAtLimit)
                     ? "text-amber-700 dark:text-amber-400"
                     : "text-emerald-700 dark:text-emerald-400";
 
@@ -772,6 +773,8 @@ export function SessionForm({
                     <div className={cn("text-xs font-medium", textColor)}>
                       {isExceeded ? (
                         <>This session exceeds remaining authorized units</>
+                      ) : isAtLimit ? (
+                        <>This session will use all remaining units</>
                       ) : isLow ? (
                         <>Low remaining units</>
                       ) : (

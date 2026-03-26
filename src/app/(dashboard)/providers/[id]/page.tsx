@@ -6,6 +6,7 @@ import {
   getProviderById,
   getProviderMetrics,
   getProviderCaseload,
+  getAvailableClients,
   getProviderRecentSessions,
   getProviderSupervisees,
   getProviderSessionBreakdown,
@@ -28,15 +29,17 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
   const { id } = await params;
   const user = await requireAuth();
   const canEdit = hasPermission(user.role, "providers.write");
+  const canManageCaseload = hasPermission(user.role, "clients.write");
 
   const provider = await getProviderById(user.organizationId, id);
   if (!provider) {
     notFound();
   }
 
-  const [metrics, caseload, recentSessions, supervisees, supervisor, sessionBreakdown, supervisorOptions] = await Promise.all([
+  const [metrics, caseload, availableClients, recentSessions, supervisees, supervisor, sessionBreakdown, supervisorOptions] = await Promise.all([
     getProviderMetrics(user.organizationId, id),
     getProviderCaseload(user.organizationId, id),
+    canManageCaseload ? getAvailableClients(user.organizationId, id) : Promise.resolve([]),
     getProviderRecentSessions(user.organizationId, id),
     getProviderSupervisees(user.organizationId, id),
     provider.supervisorId
@@ -149,10 +152,12 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
           credentialType: supervisor.credentialType,
         } : null}
         caseload={caseload}
+        availableClients={availableClients}
         recentSessions={recentSessions}
         supervisees={supervisees}
         sessionBreakdown={sessionBreakdown}
         canEdit={canEdit}
+        canManageCaseload={canManageCaseload}
         supervisorOptions={canEdit ? supervisorOptions : []}
       />
     </div>

@@ -12,6 +12,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatDateTime, utilizationPercent } from "@/lib/utils";
+import { getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
 import {
   CREDENTIAL_LABELS,
   PLACE_OF_SERVICE_LABELS,
@@ -142,14 +143,20 @@ export function SessionDetailView({
                 )}
               </KV>
               <KV label="Utilization">
-                <span className="tabular-nums">
-                  {session.authServiceUsedUnits}/{session.authServiceApprovedUnits} (
-                  {utilizationPercent(
+                {(() => {
+                  const pct = utilizationPercent(
                     session.authServiceUsedUnits ?? 0,
                     session.authServiceApprovedUnits,
-                  )}
-                  %)
-                </span>
+                  );
+                  const level = getUtilizationLevel(pct);
+                  const colors = LEVEL_COLORS[level];
+                  return (
+                    <span className="tabular-nums">
+                      {session.authServiceUsedUnits}/{session.authServiceApprovedUnits} (
+                      <span className={colors.text}>{pct}%</span>)
+                    </span>
+                  );
+                })()}
               </KV>
               {session.authStartDate && session.authEndDate && (
                 <KV label="Auth Period">

@@ -161,19 +161,28 @@ export async function getDashboardMetrics(orgId: string): Promise<DashboardMetri
     const level = getExpiryLevel(daysLeft, false);
     const utilPct = row.totalApproved > 0 ? row.totalUsed / row.totalApproved : 0;
 
+    // Determine worst severity for this auth (expiry vs utilization)
+    let hasCritical = false;
+    let hasWarning = false;
+
     if (daysLeft < 0) {
-      actionItemCount++;
-      criticalCount++;
-    } else if (level === "critical" || level === "warning") {
-      actionItemCount++;
-      if (level === "critical") criticalCount++;
+      hasCritical = true; // expired
+    } else if (level === "critical") {
+      hasCritical = true;
+    } else if (level === "warning") {
+      hasWarning = true;
     }
 
     if (utilPct >= criticalPct) {
-      actionItemCount++;
-      criticalCount++;
+      hasCritical = true;
     } else if (utilPct >= warningPct) {
+      hasWarning = true;
+    }
+
+    // Count each auth once regardless of how many issues it has
+    if (hasCritical || hasWarning) {
       actionItemCount++;
+      if (hasCritical) criticalCount++;
     }
   }
 

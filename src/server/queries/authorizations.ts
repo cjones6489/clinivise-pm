@@ -216,12 +216,14 @@ export async function getAuthorizations(
 
 /**
  * Lightweight count of action items for sidebar badge.
- * Counts: expired auths, expiring within 30 days, >=80% utilized.
+ * Counts distinct authorizations that have at least one issue:
+ * expired, expiring within 30 days, or >=80% utilized.
+ * Each auth counts as 1 action item regardless of how many issues it has.
  */
 export async function getAlertCount(orgId: string): Promise<number> {
-  const now = new Date();
-  const thirtyDaysFromNow = new Date(now);
-  thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const thirtyDaysStr = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+  const warningPct = AUTH_ALERT_THRESHOLDS.UTILIZATION_WARNING_PCT / 100;
 
   const rows = await db
     .select({
@@ -244,14 +246,13 @@ export async function getAlertCount(orgId: string): Promise<number> {
 
   let count = 0;
   for (const row of rows) {
-    const endDate = new Date(row.endDate);
-    if (endDate < now) {
-      count++; // expired
-    } else if (endDate <= thirtyDaysFromNow) {
-      count++; // expiring soon
-    }
-    if (row.totalApproved > 0 && row.totalUsed / row.totalApproved >= AUTH_ALERT_THRESHOLDS.UTILIZATION_WARNING_PCT / 100) {
-      count++; // high utilization
+    // Use date-string comparison to avoid timezone edge cases
+    const hasExpiryIssue = row.endDate < todayStr || row.endDate <= thirtyDaysStr;
+    const hasUtilIssue = row.totalApproved > 0 && row.totalUsed / row.totalApproved >= warningPct;
+
+    // Count each auth once regardless of how many issues it has
+    if (hasExpiryIssue || hasUtilIssue) {
+      count++;
     }
   }
 

@@ -1,0 +1,2 @@
+ALTER TABLE "authorization_services" ADD CONSTRAINT "approved_units_positive" CHECK ("authorization_services"."approved_units" > 0);--> statement-breakpoint
+ALTER TABLE "authorizations" ADD CONSTRAINT "auth_date_range" CHECK ("authorizations"."end_date" >= "authorizations"."start_date");

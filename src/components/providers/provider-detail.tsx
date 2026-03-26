@@ -8,16 +8,16 @@ import type {
   ProviderSupervisee,
   ProviderSessionBreakdown,
   SupervisorOption,
+  AvailableClient,
 } from "@/server/queries/providers";
+import { ProviderClients } from "./provider-clients";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import { ProviderForm } from "@/components/providers/provider-form";
 import {
   ABA_CPT_CODES,
   CREDENTIAL_LABELS,
-  CARE_TEAM_ROLE_LABELS,
   SUPERVISOR_CREDENTIAL_TYPES,
   type CredentialType,
-  type CareTeamRole,
   type CptCode,
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
@@ -64,8 +64,10 @@ export function ProviderDetailView({
   provider,
   supervisor,
   caseload,
+  availableClients,
   recentSessions,
   supervisees,
+  canManageCaseload,
   sessionBreakdown,
   canEdit,
   supervisorOptions,
@@ -73,10 +75,12 @@ export function ProviderDetailView({
   provider: Provider;
   supervisor: SupervisorOption | null;
   caseload: ProviderCaseloadItem[];
+  availableClients: AvailableClient[];
   recentSessions: ProviderRecentSession[];
   supervisees: ProviderSupervisee[];
   sessionBreakdown: ProviderSessionBreakdown;
   canEdit: boolean;
+  canManageCaseload: boolean;
   supervisorOptions: SupervisorOption[];
 }) {
   const credLabel =
@@ -313,77 +317,13 @@ export function ProviderDetailView({
 
       {/* ── Caseload Tab ─────────────────────────────────────────────── */}
       <TabsContent value="caseload" className="pt-4">
-        <SectionCard
-          title="Active Caseload"
-          action={
-            caseload.length > 0 ? (
-              <span className="text-muted-foreground text-[11px]">
-                {caseload.length} client{caseload.length !== 1 ? "s" : ""}
-              </span>
-            ) : undefined
-          }
-        >
-          {caseload.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-border border-b">
-                    <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
-                      Client
-                    </th>
-                    <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
-                      Role
-                    </th>
-                    <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
-                      Status
-                    </th>
-                    <th className="text-muted-foreground px-2 py-1.5 text-right font-medium">
-                      Sessions
-                    </th>
-                    <th className="text-muted-foreground px-2 py-1.5 text-right font-medium">
-                      Last Session
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {caseload.map((c) => (
-                    <tr key={c.clientId} className="border-border border-b last:border-0">
-                      <td className="px-2 py-1.5">
-                        <Link
-                          href={`/clients/${c.clientId}`}
-                          className="font-medium hover:underline"
-                        >
-                          {c.clientLastName}, {c.clientFirstName}
-                        </Link>
-                      </td>
-                      <td className="px-2 py-1.5">
-                        <span className="text-muted-foreground">
-                          {CARE_TEAM_ROLE_LABELS[c.role as CareTeamRole] ?? c.role}
-                          {c.isPrimary && <Badge variant="outline" className="ml-1.5 text-[9px]">Primary</Badge>}
-                        </span>
-                      </td>
-                      <td className="px-2 py-1.5">
-                        <Badge variant={c.clientStatus === "active" ? "default" : "outline"} className="text-[10px]">
-                          {c.clientStatus}
-                        </Badge>
-                      </td>
-                      <td className="px-2 py-1.5 text-right tabular-nums">{c.sessionCount}</td>
-                      <td className="text-muted-foreground px-2 py-1.5 text-right tabular-nums">
-                        {c.lastSessionDate ? formatDate(c.lastSessionDate) : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <p className="text-muted-foreground text-xs">
-                No clients on this provider&apos;s caseload yet.
-              </p>
-            </div>
-          )}
-        </SectionCard>
+        <ProviderClients
+          providerId={provider.id}
+          credentialType={provider.credentialType}
+          caseload={caseload}
+          availableClients={availableClients}
+          canEdit={canManageCaseload}
+        />
       </TabsContent>
 
       {/* ── Recent Sessions Tab ──────────────────────────────────────── */}

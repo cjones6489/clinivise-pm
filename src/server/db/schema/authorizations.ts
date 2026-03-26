@@ -61,6 +61,7 @@ export const authorizations = pgTable(
     index("auths_status_idx").on(table.organizationId, table.status),
     index("auths_end_date_idx").on(table.organizationId, table.endDate),
     index("auths_prev_auth_idx").on(table.previousAuthorizationId),
+    check("auth_date_range", sql`${table.endDate} >= ${table.startDate}`),
   ],
 );
 
@@ -94,5 +95,6 @@ export const authorizationServices = pgTable(
     index("auth_services_auth_idx").on(table.authorizationId),
     index("auth_services_cpt_idx").on(table.authorizationId, table.cptCode),
     check("used_units_non_negative", sql`${table.usedUnits} >= 0`),
+    check("approved_units_positive", sql`${table.approvedUnits} > 0`),
   ],
 );
