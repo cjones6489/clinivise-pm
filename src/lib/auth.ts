@@ -47,7 +47,8 @@ async function autoProvision(clerkUserId: string, clerkOrgId: string) {
   if (!org) return null;
 
   // Check if user already exists (match by email + org for invited users)
-  const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
+  // Use primaryEmailAddress (Clerk's designated primary), not emailAddresses[0] (creation order)
+  const email = (clerkUser.primaryEmailAddress?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress ?? "").toLowerCase();
   let [user] = await db
     .select()
     .from(users)

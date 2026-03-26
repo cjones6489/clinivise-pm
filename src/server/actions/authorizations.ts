@@ -10,11 +10,12 @@ import { db } from "@/server/db";
 import {
   authorizations,
   authorizationServices,
+  sessions,
   clients,
   clientInsurance,
   payers,
 } from "@/server/db/schema";
-import { eq, and, isNull, notInArray, gt } from "drizzle-orm";
+import { eq, and, isNull, notInArray, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
 import { z } from "zod/v4";
@@ -198,22 +199,35 @@ export const updateAuthorization = authActionClient
       // Reconcile service lines: update existing, insert new, delete removed
       const existingIds = services.filter((s) => s.id).map((s) => s.id!);
 
-      // Guard: reject removal of service lines with recorded usage
-      const removedWithUsage = await tx
+      // Guard: reject removal of service lines that have ANY linked sessions
+      // (not just usedUnits > 0 — cancelled sessions may have reset units to 0
+      //  but still reference the service line for audit trail purposes)
+      const removedServiceIds = await tx
         .select({ id: authorizationServices.id })
         .from(authorizationServices)
         .where(
           and(
             eq(authorizationServices.authorizationId, id),
             eq(authorizationServices.organizationId, ctx.organizationId),
-            gt(authorizationServices.usedUnits, 0),
             ...(existingIds.length > 0 ? [notInArray(authorizationServices.id, existingIds)] : []),
           ),
-        )
-        .limit(1);
+        );
 
-      if (removedWithUsage.length > 0) {
-        throw new ConflictError("Cannot remove service lines that have recorded usage");
+      if (removedServiceIds.length > 0) {
+        const linkedSessions = await tx
+          .select({ id: sessions.id })
+          .from(sessions)
+          .where(
+            inArray(
+              sessions.authorizationServiceId,
+              removedServiceIds.map((r) => r.id),
+            ),
+          )
+          .limit(1);
+
+        if (linkedSessions.length > 0) {
+          throw new ConflictError("Cannot remove service lines that have linked sessions");
+        }
       }
 
       // Delete removed service lines (org-scoped for defense-in-depth)
@@ -241,8 +255,29 @@ export const updateAuthorization = authActionClient
 
       for (const svc of services) {
         if (svc.id) {
-          // Update existing — preserve usedUnits
+          // Update existing — lock row and validate approvedUnits >= usedUnits
           const { id: svcId, ...svcFields } = svc;
+
+          // Lock the service line to prevent concurrent session logging from
+          // reading stale approvedUnits during the update
+          const [locked] = await tx
+            .select({ usedUnits: authorizationServices.usedUnits })
+            .from(authorizationServices)
+            .where(
+              and(
+                eq(authorizationServices.id, svcId),
+                eq(authorizationServices.organizationId, ctx.organizationId),
+              ),
+            )
+            .for("update");
+
+          // If reducing approvedUnits, ensure it doesn't go below usedUnits
+          if (locked && svcFields.approvedUnits !== undefined && svcFields.approvedUnits < locked.usedUnits) {
+            throw new ConflictError(
+              `Cannot reduce approved units below used units (${locked.usedUnits} used). Cancel excess sessions first.`,
+            );
+          }
+
           await tx
             .update(authorizationServices)
             .set(stripUndefined(svcFields) as Partial<typeof authorizationServices.$inferInsert>)
