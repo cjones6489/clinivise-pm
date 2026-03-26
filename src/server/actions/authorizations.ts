@@ -381,6 +381,8 @@ export const archiveAuthorization = authActionClient
 export const fetchClientInsuranceOptions = authActionClient
   .schema(z.object({ clientId: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
+    requirePermission(ctx.userRole, "authorizations.read");
+
     const rows = await db
       .select({
         id: clientInsurance.id,
@@ -409,6 +411,8 @@ export const fetchClientInsuranceOptions = authActionClient
 export const fetchAuthorizationOptions = authActionClient
   .schema(z.object({ clientId: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
+    requirePermission(ctx.userRole, "authorizations.read");
+
     const rows = await db
       .select({
         id: authorizations.id,

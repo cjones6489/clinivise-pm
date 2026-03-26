@@ -65,8 +65,9 @@ export function computeActualMinutes(
   const actualMinutes = parseTimeToMinutes(endTime) - parseTimeToMinutes(startTime);
 
   // Timestamps for storage (display only, not used for billing math)
-  const startTimestamp = new Date(`${sessionDate}T${startTime}:00`);
-  const endTimestamp = new Date(`${sessionDate}T${endTime}:00`);
+  // Append Z to parse as UTC — prevents local-timezone offset shifts on the server
+  const startTimestamp = new Date(`${sessionDate}T${startTime}:00Z`);
+  const endTimestamp = new Date(`${sessionDate}T${endTime}:00Z`);
 
   return { startTimestamp, endTimestamp, actualMinutes };
 }

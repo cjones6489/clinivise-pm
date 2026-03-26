@@ -139,40 +139,36 @@ export const deleteClient = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     requirePermission(ctx.userRole, "clients.write");
 
-    const [existing] = await db
-      .select({ id: clients.id })
-      .from(clients)
-      .where(
-        and(
-          eq(clients.id, parsedInput.id),
-          eq(clients.organizationId, ctx.organizationId),
-          isNull(clients.deletedAt),
-        ),
-      )
-      .limit(1);
+    // Atomic: archive client + cascade to their active authorizations
+    const client = await db.transaction(async (tx) => {
+      const [archived] = await tx
+        .update(clients)
+        .set({ deletedAt: new Date(), status: "archived" })
+        .where(
+          and(
+            eq(clients.id, parsedInput.id),
+            eq(clients.organizationId, ctx.organizationId),
+            isNull(clients.deletedAt),
+          ),
+        )
+        .returning();
 
-    if (!existing) {
-      throw new NotFoundError("Client");
-    }
+      if (!archived) throw new NotFoundError("Client");
 
-    const [client] = await db
-      .update(clients)
-      .set({ deletedAt: new Date(), status: "archived" })
-      .where(and(eq(clients.id, parsedInput.id), eq(clients.organizationId, ctx.organizationId)))
-      .returning();
+      // Cascade: soft-delete active authorizations to prevent phantom dashboard alerts
+      await tx
+        .update(authorizations)
+        .set({ deletedAt: new Date() })
+        .where(
+          and(
+            eq(authorizations.clientId, parsedInput.id),
+            eq(authorizations.organizationId, ctx.organizationId),
+            isNull(authorizations.deletedAt),
+          ),
+        );
 
-    // Also soft-delete the client's active authorizations to prevent
-    // phantom alerts on the dashboard from archived clients
-    await db
-      .update(authorizations)
-      .set({ deletedAt: new Date() })
-      .where(
-        and(
-          eq(authorizations.clientId, parsedInput.id),
-          eq(authorizations.organizationId, ctx.organizationId),
-          isNull(authorizations.deletedAt),
-        ),
-      );
+      return archived;
+    });
 
     await logAudit({
       organizationId: ctx.organizationId,
