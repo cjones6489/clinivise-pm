@@ -4,7 +4,7 @@ import { authActionClient } from "@/lib/safe-action";
 import { createClientSchema, updateClientSchema } from "@/lib/validators/clients";
 import { idSchema } from "@/lib/validators";
 import { db } from "@/server/db";
-import { clients, providers } from "@/server/db/schema";
+import { clients, providers, authorizations } from "@/server/db/schema";
 import { eq, and, isNull, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripUndefined, undefinedToNull } from "@/lib/utils";
@@ -161,14 +161,30 @@ export const deleteClient = authActionClient
       .where(and(eq(clients.id, parsedInput.id), eq(clients.organizationId, ctx.organizationId)))
       .returning();
 
+    // Also soft-delete the client's active authorizations to prevent
+    // phantom alerts on the dashboard from archived clients
+    await db
+      .update(authorizations)
+      .set({ deletedAt: new Date() })
+      .where(
+        and(
+          eq(authorizations.clientId, parsedInput.id),
+          eq(authorizations.organizationId, ctx.organizationId),
+          isNull(authorizations.deletedAt),
+        ),
+      );
+
     await logAudit({
       organizationId: ctx.organizationId,
       userId: ctx.userId,
       action: "archive",
       entityType: "client",
       entityId: parsedInput.id,
+      metadata: { cascadeAuthArchive: true },
     });
 
     revalidatePath("/clients");
+    revalidatePath("/authorizations");
+    revalidatePath("/overview");
     return { success: true as const, data: client };
   });

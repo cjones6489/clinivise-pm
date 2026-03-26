@@ -114,18 +114,17 @@ export async function getDashboardMetrics(orgId: string): Promise<DashboardMetri
         ),
       ),
 
-    // Hours this week from sessions
+    // Hours this week from sessions — WHERE limits scan to this week for index usage
     db
       .select({
         hoursThisWeek: sql<number>`coalesce(
           sum(${sessions.units}) filter (
-            where ${sessions.sessionDate} >= ${weekStartStr}
-            and ${sessions.status} = 'completed'
+            where ${sessions.status} = 'completed'
           ), 0
         )::numeric * 15.0 / 60`.mapWith(Number),
       })
       .from(sessions)
-      .where(eq(sessions.organizationId, orgId)),
+      .where(and(eq(sessions.organizationId, orgId), sql`${sessions.sessionDate} >= ${weekStartStr}`)),
 
     // Auth alert rows (for counting)
     db

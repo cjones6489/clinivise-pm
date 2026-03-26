@@ -335,6 +335,24 @@ export const archiveAuthorization = authActionClient
 
     if (!existing) throw new NotFoundError("Authorization");
 
+    // Block archiving if there are scheduled or flagged sessions linked to this auth
+    // (completed/cancelled/no_show sessions are fine — they're terminal or already processed)
+    const [activeSession] = await db
+      .select({ id: sessions.id })
+      .from(sessions)
+      .where(
+        and(
+          eq(sessions.authorizationId, parsedInput.id),
+          eq(sessions.organizationId, ctx.organizationId),
+          inArray(sessions.status, ["scheduled", "flagged"]),
+        ),
+      )
+      .limit(1);
+
+    if (activeSession) {
+      throw new ConflictError("Cannot archive an authorization with scheduled or flagged sessions. Resolve those sessions first.");
+    }
+
     await db
       .update(authorizations)
       .set({ deletedAt: new Date() })

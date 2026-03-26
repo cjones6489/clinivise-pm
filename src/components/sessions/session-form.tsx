@@ -95,7 +95,9 @@ export function SessionForm({
   const [authLoading, setAuthLoading] = useState(false);
 
   const today = format(new Date(), "yyyy-MM-dd");
-  const idempotencyKey = useMemo(() => nanoid(), []);
+  // Generate fresh key per submission attempt (not per mount) to prevent
+  // stale keys after browser back/forward navigation
+  const idempotencyKeyRef = useRef("");
 
   // Compute initial user-added modifiers for edit mode by subtracting auto-computed ones
   const initialUserModifiers = useMemo(() => {
@@ -351,7 +353,9 @@ export function SessionForm({
     if (isEdit) {
       executeUpdate({ ...data, id: session.id, updatedAt: session.updatedAt.toISOString() });
     } else {
-      executeCreate({ ...data, idempotencyKey });
+      // Generate fresh idempotency key per submit attempt
+      idempotencyKeyRef.current = nanoid();
+      executeCreate({ ...data, idempotencyKey: idempotencyKeyRef.current });
     }
   }
 
