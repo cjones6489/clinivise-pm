@@ -741,10 +741,26 @@ Tests:
 - [ ] **Role descriptions card**: collapsible section card below the table explaining what each role can access.
 - [ ] **Empty state**: "No team members yet. Invite your first team member to get started."
 
-**Permission enforcement upgrades**:
-- [ ] Create `<Can permission="...">` wrapper component for declarative UI gating (shows/hides children based on current user's role)
+**Permission enforcement — apply everywhere** (HIPAA minimum necessary requires it):
+- [ ] Create `<Can permission="...">` wrapper component (~10 lines, shows/hides children based on current user's role + permissions map)
+- [ ] Create `usePermissions()` hook to expose current user's role + `can(permission)` helper to client components
 - [ ] Expand `PERMISSIONS` map to cover: `clients.read`, `clients.write`, `sessions.read`, `sessions.write`, `sessions.cancel`, `authorizations.read`, `authorizations.write`, `providers.read`, `providers.write`, `payers.read`, `payers.write`, `team.manage`, `settings.manage`, `billing.read`, `billing.write`, `reports.read`
-- [ ] Apply `<Can>` to all action buttons, form sections, and nav items that should be role-gated
+- [ ] Apply `<Can>` to ALL action buttons across the app (~15-20 wrappers):
+  - Dashboard: (no actions — already clean)
+  - Client list: "Add Client" button
+  - Client detail: "Log Session", "Add Authorization" buttons, Edit tab
+  - Session list: "Log Session" button
+  - Session form: entire page gated by `sessions.write`
+  - Session table: cancel action, edit action
+  - Auth list: "Add Authorization" button
+  - Auth detail: "Edit" button, Edit tab
+  - Provider list: "Add Provider" button
+  - Provider detail: edit/archive actions
+  - Payers: "Add Payer" button, edit/deactivate actions
+  - Team: entire page gated by `team.manage`
+  - Settings: entire page gated by `settings.manage`
+- [ ] Update sidebar nav to use permissions map (replace hardcoded role arrays with `PERMISSIONS` lookups)
+- [ ] **Defer to Phase 3**: data-level filtering (caseload scoping), field-level filtering (hide billing fields from RBTs), custom per-user permission overrides
 
 Tests:
 - [ ] Invite creates user row with status='invited' and correct role
