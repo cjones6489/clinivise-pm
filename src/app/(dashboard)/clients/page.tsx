@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
-import { getClients } from "@/server/queries/clients";
+import { getClientsForList } from "@/server/queries/clients";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ClientTable } from "@/components/clients/client-table";
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function ClientsPage() {
   const user = await requireAuth();
   const canCreate = hasPermission(user.role, "clients.write");
-  const clients = await getClients(user.organizationId);
+  const clients = await getClientsForList(user.organizationId);
 
   return (
     <div className="space-y-6">

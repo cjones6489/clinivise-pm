@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import type { ClientWithBcba } from "@/server/queries/clients";
+import type { ClientListItem } from "@/server/queries/clients";
 import type { ClientStatus } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,13 @@ import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_VARIANT } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import { differenceInYears } from "date-fns";
+import { UtilizationBar } from "@/components/shared/utilization-bar";
+import { ExpiryBadge } from "@/components/shared/expiry-badge";
 
 export function getClientColumns(opts: {
-  onView: (client: ClientWithBcba) => void;
-  onArchive?: (client: ClientWithBcba) => void;
-}): ColumnDef<ClientWithBcba>[] {
+  onView: (client: ClientListItem) => void;
+  onArchive?: (client: ClientListItem) => void;
+}): ColumnDef<ClientListItem>[] {
   return [
     {
       id: "name",
@@ -55,8 +57,17 @@ export function getClientColumns(opts: {
       },
     },
     {
+      id: "payer",
+      header: "Payer",
+      cell: ({ row }) => {
+        const { payerName } = row.original;
+        if (!payerName) return <span className="text-muted-foreground">—</span>;
+        return <span className="truncate">{payerName}</span>;
+      },
+    },
+    {
       id: "bcba",
-      header: "BCBA",
+      header: "Supervising BCBA",
       cell: ({ row }) => {
         const { bcbaLastName, bcbaFirstName } = row.original;
         if (!bcbaLastName) return <span className="text-muted-foreground">—</span>;
@@ -65,6 +76,24 @@ export function getClientColumns(opts: {
             {bcbaFirstName} {bcbaLastName}
           </span>
         );
+      },
+    },
+    {
+      id: "utilization",
+      header: "Auth Utilization",
+      cell: ({ row }) => {
+        const { totalApproved, totalUsed } = row.original;
+        if (totalApproved === 0) return <span className="text-muted-foreground">—</span>;
+        return <UtilizationBar usedUnits={totalUsed} approvedUnits={totalApproved} compact />;
+      },
+    },
+    {
+      id: "expiry",
+      header: "Auth Expiry",
+      cell: ({ row }) => {
+        const { nearestExpiry } = row.original;
+        if (!nearestExpiry) return <span className="text-muted-foreground">—</span>;
+        return <ExpiryBadge endDate={nearestExpiry} />;
       },
     },
     {

@@ -79,23 +79,33 @@ export function UtilizationBar({
   const remainingDisplay = showHours ? `${formatHours(remaining)} hrs` : `${remaining} units`;
   const valueText = `${pct}% utilized — ${remainingDisplay} remaining`;
 
-  // Compact mode: just colored percentage text with status label for table cells
+  // Compact mode: thin progress bar + percentage for table cells
   if (compact) {
     return (
-      <span
+      <div
         role="meter"
         aria-valuemin={0}
         aria-valuemax={approvedUnits}
         aria-valuenow={usedUnits}
         aria-valuetext={valueText}
         aria-label={label ? `${label} utilization` : "Authorization utilization"}
-        className={cn("text-xs font-semibold tabular-nums", colors.text)}
+        className="space-y-1"
       >
-        {pct}%
-        <span className="ml-1 font-normal text-muted-foreground">
-          ({usedDisplay})
-        </span>
-      </span>
+        <div className="flex items-center gap-2">
+          <div className={cn("relative h-1.5 flex-1 overflow-hidden rounded-full", colors.track)}>
+            <div
+              className={cn("absolute inset-y-0 left-0 rounded-full transition-all", colors.bar)}
+              style={{ width: `${fillWidth}%` }}
+            />
+          </div>
+          <span className={cn("text-xs font-semibold tabular-nums shrink-0", colors.text)}>
+            {pct}%
+          </span>
+        </div>
+        <div className="text-[11px] text-muted-foreground tabular-nums">
+          {usedDisplay}
+        </div>
+      </div>
     );
   }
 

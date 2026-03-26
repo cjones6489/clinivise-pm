@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { toast } from "sonner";
 
-import type { ClientWithBcba } from "@/server/queries/clients";
+import type { ClientListItem } from "@/server/queries/clients";
 import { deleteClient } from "@/server/actions/clients";
 import { getClientColumns } from "./client-columns";
 import { DataTable } from "@/components/shared/data-table";
@@ -20,9 +20,9 @@ import { DataTableToolbar } from "@/components/shared/data-table-toolbar";
 import { DataTablePagination } from "@/components/shared/data-table-pagination";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
-export function ClientTable({ data, canEdit }: { data: ClientWithBcba[]; canEdit: boolean }) {
+export function ClientTable({ data, canEdit }: { data: ClientListItem[]; canEdit: boolean }) {
   const router = useRouter();
-  const [archiveTarget, setArchiveTarget] = useState<ClientWithBcba | null>(null);
+  const [archiveTarget, setArchiveTarget] = useState<ClientListItem | null>(null);
 
   const { executeAsync } = useAction(deleteClient, {
     onSuccess: ({ data }) => {

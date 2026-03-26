@@ -171,11 +171,13 @@ export const createSession = authActionClient
     );
 
     // Compute actual minutes from times
-    const { startTimestamp, endTimestamp, actualMinutes } = computeActualMinutes(
+    const { startTimestamp, endTimestamp, actualMinutes: rawMinutes } = computeActualMinutes(
       parsedInput.sessionDate,
       parsedInput.startTime,
       parsedInput.endTime,
     );
+    // Defense-in-depth: clamp negative minutes (validator should prevent, but guard the DB)
+    const actualMinutes = rawMinutes != null && rawMinutes < 0 ? null : rawMinutes;
 
     // Initial auth context from explicit selection
     let authServiceId = parsedInput.authorizationServiceId ?? null;
@@ -341,11 +343,12 @@ export const updateSession = authActionClient
       input.modifierCodes,
     );
 
-    const { startTimestamp, endTimestamp, actualMinutes } = computeActualMinutes(
+    const { startTimestamp, endTimestamp, actualMinutes: rawMinutes } = computeActualMinutes(
       input.sessionDate,
       input.startTime,
       input.endTime,
     );
+    const actualMinutes = rawMinutes != null && rawMinutes < 0 ? null : rawMinutes;
 
     const newAuthServiceId = input.authorizationServiceId ?? null;
     const resolvedAuthId = authorizationId;

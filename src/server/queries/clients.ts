@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/server/db";
-import { clients, clientContacts, clientInsurance, payers } from "@/server/db/schema";
+import { clients, clientContacts, clientInsurance, payers, authorizations, authorizationServices } from "@/server/db/schema";
 import { providers } from "@/server/db/schema";
 import { eq, and, isNull, ne, inArray, asc, sql } from "drizzle-orm";
 
@@ -11,6 +11,21 @@ export type ClientContact = typeof clientContacts.$inferSelect;
 export type ClientWithBcba = Client & {
   bcbaFirstName: string | null;
   bcbaLastName: string | null;
+};
+
+export type ClientListItem = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  diagnosisCode: string | null;
+  status: string;
+  bcbaFirstName: string | null;
+  bcbaLastName: string | null;
+  payerName: string | null;
+  totalApproved: number;
+  totalUsed: number;
+  nearestExpiry: string | null;
 };
 
 function scopedWhere(orgId: string) {
@@ -59,6 +74,73 @@ export async function getClients(orgId: string): Promise<ClientWithBcba[]> {
     })
     .from(clients)
     .leftJoin(providers, eq(clients.assignedBcbaId, providers.id))
+    .where(and(scopedWhere(orgId), ne(clients.status, "archived")))
+    .orderBy(clients.lastName, clients.firstName);
+
+  return rows;
+}
+
+/** Enriched client list with payer, auth utilization, and nearest expiry */
+export async function getClientsForList(orgId: string): Promise<ClientListItem[]> {
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  // Subquery: per-client auth utilization for active auths
+  const authUtil = db
+    .select({
+      clientId: authorizations.clientId,
+      totalApproved: sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.as("total_approved"),
+      totalUsed: sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.as("total_used"),
+      nearestExpiry: sql<string>`min(${authorizations.endDate})`.as("nearest_expiry"),
+    })
+    .from(authorizations)
+    .leftJoin(authorizationServices, eq(authorizations.id, authorizationServices.authorizationId))
+    .where(
+      and(
+        eq(authorizations.organizationId, orgId),
+        eq(authorizations.status, "approved"),
+        isNull(authorizations.deletedAt),
+        sql`${authorizations.endDate} >= ${todayStr}`,
+      ),
+    )
+    .groupBy(authorizations.clientId)
+    .as("auth_util");
+
+  // Subquery: primary insurance payer name
+  const primaryIns = db
+    .select({
+      clientId: clientInsurance.clientId,
+      payerName: payers.name,
+    })
+    .from(clientInsurance)
+    .innerJoin(payers, eq(clientInsurance.payerId, payers.id))
+    .where(
+      and(
+        eq(clientInsurance.organizationId, orgId),
+        eq(clientInsurance.priority, 1),
+        isNull(clientInsurance.deletedAt),
+      ),
+    )
+    .as("primary_ins");
+
+  const rows = await db
+    .select({
+      id: clients.id,
+      firstName: clients.firstName,
+      lastName: clients.lastName,
+      dateOfBirth: clients.dateOfBirth,
+      diagnosisCode: clients.diagnosisCode,
+      status: clients.status,
+      bcbaFirstName: providers.firstName,
+      bcbaLastName: providers.lastName,
+      payerName: primaryIns.payerName,
+      totalApproved: sql<number>`coalesce(${authUtil.totalApproved}, 0)`.mapWith(Number),
+      totalUsed: sql<number>`coalesce(${authUtil.totalUsed}, 0)`.mapWith(Number),
+      nearestExpiry: authUtil.nearestExpiry,
+    })
+    .from(clients)
+    .leftJoin(providers, eq(clients.assignedBcbaId, providers.id))
+    .leftJoin(authUtil, eq(clients.id, authUtil.clientId))
+    .leftJoin(primaryIns, eq(clients.id, primaryIns.clientId))
     .where(and(scopedWhere(orgId), ne(clients.status, "archived")))
     .orderBy(clients.lastName, clients.firstName);
 
