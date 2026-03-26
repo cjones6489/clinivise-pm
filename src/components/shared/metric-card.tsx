@@ -25,7 +25,7 @@ export function MetricCard({
         {icon}
       </div>
       <div
-        className={cn("mt-2 text-2xl font-bold tracking-tight tabular-nums", accent)}
+        className={cn("mt-2 text-2xl font-semibold tracking-tight tabular-nums", accent)}
         style={!accent && color ? { color } : undefined}
       >
         {value}

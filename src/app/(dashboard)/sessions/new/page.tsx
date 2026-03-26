@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { getClientOptions } from "@/server/queries/authorizations";
 import { getProviderOptions } from "@/server/queries/sessions";
@@ -26,6 +27,9 @@ export default async function NewSessionPage({
 
   return (
     <div className="space-y-6">
+      <Link href="/sessions" className="text-xs text-primary hover:underline">
+        &larr; Back to Sessions
+      </Link>
       <PageHeader
         title="Log Session"
         description="Record a therapy session with unit tracking and authorization linking."

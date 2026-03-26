@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 import { requireAuth } from "@/lib/auth";
 import { hasClients } from "@/server/queries/clients";
-import { Button } from "@/components/ui/button";
 import { SectionErrorBoundary, SectionError } from "@/components/shared/section-error-boundary";
 import { DashboardMetrics, DashboardMetricsSkeleton } from "@/components/dashboard/dashboard-metrics";
 import { DashboardAlerts, DashboardAlertsSkeleton } from "@/components/dashboard/dashboard-alerts";
@@ -23,22 +21,12 @@ export default async function OverviewPage() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground text-xs">
-            Here&apos;s what needs attention today.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button asChild size="sm" className="text-xs">
-            <Link href="/sessions/new">Log Session</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline" className="text-xs">
-            <Link href="/clients/new">Add Client</Link>
-          </Button>
-        </div>
+      {/* Header — pure signal, no action buttons (actions live on their pages) */}
+      <div>
+        <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground text-xs">
+          Here&apos;s what needs attention today.
+        </p>
       </div>
 
       {/* Getting Started (new practice) */}

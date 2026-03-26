@@ -7,12 +7,41 @@ import { AuthorizationForm } from "./authorization-form";
 import { AuthSessionsCard } from "./auth-sessions-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UtilizationBar } from "@/components/shared/utilization-bar";
+import { ExpiryBadge } from "@/components/shared/expiry-badge";
+import { AuthStatusBadge } from "./auth-status-badge";
+import { EmptyState } from "@/components/shared/empty-state";
+import { formatDate } from "@/lib/utils";
+import { FileValidationIcon } from "@hugeicons/core-free-icons";
 import {
   ABA_CPT_CODES,
   type CptCode,
   SERVICE_FREQUENCY_LABELS,
   type ServiceFrequency,
 } from "@/lib/constants";
+
+// ── Shared layout components ─────────────────────────────────────────────────
+
+function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between border-b border-border/40 py-1.5 last:border-0">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-xs font-medium">{value}</span>
+    </div>
+  );
+}
+
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="border-b border-border/60 bg-muted/20 px-4 py-2.5">
+        <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">{title}</span>
+      </div>
+      <div className="p-4">{children}</div>
+    </div>
+  );
+}
+
+// ── Main component ───────────────────────────────────────────────────────────
 
 export function AuthorizationDetail({
   authorization,
@@ -36,65 +65,98 @@ export function AuthorizationDetail({
         <TabsTrigger value="services">Service Lines</TabsTrigger>
         <TabsTrigger value="sessions">Sessions</TabsTrigger>
         <TabsTrigger value="documents">Documents</TabsTrigger>
+        {canEdit && <TabsTrigger value="edit">Edit</TabsTrigger>}
       </TabsList>
 
-      <TabsContent value="overview" className="pt-4">
-        <AuthorizationForm
-          authorization={authorization}
-          clientOptions={clientOptions}
-          insuranceOptions={insuranceOptions}
-          authorizationOptions={authorizationOptions}
-          disabled={!canEdit}
-        />
+      {/* Overview — read-only KV display (not a form) */}
+      <TabsContent value="overview" className="space-y-4 pt-4">
+        <SectionCard title="Authorization Details">
+          <KVRow label="Client" value={`${authorization.clientFirstName} ${authorization.clientLastName}`} />
+          <KVRow label="Payer" value={authorization.payerName} />
+          {authorization.authorizationNumber && (
+            <KVRow label="Auth #" value={<span className="font-mono tabular-nums">{authorization.authorizationNumber}</span>} />
+          )}
+          <KVRow label="Status" value={<AuthStatusBadge status={authorization.status} />} />
+          <KVRow label="Period" value={`${formatDate(authorization.startDate)} — ${formatDate(authorization.endDate)}`} />
+          <KVRow label="Expiry" value={<ExpiryBadge endDate={authorization.endDate} startDate={authorization.startDate} showFullDate />} />
+          {authorization.diagnosisCode && (
+            <KVRow label="Diagnosis" value={authorization.diagnosisCode} />
+          )}
+          {authorization.clientInsuranceMemberId && (
+            <KVRow label="Member ID" value={authorization.clientInsuranceMemberId} />
+          )}
+          {authorization.notes && (
+            <KVRow label="Notes" value={<span className="max-w-xs text-right">{authorization.notes}</span>} />
+          )}
+        </SectionCard>
       </TabsContent>
 
+      {/* Service Lines — per-CPT utilization bars */}
       <TabsContent value="services" className="pt-4">
         {authorization.services.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-muted-foreground text-xs">No service lines.</p>
-          </div>
+          <EmptyState
+            icon={FileValidationIcon}
+            title="No service lines"
+            description="Add service lines to track approved units per CPT code."
+          />
         ) : (
-          <div className="space-y-5">
-            {authorization.services.map((svc) => {
-              const meta = ABA_CPT_CODES[svc.cptCode as CptCode];
-              return (
-                <div key={svc.id} className="space-y-2">
-                  <UtilizationBar
-                    usedUnits={svc.usedUnits}
-                    approvedUnits={svc.approvedUnits}
-                    label={`${svc.cptCode}${meta ? ` — ${meta.description}` : ""}`}
-                  />
-                  <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
-                    {svc.frequency && (
-                      <span>
-                        Frequency: {SERVICE_FREQUENCY_LABELS[svc.frequency as ServiceFrequency] ?? svc.frequency}
-                      </span>
-                    )}
-                    {svc.maxUnitsPerDay != null && (
-                      <span>Max/day: <span className="tabular-nums">{svc.maxUnitsPerDay}</span></span>
-                    )}
-                    {svc.maxUnitsPerWeek != null && (
-                      <span>Max/week: <span className="tabular-nums">{svc.maxUnitsPerWeek}</span></span>
-                    )}
+          <SectionCard title="Service Lines">
+            <div className="space-y-5">
+              {authorization.services.map((svc) => {
+                const meta = ABA_CPT_CODES[svc.cptCode as CptCode];
+                return (
+                  <div key={svc.id} className="space-y-2">
+                    <UtilizationBar
+                      usedUnits={svc.usedUnits}
+                      approvedUnits={svc.approvedUnits}
+                      label={`${svc.cptCode}${meta ? ` — ${meta.description}` : ""}`}
+                    />
+                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
+                      {svc.frequency && (
+                        <span>
+                          Frequency: {SERVICE_FREQUENCY_LABELS[svc.frequency as ServiceFrequency] ?? svc.frequency}
+                        </span>
+                      )}
+                      {svc.maxUnitsPerDay != null && (
+                        <span>Max/day: <span className="tabular-nums">{svc.maxUnitsPerDay}</span></span>
+                      )}
+                      {svc.maxUnitsPerWeek != null && (
+                        <span>Max/week: <span className="tabular-nums">{svc.maxUnitsPerWeek}</span></span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </SectionCard>
         )}
       </TabsContent>
 
+      {/* Sessions */}
       <TabsContent value="sessions" className="pt-4">
         <AuthSessionsCard sessions={sessions} clientId={authorization.clientId} canEdit={canEdit} />
       </TabsContent>
 
+      {/* Documents */}
       <TabsContent value="documents" className="pt-4">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-muted-foreground text-xs">
-            Document management coming in a future sprint.
-          </p>
-        </div>
+        <EmptyState
+          icon={FileValidationIcon}
+          title="No documents"
+          description="Document management coming in a future update."
+        />
       </TabsContent>
+
+      {/* Edit — form (only for authorized roles) */}
+      {canEdit && (
+        <TabsContent value="edit" className="pt-4">
+          <AuthorizationForm
+            authorization={authorization}
+            clientOptions={clientOptions}
+            insuranceOptions={insuranceOptions}
+            authorizationOptions={authorizationOptions}
+          />
+        </TabsContent>
+      )}
     </Tabs>
   );
 }

@@ -63,7 +63,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       {/* Back link */}
       <Link
         href="/clients"
-        className="text-primary inline-flex items-center gap-1 text-[13px] hover:underline"
+        className="text-primary inline-flex items-center gap-1 text-xs hover:underline"
       >
         &larr; Back to Clients
       </Link>
@@ -71,7 +71,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       {/* Rich header — matching wireframe */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[22px] font-bold tracking-tight">
+          <h1 className="text-xl font-semibold tracking-tight">
             {client.firstName} {client.lastName}
           </h1>
           <div className="text-muted-foreground mt-0.5 text-[13px]">

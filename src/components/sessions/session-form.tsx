@@ -329,8 +329,11 @@ export function SessionForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
       {/* Section 1: Client & Provider */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-semibold">Client & Provider</h3>
+      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div className="border-b border-border/60 bg-muted/20 px-4 py-2.5">
+          <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Client & Provider</span>
+        </div>
+        <div className="space-y-4 p-4">
         <Field>
           <Label className="text-xs font-medium">Client</Label>
           <Controller
@@ -429,11 +432,15 @@ export function SessionForm({
             ensure one is assigned on the provider record.
           </p>
         )}
+        </div>
       </div>
 
       {/* Section 2: Session Details */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-semibold">Session Details</h3>
+      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div className="border-b border-border/60 bg-muted/20 px-4 py-2.5">
+          <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Session Details</span>
+        </div>
+        <div className="space-y-4 p-4">
         <div className="grid grid-cols-3 gap-4">
           <Field>
             <Label className="text-xs font-medium">Date</Label>
@@ -559,6 +566,7 @@ export function SessionForm({
             )}
           </div>
         )}
+        </div>
       </div>
 
       {/* Section 3: Authorization Check */}
@@ -693,11 +701,15 @@ export function SessionForm({
       )}
 
       {/* Section 4: Notes */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-semibold">Notes</h3>
-        <Field>
-          <Textarea {...register("notes")} className="text-xs" />
-        </Field>
+      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div className="border-b border-border/60 bg-muted/20 px-4 py-2.5">
+          <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Notes</span>
+        </div>
+        <div className="p-4">
+          <Field>
+            <Textarea {...register("notes")} className="text-xs" />
+          </Field>
+        </div>
       </div>
 
       <div className="flex gap-2 pt-2">

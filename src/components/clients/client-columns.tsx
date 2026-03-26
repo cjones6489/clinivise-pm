@@ -15,17 +15,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_VARIANT } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
-
-function calculateAge(dateOfBirth: string): number {
-  const today = new Date();
-  const dob = new Date(dateOfBirth);
-  let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  return age;
-}
+import { differenceInYears } from "date-fns";
 
 export function getClientColumns(opts: {
   onView: (client: ClientWithBcba) => void;
@@ -38,24 +28,19 @@ export function getClientColumns(opts: {
       header: "Client",
       cell: ({ row }) => {
         const { firstName, lastName, dateOfBirth, diagnosisCode } = row.original;
+        const age = differenceInYears(new Date(), new Date(dateOfBirth));
         return (
           <div>
             <div className="font-medium">
               {firstName} {lastName}
             </div>
             <div className="text-muted-foreground text-[11px]">
-              DOB: {formatDate(dateOfBirth)} · {diagnosisCode ?? "F84.0"}
+              DOB: {formatDate(dateOfBirth)} · Age {age}
+              {diagnosisCode && <> · {diagnosisCode}</>}
             </div>
           </div>
         );
       },
-    },
-    {
-      id: "age",
-      header: "Age",
-      cell: ({ row }) => (
-        <span className="tabular-nums">{calculateAge(row.original.dateOfBirth)}</span>
-      ),
     },
     {
       accessorKey: "status",
@@ -86,7 +71,9 @@ export function getClientColumns(opts: {
       id: "actions",
       header: "",
       cell: ({ row }) => (
-        <div className="flex items-center justify-end">
+        // Stop propagation to prevent row click from firing
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-7 w-7">
