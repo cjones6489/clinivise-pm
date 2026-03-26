@@ -27,6 +27,7 @@
 | Phase 0 | Stabilize — seed data, domain errors, timezone-safe session parsing |
 | Phase 1A | Session Logging — billing compliance fixes (required times, CPT-credential blocking, FOR UPDATE lock), session list (metric cards, server-side filters, filter tabs), session form (auto-calc card, auth check card, status-conditional fields), session detail sheet. 263 tests. 10 audit findings fixed. |
 | Phase 1B | Auth Intelligence — shared UtilizationBar (role="meter", a11y, over-utilization) + ExpiryBadge, auth list (metrics query, filter tabs, compact bars, expiry badges), client detail overview (per-CPT bars, auth badge, action buttons, under-utilization detection, new query), auth detail (rich header card, per-service bars, expiry alert banner). 263 tests. 14+ audit findings fixed. |
+| Phase 1C | Dashboard — 3 SQL queries (metrics, alerts, client overview) with FILTER/coalesce/nullif replacing client-side computation. Suspense decomposition (3 async server components + ErrorBoundary + skeleton loaders). Alert aggregation (anti-fatigue grouping), urgency-sorted client overview with needs-attention/on-track split, "everything is fine" state, Hours This Week metric. 263 tests. 10+ audit findings fixed. |
 
 ---
 
@@ -917,5 +918,5 @@ Key findings incorporated into the plan:
 *Created: 2026-03-25*
 *Reviewed: 2026-03-25 — 11 architectural findings, 5 industry research dives*
 *Updated: 2026-03-25 — Incorporated Phase 1 implementation research (60+ sources, 14 architecture decisions, 7 research findings)*
-*Updated: 2026-03-25 — Phase 1A (Session Logging) complete + audited. Phase 1B (Auth Intelligence) complete + audited. 263 tests, all passing.*
-*Status: Phase 0 done. Phase 1A done. Phase 1B done. Next: Phase 1C (Dashboard).*
+*Updated: 2026-03-25 — Phase 1A (Session Logging) complete + audited. Phase 1B (Auth Intelligence) complete + audited. Phase 1C (Dashboard) complete + audited. 263 tests, all passing.*
+*Status: Phase 0 done. Phase 1A done. Phase 1B done. Phase 1C done. Phase 1-Core complete. Next: Phase 1D (Integration & Fixes).*

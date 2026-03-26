@@ -261,23 +261,27 @@ Key fixes applied across all audit rounds:
 | +   | Status-conditional fields (time/auth hidden for cancelled/no_show, clear values on status change) | `src/components/sessions/session-form.tsx` | `[x]` |
 | +   | Shared MetricCard + DataTable onRowClick prop | `src/components/shared/metric-card.tsx`, `data-table.tsx` | `[x]` |
 
-### 3B — Dashboard + Auth Intelligence (Phase 1C — next)
+### 3B — Dashboard + Auth Intelligence (completed — Phase 1C)
 
-> Dashboard overview AND the auth intelligence features that depend on session history. Partially complete: under-utilization detection built in 1B-3, dashboard-view exists with basic metrics. Phase 1C will add Suspense boundaries, per-section error boundaries, alert fatigue prevention, and urgency-sorted client overview.
+> Built as Phase 1C (3 sub-sprints, 6 commits, 10+ audit findings fixed). Replaced 462-line client-side dashboard with async server components + Suspense + SQL aggregation.
 
 | #   | Task | Files | Status |
 | --- | ---- | ----- | ------ |
 | 97  | Schema migration: add `ratePerUnit` (numeric 10,2, nullable) to `authorization_services` | `drizzle/` | `[—]` deferred to Phase 2 |
-| 98  | Dashboard overview page (Suspense streaming, staggered boundaries, ErrorBoundary per section) | `src/app/(dashboard)/overview/page.tsx` | `[ ]` |
-| 99  | Metrics cards (active clients, avg utilization, hours this week, action items) | `src/components/dashboard/dashboard-view.tsx` | `[~]` basic version exists |
-| 100 | Priority alerts card (expiring auths, high utilization, expired credentials, max 3-5 visible, aggregate similar) | `src/components/dashboard/dashboard-view.tsx` | `[~]` basic version exists |
-| 101 | Client overview table (urgency-sorted, utilization bars, expiry badges, clickable rows) | `src/components/dashboard/dashboard-view.tsx` | `[~]` basic version exists |
-| 102 | Dashboard read queries (SQL aggregation with FILTER/coalesce/nullif, not JS computation) | `src/server/queries/dashboard.ts` | `[ ]` |
-| 103 | Getting Started card (new practice onboarding: add provider → add client → add auth) | `src/components/dashboard/dashboard-view.tsx` | `[~]` basic version exists |
+| 98  | Dashboard overview page (3 Suspense boundaries, ErrorBoundary per section, lightweight hasClients check) | `src/app/(dashboard)/overview/page.tsx` | `[x]` |
+| 99  | Metrics cards (active clients, avg utilization, hours this week, action items — SQL FILTER aggregation) | `src/components/dashboard/dashboard-metrics.tsx` | `[x]` |
+| 100 | Priority alerts card (aggregated by type+severity, max 5 visible groups, "everything is fine" state, AHRQ anti-fatigue) | `src/components/dashboard/dashboard-alerts.tsx` | `[x]` |
+| 101 | Client overview table (urgency-scored, needs-attention/on-track split, UtilizationBar compact + ExpiryBadge, clickable rows) | `src/components/dashboard/dashboard-clients.tsx` | `[x]` |
+| 102 | Dashboard read queries (getDashboardMetrics, getDashboardAlerts, getClientOverviewForDashboard — Promise.all parallel) | `src/server/queries/dashboard.ts` | `[x]` |
+| 103 | Getting Started card (extracted to standalone component) | `src/components/dashboard/getting-started-card.tsx` | `[x]` |
 | 104 | Predictive burndown on auth detail ("At current pace, exhausts on [date]") | `src/components/authorizations/auth-detail.tsx` | `[—]` Phase 1-Polish |
 | 105 | Under-utilization pacing alert (<50% used with >50% period elapsed) | `src/components/clients/client-overview.tsx` | `[x]` built in Phase 1B-3 |
 | 106 | Revenue-at-risk calculation ((approved - used) × ratePerUnit for auths expiring within 30d) | `src/server/queries/dashboard.ts` | `[—]` Phase 2 (needs fee schedule) |
 | 107 | Auth health composite score (utilization pacing + expiry proximity + gap risk) | `src/server/queries/authorization-alerts.ts` | `[—]` Phase 2+ (needs validation) |
+| +   | SectionErrorBoundary shared component (class component, componentDidCatch logging) | `src/components/shared/section-error-boundary.tsx` | `[x]` |
+| +   | Skeleton loaders (metrics, alerts, clients — content-shaped placeholders) | `src/components/dashboard/*.tsx` | `[x]` |
+| +   | Deleted 462-line monolithic dashboard-view.tsx (replaced by 3 async server components) | — | `[x]` |
+| +   | hasClients lightweight query (SELECT 1 LIMIT 1, doesn't block Suspense streaming) | `src/server/queries/clients.ts` | `[x]` |
 
 ---
 
@@ -410,4 +414,4 @@ Key fixes applied across all audit rounds:
 
 ---
 
-_Last updated: 2026-03-25 — Phase 0 + Phase 1A (Sessions) + Phase 1B (Auth Intelligence) complete. 263 tests passing. Next: Phase 1C (Dashboard)._
+_Last updated: 2026-03-25 — Phase 0 + Phase 1A (Sessions) + Phase 1B (Auth Intelligence) + Phase 1C (Dashboard) complete. Phase 1-Core done. 263 tests passing. Next: Phase 1D (Integration & Fixes)._
