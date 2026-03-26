@@ -637,29 +637,88 @@ Tests:
 - [ ] Onboard 2-3 pilot practices
 - [ ] Gather feedback on the core workflow (session logging speed, auth visibility, dashboard usefulness)
 
-### Settings Completion
+### Navigation Restructuring
+
+> Move Payers out of Settings to its own page. Create Team page. Rebuild Settings as Practice Info + Profile. Based on competitor research (SimplePractice, CentralReach, AlohaABA) and SaaS best practices.
+
+**Sidebar nav update** (`src/components/layout/sidebar-nav.ts`):
+```
+── Core (daily use, all roles) ──
+   Dashboard        /overview
+   Clients          /clients
+   Sessions         /sessions
+   Authorizations   /authorizations
+
+── Management (setup, admin/bcba) ──
+   Providers        /providers
+   Payers           /payers  (moved from Settings)
+
+── Admin (owner/admin only) ──
+   Team             /team   (new)
+   Settings         /settings (rebuilt)
+```
+
+#### 2A — Payers Page (`/payers`)
+
+> Move existing payer CRUD from Settings to its own top-level page. Payers are practice configuration data referenced by insurance policies, authorizations, and claims — they don't belong in account settings.
+
+- [ ] Create `/payers` route with PageHeader, existing PayerTable, "Add Payer" button
+- [ ] Move `PayersSettings` component content to new page (no logic changes, just relocation)
+- [ ] Update sidebar nav: add Payers item with roles `["owner", "admin", "billing_staff"]`
+- [ ] Remove Payers tab from Settings page
+
+#### 2B — Team Page (`/team`)
+
+> Team member management with ABA-specific role assignment. Clerk handles auth/invite, we handle role display and assignment.
+
+- [ ] Create `/team` route (owner/admin only)
+- [ ] **Members list**: table showing name, email, role badge (Owner/Admin/BCBA/BCaBA/RBT/Billing Staff), last active date. Data from our `users` table joined with Clerk user metadata.
+- [ ] **Invite member**: Clerk `<OrganizationProfile>` component for invite flow (handles email invite, org membership)
+- [ ] **Change role**: dropdown per member row to reassign ABA-specific role. Updates our `users.role` field. Owner/admin only.
+- [ ] **Role descriptions**: tooltip or info section explaining what each role can access (from `src/lib/permissions.ts` permission map)
+- [ ] Update sidebar nav: add Team item with roles `["owner", "admin"]`
+
+#### 2C — Settings Page Rebuild (`/settings`)
 
 > **Decision**: Display-first UI (key-value pairs) with "Edit" button. Progressive disclosure: practice name + timezone minimum, NPI/Tax ID as "Complete your billing profile" soft nudge. See [Architecture Decision #10](#architecture-decisions-reference).
 
-Backend:
+**Practice Info tab** (display-first, "Edit" button opens form):
+- [ ] `getOrganization(orgId)` query — org record with all fields
 - [ ] `updateOrganizationSchema` — Zod validator with NPI Luhn check digit (80840 prefix algorithm), Tax ID format (`/^\d{2}-?\d{7}$/`), taxonomy code from curated ABA dropdown, timezone from IANA list
-- [ ] `updateOrganization` action — owner/admin only via permissions map, audit log for billing-critical fields (NPI, Tax ID, taxonomy)
-- [ ] `getOrganization(orgId)` query — for pre-filling the settings form
-- [ ] `isValidNpi(npi)` utility — Luhn algorithm with `80840` prefix in `src/lib/utils.ts`
+- [ ] `updateOrganization` action — owner/admin only, audit log for billing-critical fields
+- [ ] `isValidNpi(npi)` utility — Luhn algorithm with `80840` prefix
+- [ ] KV pair display: Practice Name, Timezone, NPI, Tax ID, Taxonomy Code, Address, Phone
+- [ ] "Complete your billing profile" soft nudge when NPI/Tax ID empty
+- [ ] NPI inline validation on edit: "Invalid NPI — check digit does not match"
 
-Frontend:
-- [ ] **Organization tab**: display-first as key-value pairs, "Edit" button opens form. NPI inline validation: "Invalid NPI — check digit does not match." Taxonomy code as curated dropdown. "Complete your billing profile" nudge for empty NPI/Tax ID.
-- [ ] **Team tab**: Embed Clerk `<OrganizationProfile>` component
-- [ ] **Payers tab**: Already built — verify design quality
-- [ ] **Billing tab**: Phase 2 stub with "Coming soon" message
+**Profile tab** (Clerk `<UserProfile>` component):
+- [ ] Embed Clerk `<UserProfile>` — handles name, email, password, 2FA
+- [ ] Minimal wrapper with consistent page styling
 
 Tests:
 - [ ] NPI Luhn validation: valid NPIs pass, transposed digits fail, non-10-digit rejected
 - [ ] Non-owner/admin role cannot update org settings
+- [ ] Non-owner/admin cannot access Team page
 
 Phase 2+ noted:
 - [ ] NPPES registry lookup ("Verify against NPPES" button, advisory not blocking)
 - [ ] Confirmation dialog for NPI/Tax ID changes when claims exist
+
+### Design Quality Pass — COMPLETE
+
+> Applied design system standards across all pages in Design Passes 1-4.
+
+- [x] PageHeader typography standardized (text-lg font-semibold, text-xs description)
+- [x] All section cards with title bars (session form, auth detail, client overview)
+- [x] MetricCard font-semibold, all metric cards consistent
+- [x] Breadcrumbs on all detail pages
+- [x] Client list: rich table rows with inline age + diagnosis
+- [x] Client detail: 2-card overview grid, read-only auth KV display
+- [x] Auth list: utilization bars, expiry badges, period + days left columns
+- [x] Auth detail: rich header card, metric cards, per-service utilization bars, read-only overview + edit tab
+- [x] Dashboard: no action buttons, payer column, urgency-sorted clients, alert aggregation
+- [x] All dark mode variants applied, tracking-wider standardized
+- [x] Non-functional search bar removed
 
 ### Cmd+K Command Palette
 
@@ -669,16 +728,6 @@ Phase 2+ noted:
 - [ ] Fuzzy match on entity names, prioritize exact prefix matches
 - [ ] Results show entity type icon + name + subtitle
 - [ ] Available on every page via `Cmd+K` / `Ctrl+K`
-
-### Design Quality Pass
-
-> Apply design system standards to all existing pages.
-
-- [ ] **Client list**: rich table rows (name bold + DOB + diagnosis muted), guardian column, auth utilization mini-bar inline, days remaining badge
-- [ ] **Provider detail**: overview as key-value pairs first (not form-first), edit behind a button/tab
-- [ ] **Provider list**: add supervisor column, match visual quality standards
-- [ ] **Client detail header**: sticky banner with name, DOB/Age/Diagnosis, Guardian, status badges, action buttons
-- [ ] **All pages**: verify section cards with title bars, metric cards where appropriate, contextual action buttons, three tiers of visual hierarchy
 
 ### Audit Logging Completion
 
@@ -690,11 +739,11 @@ Phase 2+ noted:
 
 > Depends on fee schedule data. Shows when rate data exists, gracefully degrades when it doesn't. See [Architecture Decision #7](#architecture-decisions-reference).
 
-- [ ] Add optional rate-per-CPT-per-payer fields to payer management in Settings (lightweight fee schedule)
+- [ ] Add optional rate-per-CPT-per-payer fields to Payers page (lightweight fee schedule)
 - [ ] Revenue-at-risk calculation: `(approved_units - used_units) * rate_per_unit` for auths expiring within 30d
 - [ ] JOIN authorization services → client insurance → payer → rate data
 - [ ] Dashboard widget: "Revenue at risk: ${amount}" — only shows when rate data exists
-- [ ] Auth detail: per-service-line dollar value of unused units. Shows "Add rates in Settings → Payers to see revenue projections" when rate data is missing.
+- [ ] Auth detail: per-service-line dollar value of unused units. Shows "Add rates in Payers to see revenue projections" when rate data is missing.
 
 ---
 
