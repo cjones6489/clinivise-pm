@@ -59,6 +59,7 @@ export function ClientDetail({
           contacts={contacts}
           insurance={insurance}
           authorizations={authorizations}
+          sessions={sessions}
           bcbaName={bcbaName}
           authUtilization={authUtilization}
         />

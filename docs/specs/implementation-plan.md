@@ -567,14 +567,17 @@ File: `src/server/actions/sessions.ts` (in `createSession` transaction, before u
 
 > Wire everything together.
 
-- [ ] Client detail: wire **Sessions tab** (filtered session table + "Log Session" button)
-- [ ] Auth detail: wire **Sessions tab** (sessions logged against this auth)
-- [ ] Auth detail: show impact of sessions on utilization (used_units reflects logged sessions)
-- [ ] Client detail Overview tab: wire Recent Sessions with real data (Suspense boundary 3)
-- [ ] Fix dashboard age calculation (use `differenceInYears` from date-fns, not year subtraction)
-- [ ] Batch authorization service inserts (single `tx.insert(...).values(services.map(...))`)
+Already done (built during earlier sprints):
+- [x] Client detail: wire **Sessions tab** (filtered session table + "Log Session" button) — Sprint 2D-1
+- [x] Auth detail: wire **Sessions tab** (sessions logged against this auth) — Sprint 2D-1
+- [x] Auth detail: show impact of sessions on utilization (used_units reflects logged sessions) — Phase 1B-4
+- [x] Fix dashboard age calculation (use `differenceInYears` from date-fns, not year subtraction) — Phase 1C-2
+- [x] Batch authorization service inserts (single `tx.insert(...).values(services.map(...))`) — Sprint 2D-1
 
-Tests:
+Remaining:
+- [ ] Client detail Overview tab: **Recent Sessions** compact table (last 5 sessions) below Authorized Services. Shows date, CPT, provider, units, status badge. Empty state: "No sessions yet. Log your first session →". Links to Sessions tab for full list.
+
+Tests (E2E — deferred to Phase 4 per roadmap, underlying logic covered by 263 unit tests):
 - [ ] E2E flow: log a session → verify auth used_units incremented → verify session appears in list and client detail
 - [ ] Edge case: log session with no matching auth → session created as "flagged"
 - [ ] Edge case: cancel completed session → used_units decremented

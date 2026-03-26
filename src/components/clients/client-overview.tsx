@@ -1,13 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import type { Client, ClientContact, ClientInsuranceWithPayer } from "@/server/queries/clients";
 import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
+import type { SessionListItem } from "@/server/queries/sessions";
+import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import {
   CONTACT_RELATIONSHIP_LABELS,
+  CREDENTIAL_LABELS,
   PAYER_TYPE_LABELS,
   ABA_CPT_CODES,
   AUTH_ALERT_THRESHOLDS,
   type ContactRelationshipType,
+  type CredentialType,
   type PayerType,
   type CptCode,
 } from "@/lib/constants";
@@ -52,6 +57,7 @@ export function ClientOverview({
   contacts,
   insurance,
   authorizations,
+  sessions,
   bcbaName,
   authUtilization,
 }: {
@@ -59,6 +65,7 @@ export function ClientOverview({
   contacts: ClientContact[];
   insurance: ClientInsuranceWithPayer[];
   authorizations: AuthorizationListItem[];
+  sessions: SessionListItem[];
   bcbaName: string | null;
   authUtilization: ClientAuthUtilization | null;
 }) {
@@ -275,6 +282,55 @@ export function ClientOverview({
                 ? "No authorizations on file. Add one to start tracking utilization."
                 : "No active authorization found for today's date."}
             </p>
+          </div>
+        )}
+      </SectionCard>
+
+      {/* Recent Sessions — last 5 */}
+      <SectionCard
+        title="Recent Sessions"
+        action={
+          sessions.length > 0 ? (
+            <Link href={`/clients/${client.id}`} className="text-xs text-primary hover:underline">
+              All sessions &rarr;
+            </Link>
+          ) : undefined
+        }
+      >
+        {sessions.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-border border-b">
+                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Date</th>
+                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">CPT</th>
+                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Provider</th>
+                  <th className="px-2 py-1.5 text-right font-medium text-muted-foreground">Units</th>
+                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sessions.slice(0, 5).map((s) => (
+                  <tr key={s.id} className="border-border border-b last:border-0">
+                    <td className="px-2 py-1.5 tabular-nums">{formatDate(s.sessionDate)}</td>
+                    <td className="px-2 py-1.5 font-medium tabular-nums">{s.cptCode}</td>
+                    <td className="px-2 py-1.5 text-muted-foreground">
+                      {s.providerLastName}, {s.providerFirstName}{" "}
+                      <span className="text-[11px]">({CREDENTIAL_LABELS[s.providerCredentialType as CredentialType] ?? s.providerCredentialType})</span>
+                    </td>
+                    <td className="px-2 py-1.5 text-right tabular-nums">{s.units}</td>
+                    <td className="px-2 py-1.5"><SessionStatusBadge status={s.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <p className="text-xs text-muted-foreground">No sessions yet.</p>
+            <Link href={`/sessions/new?clientId=${client.id}`} className="mt-1 text-xs text-primary hover:underline">
+              Log your first session &rarr;
+            </Link>
           </div>
         )}
       </SectionCard>
