@@ -446,6 +446,58 @@ Comprehensive verification of unit calculations, modifier codes, and payer-speci
 | TRICARE | `ama` | Rule of Eights (per-code) |
 | Strict Medicaid (AR, etc.) | `full_unit` | State-specific |
 
+### Session Validation Rules (from 2026-03-26 research)
+
+Multi-agent research across CMS documentation, ABA Coding Coalition, Optum/UHC policies, state Medicaid manuals, and ABA billing practitioner forums. Key finding: **most proposed "universal" rules are actually payer-specific or warnings, not hard blocks.**
+
+**Design principle: Session logging captures what actually happened. Never block session creation for billing issues — that hides the problem. Warn at session creation, hard-block at claim generation.**
+
+**Hard Blocks (prevent session save — truly universal, no exceptions):**
+
+| Rule | Why Universal |
+|------|-------------|
+| Same provider, overlapping 1:1 sessions (different clients) | Fraud indicator — physically impossible. "Impossible day" pattern is primary OIG audit target |
+| RBT billing QHP-only CPT codes (97151, 97155-97158) | Embedded in CPT code definitions by the AMA. No state/payer exception exists. BACB scope of practice prohibits it |
+
+**Warnings (show alert at session creation, allow save, flag for billing review):**
+
+| Rule | Classification | Why Not a Block |
+|------|---------------|-----------------|
+| Session date outside auth date range | Universal Warning | Retroactive authorizations exist (0-90 days depending on payer). Practice may attach auth later |
+| Max units/day (MUE) exceeded | Universal Warning | All ABA CPT codes have MAI=3 (appealable, not absolute). Pre-authorized amounts override MUEs. MUE values vary by payer |
+| Missing supervisor for RBT sessions | Universal Warning | Depends on billing model (3 models exist — see below). Supervisor can be assigned before claim generation |
+| Expired provider credentials | Universal Warning | BACB has 30-day renewal grace period. Practice may be mid-renewal process |
+| BCaBA billing QHP codes | Payer-Specific | BCaBAs ARE considered QHPs by some payers/states (e.g., Virginia DMAS, some BCBS). Configurable, not blockable |
+| Concurrent BCBA + RBT same client (97155 + 97153) | Allowed | CPT 97155 description explicitly includes "simultaneous direction of technician" |
+| Group codes (97154, 97157, 97158) overlapping | Allowed | Group codes by definition serve 2-8 clients simultaneously |
+
+**Hard Blocks at Claim Generation (Phase 2 — prevent claim submission, not session logging):**
+
+| Rule | Why Block at Claim |
+|------|-------------------|
+| Session date outside auth date range (no retro-auth flag) | Claim will be auto-denied |
+| Missing supervisor for RBT session (when payer requires it) | Claim will be denied — payer-specific |
+| Expired credentials on date of service | Recoupment risk if discovered in audit |
+
+**Three RBT Billing Models (payer-specific — affects supervisor requirements):**
+
+| Model | Rendering Provider (Box 24J) | Supervisor (Box 17) | Used By |
+|-------|------------------------------|---------------------|---------|
+| A (most common) | BCBA's NPI | Empty — BCBA IS the renderer | Most commercial (Aetna, Cigna, many BCBS) |
+| B | RBT's NPI | BCBA with DQ qualifier | TRICARE, some Medicaid, some BCBS |
+| C | RBT's NPI (group billing) | Payer-dependent | Larger practices, some Medicaid |
+
+**Key insight:** Under Model A (most small practices), the RBT is invisible on the claim. There is no "supervisor" field because the BCBA IS the rendering provider. The supervision relationship is documented in clinical records, not on the claim form. Optum/UHC explicitly states their supervisory services reimbursement policy does NOT apply to ABA services.
+
+**BACB supervision (5% monthly hours) is a CERTIFICATION requirement, NOT a billing/claim requirement.** These are completely separate systems. A practice can be BACB-compliant on supervision while having zero supervisor fields on claims (Model A), and vice versa.
+
+**Correction needed in codebase:** `QHP_ONLY_CPT_CODES` currently hard-blocks BCaBAs. This should be a configurable warning — BCaBAs are QHPs in some jurisdictions. Safe default: warn for BCaBAs, block for RBTs.
+
+**Implementation plan (2-tier validation engine):**
+1. **Session creation:** Run all checks, show warnings inline, only hard-block the 2 universal rules
+2. **Billing readiness indicator:** Per-session status — green (clean), amber (warnings), red (will be blocked at claim generation)
+3. **Claim generation (Phase 2):** Hard-block on all payer-specific rules. Payer configuration drives which warnings become blocks.
+
 ### Care Team / Client-Provider Assignment (from 2026-03-26 research)
 
 Multi-agent competitive research across CentralReach, AlohaABA, Raven Health, Motivity, Healthie, SimplePractice, plus BACB supervision requirements and ABA practitioner forums.
