@@ -108,7 +108,7 @@ export const inviteMember = authActionClient
       // If deactivated, reactivate with new role
       await db
         .update(users)
-        .set({ role, status: "invited", isActive: true, invitedBy: ctx.userId, invitedAt: new Date() })
+        .set({ role, status: "invited", isActive: false, invitedBy: ctx.userId, invitedAt: new Date() })
         .where(and(eq(users.id, existing.id), eq(users.organizationId, ctx.organizationId)));
       memberId = existing.id;
     } else {

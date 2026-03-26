@@ -38,10 +38,12 @@ export async function POST(req: NextRequest) {
     if (eventType === "organization.updated") {
       const { id, name } = evt.data;
 
-      await db
-        .update(organizations)
-        .set({ name: name ?? undefined })
-        .where(eq(organizations.clerkOrgId, id));
+      if (name && id) {
+        await db
+          .update(organizations)
+          .set({ name })
+          .where(eq(organizations.clerkOrgId, id));
+      }
     }
 
     if (eventType === "organization.deleted") {
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest) {
         .where(eq(organizations.clerkOrgId, clerkOrgId))
         .limit(1);
 
-      if (!org) return new Response("Org not found", { status: 200 });
+      if (!org) return new Response("Org not found — will retry", { status: 500 });
 
       // Check if user already exists in this org (may have been pre-created via invite)
       const [existing] = await db
@@ -79,8 +81,8 @@ export async function POST(req: NextRequest) {
         .limit(1);
 
       if (existing) {
-        // Link their Clerk account if not already linked
-        if (!existing.clerkUserId) {
+        // Link their Clerk account if not already linked — but don't re-activate deactivated users
+        if (!existing.clerkUserId && existing.status !== "deactivated") {
           await db
             .update(users)
             .set({
@@ -156,8 +158,14 @@ export async function POST(req: NextRequest) {
     }
 
     return new Response("Webhook processed", { status: 200 });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Clerk webhook error:", err);
-    return new Response("Webhook verification failed", { status: 400 });
+    // Verification errors → 400 (don't retry). Processing errors → 500 (retry).
+    const isVerificationError =
+      err instanceof Error && (err.message.includes("verification") || err.message.includes("signature"));
+    return new Response(
+      isVerificationError ? "Webhook verification failed" : "Internal error",
+      { status: isVerificationError ? 400 : 500 },
+    );
   }
 }

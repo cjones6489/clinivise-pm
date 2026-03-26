@@ -40,6 +40,8 @@ async function autoProvision(clerkUserId: string, clerkOrgId: string) {
   // Check if user already exists (match by email + org for invited users)
   // Use primaryEmailAddress (Clerk's designated primary), not emailAddresses[0] (creation order)
   const email = (clerkUser.primaryEmailAddress?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress ?? "").toLowerCase();
+  if (!email) return null; // No email = can't provision
+
   let [user] = await db
     .select()
     .from(users)
@@ -47,6 +49,9 @@ async function autoProvision(clerkUserId: string, clerkOrgId: string) {
     .limit(1);
 
   if (user) {
+    // Deactivated users must be re-invited by an admin — don't auto-reactivate
+    if (user.status === "deactivated") return null;
+
     // Link invited user to their Clerk account and activate
     if (!user.clerkUserId || user.status === "invited") {
       await db
@@ -120,6 +125,9 @@ export async function getCurrentUser() {
     // New org — auto-provision on first sign-in
     return autoProvision(userId, orgId);
   }
+
+  // Block access to deactivated orgs
+  if (!org.isActive) return null;
 
   // Look up user by Clerk ID
   const [user] = await db
