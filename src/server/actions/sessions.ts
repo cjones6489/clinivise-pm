@@ -478,27 +478,31 @@ export const cancelSession = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     requirePermission(ctx.userRole, "sessions.cancel");
 
-    const [existing] = await db
-      .select()
-      .from(sessions)
-      .where(and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)))
-      .limit(1);
+    // Entire cancel operation inside transaction with FOR UPDATE on session row
+    // to prevent TOCTOU race between reading existing state and applying cancel
+    const existing = await db.transaction(async (tx) => {
+      // Lock session row to serialize concurrent cancel/edit operations
+      const [session] = await tx
+        .select()
+        .from(sessions)
+        .where(and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)))
+        .for("update")
+        .limit(1);
 
-    if (!existing) throw new NotFoundError("Session");
+      if (!session) throw new NotFoundError("Session");
 
-    // Validate transition
-    if (!isValidStatusTransition(existing.status, "cancelled")) {
-      throw new ConflictError("Invalid status transition");
-    }
+      // Validate transition with current (locked) state
+      if (!isValidStatusTransition(session.status, "cancelled")) {
+        throw new ConflictError("Invalid status transition");
+      }
 
-    const cancelOp = computeCancelAccountingOps(
-      existing.status,
-      existing.authorizationServiceId,
-      existing.units,
-    );
+      const cancelOp = computeCancelAccountingOps(
+        session.status,
+        session.authorizationServiceId,
+        session.units,
+      );
 
-    await db.transaction(async (tx) => {
-      // Lock auth service row to prevent concurrent modification
+      // Lock and decrement auth service units
       if (cancelOp.type === "decrement") {
         await tx
           .select({ id: authorizationServices.id })
@@ -525,26 +529,23 @@ export const cancelSession = authActionClient
         }
       }
 
-      const [cancelledRow] = await tx
+      // Update session status
+      await tx
         .update(sessions)
         .set({
           status: "cancelled",
           notes: parsedInput.reason
-            ? `${existing.notes ? existing.notes + "\n" : ""}Cancellation reason: ${parsedInput.reason}`
-            : existing.notes,
+            ? `${session.notes ? session.notes + "\n" : ""}Cancellation reason: ${parsedInput.reason}`
+            : session.notes,
         })
         .where(
           and(
             eq(sessions.id, parsedInput.id),
             eq(sessions.organizationId, ctx.organizationId),
-            eq(sessions.updatedAt, existing.updatedAt),
           ),
-        )
-        .returning({ id: sessions.id });
+        );
 
-      if (!cancelledRow) {
-        throw new StaleDataError();
-      }
+      return session;
     });
 
     await logAudit({

@@ -6,8 +6,10 @@ import {
   date,
   integer,
   numeric,
+  check,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";
 import { clients, clientInsurance } from "./clients";
@@ -91,5 +93,6 @@ export const authorizationServices = pgTable(
     index("auth_services_org_idx").on(table.organizationId),
     index("auth_services_auth_idx").on(table.authorizationId),
     index("auth_services_cpt_idx").on(table.authorizationId, table.cptCode),
+    check("used_units_non_negative", sql`${table.usedUnits} >= 0`),
   ],
 );

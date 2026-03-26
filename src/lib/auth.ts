@@ -77,26 +77,38 @@ async function autoProvision(clerkUserId: string, clerkOrgId: string) {
     return user ?? null;
   }
 
-  // Create new user — first user in org gets owner role
-  const [memberCount] = await db
-    .select({ count: count() })
-    .from(users)
-    .where(eq(users.organizationId, org.id));
+  // Create new user in a transaction with FOR UPDATE on org to prevent
+  // race condition where two simultaneous first-users both get "owner" role
+  [user] = await db.transaction(async (tx) => {
+    // Lock the org row to serialize concurrent first-user creation
+    await tx
+      .select({ id: organizations.id })
+      .from(organizations)
+      .where(eq(organizations.id, org.id))
+      .for("update");
 
-  const isFirstUser = (memberCount?.count ?? 0) === 0;
+    const [memberCount] = await tx
+      .select({ count: count() })
+      .from(users)
+      .where(eq(users.organizationId, org.id));
 
-  [user] = await db
-    .insert(users)
-    .values({
-      clerkUserId,
-      organizationId: org.id,
-      email,
-      firstName: clerkUser.firstName ?? null,
-      lastName: clerkUser.lastName ?? null,
-      role: isFirstUser ? "owner" : "rbt",
-      status: "active",
-    })
-    .returning();
+    const isFirstUser = (memberCount?.count ?? 0) === 0;
+
+    const [newUser] = await tx
+      .insert(users)
+      .values({
+        clerkUserId,
+        organizationId: org.id,
+        email,
+        firstName: clerkUser.firstName ?? null,
+        lastName: clerkUser.lastName ?? null,
+        role: isFirstUser ? "owner" : "rbt",
+        status: "active",
+      })
+      .returning();
+
+    return [newUser];
+  });
 
   return user ?? null;
 }

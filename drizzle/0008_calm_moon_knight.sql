@@ -1,0 +1,1 @@
+ALTER TABLE "authorization_services" ADD CONSTRAINT "used_units_non_negative" CHECK ("authorization_services"."used_units" >= 0);
