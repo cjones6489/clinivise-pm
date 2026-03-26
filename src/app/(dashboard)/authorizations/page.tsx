@@ -11,12 +11,11 @@ import { Button } from "@/components/ui/button";
 import { FileValidationIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
+import { hasPermission } from "@/lib/permissions";
 
 export const metadata: Metadata = {
   title: "Authorizations | Clinivise",
 };
-
-const WRITE_ROLES = ["owner", "admin", "bcba"];
 
 type FilterTab = "all" | "active" | "expiring" | "expired" | "pending";
 
@@ -40,7 +39,7 @@ export default async function AuthorizationsPage({
 }) {
   const { filter: filterParam } = await searchParams;
   const user = await requireAuth();
-  const canCreate = WRITE_ROLES.includes(user.role);
+  const canCreate = hasPermission(user.role, "authorizations.write");
   const validKeys = FILTER_TABS.map((t) => t.key);
   const activeTab = validKeys.includes(filterParam as FilterTab) ? (filterParam as FilterTab) : "all";
   const filters = getFiltersForTab(activeTab);

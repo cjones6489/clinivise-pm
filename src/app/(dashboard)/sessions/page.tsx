@@ -10,12 +10,11 @@ import { SessionTable } from "@/components/sessions/session-table";
 import { Button } from "@/components/ui/button";
 import { Clock01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 export const metadata: Metadata = {
   title: "Sessions | Clinivise",
 };
-
-const WRITE_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt"];
 
 type FilterTab = "all" | "week" | "flagged";
 
@@ -45,7 +44,7 @@ export default async function SessionsPage({
 }) {
   const { page: pageParam, filter: filterParam } = await searchParams;
   const user = await requireAuth();
-  const canCreate = WRITE_ROLES.includes(user.role);
+  const canCreate = hasPermission(user.role, "sessions.write");
   const page = Math.max(0, parseInt(pageParam ?? "0", 10) || 0);
   const activeTab = (["all", "week", "flagged"].includes(filterParam ?? "") ? filterParam : "all") as FilterTab;
   const filters = getFiltersForTab(activeTab);

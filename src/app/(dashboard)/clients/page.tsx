@@ -7,16 +7,15 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ClientTable } from "@/components/clients/client-table";
 import { Button } from "@/components/ui/button";
 import { UserMultipleIcon } from "@hugeicons/core-free-icons";
+import { hasPermission } from "@/lib/permissions";
 
 export const metadata: Metadata = {
   title: "Clients | Clinivise",
 };
 
-const WRITE_ROLES = ["owner", "admin", "bcba"];
-
 export default async function ClientsPage() {
   const user = await requireAuth();
-  const canCreate = WRITE_ROLES.includes(user.role);
+  const canCreate = hasPermission(user.role, "clients.write");
   const clients = await getClients(user.organizationId);
 
   return (

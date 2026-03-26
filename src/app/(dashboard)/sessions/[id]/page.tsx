@@ -9,17 +9,16 @@ import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { CREDENTIAL_LABELS, type CredentialType } from "@/lib/constants";
+import { hasPermission } from "@/lib/permissions";
 
 export const metadata: Metadata = {
   title: "Session | Clinivise",
 };
 
-const WRITE_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt"];
-
 export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await requireAuth();
-  const canEdit = WRITE_ROLES.includes(user.role);
+  const canEdit = hasPermission(user.role, "sessions.write");
 
   const session = await getSessionById(user.organizationId, id);
   if (!session) {

@@ -19,18 +19,17 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbS
 import { Badge } from "@/components/ui/badge";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_VARIANT, type ClientStatus } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 import { differenceInYears } from "date-fns";
 
 export const metadata: Metadata = {
   title: "Client | Clinivise",
 };
 
-const WRITE_ROLES = ["owner", "admin", "bcba"];
-
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await requireAuth();
-  const canEdit = WRITE_ROLES.includes(user.role);
+  const canEdit = hasPermission(user.role, "clients.write");
   const canManagePayers = ["owner", "admin"].includes(user.role);
 
   const [client, contacts, bcbaOptions, insurance, payerOptions, authorizations, sessions, authUtilization] =
@@ -111,14 +110,18 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      {/* Action buttons */}
+      {/* Action buttons — permission-gated */}
       <div className="flex items-center gap-2">
-        <Button asChild size="sm" className="text-xs">
-          <Link href={`/sessions/new?clientId=${id}`}>Log Session</Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="text-xs">
-          <Link href={`/authorizations/new?clientId=${id}`}>Add Authorization</Link>
-        </Button>
+        {hasPermission(user.role, "sessions.write") && (
+          <Button asChild size="sm" className="text-xs">
+            <Link href={`/sessions/new?clientId=${id}`}>Log Session</Link>
+          </Button>
+        )}
+        {hasPermission(user.role, "authorizations.write") && (
+          <Button asChild size="sm" variant="outline" className="text-xs">
+            <Link href={`/authorizations/new?clientId=${id}`}>Add Authorization</Link>
+          </Button>
+        )}
       </div>
 
       {/* Tabs + content */}

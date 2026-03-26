@@ -18,12 +18,11 @@ import { getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilizati
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { cn, formatDate, daysUntilExpiry } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 export const metadata: Metadata = {
   title: "Authorization | Clinivise",
 };
-
-const WRITE_ROLES = ["owner", "admin", "bcba"];
 
 export default async function AuthorizationDetailPage({
   params,
@@ -32,7 +31,7 @@ export default async function AuthorizationDetailPage({
 }) {
   const { id } = await params;
   const user = await requireAuth();
-  const canEdit = WRITE_ROLES.includes(user.role);
+  const canEdit = hasPermission(user.role, "authorizations.write");
 
   const authorization = await getAuthorizationWithServices(user.organizationId, id);
   if (!authorization) {

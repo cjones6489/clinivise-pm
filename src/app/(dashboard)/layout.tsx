@@ -4,6 +4,7 @@ import { OrganizationList } from "@clerk/nextjs";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { Header } from "@/components/layout/header";
+import { PermissionProvider } from "@/components/shared/permission-provider";
 import { getCurrentUser } from "@/lib/auth";
 import { getAlertCount } from "@/server/queries/authorizations";
 
@@ -42,18 +43,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const alertCount = await getAlertCount(user.organizationId);
 
   return (
-    <SidebarProvider>
-      <a
-        href="#main-content"
-        className="bg-background text-foreground fixed top-0 left-1/2 z-50 -translate-x-1/2 -translate-y-full rounded-b-md px-4 py-2 text-sm font-medium transition-transform focus:translate-y-0"
-      >
-        Skip to content
-      </a>
-      <AppSidebar userRole={user.role} alertCount={alertCount} />
-      <SidebarInset>
-        <Header />
-        <main id="main-content" className="flex-1 bg-background p-4 md:p-6">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+    <PermissionProvider role={user.role}>
+      <SidebarProvider>
+        <a
+          href="#main-content"
+          className="bg-background text-foreground fixed top-0 left-1/2 z-50 -translate-x-1/2 -translate-y-full rounded-b-md px-4 py-2 text-sm font-medium transition-transform focus:translate-y-0"
+        >
+          Skip to content
+        </a>
+        <AppSidebar userRole={user.role} alertCount={alertCount} />
+        <SidebarInset>
+          <Header />
+          <main id="main-content" className="flex-1 bg-background p-4 md:p-6">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </PermissionProvider>
   );
 }

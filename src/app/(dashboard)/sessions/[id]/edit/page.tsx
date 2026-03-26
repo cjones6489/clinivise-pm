@@ -6,16 +6,15 @@ import { getClientOptions } from "@/server/queries/authorizations";
 import { PageHeader } from "@/components/layout/page-header";
 import { SessionForm } from "@/components/sessions/session-form";
 import { formatDate } from "@/lib/utils";
+import { PERMISSIONS } from "@/lib/permissions";
 
 export const metadata: Metadata = {
   title: "Edit Session | Clinivise",
 };
 
-const WRITE_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt"] as const;
-
 export default async function EditSessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await requireRole([...WRITE_ROLES]);
+  const user = await requireRole([...PERMISSIONS["sessions.write"]]);
 
   const session = await getSessionById(user.organizationId, id);
   if (!session) {

@@ -6,12 +6,11 @@ import { getClientOptions } from "@/server/queries/authorizations";
 import { getProviderOptions } from "@/server/queries/sessions";
 import { PageHeader } from "@/components/layout/page-header";
 import { SessionForm } from "@/components/sessions/session-form";
+import { PERMISSIONS } from "@/lib/permissions";
 
 export const metadata: Metadata = {
   title: "Log Session | Clinivise",
 };
-
-const WRITE_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt"] as const;
 
 export default async function NewSessionPage({
   searchParams,
@@ -19,7 +18,7 @@ export default async function NewSessionPage({
   searchParams: Promise<{ clientId?: string; providerId?: string }>;
 }) {
   const { clientId, providerId } = await searchParams;
-  const user = await requireRole([...WRITE_ROLES]);
+  const user = await requireRole([...PERMISSIONS["sessions.write"]]);
 
   const [clientOptions, providerOptions] = await Promise.all([
     getClientOptions(user.organizationId),
