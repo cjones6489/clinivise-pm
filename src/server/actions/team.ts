@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod/v4";
+import { clerkClient } from "@clerk/nextjs/server";
 import { authActionClient } from "@/lib/safe-action";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
@@ -123,12 +124,19 @@ export const inviteMember = authActionClient
       memberId = newUser!.id;
     }
 
-    // TODO: Call Clerk org invite API to send email
-    // await clerkClient.organizations.createInvitation({
-    //   organizationId: ctx.clerkOrgId,
-    //   emailAddress: email,
-    //   role: "org:member",
-    // });
+    // Send invite email via Clerk
+    try {
+      const clerk = await clerkClient();
+      await clerk.organizations.createOrganizationInvitation({
+        organizationId: ctx.clerkOrgId,
+        emailAddress: email,
+        role: "org:member",
+        inviterUserId: ctx.clerkUserId,
+      });
+    } catch (clerkErr) {
+      // Log but don't fail — the DB record is already created
+      console.error("Clerk invite API error:", clerkErr);
+    }
 
     await logAudit({
       organizationId: ctx.organizationId,
@@ -179,11 +187,18 @@ export const removeMember = authActionClient
       .set({ status: "deactivated", isActive: false })
       .where(and(eq(users.id, memberId), eq(users.organizationId, ctx.organizationId)));
 
-    // TODO: Call Clerk API to revoke org membership
-    // await clerkClient.organizations.revokeOrganizationMembership({
-    //   organizationId: ctx.clerkOrgId,
-    //   userId: member.clerkUserId,
-    // });
+    // Revoke Clerk org membership
+    if (member.clerkUserId) {
+      try {
+        const clerk = await clerkClient();
+        await clerk.organizations.deleteOrganizationMembership({
+          organizationId: ctx.clerkOrgId,
+          userId: member.clerkUserId,
+        });
+      } catch (clerkErr) {
+        console.error("Clerk revoke membership error:", clerkErr);
+      }
+    }
 
     await logAudit({
       organizationId: ctx.organizationId,

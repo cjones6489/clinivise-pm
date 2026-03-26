@@ -16,17 +16,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/sign-in");
   }
 
-  // Signed in but no organization selected — show org creation/selection
+  // Signed in but no organization selected — contract-first model, no self-service org creation
   if (!orgId) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="space-y-4 text-center">
+        <div className="max-w-sm space-y-4 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-500 text-lg font-bold text-white">
+            C
+          </div>
           <h1 className="text-lg font-semibold tracking-tight">Welcome to Clinivise</h1>
-          <p className="text-muted-foreground text-xs">
-            Create or select a practice to get started.
+          <p className="text-muted-foreground text-sm">
+            Select your practice to continue. If you don&apos;t see your practice listed, contact your administrator or our support team.
           </p>
           <OrganizationList
-            afterCreateOrganizationUrl="/overview"
+            hidePersonal
             afterSelectOrganizationUrl="/overview"
           />
         </div>

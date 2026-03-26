@@ -8,38 +8,29 @@ import type { UserRole } from "@/lib/constants";
 import { UnauthorizedError, ForbiddenError } from "@/lib/errors";
 
 /**
- * Auto-provision org + user from Clerk session on first sign-in.
- * Creates the org and user records if they don't exist yet.
+ * Auto-provision user from Clerk session on first sign-in.
+ * Links Clerk users to internal DB records.
+ * Org must already exist (created via webhook or admin).
  * First user in an org gets the "owner" role.
  */
 async function autoProvision(clerkUserId: string, clerkOrgId: string) {
   const clerkUser = await currentUser();
   if (!clerkUser) return null;
 
-  // Upsert organization
+  // Look up organization — must already exist (created via Clerk webhook or admin)
   let [org] = await db
     .select()
     .from(organizations)
     .where(eq(organizations.clerkOrgId, clerkOrgId))
     .limit(1);
 
+  // If org doesn't exist yet, create a placeholder (webhook may not have fired yet)
   if (!org) {
     [org] = await db
       .insert(organizations)
       .values({
         clerkOrgId,
         name: "My Practice",
-        npi: null,
-        taxId: null,
-        phone: null,
-        email: null,
-        addressLine1: null,
-        addressLine2: null,
-        city: null,
-        state: null,
-        zipCode: null,
-        taxonomyCode: null,
-        stediApiKey: null,
       })
       .returning();
   }
