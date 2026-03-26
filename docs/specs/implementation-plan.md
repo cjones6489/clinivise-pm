@@ -24,8 +24,9 @@
 | 2B | Client CRUD — list, detail (5-tab), contacts, actions, validators |
 | 2C | Insurance & Payer CRUD — policies, verification, payer management, 55 unit tests |
 | 2D-1 | Authorization CRUD — list, create, detail, service lines, validators, tests |
-
-Uncommitted: permissions map, scoped query builder, validator refinements, migration `0006`.
+| Phase 0 | Stabilize — seed data, domain errors, timezone-safe session parsing |
+| Phase 1A | Session Logging — billing compliance fixes (required times, CPT-credential blocking, FOR UPDATE lock), session list (metric cards, server-side filters, filter tabs), session form (auto-calc card, auth check card, status-conditional fields), session detail sheet. 263 tests. 10 audit findings fixed. |
+| Phase 1B | Auth Intelligence — shared UtilizationBar (role="meter", a11y, over-utilization) + ExpiryBadge, auth list (metrics query, filter tabs, compact bars, expiry badges), client detail overview (per-CPT bars, auth badge, action buttons, under-utilization detection, new query), auth detail (rich header card, per-service bars, expiry alert banner). 263 tests. 14+ audit findings fixed. |
 
 ---
 
@@ -832,4 +833,5 @@ Key findings incorporated into the plan:
 *Created: 2026-03-25*
 *Reviewed: 2026-03-25 — 11 architectural findings, 5 industry research dives*
 *Updated: 2026-03-25 — Incorporated Phase 1 implementation research (60+ sources, 14 architecture decisions, 7 research findings)*
-*Status: Flexible roadmap. Start with Phase 0, then build the product.*
+*Updated: 2026-03-25 — Phase 1A (Session Logging) complete + audited. Phase 1B (Auth Intelligence) complete + audited. 263 tests, all passing.*
+*Status: Phase 0 done. Phase 1A done. Phase 1B done. Next: Phase 1C (Dashboard).*
