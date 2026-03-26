@@ -1,14 +1,47 @@
 import type { UserRole } from "./constants";
 import { ForbiddenError } from "./errors";
 
+/**
+ * Permission matrix — defines what each role can do.
+ * Based on BACB scope of practice, HIPAA minimum necessary, and competitor research.
+ * See: docs/research/rbac-role-design-research.md (Section 4: Permission Matrix)
+ */
 export const PERMISSIONS = {
-  "clients.write": ["owner", "admin", "bcba"],
+  // Clients
   "clients.read": ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"],
+  "clients.write": ["owner", "admin", "bcba"],
+
+  // Sessions
+  "sessions.read": ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"],
   "sessions.write": ["owner", "admin", "bcba", "bcaba", "rbt"],
-  "authorizations.write": ["owner", "admin", "bcba"],
+  "sessions.cancel": ["owner", "admin", "bcba"],
+
+  // Authorizations
+  "authorizations.read": ["owner", "admin", "bcba", "bcaba", "billing_staff"],
+  "authorizations.write": ["owner", "admin", "bcba", "billing_staff"],
+
+  // Providers
+  "providers.read": ["owner", "admin", "bcba", "bcaba", "billing_staff"],
   "providers.write": ["owner", "admin"],
-  "payers.write": ["owner", "admin"],
+
+  // Payers
+  "payers.read": ["owner", "admin", "billing_staff"],
+  "payers.write": ["owner", "admin", "billing_staff"],
+
+  // Team
+  "team.read": ["owner", "admin"],
+  "team.manage": ["owner", "admin"],
+
+  // Settings
+  "settings.read": ["owner", "admin"],
   "settings.write": ["owner", "admin"],
+
+  // Billing (Phase 2)
+  "billing.read": ["owner", "admin", "billing_staff"],
+  "billing.write": ["owner", "admin", "billing_staff"],
+
+  // Reports (Phase 2)
+  "reports.read": ["owner", "admin", "bcba", "billing_staff"],
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type Permission = keyof typeof PERMISSIONS;
