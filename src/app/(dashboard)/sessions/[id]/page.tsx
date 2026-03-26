@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { getSessionById } from "@/server/queries/sessions";
 import { PageHeader } from "@/components/layout/page-header";
 import { SessionDetailView } from "@/components/sessions/session-detail";
+import { SessionActions } from "@/components/sessions/session-actions";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
-import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { CREDENTIAL_LABELS, type CredentialType } from "@/lib/constants";
+import { CREDENTIAL_LABELS, VALID_SESSION_TRANSITIONS, type CredentialType, type SessionStatus } from "@/lib/constants";
 import { hasPermission } from "@/lib/permissions";
 
 export const metadata: Metadata = {
@@ -28,6 +27,8 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
   const credLabel =
     CREDENTIAL_LABELS[session.providerCredentialType as CredentialType] ??
     session.providerCredentialType;
+  const canCancel =
+    canEdit && VALID_SESSION_TRANSITIONS[session.status as SessionStatus]?.includes("cancelled");
 
   return (
     <div className="space-y-6">
@@ -43,14 +44,15 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
           </div>
         }
         actions={
-          canEdit ? (
-            <Button asChild size="sm" variant="outline" className="text-xs">
-              <Link href={`/sessions/${id}/edit`}>Edit</Link>
-            </Button>
-          ) : undefined
+          <SessionActions
+            sessionId={id}
+            sessionStatus={session.status}
+            canEdit={canEdit}
+            canCancel={!!canCancel}
+          />
         }
       />
-      <SessionDetailView session={session} canEdit={canEdit} />
+      <SessionDetailView session={session} />
     </div>
   );
 }

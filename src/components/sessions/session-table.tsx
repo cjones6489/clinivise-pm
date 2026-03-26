@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import type { SessionListItem } from "@/server/queries/sessions";
 import { cancelSession } from "@/server/actions/sessions";
 import { getSessionColumns } from "./session-columns";
-import { SessionDetailSheet } from "./session-detail-sheet";
 import { DataTable } from "@/components/shared/data-table";
 import { DataTableToolbar } from "@/components/shared/data-table-toolbar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -40,7 +39,6 @@ export function SessionTable({
 }) {
   const router = useRouter();
   const [cancelTarget, setCancelTarget] = useState<SessionListItem | null>(null);
-  const [detailSession, setDetailSession] = useState<SessionListItem | null>(null);
 
   const { executeAsync } = useAction(cancelSession, {
     onSuccess: ({ data }) => {
@@ -56,7 +54,7 @@ export function SessionTable({
   const columns = useMemo(
     () =>
       getSessionColumns({
-        onView: (session) => setDetailSession(session),
+        onView: (session) => router.push(`/sessions/${session.id}`),
         onCancel: canEdit ? (session) => setCancelTarget(session) : undefined,
       }),
     [canEdit],
@@ -87,7 +85,7 @@ export function SessionTable({
   return (
     <div className="space-y-3">
       <DataTableToolbar table={table} searchKey="client" searchPlaceholder="Search sessions..." />
-      <DataTable table={table} onRowClick={(session) => setDetailSession(session)} />
+      <DataTable table={table} onRowClick={(session) => router.push(`/sessions/${session.id}`)} />
 
       {/* Server-side pagination */}
       {pagination ? (
@@ -118,15 +116,6 @@ export function SessionTable({
           </div>
         </div>
       ) : null}
-
-      <SessionDetailSheet
-        session={detailSession}
-        open={!!detailSession}
-        onOpenChange={(open) => {
-          if (!open) setDetailSession(null);
-        }}
-        canEdit={canEdit}
-      />
 
       <ConfirmDialog
         open={!!cancelTarget}
