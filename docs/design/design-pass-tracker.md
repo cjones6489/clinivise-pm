@@ -33,7 +33,7 @@
 | # | Issue | Fix | Status |
 |---|-------|-----|--------|
 | 7 | Client overview table missing **payer** column | Add payer name from `getClientOverviewForDashboard` (already in query) | `[ ]` |
-| 8 | No personalized greeting | Use user's first name: "Good morning, Sarah" (from Clerk session) | `[ ]` |
+| 8 | ~~No personalized greeting~~ | ~~Use user's first name~~ | `[—]` skipped per D4 |
 | 9 | `space-y-4` between sections | Consider `space-y-6` for consistency with other pages, or document as intentional | `[ ]` |
 
 ### Sessions List (`/sessions`)
@@ -80,7 +80,7 @@
 
 | # | Issue | Fix | Status |
 |---|-------|-----|--------|
-| 25 | No metric cards | Add basic cards: Total Providers, BCBAs, RBTs, Inactive | `[ ]` |
+| 25 | ~~No metric cards~~ | ~~Add basic cards~~ | `[—]` skipped per D5 |
 | 26 | No dynamic count in description | Show "{N} providers" | `[ ]` |
 
 ---
@@ -91,7 +91,7 @@
 
 | # | Issue | Fix | Status |
 |---|-------|-----|--------|
-| 27 | Filter tabs use underline style, wireframe shows pills | Decide on one pattern and apply consistently. Underline is clean and works. Document as intentional or switch to pills. | `[ ]` |
+| 27 | ~~Filter tabs use underline style~~ | ~~Decide on one pattern~~ | `[—]` keeping underline per D1 |
 | 28 | Missing breadcrumbs on detail pages | Frontend rules say "Breadcrumbs on detail pages." Add below header on client detail, auth detail, session detail/edit. | `[ ]` |
 | 29 | Non-functional search bar in header | Either implement Cmd+K command palette or remove the search bar to avoid false expectations | `[ ]` |
 | 30 | `tracking-wide` vs `tracking-wider` inconsistency in dashboard table headers | Standardize to `tracking-wider` (matches section card title bars) | `[ ]` |
@@ -105,11 +105,11 @@ These items need a product decision before implementation:
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
-| D1 | **Filter style: underline tabs or pills?** | Underline is clean, already implemented. Pills match the wireframe more closely. | |
-| D2 | **Client detail: 4 section cards or 2?** | Wireframe shows 2 (Insurance + Care Team). Current has 4 (+Guardian, +Details). Merging reduces scroll. | |
-| D3 | **Auth detail: separate Edit tab or keep form in Overview?** | Design system says no form-as-overview. But adding an Edit tab is scope. | |
-| D4 | **Personalized greeting: worth it?** | Nice touch but requires user name from Clerk. Low effort, small impact. | |
-| D5 | **Provider list metric cards: worth it?** | Every other list page has them. Consistency says yes. But providers are rarely visited. | |
+| D1 | **Filter style: underline tabs or pills?** | Underline is clean, already implemented. Pills match the wireframe more closely. | **Underline tabs.** Already consistent, more professional in Mira compact, less visual competition with metric cards. |
+| D2 | **Client detail: 4 section cards or 2?** | Wireframe shows 2 (Insurance + Care Team). Current has 4 (+Guardian, +Details). Merging reduces scroll. | **2 cards.** Guardian moves to header, Details moves to Edit tab. Overview = metrics → Insurance + Care Team → Auth Services → Recent Sessions. |
+| D3 | **Auth detail: separate Edit tab or keep form in Overview?** | Design system says no form-as-overview. But adding an Edit tab is scope. | **Read-only Overview + Edit tab.** Build KV-pair display, move form to Edit tab. Consistent with client detail. |
+| D4 | **Personalized greeting: worth it?** | Nice touch but requires user name from Clerk. Low effort, small impact. | **Skip.** Greeting adds no information. Keep generic subtitle. |
+| D5 | **Provider list metric cards: worth it?** | Every other list page has them. Consistency says yes. But providers are rarely visited. | **Skip.** Setup page, not daily workflow. False consistency. Revisit when credential tracking ships. |
 
 ---
 
