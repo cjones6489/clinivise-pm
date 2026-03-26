@@ -51,7 +51,7 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
           </div>
           <div>
             <div className="text-sidebar-foreground text-sm font-semibold tracking-tight">Clinivise</div>
-            <p className="text-sidebar-foreground/50 text-[10px] font-medium tracking-widest uppercase">
+            <p className="text-sidebar-foreground/40 text-[10px] font-medium tracking-widest uppercase">
               Practice Management
             </p>
           </div>

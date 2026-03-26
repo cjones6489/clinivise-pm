@@ -87,15 +87,15 @@
 
   --radius: 0.625rem;
 
-  /* Sidebar: dark contrast sidebar (Linear/Vercel pattern) */
-  --sidebar: oklch(0.16 0.025 260);
-  --sidebar-foreground: oklch(0.88 0.01 260);
-  --sidebar-primary: oklch(0.70 0.18 260);
+  /* Sidebar: soft contrast (lighter than Linear, darker than content) */
+  --sidebar: oklch(0.955 0.006 260);
+  --sidebar-foreground: oklch(0.25 0.02 260);
+  --sidebar-primary: oklch(0.52 0.2 260);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.22 0.035 260);
-  --sidebar-accent-foreground: oklch(0.94 0.01 260);
-  --sidebar-border: oklch(0.24 0.02 260);
-  --sidebar-ring: oklch(0.70 0.18 260);
+  --sidebar-accent: oklch(0.92 0.02 260);
+  --sidebar-accent-foreground: oklch(0.18 0.03 260);
+  --sidebar-border: oklch(0.90 0.006 260);
+  --sidebar-ring: oklch(0.52 0.2 260);
 }
 
 /* ── Dark Mode ────────────────────────────────────────────── */
