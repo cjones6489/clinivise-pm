@@ -61,12 +61,12 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
     <Sidebar>
       <SidebarHeader className="border-sidebar-border border-b px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-500 text-sm font-bold text-white shadow-sm shadow-blue-400/20">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-500 text-sm font-bold text-primary-foreground shadow-sm shadow-blue-400/20">
             C
           </div>
           <div>
             <div className="text-sidebar-foreground text-sm font-semibold tracking-tight">Clinivise</div>
-            <p className="text-sidebar-foreground/40 text-[10px] font-medium tracking-widest uppercase">
+            <p className="text-sidebar-foreground/40 text-xs font-medium tracking-widest uppercase">
               Practice Management
             </p>
           </div>
@@ -76,7 +76,7 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
       <SidebarContent className="px-2 pt-2">
         {groups.map((group) => (
           <SidebarGroup key={group}>
-            <SidebarGroupLabel className="text-sidebar-foreground/40 mb-1 px-3 text-[10px] font-semibold tracking-widest uppercase">
+            <SidebarGroupLabel className="text-sidebar-foreground/40 mb-1 px-3 text-xs font-semibold tracking-widest uppercase">
               {GROUP_LABELS[group]}
             </SidebarGroupLabel>
             <SidebarMenu>
@@ -110,7 +110,7 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
                         </Link>
                       </SidebarMenuButton>
                       {item.href === "/overview" && alertCount ? (
-                        <SidebarMenuBadge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400">
+                        <SidebarMenuBadge className="bg-destructive/10 text-destructive">
                           {alertCount}
                         </SidebarMenuBadge>
                       ) : null}

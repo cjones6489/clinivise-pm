@@ -1,10 +1,19 @@
-import { CREDENTIAL_MODIFIERS, VALID_SESSION_TRANSITIONS, type SessionStatus } from "./constants";
+import {
+  CREDENTIAL_MODIFIERS,
+  MODIFIER_PRIORITY,
+  MAX_MODIFIERS_PER_LINE,
+  VALID_SESSION_TRANSITIONS,
+  type SessionStatus,
+} from "./constants";
+import { ConflictError } from "./errors";
 import { parseTimeToMinutes } from "./utils";
 
 /**
  * Auto-compute billing modifier codes from provider credential and place of service.
  * - Credential modifier: BCBA→HO, RBT→HM, BCaBA→HN, BCBA-D→HP
  * - Telehealth modifier "95" for POS 02 or 10
+ * - Merges with any user-provided modifiers, deduplicates, and sorts by CMS priority
+ * - Throws if total exceeds MAX_MODIFIERS_PER_LINE (4)
  */
 export function computeModifierCodes(
   credentialType: string,
@@ -20,7 +29,17 @@ export function computeModifierCodes(
     modifiers.add("95");
   }
 
-  return [...modifiers];
+  const sorted = [...modifiers].sort(
+    (a, b) => (MODIFIER_PRIORITY[a] ?? 99) - (MODIFIER_PRIORITY[b] ?? 99),
+  );
+
+  if (sorted.length > MAX_MODIFIERS_PER_LINE) {
+    throw new ConflictError(
+      `Too many modifiers (${sorted.length}). CMS 1500 allows a maximum of ${MAX_MODIFIERS_PER_LINE} per line. Remove a modifier and try again.`,
+    );
+  }
+
+  return sorted;
 }
 
 /**

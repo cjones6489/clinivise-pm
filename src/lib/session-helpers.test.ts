@@ -13,73 +13,102 @@ import { calculateUnits } from "./utils";
 
 describe("computeModifierCodes", () => {
   it("adds HM modifier for RBT", () => {
-    const result = computeModifierCodes("rbt", "12");
-    expect(result).toContain("HM");
+    expect(computeModifierCodes("rbt", "12")).toEqual(["HM"]);
   });
 
   it("adds HO modifier for BCBA", () => {
-    const result = computeModifierCodes("bcba", "12");
-    expect(result).toContain("HO");
+    expect(computeModifierCodes("bcba", "12")).toEqual(["HO"]);
   });
 
   it("adds HP modifier for BCBA-D", () => {
-    const result = computeModifierCodes("bcba_d", "12");
-    expect(result).toContain("HP");
+    expect(computeModifierCodes("bcba_d", "12")).toEqual(["HP"]);
   });
 
   it("adds HN modifier for BCaBA", () => {
-    const result = computeModifierCodes("bcaba", "12");
-    expect(result).toContain("HN");
+    expect(computeModifierCodes("bcaba", "12")).toEqual(["HN"]);
   });
 
   it("adds no credential modifier for unknown type", () => {
-    const result = computeModifierCodes("other", "12");
-    expect(result).toEqual([]);
+    expect(computeModifierCodes("other", "12")).toEqual([]);
   });
 
-  it("adds telehealth modifier 95 for POS 02", () => {
-    const result = computeModifierCodes("bcba", "02");
-    expect(result).toContain("95");
-    expect(result).toContain("HO");
+  it("adds telehealth modifier 95 for POS 02, credential first", () => {
+    expect(computeModifierCodes("bcba", "02")).toEqual(["HO", "95"]);
   });
 
-  it("adds telehealth modifier 95 for POS 10", () => {
-    const result = computeModifierCodes("rbt", "10");
-    expect(result).toContain("95");
-    expect(result).toContain("HM");
+  it("adds telehealth modifier 95 for POS 10, credential first", () => {
+    expect(computeModifierCodes("rbt", "10")).toEqual(["HM", "95"]);
   });
 
   it("does not add telehealth modifier for non-telehealth POS", () => {
-    const result = computeModifierCodes("bcba", "12");
-    expect(result).not.toContain("95");
+    expect(computeModifierCodes("bcba", "12")).toEqual(["HO"]);
   });
 
-  it("preserves existing modifiers", () => {
+  it("preserves existing modifiers in CMS priority order", () => {
     const result = computeModifierCodes("rbt", "12", ["GT", "XE"]);
-    expect(result).toContain("GT");
-    expect(result).toContain("XE");
-    expect(result).toContain("HM");
+    expect(result).toEqual(["HM", "GT", "XE"]);
+  });
+
+  it("sorts credential first, telehealth second, distinct service third", () => {
+    const result = computeModifierCodes("rbt", "02", ["59"]);
+    expect(result).toEqual(["HM", "95", "59"]);
+  });
+
+  it("sorts existing modifiers by priority", () => {
+    const result = computeModifierCodes("bcba", "12", ["76", "XP"]);
+    expect(result).toEqual(["HO", "XP", "76"]);
+  });
+
+  it("unknown modifiers sort last", () => {
+    const result = computeModifierCodes("rbt", "12", ["ZZ"]);
+    expect(result).toEqual(["HM", "ZZ"]);
   });
 
   it("deduplicates existing + auto modifiers", () => {
     const result = computeModifierCodes("rbt", "12", ["HM"]);
-    const hmCount = result.filter((m) => m === "HM").length;
-    expect(hmCount).toBe(1);
+    expect(result).toEqual(["HM"]);
   });
 
   it("returns empty array for unknown credential + non-telehealth POS", () => {
-    const result = computeModifierCodes("other", "11");
-    expect(result).toEqual([]);
+    expect(computeModifierCodes("other", "11")).toEqual([]);
   });
 
   it("handles undefined existingModifiers", () => {
-    const result = computeModifierCodes("rbt", "12", undefined);
-    expect(result).toEqual(["HM"]);
+    expect(computeModifierCodes("rbt", "12", undefined)).toEqual(["HM"]);
   });
 
   it("handles empty array existingModifiers", () => {
-    const result = computeModifierCodes("rbt", "12", []);
-    expect(result).toEqual(["HM"]);
+    expect(computeModifierCodes("rbt", "12", [])).toEqual(["HM"]);
+  });
+
+  it("throws ConflictError when total modifiers exceed 4", () => {
+    expect(() =>
+      computeModifierCodes("rbt", "02", ["59", "XP", "76"]),
+    ).toThrow("Too many modifiers (5)");
+  });
+
+  it("allows exactly 4 modifiers", () => {
+    const result = computeModifierCodes("rbt", "02", ["59", "XP"]);
+    expect(result).toEqual(["HM", "95", "59", "XP"]);
+    expect(result).toHaveLength(4);
+  });
+
+  it("deduplicates when user passes auto-computed modifier", () => {
+    // User passes "HM" and "95" which are also auto-computed
+    const result = computeModifierCodes("rbt", "02", ["HM", "95"]);
+    expect(result).toEqual(["HM", "95"]);
+  });
+
+  it("allows GT and 95 together (both tier 2)", () => {
+    const result = computeModifierCodes("rbt", "02", ["GT"]);
+    expect(result).toEqual(["HM", "GT", "95"]);
+  });
+
+  it("does not add 95 for non-telehealth POS codes", () => {
+    for (const pos of ["03", "11", "12", "99"]) {
+      const result = computeModifierCodes("bcba", pos);
+      expect(result).not.toContain("95");
+    }
   });
 });
 

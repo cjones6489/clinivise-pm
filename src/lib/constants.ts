@@ -9,6 +9,9 @@ export type UserStatus = (typeof USER_STATUSES)[number];
 export const CREDENTIAL_TYPES = ["bcba", "bcba_d", "bcaba", "rbt", "other"] as const;
 export type CredentialType = (typeof CREDENTIAL_TYPES)[number];
 
+/** Credential types that qualify as supervisors (BCBA-level or above). */
+export const SUPERVISOR_CREDENTIAL_TYPES: readonly CredentialType[] = ["bcba", "bcba_d"];
+
 export const AUTH_STATUSES = ["pending", "approved", "denied", "expired", "exhausted"] as const;
 export type AuthStatus = (typeof AUTH_STATUSES)[number];
 
@@ -334,6 +337,34 @@ export const CREDENTIAL_MODIFIERS: Record<string, string> = {
   bcba_d: "HP",
 };
 
+/** CMS modifier ordering priority — credential first, telehealth second, etc. */
+export const MODIFIER_PRIORITY: Record<string, number> = {
+  // Tier 1: Credential (pricing) modifiers
+  HM: 1, HN: 1, HO: 1, HP: 1,
+  // Tier 2: Telehealth modifiers
+  "95": 2, GT: 2,
+  // Tier 3: Distinct service modifiers
+  "59": 3, XE: 3, XP: 3, XS: 3, XU: 3,
+  // Tier 4: Informational modifiers
+  "76": 4, "77": 4, KX: 4,
+};
+
+/** Max modifiers per claim line (CMS 1500 form limit). */
+export const MAX_MODIFIERS_PER_LINE = 4;
+
+/** Additional modifiers available for manual selection by billing staff. */
+export const ADDITIONAL_MODIFIER_OPTIONS = [
+  { value: "59", label: "59 — Distinct Procedural Service" },
+  { value: "XE", label: "XE — Separate Encounter" },
+  { value: "XP", label: "XP — Separate Practitioner" },
+  { value: "XS", label: "XS — Separate Structure" },
+  { value: "XU", label: "XU — Unusual Non-Overlapping Service" },
+  { value: "76", label: "76 — Repeat Procedure, Same Provider" },
+  { value: "77", label: "77 — Repeat Procedure, Different Provider" },
+  { value: "GT", label: "GT — Via Telehealth (legacy)" },
+  { value: "KX", label: "KX — Medical Policy Requirements Met" },
+] as const;
+
 // ── Place of Service Labels ─────────────────────────────────────────────────
 
 export const PLACE_OF_SERVICE_LABELS: Record<PlaceOfServiceCode, string> = {
@@ -344,6 +375,19 @@ export const PLACE_OF_SERVICE_LABELS: Record<PlaceOfServiceCode, string> = {
   "12": "Home",
   "99": "Other/Community",
 };
+
+// ── Unit / Time Conversion ─────────────────────────────────────────────────
+
+/** Each billing unit = 15 minutes per CMS 8-minute rule */
+export const MINUTES_PER_UNIT = 15;
+
+/** Milliseconds in one day */
+export const MS_PER_DAY = 86_400_000;
+
+/** Convert billing units to hours */
+export function unitsToHours(units: number): number {
+  return (units * MINUTES_PER_UNIT) / 60;
+}
 
 // ── Authorization Alert Thresholds ──────────────────────────────────────────
 

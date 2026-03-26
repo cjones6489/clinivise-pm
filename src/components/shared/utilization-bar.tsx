@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { AUTH_ALERT_THRESHOLDS } from "@/lib/constants";
+import { AUTH_ALERT_THRESHOLDS, unitsToHours } from "@/lib/constants";
 
 const { UTILIZATION_WARNING_PCT, UTILIZATION_CRITICAL_PCT } = AUTH_ALERT_THRESHOLDS;
 
@@ -39,8 +39,8 @@ export const LEVEL_COLORS: Record<UtilizationLevel, { bar: string; text: string;
   },
 };
 
-export function unitsToHours(units: number): string {
-  return ((units * 15) / 60).toFixed(1);
+function formatHours(units: number): string {
+  return unitsToHours(units).toFixed(1);
 }
 
 /**
@@ -74,9 +74,9 @@ export function UtilizationBar({
   const remaining = Math.max(0, approvedUnits - usedUnits);
   const fillWidth = Math.min(pct, 100);
 
-  const usedDisplay = showHours ? `${unitsToHours(usedUnits)} hrs` : `${usedUnits} units`;
-  const approvedDisplay = showHours ? `${unitsToHours(approvedUnits)} hrs` : `${approvedUnits} units`;
-  const remainingDisplay = showHours ? `${unitsToHours(remaining)} hrs` : `${remaining} units`;
+  const usedDisplay = showHours ? `${formatHours(usedUnits)} hrs` : `${usedUnits} units`;
+  const approvedDisplay = showHours ? `${formatHours(approvedUnits)} hrs` : `${approvedUnits} units`;
+  const remainingDisplay = showHours ? `${formatHours(remaining)} hrs` : `${remaining} units`;
   const valueText = `${pct}% utilized — ${remainingDisplay} remaining`;
 
   // Compact mode: just colored percentage text with status label for table cells

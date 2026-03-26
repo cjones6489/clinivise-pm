@@ -10,6 +10,7 @@ import {
   PAYER_TYPE_LABELS,
   ABA_CPT_CODES,
   AUTH_ALERT_THRESHOLDS,
+  unitsToHours,
   type CredentialType,
   type PayerType,
   type CptCode,
@@ -84,7 +85,7 @@ export function ClientOverview({
 
   // Weekly average: total used hours / weeks elapsed
   const weeksElapsed = authUtilization ? Math.max(1, authUtilization.daysElapsed / 7) : 0;
-  const weeklyAvgHours = weeksElapsed > 0 ? ((totalUsed * 15) / 60 / weeksElapsed).toFixed(1) : "0.0";
+  const weeklyAvgHours = weeksElapsed > 0 ? (unitsToHours(totalUsed) / weeksElapsed).toFixed(1) : "0.0";
 
   // Under-utilization detection: <50% used with >50% of auth period elapsed
   const periodPctElapsed = authUtilization
@@ -113,7 +114,7 @@ export function ClientOverview({
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <MetricCard
           label="Total Approved"
-          value={authUtilization ? `${((totalApproved * 15) / 60).toFixed(0)} hrs` : "—"}
+          value={authUtilization ? `${unitsToHours(totalApproved).toFixed(0)} hrs` : "—"}
           sub={
             authUtilization
               ? `${authUtilization.services.length} service${authUtilization.services.length !== 1 ? "s" : ""}`
@@ -122,7 +123,7 @@ export function ClientOverview({
         />
         <MetricCard
           label="Used"
-          value={authUtilization ? `${((totalUsed * 15) / 60).toFixed(0)} hrs` : "—"}
+          value={authUtilization ? `${unitsToHours(totalUsed).toFixed(0)} hrs` : "—"}
           sub={authUtilization ? `${utilizationPct}% utilized` : "No active authorization"}
           accent={utilizationAccent}
         />

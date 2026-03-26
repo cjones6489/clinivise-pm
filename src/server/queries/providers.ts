@@ -1,8 +1,9 @@
 import "server-only";
 
 import { db } from "@/server/db";
-import { providers } from "@/server/db/schema";
-import { eq, and, isNull, inArray, ne } from "drizzle-orm";
+import { providers, sessions, clients } from "@/server/db/schema";
+import { eq, and, isNull, inArray, ne, sql, desc } from "drizzle-orm";
+import { SUPERVISOR_CREDENTIAL_TYPES } from "@/lib/constants";
 
 export type Provider = typeof providers.$inferSelect;
 
@@ -40,7 +41,7 @@ export async function getSupervisorOptions(
 ): Promise<SupervisorOption[]> {
   const conditions = [
     scopedWhere(orgId),
-    inArray(providers.credentialType, ["bcba", "bcba_d"]),
+    inArray(providers.credentialType, [...SUPERVISOR_CREDENTIAL_TYPES]),
     eq(providers.isActive, true),
   ];
 
@@ -57,5 +58,215 @@ export async function getSupervisorOptions(
     })
     .from(providers)
     .where(and(...conditions))
+    .orderBy(providers.lastName, providers.firstName);
+}
+
+// ── Provider Detail Queries ──────────────────────────────────────────────────
+
+export type ProviderMetrics = {
+  activeClients: number;
+  hoursThisWeek: number;
+  sessionsThisMonth: number;
+};
+
+export async function getProviderMetrics(
+  orgId: string,
+  providerId: string,
+): Promise<ProviderMetrics> {
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  const weekStartStr = weekStart.toISOString().slice(0, 10);
+  const monthStartStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+
+  const [result] = await db
+    .select({
+      activeClients: sql<number>`count(distinct ${sessions.clientId}) filter (
+        where ${sessions.status} != 'cancelled'
+      )::int`,
+      hoursThisWeek: sql<number>`coalesce(
+        sum(${sessions.units}) filter (
+          where ${sessions.sessionDate} >= ${weekStartStr}
+          and ${sessions.status} = 'completed'
+        ), 0
+      )::numeric * 15.0 / 60`,
+      sessionsThisMonth: sql<number>`count(*) filter (
+        where ${sessions.sessionDate} >= ${monthStartStr}
+        and ${sessions.status} != 'cancelled'
+      )::int`,
+    })
+    .from(sessions)
+    .where(
+      and(eq(sessions.organizationId, orgId), eq(sessions.providerId, providerId)),
+    );
+
+  return {
+    activeClients: result?.activeClients ?? 0,
+    hoursThisWeek: Number(result?.hoursThisWeek ?? 0),
+    sessionsThisMonth: result?.sessionsThisMonth ?? 0,
+  };
+}
+
+export type ProviderCaseloadItem = {
+  clientId: string;
+  clientFirstName: string;
+  clientLastName: string;
+  clientStatus: string;
+  lastSessionDate: string;
+  sessionCount: number;
+};
+
+export async function getProviderCaseload(
+  orgId: string,
+  providerId: string,
+): Promise<ProviderCaseloadItem[]> {
+  return db
+    .select({
+      clientId: clients.id,
+      clientFirstName: clients.firstName,
+      clientLastName: clients.lastName,
+      clientStatus: clients.status,
+      lastSessionDate: sql<string>`max(${sessions.sessionDate})`,
+      sessionCount: sql<number>`count(*)::int`,
+    })
+    .from(sessions)
+    .innerJoin(clients, eq(sessions.clientId, clients.id))
+    .where(
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.providerId, providerId),
+        isNull(clients.deletedAt),
+        sql`${sessions.status} != 'cancelled'`,
+      ),
+    )
+    .groupBy(clients.id, clients.firstName, clients.lastName, clients.status)
+    .orderBy(sql`max(${sessions.sessionDate}) desc`);
+}
+
+export type ProviderRecentSession = {
+  id: string;
+  sessionDate: string;
+  clientFirstName: string;
+  clientLastName: string;
+  cptCode: string;
+  units: number;
+  status: string;
+};
+
+export async function getProviderRecentSessions(
+  orgId: string,
+  providerId: string,
+): Promise<ProviderRecentSession[]> {
+  return db
+    .select({
+      id: sessions.id,
+      sessionDate: sessions.sessionDate,
+      clientFirstName: clients.firstName,
+      clientLastName: clients.lastName,
+      cptCode: sessions.cptCode,
+      units: sessions.units,
+      status: sessions.status,
+    })
+    .from(sessions)
+    .innerJoin(clients, eq(sessions.clientId, clients.id))
+    .where(
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.providerId, providerId),
+        isNull(clients.deletedAt),
+      ),
+    )
+    .orderBy(desc(sessions.sessionDate), desc(sessions.createdAt))
+    .limit(10);
+}
+
+export type ProviderSupervisee = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  credentialType: string;
+  isActive: boolean;
+};
+
+// ── Session Breakdown (KPIs) ─────────────────────────────────────────────────
+
+export type ProviderSessionBreakdown = {
+  totalSessions: number;
+  completedSessions: number;
+  cancelledSessions: number;
+  noShowSessions: number;
+  flaggedSessions: number;
+  scheduledSessions: number;
+  totalHours: number;
+  avgSessionMinutes: number;
+  cptDistribution: { cptCode: string; count: number }[];
+};
+
+export async function getProviderSessionBreakdown(
+  orgId: string,
+  providerId: string,
+): Promise<ProviderSessionBreakdown> {
+  const [statusResult] = await db
+    .select({
+      totalSessions: sql<number>`count(*)::int`,
+      completedSessions: sql<number>`count(*) filter (where ${sessions.status} = 'completed')::int`,
+      cancelledSessions: sql<number>`count(*) filter (where ${sessions.status} = 'cancelled')::int`,
+      noShowSessions: sql<number>`count(*) filter (where ${sessions.status} = 'no_show')::int`,
+      flaggedSessions: sql<number>`count(*) filter (where ${sessions.status} = 'flagged')::int`,
+      scheduledSessions: sql<number>`count(*) filter (where ${sessions.status} = 'scheduled')::int`,
+      totalHours: sql<number>`coalesce(sum(${sessions.units}) filter (where ${sessions.status} = 'completed'), 0)::numeric * 15.0 / 60`,
+      avgSessionMinutes: sql<number>`coalesce(avg(${sessions.actualMinutes}) filter (where ${sessions.status} = 'completed' and ${sessions.actualMinutes} > 0), 0)::numeric`,
+    })
+    .from(sessions)
+    .where(and(eq(sessions.organizationId, orgId), eq(sessions.providerId, providerId)));
+
+  const cptDistribution = await db
+    .select({
+      cptCode: sessions.cptCode,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.providerId, providerId),
+        sql`${sessions.status} != 'cancelled'`,
+      ),
+    )
+    .groupBy(sessions.cptCode)
+    .orderBy(sql`count(*) desc`);
+
+  return {
+    totalSessions: statusResult?.totalSessions ?? 0,
+    completedSessions: statusResult?.completedSessions ?? 0,
+    cancelledSessions: statusResult?.cancelledSessions ?? 0,
+    noShowSessions: statusResult?.noShowSessions ?? 0,
+    flaggedSessions: statusResult?.flaggedSessions ?? 0,
+    scheduledSessions: statusResult?.scheduledSessions ?? 0,
+    totalHours: Number(statusResult?.totalHours ?? 0),
+    avgSessionMinutes: Math.round(Number(statusResult?.avgSessionMinutes ?? 0)),
+    cptDistribution,
+  };
+}
+
+export async function getProviderSupervisees(
+  orgId: string,
+  supervisorId: string,
+): Promise<ProviderSupervisee[]> {
+  return db
+    .select({
+      id: providers.id,
+      firstName: providers.firstName,
+      lastName: providers.lastName,
+      credentialType: providers.credentialType,
+      isActive: providers.isActive,
+    })
+    .from(providers)
+    .where(
+      and(
+        scopedWhere(orgId),
+        eq(providers.supervisorId, supervisorId),
+      ),
+    )
     .orderBy(providers.lastName, providers.firstName);
 }

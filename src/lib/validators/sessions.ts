@@ -45,7 +45,13 @@ const sessionFieldsSchema = z.object({
     .transform((v) => v || undefined),
   cptCode: z.enum(cptCodes, { message: "Select a CPT code" }),
   modifierCodes: z
-    .array(z.string())
+    .array(
+      z.string()
+        .min(1, "Modifier cannot be empty")
+        .max(2, "Modifier must be 1-2 characters")
+        .transform((v) => v.toUpperCase()),
+    )
+    .max(4, "Maximum 4 modifiers allowed (CMS 1500 limit)")
     .optional()
     .transform((v) => (v && v.length > 0 ? v : undefined)),
   units: z.coerce.number().int().min(0, "Units must be 0 or more"),
