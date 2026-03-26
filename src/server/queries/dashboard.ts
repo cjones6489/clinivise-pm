@@ -72,76 +72,86 @@ export async function getDashboardMetrics(orgId: string): Promise<DashboardMetri
     .groupBy(authorizationServices.authorizationId)
     .as("svc_agg");
 
-  // Single query: client count + auth utilization
-  const [clientMetrics] = await db
-    .select({
-      activeClients: sql<number>`count(*) filter (where ${clients.status} = 'active')::int`,
-      totalClients: sql<number>`count(*)::int`,
-    })
-    .from(clients)
-    .where(and(eq(clients.organizationId, orgId), isNull(clients.deletedAt)));
-
-  // Auth utilization across active auths
-  const [authMetrics] = await db
-    .select({
-      avgUtilization: sql<number>`coalesce(
-        round(
-          sum(${svcAgg.totalUsed})::numeric
-          / nullif(sum(${svcAgg.totalApproved}), 0) * 100
-        ), 0
-      )::int`,
-    })
-    .from(authorizations)
-    .leftJoin(svcAgg, eq(authorizations.id, svcAgg.authorizationId))
-    .where(
-      and(
-        eq(authorizations.organizationId, orgId),
-        isNull(authorizations.deletedAt),
-        eq(authorizations.status, "approved"),
-        sql`${authorizations.endDate} >= ${todayStr}`,
-      ),
-    );
-
-  // Hours this week from sessions
-  const [sessionMetrics] = await db
-    .select({
-      hoursThisWeek: sql<number>`coalesce(
-        sum(${sessions.units}) filter (
-          where ${sessions.sessionDate} >= ${weekStartStr}
-          and ${sessions.status} = 'completed'
-        ), 0
-      )::numeric * 15.0 / 60`,
-    })
-    .from(sessions)
-    .where(eq(sessions.organizationId, orgId));
-
-  // Alert counts (uses same logic as getDashboardAlerts but just counts)
+  // Alert threshold constants
   const warningPct = AUTH_ALERT_THRESHOLDS.UTILIZATION_WARNING_PCT / 100;
   const criticalPct = AUTH_ALERT_THRESHOLDS.UTILIZATION_CRITICAL_PCT / 100;
 
-  const authAlertRows = await db
-    .select({
-      endDate: authorizations.endDate,
-      status: authorizations.status,
-      totalApproved: sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.mapWith(Number),
-      totalUsed: sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.mapWith(Number),
-    })
-    .from(authorizations)
-    .leftJoin(authorizationServices, eq(authorizations.id, authorizationServices.authorizationId))
-    .where(
-      and(
-        eq(authorizations.organizationId, orgId),
-        isNull(authorizations.deletedAt),
-        eq(authorizations.status, "approved"),
-      ),
-    )
-    .groupBy(authorizations.id, authorizations.endDate, authorizations.status);
+  // All 5 queries are independent — run in parallel to minimize latency
+  const [
+    [clientMetrics],
+    [authMetrics],
+    [sessionMetrics],
+    authAlertRows,
+    [flaggedResult],
+  ] = await Promise.all([
+    // Client count
+    db
+      .select({
+        activeClients: sql<number>`count(*) filter (where ${clients.status} = 'active')::int`,
+        totalClients: sql<number>`count(*)::int`,
+      })
+      .from(clients)
+      .where(and(eq(clients.organizationId, orgId), isNull(clients.deletedAt))),
 
-  // Flagged session count
-  const [flaggedResult] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(sessions)
-    .where(and(eq(sessions.organizationId, orgId), eq(sessions.status, "flagged")));
+    // Auth utilization across active auths
+    db
+      .select({
+        avgUtilization: sql<number>`coalesce(
+          round(
+            sum(${svcAgg.totalUsed})::numeric
+            / nullif(sum(${svcAgg.totalApproved}), 0) * 100
+          ), 0
+        )::int`,
+      })
+      .from(authorizations)
+      .leftJoin(svcAgg, eq(authorizations.id, svcAgg.authorizationId))
+      .where(
+        and(
+          eq(authorizations.organizationId, orgId),
+          isNull(authorizations.deletedAt),
+          eq(authorizations.status, "approved"),
+          sql`${authorizations.endDate} >= ${todayStr}`,
+        ),
+      ),
+
+    // Hours this week from sessions
+    db
+      .select({
+        hoursThisWeek: sql<number>`coalesce(
+          sum(${sessions.units}) filter (
+            where ${sessions.sessionDate} >= ${weekStartStr}
+            and ${sessions.status} = 'completed'
+          ), 0
+        )::numeric * 15.0 / 60`.mapWith(Number),
+      })
+      .from(sessions)
+      .where(eq(sessions.organizationId, orgId)),
+
+    // Auth alert rows (for counting)
+    db
+      .select({
+        endDate: authorizations.endDate,
+        status: authorizations.status,
+        totalApproved: sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.mapWith(Number),
+        totalUsed: sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.mapWith(Number),
+      })
+      .from(authorizations)
+      .leftJoin(authorizationServices, eq(authorizations.id, authorizationServices.authorizationId))
+      .where(
+        and(
+          eq(authorizations.organizationId, orgId),
+          isNull(authorizations.deletedAt),
+          eq(authorizations.status, "approved"),
+        ),
+      )
+      .groupBy(authorizations.id, authorizations.endDate, authorizations.status),
+
+    // Flagged session count
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(sessions)
+      .where(and(eq(sessions.organizationId, orgId), eq(sessions.status, "flagged"))),
+  ]);
 
   let actionItemCount = 0;
   let criticalCount = 0;
@@ -175,7 +185,7 @@ export async function getDashboardMetrics(orgId: string): Promise<DashboardMetri
     activeClients: clientMetrics?.activeClients ?? 0,
     totalClients: clientMetrics?.totalClients ?? 0,
     avgUtilization: authMetrics?.avgUtilization ?? 0,
-    hoursThisWeek: Number(sessionMetrics?.hoursThisWeek ?? 0),
+    hoursThisWeek: sessionMetrics?.hoursThisWeek ?? 0,
     actionItemCount,
     criticalCount,
   };
@@ -256,10 +266,10 @@ export async function getDashboardAlerts(orgId: string): Promise<DashboardAlert[
     if (row.totalApproved > 0 && row.totalUsed / row.totalApproved >= warningPct) {
       alerts.push({
         type: "high_utilization",
-        severity: utilPct >= 95 ? "critical" : "warning",
+        severity: utilPct >= AUTH_ALERT_THRESHOLDS.UTILIZATION_CRITICAL_PCT ? "critical" : "warning",
         entityId: row.id,
         entityName: clientName,
-        description: `${utilPct}% utilized — ${utilPct >= 95 ? "almost exhausted" : "nearing limit"}`,
+        description: `${utilPct}% utilized — ${utilPct >= AUTH_ALERT_THRESHOLDS.UTILIZATION_CRITICAL_PCT ? "almost exhausted" : "nearing limit"}`,
         actionHref: `/authorizations/${row.id}`,
         actionLabel: "Review",
       });
@@ -401,7 +411,11 @@ export async function getClientOverviewForDashboard(
     return { ...row, urgencyScore };
   });
 
-  scored.sort((a, b) => b.urgencyScore - a.urgencyScore);
+  scored.sort((a, b) => {
+    if (a.urgencyScore !== b.urgencyScore) return b.urgencyScore - a.urgencyScore;
+    // Tiebreaker: alphabetical by last name
+    return a.lastName.localeCompare(b.lastName);
+  });
 
   return scored.slice(0, 10);
 }
