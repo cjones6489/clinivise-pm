@@ -76,7 +76,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       {/* Rich header — matching wireframe */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="text-lg font-semibold tracking-tight">
             {client.firstName} {client.lastName}
           </h1>
           <div className="text-muted-foreground mt-0.5 text-xs">

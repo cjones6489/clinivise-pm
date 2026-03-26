@@ -8,20 +8,20 @@ export function GettingStartedCard() {
       </div>
       <div className="mt-2 space-y-1.5">
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-blue-600">1.</span>
+          <span className="text-blue-600 dark:text-blue-400">1.</span>
           <Link href="/settings" className="text-blue-700 underline dark:text-blue-400">
             Add your practice info
           </Link>
           <span className="text-muted-foreground text-[11px]">Settings &rarr; Organization</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-blue-600">2.</span>
+          <span className="text-blue-600 dark:text-blue-400">2.</span>
           <Link href="/providers/new" className="text-blue-700 underline dark:text-blue-400">
             Add your team members
           </Link>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-blue-600">3.</span>
+          <span className="text-blue-600 dark:text-blue-400">3.</span>
           <Link href="/clients/new" className="text-blue-700 underline dark:text-blue-400">
             Add your first client
           </Link>

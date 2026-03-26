@@ -427,7 +427,7 @@ export function SessionForm({
         </div>
 
         {showSupervisorWarning && (
-          <p className="text-xs text-amber-600">
+          <p className="text-xs text-amber-600 dark:text-amber-400">
             This provider requires a supervising BCBA for CPT {selectedCptCode}. Add a supervisor or
             ensure one is assigned on the provider record.
           </p>
@@ -493,7 +493,7 @@ export function SessionForm({
         </div>
 
         {showQhpWarning && (
-          <p className="text-xs font-medium text-red-600">
+          <p className="text-xs font-medium text-red-600 dark:text-red-400">
             CPT {selectedCptCode} requires a BCBA/BCBA-D. {CREDENTIAL_LABELS[selectedProvider!.credentialType as CredentialType]} providers cannot bill this code.
           </p>
         )}

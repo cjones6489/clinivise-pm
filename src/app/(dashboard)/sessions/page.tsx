@@ -93,7 +93,7 @@ export default async function SessionsPage({
               label="Flagged"
               value={String(metrics.flaggedCount)}
               sub="needs review"
-              accent={metrics.flaggedCount > 0 ? "text-red-600" : undefined}
+              accent={metrics.flaggedCount > 0 ? "text-red-600 dark:text-red-400" : undefined}
             />
             <MetricCard
               label="Unbilled"

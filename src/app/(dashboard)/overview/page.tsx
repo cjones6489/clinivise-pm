@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { requireAuth } from "@/lib/auth";
 import { hasClients } from "@/server/queries/clients";
+import { PageHeader } from "@/components/layout/page-header";
 import { SectionErrorBoundary, SectionError } from "@/components/shared/section-error-boundary";
 import { DashboardMetrics, DashboardMetricsSkeleton } from "@/components/dashboard/dashboard-metrics";
 import { DashboardAlerts, DashboardAlertsSkeleton } from "@/components/dashboard/dashboard-alerts";
@@ -21,13 +22,10 @@ export default async function OverviewPage() {
 
   return (
     <div className="space-y-4">
-      {/* Header — pure signal, no action buttons (actions live on their pages) */}
-      <div>
-        <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-xs">
-          Here&apos;s what needs attention today.
-        </p>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Here's what needs attention today."
+      />
 
       {/* Getting Started (new practice) */}
       {showGettingStarted && <GettingStartedCard />}
