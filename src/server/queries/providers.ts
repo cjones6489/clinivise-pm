@@ -3,6 +3,7 @@ import "server-only";
 import { db } from "@/server/db";
 import { providers, sessions, clients } from "@/server/db/schema";
 import { eq, and, isNull, inArray, ne, sql, desc } from "drizzle-orm";
+import { SUPERVISOR_CREDENTIAL_TYPES } from "@/lib/constants";
 
 export type Provider = typeof providers.$inferSelect;
 
@@ -40,7 +41,7 @@ export async function getSupervisorOptions(
 ): Promise<SupervisorOption[]> {
   const conditions = [
     scopedWhere(orgId),
-    inArray(providers.credentialType, ["bcba", "bcba_d"]),
+    inArray(providers.credentialType, [...SUPERVISOR_CREDENTIAL_TYPES]),
     eq(providers.isActive, true),
   ];
 
@@ -169,7 +170,11 @@ export async function getProviderRecentSessions(
     .from(sessions)
     .innerJoin(clients, eq(sessions.clientId, clients.id))
     .where(
-      and(eq(sessions.organizationId, orgId), eq(sessions.providerId, providerId)),
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.providerId, providerId),
+        isNull(clients.deletedAt),
+      ),
     )
     .orderBy(desc(sessions.sessionDate), desc(sessions.createdAt))
     .limit(10);

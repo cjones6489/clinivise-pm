@@ -51,7 +51,7 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
     : undefined;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -67,19 +67,9 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
       {/* Rich header */}
       <div className="flex items-start justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold tracking-tight">
-              {provider.firstName} {provider.lastName}
-            </h1>
-            <Badge variant="secondary">{credLabel}</Badge>
-            {provider.isActive ? (
-              <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
-                Active
-              </Badge>
-            ) : (
-              <Badge variant="outline">Archived</Badge>
-            )}
-          </div>
+          <h1 className="text-lg font-semibold tracking-tight">
+            {provider.firstName} {provider.lastName}
+          </h1>
           <div className="text-muted-foreground mt-0.5 text-xs">
             {provider.npi && <>NPI: <span className="font-mono">{provider.npi}</span> &middot; </>}
             {provider.credentialNumber && <>Cert #{provider.credentialNumber} &middot; </>}
@@ -91,18 +81,30 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {hasPermission(user.role, "sessions.write") && (
-            <Button asChild size="sm" className="text-xs">
-              <Link href={`/sessions/new?providerId=${id}`}>Log Session</Link>
-            </Button>
-          )}
-          {canEdit && (
-            <Button asChild size="sm" variant="outline" className="text-xs">
-              <Link href={`/providers/${id}/edit`}>Edit</Link>
-            </Button>
+        <div className="flex items-center gap-1.5">
+          <Badge variant="secondary">{credLabel}</Badge>
+          {provider.isActive ? (
+            <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
+              Active
+            </Badge>
+          ) : (
+            <Badge variant="outline">Archived</Badge>
           )}
         </div>
+      </div>
+
+      {/* Action buttons — permission-gated */}
+      <div className="flex items-center gap-2">
+        {hasPermission(user.role, "sessions.write") && (
+          <Button asChild size="sm" className="text-xs">
+            <Link href={`/sessions/new?providerId=${id}`}>Log Session</Link>
+          </Button>
+        )}
+        {canEdit && (
+          <Button asChild size="sm" variant="outline" className="text-xs">
+            <Link href={`/providers/${id}/edit`}>Edit</Link>
+          </Button>
+        )}
       </div>
 
       {/* Metric cards */}
@@ -136,7 +138,12 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
 
       <ProviderDetailView
         provider={provider}
-        supervisor={supervisor}
+        supervisor={supervisor ? {
+          id: supervisor.id,
+          firstName: supervisor.firstName,
+          lastName: supervisor.lastName,
+          credentialType: supervisor.credentialType,
+        } : null}
         caseload={caseload}
         recentSessions={recentSessions}
         supervisees={supervisees}

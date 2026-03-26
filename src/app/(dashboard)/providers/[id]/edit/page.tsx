@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireRole } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { getProviderById, getSupervisorOptions } from "@/server/queries/providers";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProviderForm } from "@/components/providers/provider-form";
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
 
 export default async function EditProviderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await requireRole(["owner", "admin"]);
+  const user = await requireAuth();
+  requirePermission(user.role, "providers.write");
 
   const [provider, supervisorOptions] = await Promise.all([
     getProviderById(user.organizationId, id),

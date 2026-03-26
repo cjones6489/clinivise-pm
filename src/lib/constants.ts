@@ -9,6 +9,9 @@ export type UserStatus = (typeof USER_STATUSES)[number];
 export const CREDENTIAL_TYPES = ["bcba", "bcba_d", "bcaba", "rbt", "other"] as const;
 export type CredentialType = (typeof CREDENTIAL_TYPES)[number];
 
+/** Credential types that qualify as supervisors (BCBA-level or above). */
+export const SUPERVISOR_CREDENTIAL_TYPES: readonly CredentialType[] = ["bcba", "bcba_d"];
+
 export const AUTH_STATUSES = ["pending", "approved", "denied", "expired", "exhausted"] as const;
 export type AuthStatus = (typeof AUTH_STATUSES)[number];
 

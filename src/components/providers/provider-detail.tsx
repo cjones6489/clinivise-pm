@@ -6,10 +6,12 @@ import type {
   ProviderCaseloadItem,
   ProviderRecentSession,
   ProviderSupervisee,
+  SupervisorOption,
 } from "@/server/queries/providers";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import {
   CREDENTIAL_LABELS,
+  SUPERVISOR_CREDENTIAL_TYPES,
   type CredentialType,
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
@@ -60,14 +62,14 @@ export function ProviderDetailView({
   supervisees,
 }: {
   provider: Provider;
-  supervisor: Provider | null;
+  supervisor: SupervisorOption | null;
   caseload: ProviderCaseloadItem[];
   recentSessions: ProviderRecentSession[];
   supervisees: ProviderSupervisee[];
 }) {
   const credLabel =
     CREDENTIAL_LABELS[provider.credentialType as CredentialType] ?? provider.credentialType;
-  const isSupervisor = provider.credentialType === "bcba" || provider.credentialType === "bcba_d";
+  const isSupervisor = SUPERVISOR_CREDENTIAL_TYPES.includes(provider.credentialType as CredentialType);
 
   return (
     <Tabs defaultValue="overview">
