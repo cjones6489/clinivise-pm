@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/server/db";
-import { providers, sessions, clients } from "@/server/db/schema";
+import { providers, sessions, clients, clientProviders } from "@/server/db/schema";
 import { eq, and, isNull, inArray, ne, sql, desc } from "drizzle-orm";
 import { SUPERVISOR_CREDENTIAL_TYPES } from "@/lib/constants";
 
@@ -122,35 +122,58 @@ export type ProviderCaseloadItem = {
   clientFirstName: string;
   clientLastName: string;
   clientStatus: string;
-  lastSessionDate: string;
+  role: string;
+  isPrimary: boolean;
+  lastSessionDate: string | null;
   sessionCount: number;
 };
 
+/** Active caseload from care team assignments, enriched with session stats */
 export async function getProviderCaseload(
   orgId: string,
   providerId: string,
 ): Promise<ProviderCaseloadItem[]> {
+  // Subquery: session stats per client for this provider
+  const sessionStats = db
+    .select({
+      clientId: sessions.clientId,
+      lastSessionDate: sql<string | null>`max(${sessions.sessionDate})`.as("last_session_date"),
+      sessionCount: sql<number>`count(*)::int`.as("session_count"),
+    })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.providerId, providerId),
+        sql`${sessions.status} != 'cancelled'`,
+      ),
+    )
+    .groupBy(sessions.clientId)
+    .as("session_stats");
+
   return db
     .select({
       clientId: clients.id,
       clientFirstName: clients.firstName,
       clientLastName: clients.lastName,
       clientStatus: clients.status,
-      lastSessionDate: sql<string>`max(${sessions.sessionDate})`,
-      sessionCount: sql<number>`count(*)::int`,
+      role: clientProviders.role,
+      isPrimary: clientProviders.isPrimary,
+      lastSessionDate: sessionStats.lastSessionDate,
+      sessionCount: sql<number>`coalesce(${sessionStats.sessionCount}, 0)`.mapWith(Number),
     })
-    .from(sessions)
-    .innerJoin(clients, eq(sessions.clientId, clients.id))
+    .from(clientProviders)
+    .innerJoin(clients, eq(clientProviders.clientId, clients.id))
+    .leftJoin(sessionStats, eq(clients.id, sessionStats.clientId))
     .where(
       and(
-        eq(sessions.organizationId, orgId),
-        eq(sessions.providerId, providerId),
+        eq(clientProviders.organizationId, orgId),
+        eq(clientProviders.providerId, providerId),
+        isNull(clientProviders.endDate),
         isNull(clients.deletedAt),
-        sql`${sessions.status} != 'cancelled'`,
       ),
     )
-    .groupBy(clients.id, clients.firstName, clients.lastName, clients.status)
-    .orderBy(sql`max(${sessions.sessionDate}) desc`);
+    .orderBy(clients.lastName, clients.firstName);
 }
 
 export type ProviderRecentSession = {

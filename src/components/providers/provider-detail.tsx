@@ -14,8 +14,10 @@ import { ProviderForm } from "@/components/providers/provider-form";
 import {
   ABA_CPT_CODES,
   CREDENTIAL_LABELS,
+  CARE_TEAM_ROLE_LABELS,
   SUPERVISOR_CREDENTIAL_TYPES,
   type CredentialType,
+  type CareTeamRole,
   type CptCode,
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
@@ -330,6 +332,9 @@ export function ProviderDetailView({
                       Client
                     </th>
                     <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
+                      Role
+                    </th>
+                    <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
                       Status
                     </th>
                     <th className="text-muted-foreground px-2 py-1.5 text-right font-medium">
@@ -350,6 +355,12 @@ export function ProviderDetailView({
                         >
                           {c.clientLastName}, {c.clientFirstName}
                         </Link>
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <span className="text-muted-foreground">
+                          {CARE_TEAM_ROLE_LABELS[c.role as CareTeamRole] ?? c.role}
+                          {c.isPrimary && <Badge variant="outline" className="ml-1.5 text-[9px]">Primary</Badge>}
+                        </span>
                       </td>
                       <td className="px-2 py-1.5">
                         <Badge variant={c.clientStatus === "active" ? "default" : "outline"} className="text-[10px]">
