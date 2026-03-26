@@ -3,7 +3,8 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { getClientOptions } from "@/server/queries/authorizations";
-import { getProviderOptions } from "@/server/queries/sessions";
+import { getProviderOptions, getClientLastSessionDefaults } from "@/server/queries/sessions";
+import { getProviderByUserId } from "@/server/queries/providers";
 import { PageHeader } from "@/components/layout/page-header";
 import { SessionForm } from "@/components/sessions/session-form";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -20,10 +21,17 @@ export default async function NewSessionPage({
   const { clientId, providerId } = await searchParams;
   const user = await requireRole([...PERMISSIONS["sessions.write"]]);
 
-  const [clientOptions, providerOptions] = await Promise.all([
+  // Parallel fetch: options + pre-fill data
+  const [clientOptions, providerOptions, userProvider, lastSessionDefaults] = await Promise.all([
     getClientOptions(user.organizationId),
     getProviderOptions(user.organizationId),
+    // Auto-select current user's provider (if they have one)
+    !providerId ? getProviderByUserId(user.organizationId, user.id) : Promise.resolve(null),
+    // Pre-fill CPT + POS from client's last session (if client is pre-selected)
+    clientId ? getClientLastSessionDefaults(user.organizationId, clientId) : Promise.resolve(null),
   ]);
+
+  const resolvedProviderId = providerId ?? userProvider?.id;
 
   return (
     <div className="space-y-6">
@@ -46,7 +54,9 @@ export default async function NewSessionPage({
         clientOptions={clientOptions}
         providerOptions={providerOptions}
         preselectedClientId={clientId}
-        preselectedProviderId={providerId}
+        preselectedProviderId={resolvedProviderId}
+        prefilledCptCode={lastSessionDefaults?.cptCode}
+        prefilledPlaceOfService={lastSessionDefaults?.placeOfService}
       />
     </div>
   );

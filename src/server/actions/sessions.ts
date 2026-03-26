@@ -15,7 +15,7 @@ import {
   authorizationServices,
   authorizations,
 } from "@/server/db/schema";
-import { eq, and, sql, lt, lte, gte, asc, isNull } from "drizzle-orm";
+import { eq, and, sql, lt, lte, gte, asc, desc, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
 import { logAudit } from "@/server/audit";
@@ -611,4 +611,28 @@ export const fetchMatchingAuthorizations = authActionClient
     }));
 
     return { success: true as const, data };
+  });
+
+// ── Fetch Client Session Defaults (for form pre-fill) ───────────────────────
+
+export const fetchClientSessionDefaults = authActionClient
+  .schema(z.object({ clientId: idSchema }))
+  .action(async ({ parsedInput, ctx }) => {
+    const [row] = await db
+      .select({
+        cptCode: sessions.cptCode,
+        placeOfService: sessions.placeOfService,
+      })
+      .from(sessions)
+      .where(
+        and(
+          eq(sessions.organizationId, ctx.organizationId),
+          eq(sessions.clientId, parsedInput.clientId),
+          eq(sessions.status, "completed"),
+        ),
+      )
+      .orderBy(desc(sessions.sessionDate), desc(sessions.createdAt))
+      .limit(1);
+
+    return { success: true as const, data: row ?? null };
   });

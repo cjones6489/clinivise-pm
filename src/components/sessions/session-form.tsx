@@ -14,6 +14,7 @@ import {
   createSession,
   updateSession,
   fetchMatchingAuthorizations,
+  fetchClientSessionDefaults,
 } from "@/server/actions/sessions";
 import type { SessionDetail, ProviderOption } from "@/server/queries/sessions";
 import type { ClientOption } from "@/server/queries/authorizations";
@@ -73,6 +74,8 @@ export function SessionForm({
   initialAuthMatches,
   preselectedClientId,
   preselectedProviderId,
+  prefilledCptCode,
+  prefilledPlaceOfService,
 }: {
   session?: SessionDetail;
   clientOptions: ClientOption[];
@@ -80,6 +83,10 @@ export function SessionForm({
   initialAuthMatches?: AuthServiceMatch[];
   preselectedClientId?: string;
   preselectedProviderId?: string;
+  /** Pre-fill from client's last completed session */
+  prefilledCptCode?: string;
+  /** Pre-fill from client's last completed session */
+  prefilledPlaceOfService?: string;
 }) {
   const router = useRouter();
   const isEdit = !!session;
@@ -124,9 +131,9 @@ export function SessionForm({
       sessionDate: session?.sessionDate ?? today,
       startTime: session ? formatTimeFromTimestamp(session.startTime) : "",
       endTime: session ? formatTimeFromTimestamp(session.endTime) : "",
-      cptCode: (session?.cptCode ?? "") as CreateSessionInput["cptCode"],
+      cptCode: (session?.cptCode ?? prefilledCptCode ?? "") as CreateSessionInput["cptCode"],
       units: session?.units ?? 0,
-      placeOfService: (session?.placeOfService ?? "12") as CreateSessionInput["placeOfService"],
+      placeOfService: (session?.placeOfService ?? prefilledPlaceOfService ?? "12") as CreateSessionInput["placeOfService"],
       status: (session?.status ?? "completed") as CreateSessionInput["status"],
       modifierCodes: initialUserModifiers,
       notes: session?.notes ?? "",
@@ -198,6 +205,27 @@ export function SessionForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProviderId]);
+
+  // Cascade 1.5: Client change → pre-fill CPT + POS from last session
+  const { executeAsync: loadDefaults } = useAction(fetchClientSessionDefaults);
+
+  useEffect(() => {
+    if (!selectedClientId || isEdit) return;
+    // Only pre-fill if CPT is currently empty (user hasn't selected one yet)
+    const currentCpt = watch("cptCode");
+    if (currentCpt) return;
+
+    loadDefaults({ clientId: selectedClientId }).then((result) => {
+      if (result?.data?.data) {
+        const { cptCode, placeOfService } = result.data.data;
+        if (cptCode) setValue("cptCode", cptCode as CreateSessionInput["cptCode"]);
+        if (placeOfService) setValue("placeOfService", placeOfService as CreateSessionInput["placeOfService"]);
+      }
+    }).catch(() => {
+      // Silently ignore — pre-fill is optional
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClientId]);
 
   // Cascade 2: Client + CPT + Date → fetch matching authorizations
   const { executeAsync: loadAuthMatches } = useAction(fetchMatchingAuthorizations);

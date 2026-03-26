@@ -425,3 +425,27 @@ export async function getMatchingAuthorizationServices(
     remainingUnits: r.approvedUnits - r.usedUnits,
   }));
 }
+
+/** Get the most recent session's CPT + POS for a client (for form pre-fill). */
+export async function getClientLastSessionDefaults(
+  orgId: string,
+  clientId: string,
+): Promise<{ cptCode: string; placeOfService: string } | null> {
+  const [row] = await db
+    .select({
+      cptCode: sessions.cptCode,
+      placeOfService: sessions.placeOfService,
+    })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.organizationId, orgId),
+        eq(sessions.clientId, clientId),
+        eq(sessions.status, "completed"),
+      ),
+    )
+    .orderBy(desc(sessions.sessionDate), desc(sessions.createdAt))
+    .limit(1);
+
+  return row ?? null;
+}

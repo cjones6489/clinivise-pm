@@ -19,6 +19,16 @@ export async function getProviders(orgId: string): Promise<Provider[]> {
     .orderBy(providers.lastName, providers.firstName);
 }
 
+/** Find the provider record linked to a user (for session form pre-fill). */
+export async function getProviderByUserId(orgId: string, userId: string): Promise<{ id: string } | null> {
+  const [provider] = await db
+    .select({ id: providers.id })
+    .from(providers)
+    .where(and(scopedWhere(orgId), eq(providers.userId, userId), eq(providers.isActive, true)))
+    .limit(1);
+  return provider ?? null;
+}
+
 export async function getProviderById(orgId: string, id: string): Promise<Provider | null> {
   const [provider] = await db
     .select()
