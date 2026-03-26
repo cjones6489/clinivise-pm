@@ -20,7 +20,7 @@ export default async function ProvidersPage() {
     <div className="space-y-6">
       <PageHeader
         title="Providers"
-        description="Manage your practice's providers and their credentials."
+        description={`${providers.length} provider${providers.length !== 1 ? "s" : ""} in your practice`}
         actions={
           <Button asChild size="sm" className="text-xs">
             <Link href="/providers/new">Add Provider</Link>

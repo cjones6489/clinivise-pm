@@ -13,6 +13,8 @@ import { AuthorizationDetail } from "@/components/authorizations/authorization-d
 import { AuthStatusBadge } from "@/components/authorizations/auth-status-badge";
 import { UtilizationBar } from "@/components/shared/utilization-bar";
 import { ExpiryBadge, getExpiryLevel } from "@/components/shared/expiry-badge";
+import { MetricCard } from "@/components/shared/metric-card";
+import { getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
 import { Button } from "@/components/ui/button";
 import { cn, formatDate, daysUntilExpiry } from "@/lib/utils";
 
@@ -124,6 +126,44 @@ export default async function AuthorizationDetailPage({
           </div>
         )}
       </div>
+
+      {/* Metric Cards */}
+      {totalApproved > 0 && (() => {
+        const utilizationPct = Math.round((totalUsed / totalApproved) * 100);
+        const level = getUtilizationLevel(utilizationPct);
+        const startMs = new Date(authorization.startDate).getTime();
+        const endMs = new Date(authorization.endDate).getTime();
+        const nowMs = Date.now();
+        const weeksElapsed = Math.max(1, (Math.min(nowMs, endMs) - startMs) / (7 * 86400000));
+        const weeklyBurn = ((totalUsed * 15) / 60 / weeksElapsed).toFixed(1);
+
+        return (
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+            <MetricCard
+              label="Days Remaining"
+              value={daysLeft >= 0 ? String(daysLeft) : "Expired"}
+              sub={`Expires ${formatDate(authorization.endDate)}`}
+              accent={daysLeft <= 7 ? "text-red-600 dark:text-red-400" : daysLeft <= 30 ? "text-amber-600 dark:text-amber-400" : undefined}
+            />
+            <MetricCard
+              label="Hours Used"
+              value={`${((totalUsed * 15) / 60).toFixed(1)}h`}
+              sub={`${utilizationPct}% utilized`}
+              accent={LEVEL_COLORS[level].text}
+            />
+            <MetricCard
+              label="Hours Approved"
+              value={`${((totalApproved * 15) / 60).toFixed(1)}h`}
+              sub={`${authorization.services.length} service line${authorization.services.length !== 1 ? "s" : ""}`}
+            />
+            <MetricCard
+              label="Weekly Burn"
+              value={`${weeklyBurn}h`}
+              sub="avg per week"
+            />
+          </div>
+        );
+      })()}
 
       <AuthorizationDetail
         authorization={authorization}

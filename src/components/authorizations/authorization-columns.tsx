@@ -14,6 +14,7 @@ import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { AuthStatusBadge } from "./auth-status-badge";
 import { UtilizationBar } from "@/components/shared/utilization-bar";
 import { ExpiryBadge } from "@/components/shared/expiry-badge";
+import { formatDate } from "@/lib/utils";
 
 export function getAuthorizationColumns(opts: {
   onView: (auth: AuthorizationListItem) => void;
@@ -43,8 +44,17 @@ export function getAuthorizationColumns(opts: {
       cell: ({ getValue }) => <AuthStatusBadge status={getValue<string>()} />,
     },
     {
+      id: "period",
+      header: "Period",
+      cell: ({ row }) => (
+        <span className="text-xs tabular-nums">
+          {formatDate(row.original.startDate)} – {formatDate(row.original.endDate)}
+        </span>
+      ),
+    },
+    {
       id: "expiry",
-      header: "Expiry",
+      header: "Days Left",
       cell: ({ row }) => (
         <ExpiryBadge endDate={row.original.endDate} startDate={row.original.startDate} />
       ),

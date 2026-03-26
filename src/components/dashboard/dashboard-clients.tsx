@@ -17,7 +17,7 @@ function ClientRow({ client }: { client: DashboardClientRow }) {
       className="border-border/40 hover:bg-muted/30 block border-b px-4 py-2.5 transition-colors last:border-b-0"
     >
       {/* Desktop grid */}
-      <div className="hidden items-center gap-2 sm:grid sm:grid-cols-[2fr_1fr_1.5fr_0.8fr_24px]">
+      <div className="hidden items-center gap-2 sm:grid sm:grid-cols-[2fr_0.8fr_1fr_1.5fr_0.8fr_24px]">
         <div>
           <span className="text-xs font-semibold">
             {client.firstName} {client.lastName}
@@ -25,6 +25,9 @@ function ClientRow({ client }: { client: DashboardClientRow }) {
           <span className="text-muted-foreground ml-1.5 text-[11px]">
             · {client.diagnosisCode ?? "—"} · Age {age}
           </span>
+        </div>
+        <div className="text-xs text-muted-foreground truncate">
+          {client.payerName ?? "—"}
         </div>
         <div className="text-xs text-muted-foreground">
           {client.bcbaName ?? "—"}
@@ -98,11 +101,12 @@ export async function DashboardClients({ orgId }: { orgId: string }) {
       </div>
 
       {/* Desktop header */}
-      <div className="border-border bg-muted/50 hidden grid-cols-[2fr_1fr_1.5fr_0.8fr_24px] gap-2 border-b px-4 py-2 sm:grid">
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">Client</span>
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">BCBA</span>
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">Utilization</span>
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">Expiry</span>
+      <div className="border-border bg-muted/50 hidden grid-cols-[2fr_0.8fr_1fr_1.5fr_0.8fr_24px] gap-2 border-b px-4 py-2 sm:grid">
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Client</span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Payer</span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">BCBA</span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Utilization</span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Expiry</span>
         <span />
       </div>
 

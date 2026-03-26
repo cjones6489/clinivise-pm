@@ -1,17 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import type { Client, ClientContact, ClientInsuranceWithPayer } from "@/server/queries/clients";
+import type { Client, ClientInsuranceWithPayer } from "@/server/queries/clients";
 import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import {
-  CONTACT_RELATIONSHIP_LABELS,
   CREDENTIAL_LABELS,
   PAYER_TYPE_LABELS,
   ABA_CPT_CODES,
   AUTH_ALERT_THRESHOLDS,
-  type ContactRelationshipType,
   type CredentialType,
   type PayerType,
   type CptCode,
@@ -54,7 +52,6 @@ function SectionCard({
 
 export function ClientOverview({
   client,
-  contacts,
   insurance,
   authorizations,
   sessions,
@@ -62,14 +59,12 @@ export function ClientOverview({
   authUtilization,
 }: {
   client: Client;
-  contacts: ClientContact[];
   insurance: ClientInsuranceWithPayer[];
   authorizations: AuthorizationListItem[];
   sessions: SessionListItem[];
   bcbaName: string | null;
   authUtilization: ClientAuthUtilization | null;
 }) {
-  const guardian = contacts.find((c) => c.isLegalGuardian);
   const primaryInsurance = insurance.find((i) => i.priority === 1);
 
   // Utilization metrics from the new per-CPT query
@@ -203,54 +198,6 @@ export function ClientOverview({
           )}
         </SectionCard>
 
-        {/* Guardian */}
-        <SectionCard title="Primary Guardian">
-          {guardian ? (
-            <>
-              <KVRow label="Name" value={`${guardian.firstName} ${guardian.lastName}`} />
-              <KVRow
-                label="Relationship"
-                value={
-                  CONTACT_RELATIONSHIP_LABELS[guardian.relationship as ContactRelationshipType] ??
-                  guardian.relationship
-                }
-              />
-              {guardian.phone && <KVRow label="Phone" value={guardian.phone} />}
-              {guardian.email && <KVRow label="Email" value={guardian.email} />}
-            </>
-          ) : (
-            <p className="text-muted-foreground py-2 text-xs">No guardian on file</p>
-          )}
-        </SectionCard>
-
-        {/* Client Details */}
-        <SectionCard title="Details">
-          <KVRow
-            label="Gender"
-            value={
-              client.gender === "M"
-                ? "Male"
-                : client.gender === "F"
-                  ? "Female"
-                  : client.gender === "U"
-                    ? "Unknown"
-                    : "—"
-            }
-          />
-          {client.referralSource && <KVRow label="Referral" value={client.referralSource} />}
-          {client.addressLine1 && (
-            <KVRow
-              label="Address"
-              value={
-                client.city && client.state
-                  ? `${client.addressLine1}, ${client.city}, ${client.state} ${client.zipCode ?? ""}`
-                  : client.addressLine1
-              }
-            />
-          )}
-          {client.phone && <KVRow label="Phone" value={client.phone} />}
-          {client.email && <KVRow label="Email" value={client.email} />}
-        </SectionCard>
       </div>
 
       {/* Authorized Services — per-CPT utilization bars */}
@@ -290,10 +237,10 @@ export function ClientOverview({
       <SectionCard
         title="Recent Sessions"
         action={
-          sessions.length > 0 ? (
-            <Link href={`/clients/${client.id}`} className="text-xs text-primary hover:underline">
-              All sessions &rarr;
-            </Link>
+          sessions.length > 5 ? (
+            <span className="text-[11px] text-muted-foreground">
+              Showing 5 of {sessions.length} · see Sessions tab
+            </span>
           ) : undefined
         }
       >

@@ -56,7 +56,6 @@ export function ClientDetail({
       <TabsContent value="overview" className="pt-4">
         <ClientOverview
           client={client}
-          contacts={contacts}
           insurance={insurance}
           authorizations={authorizations}
           sessions={sessions}
