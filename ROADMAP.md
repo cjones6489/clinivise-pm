@@ -386,7 +386,9 @@ Key fixes applied across all audit rounds:
 - **Money**: `numeric(10,2)` in Postgres + `decimal.js` for arithmetic. Never `parseFloat()`.
 - **Multi-tenancy**: Shared schema with `organization_id`. Scoped query builder planned for Sprint 2.
 - **Auth utilization**: Atomic SQL increments (`SET used_units = used_units + N`). Never read-modify-write.
-- **8-minute rule**: Per-session in Phase 1, per-day aggregation in Phase 2. Default AMA method.
+- **8-minute rule**: Per-code (AMA) in Phase 1. Phase 2 adds CMS aggregate (Medicaid) and full-unit (strict Medicaid). Formula `floor(m/15) + (m%15 >= 8 ? 1 : 0)` verified against CMS Ch. 15 §220.3.
+- **Modifier codes**: HM/HN/HO/HP auto-applied from credential type. Verified against Optum ABA Modifier FAQ. Phase 2 needs payer-specific overrides for state Medicaid U-series modifiers.
+- **Care team**: Phase 1 uses `assignedBcbaId` (single BCBA). Phase 2 adds `client_providers` junction table with roles, `is_primary`, time-bounding. Care team is suggestive (drives defaults), not restrictive (any provider can log sessions for any client).
 - **Auth overlap**: FIFO (oldest expiration first), allow manual override.
 - **Audit logging**: Synchronous, in-transaction, append-only.
 
@@ -403,6 +405,123 @@ Key fixes applied across all audit rounds:
 - **NOT using**: LangChain (overkill), vector DBs (no RAG needed), custom ML models (volume too low), OpenAI Whisper (hallucination risk in medical context)
 - **See**: `docs/research/deep-research-ai-native.md` for full strategy
 
+### Billing Research Findings (from 2026-03-26 audit)
+
+Comprehensive verification of unit calculations, modifier codes, and payer-specific rules. All findings verified against CMS manuals, ABA Coding Coalition, Optum/UHC FAQs, and state Medicaid provider manuals.
+
+**Unit Calculations (verified correct):**
+- `calculateUnitsFromMinutes` formula verified against CMS Medicare Benefit Policy Manual Ch. 15 §220.3
+- AMA per-code method (current default) is correct for commercial payers
+- Three methods needed for Phase 2: `ama` (commercial), `cms` (Medicaid aggregate), `full_unit` (strict Medicaid like Arkansas — `floor(minutes/15)`, no rounding)
+- CMS aggregate operates at **date-of-service level per patient**, not per session — needs date-level aggregation step in Phase 2
+- All ABA CPT codes 97151-97158 are timed at 15-minute units (97151 is NOT untimed)
+- January 2027: ABA Coding Coalition announced 6 new CPT codes + revisions to existing codes. Monitor in late 2026.
+
+**Modifier Codes (verified correct):**
+- `CREDENTIAL_MODIFIERS` mapping (RBT→HM, BCaBA→HN, BCBA→HO, BCBA-D→HP) confirmed by Optum ABA Modifier FAQ
+- Auto-application of telehealth modifier 95 for POS 02/10 is correct
+- Priority ordering and CMS 1500 4-modifier limit are correct
+- 21 test cases cover all standard scenarios
+
+**Phase 2 Billing Gaps (not blocking Phase 1):**
+
+| Gap | Impact | Details |
+|-----|--------|---------|
+| Payer-specific modifier overrides | High | Some state Medicaid programs use different modifiers: Nevada=UD, New Mexico=U1-U4, Minnesota=UB, Georgia=U6/U7. Need `payer_modifier_rules` table or JSONB override on payers |
+| CMS aggregate unit calc method | High | Medicaid payers need date-level cross-code aggregation with remainder distribution. Current code hardcodes `unitCalcMethod: "ama"` |
+| `full_unit` calculation method | Medium | Arkansas Medicaid and some strict programs require `floor(minutes/15)` with no rounding up |
+| `supervisingProviderId` on claims | Medium | CMS-1500 Box 17/17b needs supervising BCBA NPI when RBT is rendering provider. `sessions.supervisorId` exists but `claims` table lacks dedicated field |
+| Rendering vs supervising NPI rules | High | Some payers want RBT NPI as rendering, others want BCBA NPI. Needs payer-level configuration |
+| Modifier mutual exclusivity | Medium | No validation prevents 59 + XE on same line (mutually exclusive). Add during claim generation |
+| Credential expiry warning | Medium | Expired RBT certification + HM modifier = denial. Track `credentialExpiry` and warn/block |
+| `maxUnitsPerDay` server enforcement | Medium | Value exists in constants/schema but not enforced during session creation |
+
+**Recommended payer defaults for Phase 2:**
+
+| Payer Type | Unit Calc | Modifier Source |
+|-----------|-----------|-----------------|
+| Commercial (BCBS, Aetna, Cigna, UHC) | `ama` | Standard HM/HN/HO/HP |
+| Medicaid (most states) | `cms` | Standard, but check state manual |
+| Medicare | `cms` | Standard |
+| TRICARE | `ama` | Rule of Eights (per-code) |
+| Strict Medicaid (AR, etc.) | `full_unit` | State-specific |
+
+### Care Team / Client-Provider Assignment (from 2026-03-26 research)
+
+Multi-agent competitive research across CentralReach, AlohaABA, Raven Health, Motivity, Healthie, SimplePractice, plus BACB supervision requirements and ABA practitioner forums.
+
+**Real-world care team structure per client:**
+- 1+ supervising BCBAs (one primary, others for coverage/transition/supervision)
+- 0-1 BCaBAs (uncommon, assists BCBA)
+- 1-4 RBTs (frontline therapy, high turnover: 77-103% annually)
+- Optional: Clinical Director (BCBA-D, oversees BCBAs)
+
+**Critical design principles:**
+- **Care team = convenience, not access control.** The team is "who usually works with this client" — it drives smart defaults and caseload views, but never blocks service delivery.
+- **Sessions record who actually showed up.** Any active provider in the org can log for any client, whether or not they're on the team. Float RBTs, coverage BCBAs, one-time assessments — all valid without team assignment.
+- **Multiple BCBAs per client are valid.** Primary BCBA owns the treatment plan/auth, but coverage BCBAs, transitioning BCBAs, and clinical directors may also be on the team.
+- **`is_primary` is a flag, not a role restriction.** One primary BCBA per client for auth/claims defaults, but multiple BCBA-role team members are allowed.
+- **Phase 3 optional restriction.** Larger practices may want a "restrict sessions to team members" setting. Off by default.
+
+**Competitor landscape (opportunity):**
+
+| Platform | Model | Weakness |
+|----------|-------|----------|
+| CentralReach | Manual "Connections" per client-employee pair | Setup friction, no role distinction |
+| AlohaABA | Implicit through scheduling/permissions | No visible team anywhere |
+| Raven Health | Scheduling-driven, no formal team | Same — emergent, not explicit |
+| Motivity | Explicit "Learner Team" with permission scoping | Best in ABA, but no time-bounding |
+| Healthie | Primary provider + Care Team members + bulk assignment | Best UX, but no roles |
+
+**No ABA platform does care teams well. This is a differentiator.**
+
+**Phase 1 (current — adequate):**
+- `clients.assignedBcbaId` covers the primary BCBA relationship
+- 15 locations in codebase assume single BCBA (schema, queries, actions, validators, UI)
+- Sessions already allow any org provider via `sessions.providerId`
+- Sufficient for MVP — most small practices have 1-2 BCBAs
+
+**Phase 2 (add junction table):**
+
+```
+client_providers:
+  id              — nanoid PK
+  organization_id — FK, multi-tenant isolation
+  client_id       — FK to clients
+  provider_id     — FK to providers
+  role            — text: 'supervising_bcba' | 'bcba' | 'lead_rbt' | 'rbt' | 'bcaba'
+  is_primary      — boolean (one primary per client, for auth/claims defaults)
+  start_date      — date, when assignment began
+  end_date        — date nullable, null = active, date = historical
+  notes           — text nullable ("covering for X during leave")
+  created_at, updated_at
+
+Indexes:
+  (org_id, client_id) WHERE end_date IS NULL  — active team for client
+  (org_id, provider_id) WHERE end_date IS NULL — active caseload for provider
+  UNIQUE (org_id, client_id, provider_id) WHERE end_date IS NULL — no duplicate active assignments
+```
+
+Migration: Seed from existing `assignedBcbaId`. Keep `assignedBcbaId` as denormalized shortcut until fully migrated.
+
+**Phase 2 UI:** Care Team card on client detail (avatar list with roles), team management in client edit, provider dropdown on session form suggests team members first.
+
+**Phase 3 features:**
+- BACB supervision ratio tracking (5% of monthly RBT direct hours supervised by BCBA)
+- ReBAC data scoping — "If on Team" permission model (Motivity pattern)
+- Optional "restrict sessions to team" setting per practice
+- Substitution workflow (one-click temp assignment)
+- Bulk team assignment from client list (Healthie pattern)
+- Historical team assignment records for compliance audits
+
+**BACB supervision requirements (for Phase 3 tracking):**
+- RBTs: minimum 5% of monthly direct-service hours supervised by BCBA/BCaBA
+- Cannot be averaged across months — must be met every calendar month
+- At least 2 face-to-face supervision contacts per month
+- At least 1 must be individual (not group)
+- At least 1 must include direct observation of RBT with client
+- Non-compliance = RBT certification suspension/revocation + retroactive claim denials
+
 ### What's Explicitly Out of Scope (Phase 2+)
 
 - Claims submission / ERA processing / eligibility checks (Stedi)
@@ -414,4 +533,4 @@ Key fixes applied across all audit rounds:
 
 ---
 
-_Last updated: 2026-03-25 — Phase 1-Core complete (1A Sessions + 1B Auth Intelligence + 1C Dashboard + 1D Integration). 263 tests passing. 34+ audit findings fixed. Next: Phase 1-Polish or Phase 2._
+_Last updated: 2026-03-26 — Phase 1-Core complete. 263 tests passing. Billing math + modifier codes audited. Care team model researched and designed._

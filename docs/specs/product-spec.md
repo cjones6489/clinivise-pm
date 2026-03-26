@@ -260,7 +260,7 @@ SETTINGS
 - **Back link**: "← Back to Clients" (text-primary, clickable)
 - **Header**: Large client name (22px bold) + "DOB: {date} · Age {N} · {diagnosisCode}: {diagnosisDescription}" + "Guardian: {name} · {phone} · {email}" + status badges on right (status badge + "Auth: {N}d left" if active auth)
 - **Action buttons row**: Log Session (primary blue), Upload Auth Letter (outline), Run Eligibility Check (outline, Phase 2)
-- **Tabs**: Overview | Insurance | Authorizations | Sessions | Documents | Edit (if canEdit)
+- **Tabs**: Overview | Care Team | Insurance | Authorizations | Sessions | Documents | Edit (if canEdit)
 
 **Overview tab**:
 - **Metric cards** (4):
@@ -270,12 +270,70 @@ SETTINGS
   - Days Left: `end_date - today` from active auth, sub-text shows "Auth expires {date}"
 - **2-column grid**:
   - Insurance card (section card with title bar): key-value pairs — Payer, Member ID, Group, Plan Name, Type, Effective Date, Term Date. Data from primary `client_insurance` with `payers` JOIN.
-  - Care Team card (section card with title bar): avatar initials (colored square) + provider name + role. Shows assigned BCBA. Future: assigned RBTs.
+  - Care Team summary card (section card with title bar + "Manage →" link to Care Team tab): compact avatar stack showing team members with role labels. Shows count: "2 BCBAs · 3 RBTs". Phase 1: shows assigned BCBA only. Phase 2: full team from `client_providers`.
 - **Authorized Services card** (section card with title bar): Per-CPT code utilization. Each row shows: CPT code (monospace, primary color) + description, "N hrs remaining" on right, progress bar (color-coded by utilization threshold). Data from `authorization_services` on the active authorization.
 
 **Note on units vs hours**: The schema stores 15-minute units in `approved_units` and `used_units`. The UI displays hours for readability: `hours = units * 15 / 60`. Both the metric cards and utilization bars show hours. The Authorizations tab detail view can show raw units for precision.
 
 **Insurance tab**: Already built (Sprint 2C). Insurance policy cards with verification status, payer combobox, subscriber details.
+
+**Care Team tab** (Phase 2):
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  CARE TEAM                          2 BCBAs · 3 RBTs       │
+│                                                             │
+│  ┌─ Supervising ──────────────────────────────────────────┐ │
+│  │ [SC] Sarah Chen       BCBA    ★ Primary          [⋯]  │ │
+│  │ [DP] David Park       BCBA                       [⋯]  │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                             │
+│  ┌─ Direct Service ───────────────────────────────────────┐ │
+│  │ [MJ] Marcus Johnson   RBT                        [⋯]  │ │
+│  │ [AR] Amy Rodriguez    RBT    ★ Primary RBT       [⋯]  │ │
+│  │ [CL] Chris Lee        RBT                        [⋯]  │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                             │
+│  [+ Add Provider to Care Team]                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Interaction pattern** (combobox-search-and-add — NOT drag-and-drop):
+1. Click "+ Add Provider to Care Team" → popover opens (not modal, keep team visible for context)
+2. Search input auto-focused, type-ahead filters available providers (those NOT already on this team)
+3. Each row: avatar initials, name, credential badge, # current clients (load context)
+4. Click provider → role auto-selects from credential (BCBA→Supervising, RBT→Direct Service)
+5. User can override role from inline dropdown if needed
+6. Provider appears in grouped list with subtle animation + Sonner toast
+
+**Team member row**: Avatar initials + name + credential badge + role dropdown (inline, changeable) + ★ primary toggle (star icon, single-click) + ⋯ overflow menu (Remove from team, View provider profile)
+
+**Role groups (section headers):**
+- Supervising (BCBAs, BCBA-Ds, BCaBAs)
+- Direct Service (RBTs, lead RBTs)
+
+**Primary designation**: ★ star toggle per role group — one primary BCBA (for auth/claims defaults) and optionally one primary RBT (lead). Click star → previous primary in that group is demoted. Not the same as "role" — a provider can be role=BCBA + primary=false (coverage BCBA).
+
+**Key design decisions:**
+
+| Decision | Choice | Reasoning |
+|----------|--------|-----------|
+| No drag-and-drop | Combobox-add | Faster (3 clicks vs 5+), works on tablets, accessible, supports inline role assignment |
+| Popover not modal | Keep team visible | Context: see who's already on the team while adding |
+| Auto-role from credential | RBT→Direct, BCBA→Supervising | Reduces clicks; 80% of the time the default is correct |
+| Grouped by role | Section headers | ABA teams have clear hierarchy; scannable |
+| Primary = star toggle | Separate from role | Orthogonal concerns; most common edit is changing primary, should be 1 click |
+| Remove via overflow menu | Not prominent button | Destructive action behind intentional click |
+
+**Empty state**: "No care team assigned yet. Add providers to this client's care team." + [Add Provider] button.
+
+**Phase 1 (current)**: Care Team tab shows single assigned BCBA (from `clients.assignedBcbaId`) in the same grouped layout. "Add Provider" button either links to Edit tab BCBA dropdown or is disabled with "Full care team management coming soon."
+
+**Phase 2**: Full `client_providers` junction table. Add/remove/role-change interactions. Time-bounded assignments (start/end dates visible in ⋯ menu details).
+
+**Phase 3**: Supervision ratio display per BCBA-RBT pair (% of hours supervised this month), substitution workflow (one-click temp assignment), bulk assignment from client list.
+
+**Data required**: `client_providers` JOIN `providers` WHERE `end_date IS NULL` (active assignments). Phase 1: `providers` WHERE `id = client.assignedBcbaId`.
 
 **Authorizations tab**: Card per authorization. Current/active auth expanded showing: period (start → end), days left, weekly target hours, projected utilization %, per-CPT utilization bars. Previous/expired auths collapsed showing one-line summary: "{period} · {CPT}: {used}/{approved} ({pct}%)". Actions: Add Authorization, Edit, Renew (creates new auth with `previous_authorization_id` link).
 
@@ -291,16 +349,16 @@ SETTINGS
 - `client_insurance` → `payers` JOIN (all policies, ordered by priority)
 - `authorizations` → `authorization_services` (CPT + used/approved units)
 - `sessions` for this client, joined with `providers`
-- `providers` for care team display (BCBA via `assigned_bcba_id`)
+- `providers` for care team display (Phase 1: BCBA via `assigned_bcba_id`; Phase 2: `client_providers` junction table)
 
 **Actions from this page**:
 - Primary: Log Session (→ `/sessions/new?clientId={id}`)
 - Secondary: Upload Auth Letter (→ upload + AI parse, Phase 2), Run Eligibility Check (Phase 2)
 - Tab-specific: Add/edit insurance (Insurance tab), Add/edit authorization (Authorizations tab), view/edit session (Sessions tab)
 
-**MVP scope**: Rich header with contextual metadata + Overview tab (metric cards, insurance snapshot, care team, utilization bars) + Insurance tab (built) + Authorizations tab (Sprint 2D) + Sessions tab (Sprint 3A) + Edit tab (built). Documents tab deferred to Phase 2.
+**MVP scope**: Rich header with contextual metadata + Overview tab (metric cards, insurance snapshot, care team summary, utilization bars) + Care Team tab (Phase 1: single BCBA display; Phase 2: full team management) + Insurance tab (built) + Authorizations tab (Sprint 2D) + Sessions tab (Sprint 3A) + Edit tab (built). Documents tab deferred to Phase 2.
 
-**Phase 2+**: Eligibility check button (Stedi), AI auth letter parsing, document management, session graphing, supervision notes.
+**Phase 2+**: Full care team management (add/remove/roles via `client_providers`), eligibility check button (Stedi), AI auth letter parsing, document management, session graphing, supervision notes.
 
 ---
 

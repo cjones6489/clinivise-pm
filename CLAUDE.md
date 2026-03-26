@@ -117,12 +117,13 @@ src/
 - **Sessions**: Measured in 15-minute units per CMS 8-minute rule. Store actual minutes + calculated units. Two calculation methods: CMS (aggregate across codes, Medicare/Medicaid) and AMA (per-code, commercial payers). Default AMA. Store payer preference
 - **Auth tracking**: `used_units` vs `approved_units` per CPT code per authorization. Atomic SQL increments only (`SET used_units = used_units + N`), never read-modify-write. Overlapping auths: FIFO (oldest expiration first), allow manual override
 - **Auth utilization alerts**: 80% warning, 95% critical, 100%+ over-utilized. Alert on expiring auths (30/14/7 days). Alert on under-utilization (<50% used with >50% of period elapsed)
+- **Care team**: Phase 1 uses `clients.assignedBcbaId` (single primary BCBA). Phase 2 adds `client_providers` junction table with roles (`supervising_bcba`, `bcba`, `lead_rbt`, `rbt`, `bcaba`), `is_primary` flag, and time-bounded assignments (`start_date`/`end_date`). **Care team is suggestive, not restrictive** — any active org provider can log sessions for any client. Multiple BCBAs per client are valid (coverage, transitions, clinical director). The team drives smart defaults (pre-fill provider dropdowns, auto-suggest supervisor, caseload views) but never blocks service delivery.
 
 ## Phase Context
 
 **Phase 1 (current):** Auth, multi-tenant foundation, client/provider/authorization CRUD, session logging, dashboard overview, AI auth letter parsing, audit logging.
 
-**Out of scope now:** Claims submission, ERA processing, eligibility checks, denial management, analytics, parent portal.
+**Out of scope now:** Claims submission, ERA processing, eligibility checks, denial management, analytics, parent portal, full care team management (Phase 2), supervision ratio tracking (Phase 3).
 
 ## Documentation
 

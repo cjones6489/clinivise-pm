@@ -121,7 +121,7 @@ Same structure as BCBA but with financial metrics:
 │                                                                 │
 │ [+ Log Session]  [Upload Auth Letter]                           │
 ├─────────────────────────────────────────────────────────────────┤
-│ [Overview] [Insurance] [Authorizations] [Sessions] [Contacts] [Edit] │
+│ [Overview] [Care Team] [Insurance] [Authorizations] [Sessions] [Contacts] [Edit] │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -138,20 +138,12 @@ Same structure as BCBA but with financial metrics:
 │                                                                 │
 │  ROW 2: Two-column grid                                         │
 │  ┌───────────────────────┐ ┌───────────────────────────────────┐│
-│  │ INSURANCE             │ │ CARE TEAM                         ││
-│  │ Payer: BCBS           │ │ [SC] Dr. Sarah Chen, BCBA        ││
-│  │ Member: BCB998877     │ │      Clinical Director            ││
+│  │ INSURANCE             │ │ CARE TEAM            [Manage →]   ││
+│  │ Payer: BCBS           │ │ [SC][DP][MJ][AR] 2 BCBAs · 2 RBTs││
+│  │ Member: BCB998877     │ │ Primary: Dr. Sarah Chen, BCBA     ││
 │  │ Group: GRP-44521      │ │                                   ││
-│  │ Type: Commercial      │ │ [DP] David Park, RBT             ││
-│  │ Effective: Jan 1 2025 │ │      Behavior Technician          ││
-│  └───────────────────────┘ └───────────────────────────────────┘│
-│                                                                 │
-│  ┌───────────────────────┐ ┌───────────────────────────────────┐│
-│  │ PRIMARY GUARDIAN      │ │ DETAILS                           ││
-│  │ Rebecca Thompson      │ │ Gender: Male                      ││
-│  │ Mother                │ │ Referral: Pediatrician             ││
-│  │ (512) 555-0142        │ │ Address: Austin, TX                ││
-│  │ r.thompson@email.com  │ │ Intake: Jan 15, 2025              ││
+│  │ Type: Commercial      │ │ (compact summary — full team on   ││
+│  │ Effective: Jan 1 2025 │ │  Care Team tab)                   ││
 │  └───────────────────────┘ └───────────────────────────────────┘│
 │                                                                 │
 │  ROW 3: Authorized Services (full width)                        │
@@ -181,6 +173,52 @@ Same structure as BCBA but with financial metrics:
 - Auth utilization progress bars with color thresholds on the Overview tab (CentralReach buries this in billing)
 - Inline alerts for expiring auths, missing data (no competitor does this on the client page)
 - Recent sessions feed on overview (SimplePractice-inspired)
+
+**Care Team tab layout (Phase 2):**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  CARE TEAM                              2 BCBAs · 3 RBTs       │
+│                                                                 │
+│  ┌─ Supervising ──────────────────────────────────────────────┐ │
+│  │ [SC] Sarah Chen        BCBA    ★ Primary             [⋯]  │ │
+│  │ [DP] David Park        BCBA    (coverage)             [⋯]  │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│  ┌─ Direct Service ───────────────────────────────────────────┐ │
+│  │ [MJ] Marcus Johnson    RBT                            [⋯]  │ │
+│  │ [AR] Amy Rodriguez     RBT     ★ Lead RBT             [⋯]  │ │
+│  │ [CL] Chris Lee         RBT                            [⋯]  │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│  [+ Add Provider to Care Team]                                  │
+│                                                                 │
+│  ── Add Provider (popover, not modal) ──────────────────────    │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ 🔍 Search providers...                                   │   │
+│  │                                                          │   │
+│  │ Jordan Williams    RBT     4 clients    [Add →]          │   │
+│  │ Lisa Park          BCBA    8 clients    [Add →]          │   │
+│  │ Mike Chen          RBT     3 clients    [Add →]          │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  On click "Add": role auto-selects from credential              │
+│  (RBT → Direct Service, BCBA → Supervising). Override via       │
+│  inline dropdown. Provider appears in grouped list.              │
+│                                                                 │
+│  [⋯] menu per member: Change Role, Set as Primary,             │
+│       View Provider Profile, Remove from Team                   │
+│                                                                 │
+│  ★ = primary toggle (one per role group, single-click)          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key UX decisions (from research — Linear, GitHub, Healthie convergent pattern):**
+- **No drag-and-drop** — combobox-search-and-add is faster (3 clicks vs 5+), works on tablets, accessible
+- **Popover not modal** — keep existing team visible while adding
+- **Auto-role from credential** — reduces clicks; override available
+- **Grouped by role** — ABA teams have clear hierarchy; scannable at a glance
+- **Primary = star toggle** — separate from role, most common edit, single click
+- **No team membership restriction on sessions** — any org provider can log sessions for any client. Care team drives defaults, not access control.
 
 ---
 
