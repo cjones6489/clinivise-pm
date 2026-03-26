@@ -50,8 +50,8 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
             C
           </div>
           <div>
-            <div className="text-sm font-bold tracking-tight">Clinivise</div>
-            <p className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
+            <div className="text-sidebar-foreground text-sm font-semibold tracking-tight">Clinivise</div>
+            <p className="text-sidebar-foreground/50 text-[10px] font-medium tracking-widest uppercase">
               Practice Management
             </p>
           </div>
@@ -60,7 +60,7 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
 
       <SidebarContent className="px-2 pt-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-muted-foreground/70 mb-1 px-3 text-[10px] font-semibold tracking-widest uppercase">
+          <SidebarGroupLabel className="text-sidebar-foreground/40 mb-1 px-3 text-[10px] font-semibold tracking-widest uppercase">
             Core
           </SidebarGroupLabel>
           <SidebarMenu>

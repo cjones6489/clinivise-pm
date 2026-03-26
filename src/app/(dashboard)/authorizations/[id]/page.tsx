@@ -61,7 +61,7 @@ export default async function AuthorizationDetailPage({
 
   // Pre-compute metric card values
   const utilizationPct = totalApproved > 0 ? Math.round((totalUsed / totalApproved) * 100) : 0;
-  const utilizationLevel = totalApproved > 0 ? getUtilizationLevel(utilizationPct) : "normal";
+  const utilizationLevel = getUtilizationLevel(utilizationPct);
   const now = new Date();
   const weeklyBurn = totalApproved > 0
     ? (() => {
