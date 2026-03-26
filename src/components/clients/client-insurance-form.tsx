@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
@@ -65,8 +65,8 @@ export function ClientInsuranceForm({
 }) {
   const isEdit = !!insurance;
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [payerInputValue, setPayerInputValue] = useState("");
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const guardian = contacts.find((c) => c.isLegalGuardian);
 
@@ -104,12 +104,6 @@ export function ClientInsuranceForm({
 
   const relationship = watch("relationshipToSubscriber");
   const showSubscriber = relationship !== "self";
-
-  const filteredPayers = useMemo(() => {
-    if (!payerInputValue) return payerOptions;
-    const lower = payerInputValue.toLowerCase();
-    return payerOptions.filter((p) => p.name.toLowerCase().includes(lower));
-  }, [payerInputValue, payerOptions]);
 
   const { execute: executeCreate, isPending: isCreating } = useAction(createInsurance, {
     onSuccess: ({ data }) => {
@@ -175,7 +169,7 @@ export function ClientInsuranceForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Payer Section */}
         <div className="space-y-3">
           <h3 className="text-sm font-semibold">Payer</h3>
@@ -190,16 +184,19 @@ export function ClientInsuranceForm({
                   onValueChange={(val) => {
                     field.onChange(val);
                   }}
-                  onInputValueChange={(val) => setPayerInputValue(val)}
-                  filter={null}
+                  filter={(value, inputValue) => {
+                    if (!inputValue) return true;
+                    const name = payerOptions.find((p) => p.id === value)?.name ?? "";
+                    return name.toLowerCase().includes(inputValue.toLowerCase());
+                  }}
                   itemToStringLabel={(id: string) =>
                     payerOptions.find((p) => p.id === id)?.name ?? ""
                   }
                 >
                   <ComboboxInput placeholder="Search payers..." className="h-8 text-xs" />
-                  <ComboboxContent>
+                  <ComboboxContent container={formRef}>
                     <ComboboxList>
-                      {filteredPayers.map((p) => (
+                      {payerOptions.map((p) => (
                         <ComboboxItem key={p.id} value={p.id}>
                           <span>{p.name}</span>
                           {p.payerType && (

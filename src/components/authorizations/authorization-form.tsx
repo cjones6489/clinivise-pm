@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
@@ -72,7 +72,6 @@ export function AuthorizationForm({
   const router = useRouter();
   const isEdit = !!authorization;
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [clientInputValue, setClientInputValue] = useState("");
   const [insuranceOptions, setInsuranceOptions] = useState<ClientInsuranceOption[]>(
     initialInsuranceOptions ?? [],
   );
@@ -178,14 +177,6 @@ export function AuthorizationForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClientId]);
 
-  const filteredClients = useMemo(() => {
-    if (!clientInputValue) return clientOptions;
-    const lower = clientInputValue.toLowerCase();
-    return clientOptions.filter(
-      (c) => c.lastName.toLowerCase().includes(lower) || c.firstName.toLowerCase().includes(lower),
-    );
-  }, [clientInputValue, clientOptions]);
-
   const { execute: executeCreate, isPending: isCreating } = useAction(createAuthorization, {
     onSuccess: ({ data }) => {
       if (data?.success) {
@@ -246,8 +237,12 @@ export function AuthorizationForm({
               <Combobox
                 value={field.value || null}
                 onValueChange={(val) => field.onChange(val)}
-                onInputValueChange={(val) => setClientInputValue(val)}
-                filter={null}
+                filter={(value, inputValue) => {
+                  if (!inputValue) return true;
+                  const c = clientOptions.find((o) => o.id === value);
+                  const name = c ? `${c.lastName} ${c.firstName}` : "";
+                  return name.toLowerCase().includes(inputValue.toLowerCase());
+                }}
                 itemToStringLabel={(id: string) => {
                   const c = clientOptions.find((o) => o.id === id);
                   return c ? `${c.lastName}, ${c.firstName}` : "";
@@ -257,7 +252,7 @@ export function AuthorizationForm({
                 <ComboboxInput placeholder="Search clients..." className="h-8 text-xs" />
                 <ComboboxContent>
                   <ComboboxList>
-                    {filteredClients.map((c) => (
+                    {clientOptions.map((c) => (
                       <ComboboxItem key={c.id} value={c.id}>
                         {c.lastName}, {c.firstName}
                       </ComboboxItem>
