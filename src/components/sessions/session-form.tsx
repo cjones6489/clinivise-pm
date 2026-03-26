@@ -29,6 +29,8 @@ import {
   CREDENTIAL_MODIFIERS,
   RBT_SUPERVISED_CPT_CODES,
   QHP_ONLY_CPT_CODES,
+  ADDITIONAL_MODIFIER_OPTIONS,
+  MAX_MODIFIERS_PER_LINE,
   type CredentialType,
   type PlaceOfServiceCode,
   type SessionStatus,
@@ -47,6 +49,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, FieldError } from "@/components/ui/field";
+import { Badge } from "@/components/ui/badge";
 import {
   Combobox,
   ComboboxInput,
@@ -87,6 +90,23 @@ export function SessionForm({
   const today = format(new Date(), "yyyy-MM-dd");
   const idempotencyKey = useMemo(() => nanoid(), []);
 
+  // Compute initial user-added modifiers for edit mode by subtracting auto-computed ones
+  const initialUserModifiers = useMemo(() => {
+    if (!session?.modifierCodes) return [];
+    const autoSet = new Set<string>();
+    if (session.providerId) {
+      const provider = providerOptions.find((p) => p.id === session.providerId);
+      if (provider) {
+        const cred = CREDENTIAL_MODIFIERS[provider.credentialType];
+        if (cred) autoSet.add(cred);
+      }
+    }
+    if (session.placeOfService === "02" || session.placeOfService === "10") {
+      autoSet.add("95");
+    }
+    return session.modifierCodes.filter((m) => !autoSet.has(m));
+  }, [session, providerOptions]);
+
   const {
     register,
     handleSubmit,
@@ -108,6 +128,7 @@ export function SessionForm({
       units: session?.units ?? 0,
       placeOfService: (session?.placeOfService ?? "12") as CreateSessionInput["placeOfService"],
       status: (session?.status ?? "completed") as CreateSessionInput["status"],
+      modifierCodes: initialUserModifiers,
       notes: session?.notes ?? "",
       idempotencyKey: "",
     },
@@ -119,12 +140,26 @@ export function SessionForm({
   const selectedSessionDate = watch("sessionDate");
   const startTime = watch("startTime");
   const endTime = watch("endTime");
+  const watchedPlaceOfService = watch("placeOfService");
 
   // Get selected provider info
   const selectedProvider = useMemo(
     () => providerOptions.find((p) => p.id === selectedProviderId),
     [providerOptions, selectedProviderId],
   );
+
+  // Auto-assigned modifiers (credential + telehealth) — read-only in UI
+  const autoModifiers = useMemo(() => {
+    const mods: string[] = [];
+    if (selectedProvider) {
+      const cred = CREDENTIAL_MODIFIERS[selectedProvider.credentialType];
+      if (cred) mods.push(cred);
+    }
+    if (watchedPlaceOfService === "02" || watchedPlaceOfService === "10") {
+      mods.push("95");
+    }
+    return mods;
+  }, [selectedProvider, watchedPlaceOfService]);
 
   // Supervisor options (BCBAs only)
   const supervisorOptions = useMemo(
@@ -294,14 +329,8 @@ export function SessionForm({
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     const units = calculateUnitsFromMinutes(minutes);
-    const modifier = selectedProvider
-      ? CREDENTIAL_MODIFIERS[selectedProvider.credentialType] ?? null
-      : null;
-    const credLabel = selectedProvider
-      ? CREDENTIAL_LABELS[selectedProvider.credentialType as CredentialType] ?? null
-      : null;
-    return { hours, mins, units, modifier, credLabel };
-  }, [startTime, endTime, isNonBillableStatus, selectedProvider]);
+    return { hours, mins, units };
+  }, [startTime, endTime, isNonBillableStatus]);
 
   // Auth check card state
   const selectedAuthServiceId = watch("authorizationServiceId");
@@ -553,13 +582,75 @@ export function SessionForm({
               <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Units</div>
               <div className="text-sm font-semibold tabular-nums">{autoCalc.units}</div>
             </div>
-            {autoCalc.modifier && (
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Modifier</div>
-                <div className="text-sm font-semibold">{autoCalc.modifier}{autoCalc.credLabel ? ` (${autoCalc.credLabel})` : ""}</div>
-              </div>
-            )}
           </div>
+        )}
+
+        {/* Modifiers */}
+        {!isNonBillableStatus && (
+          <Field>
+            <Label className="text-xs font-medium">
+              Modifiers
+              <span className="ml-1 font-normal text-muted-foreground">
+                ({autoModifiers.length + (watch("modifierCodes")?.length ?? 0)} of {MAX_MODIFIERS_PER_LINE})
+              </span>
+            </Label>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {/* Auto-assigned modifiers (read-only) */}
+              {autoModifiers.map((mod) => (
+                <Badge key={mod} variant="secondary" className="text-[10px]">
+                  {mod}
+                  <span className="ml-1 text-muted-foreground">auto</span>
+                </Badge>
+              ))}
+              {/* User-added modifiers (removable) */}
+              <Controller
+                name="modifierCodes"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    {(field.value ?? []).map((mod) => (
+                      <Badge
+                        key={mod}
+                        variant="outline"
+                        className="cursor-pointer text-[10px] hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => field.onChange((field.value ?? []).filter((m) => m !== mod))}
+                      >
+                        {mod} ✕
+                      </Badge>
+                    ))}
+                    {autoModifiers.length + (field.value?.length ?? 0) < MAX_MODIFIERS_PER_LINE && (
+                      <Select
+                        value=""
+                        onValueChange={(val) => {
+                          if (val && !(field.value ?? []).includes(val)) {
+                            field.onChange([...(field.value ?? []), val]);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="h-6 w-auto min-w-24 gap-1 border-dashed px-2 text-[10px] text-muted-foreground">
+                          <SelectValue placeholder="+ Add" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ADDITIONAL_MODIFIER_OPTIONS
+                            .filter(
+                              (opt) =>
+                                !autoModifiers.includes(opt.value) &&
+                                !(field.value ?? []).includes(opt.value),
+                            )
+                            .map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </>
+                )}
+              />
+            </div>
+            <FieldError>{errors.modifierCodes?.message}</FieldError>
+          </Field>
         )}
         </div>
       </div>
