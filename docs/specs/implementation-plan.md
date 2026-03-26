@@ -437,44 +437,128 @@ File: `src/server/actions/sessions.ts` (in `createSession` transaction, before u
 
 > *Product spec §1 (Dashboard), UI/UX guide §1 (Dashboard), dashboard design research.*
 > Landing page after login. Practice health at a glance.
-
-#### Dashboard Backend
-
+>
 > See [Research §2: Dashboard — Design Patterns & Alert Systems](../research/phase-1-implementation-research.md#2-dashboard--design-patterns--alert-systems) and [Research §4: Technical Implementation Patterns](../research/phase-1-implementation-research.md#4-technical-implementation-patterns).
 
-Queries (use **SQL aggregation** — `FILTER (WHERE ...)`, `coalesce`, `nullif(... , 0)` — not fetch-all-rows-and-compute-in-JS):
-- [ ] `getDashboardMetrics(orgId)` — active client count, avg utilization, hours this week, action item count. Use Postgres `FILTER` for conditional counts in a single query.
-- [ ] `getDashboardAlerts(orgId)` — expiring auths (30/14/7d), high utilization (>=80%), expired auths, expired provider credentials, terminated insurance with active auth, flagged sessions. **Escalating severity**: same alert changes from info → warning → critical as deadline approaches. **Aggregate similar alerts**: "3 auths expiring within 14d" (one row), not 3 separate rows.
-- [ ] `getClientOverviewForDashboard(orgId)` — clients with inline payer, BCBA, auth utilization, auth status, days remaining. Use subquery for auth utilization per client (avoid N+1). **Sort by urgency** (most critical auth status first), not alphabetically.
+#### What's Already Built
 
-Tests:
-- [ ] Alert detection: expiring auth within 7 days returns critical severity
-- [ ] Alert detection: terminated insurance with active auth returns critical
-- [ ] Alert aggregation: 3 expiring auths within 14d produce single aggregated alert row
-- [ ] Metric aggregation: avg utilization correctly weights across auths, uses `coalesce`/`nullif` for NULL/zero safety
-- [ ] Client overview: results sorted by auth urgency (expired → expiring → low utilization → healthy)
-- [ ] Org isolation: dashboard queries only return data for the authenticated org
+| Component | File | Status |
+|-----------|------|--------|
+| Dashboard page (fetches clients + auths, passes to client component) | `src/app/(dashboard)/overview/page.tsx` | Done (21 lines) |
+| DashboardView (4 metric cards, alerts, client overview, getting started) | `src/components/dashboard/dashboard-view.tsx` | Done (462 lines — **all computation client-side**) |
+| Alert count for sidebar badge | `src/server/queries/authorizations.ts:getAlertCount` | Done |
 
-#### Dashboard Frontend
+**What's wrong with the current dashboard** (per plan + research):
 
-> See [Research §2: Alert Fatigue Prevention](../research/phase-1-implementation-research.md#alert-fatigue-prevention-critical-research) — healthcare alert fatigue causes 49-96% of alerts to be overridden (AHRQ). Follow the "5 Rights" framework.
+1. **All computation is client-side** — fetches ALL clients + ALL authorizations, computes in JS. Won't scale. Plan requires SQL aggregation.
+2. **No "Hours This Week" metric** — shows "Active Auths" instead.
+3. **No Suspense boundaries** — everything loads as one monolithic block.
+4. **No ErrorBoundary per section** — one query failure breaks the whole page.
+5. **Alerts not aggregated** — each expiring auth is a separate row. Research says "aggregate similar."
+6. **No max alert limit** — all alerts shown. Research says "max 3-5 visible."
+7. **Client overview sorted alphabetically** — plan says sort by urgency.
+8. **No "everything is fine" state** — no alerts = nothing shown.
+9. **No session data fetched** — can't show Hours This Week.
+10. **Hardcoded thresholds** — dashboard-view uses `0.8` and `95` instead of `AUTH_ALERT_THRESHOLDS`.
 
-Layout (match wireframe):
-- [ ] **Header**: "Dashboard" + date + description + action buttons (Log Session)
-- [ ] **4 metric cards**: Active Clients, Avg Utilization (color-coded), Hours This Week, Action Items (with critical count). 4 is optimal — scannable in one eye sweep per preattentive processing research.
-- [ ] **Priority Alerts card**: color-coded left border (red=critical, amber=warning), each with entity name, description, action button (Verify/Renew/Review). **Max 3-5 visible alerts** before "View all (N)" link. Aggregate similar alerts into single rows.
-- [ ] **Client Overview table**: client name+diagnosis+age, payer, eligibility (— for MVP), auth utilization bar, auth status badge with days remaining, clickable rows → client detail. **Sort by urgency** (most critical auth first), not alphabetically. Default: "Only showing items needing attention" filter, with "Show all" toggle.
-- [ ] **"Everything is fine" state**: When no alerts, show "All authorizations on track. No action items." with checkmark — confirms system is working, not that data is missing.
+**What's remaining** — three focused sub-sprints:
 
-Design quality:
-- [ ] **Per-section Suspense boundaries** — metrics load first, alerts second, table last. Each is an async server component fetching independently.
-- [ ] **ErrorBoundary wraps each Suspense** — one failing query doesn't break the whole dashboard. Pattern: `<SectionErrorBoundary><Suspense fallback={<Skeleton />}><AsyncSection /></Suspense></SectionErrorBoundary>`
-- [ ] Individual skeleton states per section matching exact content dimensions
-- [ ] Exception-based alerting: only surface problems, not happy paths
-- [ ] **60-30-10 color rule**: 60% default/muted (things that are fine), 30% accent/structure, 10% signal colors (things needing attention)
-- [ ] **3-second rule**: clinician should know what needs attention within 3 seconds of page load
-- [ ] Use section cards with title bars (not naked headings)
-- [ ] Max 3 levels of visual hierarchy per section: card title (uppercase 11px), content (13px medium), metadata (11px muted)
+---
+
+#### 1C-1 — Dashboard Backend (SQL Queries)
+
+> Replace client-side computation with 3 server-side SQL queries using Postgres `FILTER (WHERE ...)`, `coalesce`, `nullif`. This is the foundation — 1C-2 and 1C-3 depend on these queries.
+
+**New file** (`src/server/queries/dashboard.ts`):
+
+- [ ] `getDashboardMetrics(orgId)` — single SQL query returning:
+  - `activeClients`: `count(*) filter (where status = 'active')` from clients
+  - `avgUtilization`: `coalesce(round(sum(used) / nullif(sum(approved), 0) * 100), 0)` across active auth services
+  - `hoursThisWeek`: `coalesce(sum(units) filter (where session_date >= weekStart and status = 'completed'), 0) * 15.0 / 60` from sessions
+  - `actionItemCount`: count of alerts (expiring + high util + expired + flagged sessions)
+  - `criticalCount`: count of critical-severity alerts only
+  - Use `AUTH_ALERT_THRESHOLDS` constants, not hardcoded values
+
+- [ ] `getDashboardAlerts(orgId)` — returns individual alert items (grouped client-side for MVP):
+  - Expiring auths: `approved + endDate within 30d` → severity from `getExpiryLevel`
+  - Expired auths: `status = 'expired' OR (approved + endDate < today)`
+  - High utilization: `used/approved >= UTILIZATION_WARNING_PCT/100`
+  - Flagged sessions: `status = 'flagged'`
+  - Each alert: `{ type, severity, entityId, entityName, description, actionHref, actionLabel }`
+  - Order by severity (critical first), then by urgency within severity
+
+- [ ] `getClientOverviewForDashboard(orgId)` — clients with inline auth utilization via subquery:
+  - Subquery: per-client auth utilization (`sum(used)`, `sum(approved)`, `min(endDate)`) for active auths
+  - Main query: clients LEFT JOIN subquery, LEFT JOIN providers (BCBA), LEFT JOIN payers (primary insurance)
+  - **Sort by urgency**: expired auths first → expiring → high utilization → low utilization → healthy
+  - Limit 10 rows for dashboard
+
+**Tests** (`src/server/queries/dashboard.test.ts` — pure logic tests for alert severity/sorting):
+
+| # | Test | Expected |
+|---|------|----------|
+| 1 | Alert severity: auth expiring in 3d | critical |
+| 2 | Alert severity: auth expiring in 14d | warning |
+| 3 | Alert severity: 90% utilized | warning |
+| 4 | Alert severity: 100%+ utilized | critical |
+| 5 | Metrics: hours this week excludes cancelled sessions | Correct |
+| 6 | Client overview: sorted by urgency | expired → expiring → high util → healthy |
+
+---
+
+#### 1C-2 — Dashboard Page Rewrite (Suspense + Server Components)
+
+> Decompose the monolithic `"use client"` DashboardView into async server components with per-section Suspense boundaries. This is a significant refactor — the entire `dashboard-view.tsx` (462 lines) is replaced.
+
+**Page** (`src/app/(dashboard)/overview/page.tsx`):
+- [ ] Server component shell with header + action buttons
+- [ ] 3 Suspense boundaries, each wrapping an async server component:
+  ```tsx
+  <SectionErrorBoundary fallback={<SectionError title="Metrics unavailable" />}>
+    <Suspense fallback={<MetricsSkeleton />}>
+      <DashboardMetrics orgId={orgId} />
+    </Suspense>
+  </SectionErrorBoundary>
+  ```
+- [ ] Pattern: ErrorBoundary wraps Suspense (not the other way around)
+
+**Async server components** (new files in `src/components/dashboard/`):
+- [ ] `dashboard-metrics.tsx` — fetches `getDashboardMetrics`, renders 4 metric cards (Active Clients, Avg Utilization, Hours This Week, Action Items). Uses shared `MetricCard`, `getUtilizationLevel`, `LEVEL_COLORS`.
+- [ ] `dashboard-alerts.tsx` — fetches `getDashboardAlerts`, renders Priority Alerts section card. Groups similar alerts, caps at 5 visible with "View all (N)" link.
+- [ ] `dashboard-clients.tsx` — fetches `getClientOverviewForDashboard`, renders client overview table with `UtilizationBar` (compact) + `ExpiryBadge`. Clickable rows → client detail.
+
+**Shared infrastructure**:
+- [ ] `src/components/shared/section-error-boundary.tsx` — ErrorBoundary component with styled fallback ("Section unavailable. Try refreshing.")
+- [ ] Skeleton components for each section (metric cards skeleton, alerts skeleton, table skeleton)
+
+**Preserve from existing `dashboard-view.tsx`**:
+- [ ] Getting Started card (conditional on empty practice) — move to its own component
+- [ ] Header layout pattern (title + greeting + action button)
+
+---
+
+#### 1C-3 — Dashboard Polish
+
+> Alert fatigue prevention, urgency sorting, visual quality per research findings.
+
+**Alert aggregation + cap** (`dashboard-alerts.tsx`):
+- [ ] Group alerts by type: "3 authorizations expiring within 14 days" (single row with expand)
+- [ ] **Max 5 visible alerts** before "View all (N)" link
+- [ ] **"Everything is fine" state**: when no alerts, show "All authorizations on track. No action items." with checkmark icon
+- [ ] Severity ordering: critical first, then warning
+- [ ] Action buttons per alert: "Verify" → insurance tab, "Renew" → auth tab, "Review" → session detail
+
+**Client overview sorting** (`dashboard-clients.tsx`):
+- [ ] **Sort by urgency**: expired auth → expiring ≤7d → expiring ≤30d → high utilization → under-utilized → healthy
+- [ ] Default: "Showing items needing attention" — hide healthy clients. "Show all" toggle reveals full list.
+- [ ] Limit 10 rows, "View all clients →" link
+
+**Visual quality**:
+- [ ] **60-30-10 color rule**: 60% default/muted, 30% accent/structure, 10% signal colors
+- [ ] **3-second rule**: clinician knows what needs attention within 3 seconds
+- [ ] All thresholds derived from `AUTH_ALERT_THRESHOLDS` constants (no hardcoded values)
+
+**Phase 1C Checkpoint**: A practice owner opens the dashboard Monday morning and within 3 seconds sees: 4 metric cards (active clients, utilization %, hours this week, action items), a priority alerts card showing the top issues (expiring auths, over-utilized auths, flagged sessions), and a client overview sorted by who needs attention first. Each section loads independently via Suspense. If one query fails, the rest still render. **This is practice health at a glance.**
 
 ---
 
