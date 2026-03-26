@@ -5,6 +5,7 @@ import {
   VALID_SESSION_TRANSITIONS,
   type SessionStatus,
 } from "./constants";
+import { ConflictError } from "./errors";
 import { parseTimeToMinutes } from "./utils";
 
 /**
@@ -33,8 +34,8 @@ export function computeModifierCodes(
   );
 
   if (sorted.length > MAX_MODIFIERS_PER_LINE) {
-    throw new Error(
-      `Too many modifiers (${sorted.length}). CMS 1500 allows a maximum of ${MAX_MODIFIERS_PER_LINE} per line.`,
+    throw new ConflictError(
+      `Too many modifiers (${sorted.length}). CMS 1500 allows a maximum of ${MAX_MODIFIERS_PER_LINE} per line. Remove a modifier and try again.`,
     );
   }
 

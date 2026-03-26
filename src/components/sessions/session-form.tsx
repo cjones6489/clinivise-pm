@@ -149,17 +149,36 @@ export function SessionForm({
   );
 
   // Auto-assigned modifiers (credential + telehealth) — read-only in UI
+  const selectedCredentialType = selectedProvider?.credentialType;
   const autoModifiers = useMemo(() => {
     const mods: string[] = [];
-    if (selectedProvider) {
-      const cred = CREDENTIAL_MODIFIERS[selectedProvider.credentialType];
+    if (selectedCredentialType) {
+      const cred = CREDENTIAL_MODIFIERS[selectedCredentialType];
       if (cred) mods.push(cred);
     }
     if (watchedPlaceOfService === "02" || watchedPlaceOfService === "10") {
       mods.push("95");
     }
     return mods;
-  }, [selectedProvider, watchedPlaceOfService]);
+  }, [selectedCredentialType, watchedPlaceOfService]);
+
+  // Cascade: when auto modifiers change, strip conflicts & trim overflow from user modifiers
+  useEffect(() => {
+    const current = watch("modifierCodes") ?? [];
+    if (current.length === 0) return;
+    const autoSet = new Set(autoModifiers);
+    // Remove user modifiers that are now auto-assigned (e.g., user added "95" then POS changed to telehealth)
+    let cleaned = current.filter((m) => !autoSet.has(m));
+    // Trim if total would exceed max
+    const maxUserSlots = MAX_MODIFIERS_PER_LINE - autoModifiers.length;
+    if (cleaned.length > maxUserSlots) {
+      cleaned = cleaned.slice(0, maxUserSlots);
+    }
+    if (cleaned.length !== current.length) {
+      setValue("modifierCodes", cleaned);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoModifiers]);
 
   // Supervisor options (BCBAs only)
   const supervisorOptions = useMemo(
@@ -260,6 +279,7 @@ export function SessionForm({
       setValue("endTime", "");
       setValue("units", 0);
       setValue("authorizationServiceId", "");
+      setValue("modifierCodes", []);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedStatusForClear]);
@@ -587,43 +607,46 @@ export function SessionForm({
 
         {/* Modifiers */}
         {!isNonBillableStatus && (
-          <Field>
-            <Label className="text-xs font-medium">
-              Modifiers
-              <span className="ml-1 font-normal text-muted-foreground">
-                ({autoModifiers.length + (watch("modifierCodes")?.length ?? 0)} of {MAX_MODIFIERS_PER_LINE})
-              </span>
-            </Label>
-            <div className="flex flex-wrap items-center gap-1.5">
-              {/* Auto-assigned modifiers (read-only) */}
-              {autoModifiers.map((mod) => (
-                <Badge key={mod} variant="secondary" className="text-[10px]">
-                  {mod}
-                  <span className="ml-1 text-muted-foreground">auto</span>
-                </Badge>
-              ))}
-              {/* User-added modifiers (removable) */}
-              <Controller
-                name="modifierCodes"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    {(field.value ?? []).map((mod) => (
+          <Controller
+            name="modifierCodes"
+            control={control}
+            render={({ field }) => {
+              const userMods = field.value ?? [];
+              const totalCount = autoModifiers.length + userMods.length;
+              const canAddMore = totalCount < MAX_MODIFIERS_PER_LINE;
+              return (
+                <Field>
+                  <Label className="text-xs font-medium">
+                    Modifiers
+                    <span className="ml-1 font-normal text-muted-foreground">
+                      ({totalCount} of {MAX_MODIFIERS_PER_LINE})
+                    </span>
+                  </Label>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {/* Auto-assigned modifiers (read-only) */}
+                    {autoModifiers.map((mod) => (
+                      <Badge key={mod} variant="secondary" className="text-[10px]">
+                        {mod}
+                        <span className="ml-1 text-muted-foreground">auto</span>
+                      </Badge>
+                    ))}
+                    {/* User-added modifiers (removable) */}
+                    {userMods.map((mod) => (
                       <Badge
                         key={mod}
                         variant="outline"
                         className="cursor-pointer text-[10px] hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => field.onChange((field.value ?? []).filter((m) => m !== mod))}
+                        onClick={() => field.onChange(userMods.filter((m) => m !== mod))}
                       >
                         {mod} ✕
                       </Badge>
                     ))}
-                    {autoModifiers.length + (field.value?.length ?? 0) < MAX_MODIFIERS_PER_LINE && (
+                    {canAddMore && (
                       <Select
                         value=""
                         onValueChange={(val) => {
-                          if (val && !(field.value ?? []).includes(val)) {
-                            field.onChange([...(field.value ?? []), val]);
+                          if (val && !userMods.includes(val)) {
+                            field.onChange([...userMods, val]);
                           }
                         }}
                       >
@@ -635,7 +658,7 @@ export function SessionForm({
                             .filter(
                               (opt) =>
                                 !autoModifiers.includes(opt.value) &&
-                                !(field.value ?? []).includes(opt.value),
+                                !userMods.includes(opt.value),
                             )
                             .map((opt) => (
                               <SelectItem key={opt.value} value={opt.value} className="text-xs">
@@ -645,12 +668,12 @@ export function SessionForm({
                         </SelectContent>
                       </Select>
                     )}
-                  </>
-                )}
-              />
-            </div>
-            <FieldError>{errors.modifierCodes?.message}</FieldError>
-          </Field>
+                  </div>
+                  <FieldError>{errors.modifierCodes?.message}</FieldError>
+                </Field>
+              );
+            }}
+          />
         )}
         </div>
       </div>

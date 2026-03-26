@@ -81,7 +81,7 @@ describe("computeModifierCodes", () => {
     expect(computeModifierCodes("rbt", "12", [])).toEqual(["HM"]);
   });
 
-  it("throws when total modifiers exceed 4", () => {
+  it("throws ConflictError when total modifiers exceed 4", () => {
     expect(() =>
       computeModifierCodes("rbt", "02", ["59", "XP", "76"]),
     ).toThrow("Too many modifiers (5)");
@@ -91,6 +91,24 @@ describe("computeModifierCodes", () => {
     const result = computeModifierCodes("rbt", "02", ["59", "XP"]);
     expect(result).toEqual(["HM", "95", "59", "XP"]);
     expect(result).toHaveLength(4);
+  });
+
+  it("deduplicates when user passes auto-computed modifier", () => {
+    // User passes "HM" and "95" which are also auto-computed
+    const result = computeModifierCodes("rbt", "02", ["HM", "95"]);
+    expect(result).toEqual(["HM", "95"]);
+  });
+
+  it("allows GT and 95 together (both tier 2)", () => {
+    const result = computeModifierCodes("rbt", "02", ["GT"]);
+    expect(result).toEqual(["HM", "GT", "95"]);
+  });
+
+  it("does not add 95 for non-telehealth POS codes", () => {
+    for (const pos of ["03", "11", "12", "99"]) {
+      const result = computeModifierCodes("bcba", pos);
+      expect(result).not.toContain("95");
+    }
   });
 });
 
