@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { requireAuth } from "@/lib/auth";
-import { db } from "@/server/db";
-import { organizations } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
+import { requireRole } from "@/lib/auth";
+import { getOrganization } from "@/server/queries/organizations";
 import { PageHeader } from "@/components/layout/page-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserProfile } from "@clerk/nextjs";
-import type { UserRole } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Settings | Clinivise",
 };
-
-const ALLOWED_ROLES: UserRole[] = ["owner", "admin"];
 
 function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -46,24 +41,21 @@ function SectionCard({
 }
 
 export default async function SettingsPage() {
-  const user = await requireAuth();
+  const user = await requireRole(["owner", "admin"]);
+  const org = await getOrganization(user.organizationId);
 
-  if (!ALLOWED_ROLES.includes(user.role as UserRole)) {
+  if (!org) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-sm font-semibold">Access Denied</h2>
-        <p className="text-muted-foreground mt-1 text-xs">
-          You need admin or owner permissions to access settings.
-        </p>
+      <div className="space-y-6">
+        <PageHeader title="Settings" description="Practice configuration and profile" />
+        <SectionCard title="Error">
+          <p className="text-xs text-muted-foreground">
+            Organization not found. Please contact support if this issue persists.
+          </p>
+        </SectionCard>
       </div>
     );
   }
-
-  const [org] = await db
-    .select()
-    .from(organizations)
-    .where(eq(organizations.id, user.organizationId))
-    .limit(1);
 
   return (
     <div className="space-y-6">
@@ -78,11 +70,11 @@ export default async function SettingsPage() {
         <TabsContent value="practice" className="space-y-4 pt-4">
           {/* Practice Information */}
           <SectionCard title="Practice Information">
-            <KVRow label="Practice Name" value={org?.name ?? "—"} />
-            <KVRow label="Timezone" value={org?.timezone ?? "—"} />
-            {org?.phone && <KVRow label="Phone" value={org.phone} />}
-            {org?.email && <KVRow label="Email" value={org.email} />}
-            {org?.addressLine1 && (
+            <KVRow label="Practice Name" value={org.name} />
+            <KVRow label="Timezone" value={org.timezone} />
+            {org.phone && <KVRow label="Phone" value={org.phone} />}
+            {org.email && <KVRow label="Email" value={org.email} />}
+            {org.addressLine1 && (
               <KVRow
                 label="Address"
                 value={
@@ -94,11 +86,11 @@ export default async function SettingsPage() {
             )}
           </SectionCard>
 
-          {/* Billing Identifiers */}
-          {org?.npi || org?.taxId || org?.taxonomyCode ? (
+          {/* Billing Identifiers — show if BOTH NPI and Tax ID exist */}
+          {org.npi && org.taxId ? (
             <SectionCard title="Billing Identifiers">
-              {org.npi && <KVRow label="NPI" value={<span className="font-mono tabular-nums">{org.npi}</span>} />}
-              {org.taxId && <KVRow label="Tax ID" value={<span className="font-mono tabular-nums">{org.taxId}</span>} />}
+              <KVRow label="NPI" value={<span className="font-mono tabular-nums">{org.npi}</span>} />
+              <KVRow label="Tax ID" value={<span className="font-mono tabular-nums">{org.taxId}</span>} />
               {org.taxonomyCode && <KVRow label="Taxonomy Code" value={<span className="font-mono">{org.taxonomyCode}</span>} />}
             </SectionCard>
           ) : (
@@ -116,6 +108,7 @@ export default async function SettingsPage() {
         <TabsContent value="profile" className="pt-4">
           <div className="max-w-2xl">
             <UserProfile
+              routing="hash"
               appearance={{
                 elements: {
                   rootBox: "w-full",
