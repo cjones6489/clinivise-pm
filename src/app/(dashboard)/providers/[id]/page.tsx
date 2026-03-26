@@ -114,9 +114,9 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
       {/* Metric cards */}
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <MetricCard
-          label="Active Clients"
+          label="Clients Served"
           value={String(metrics.activeClients)}
-          sub="distinct clients served"
+          sub="all time"
         />
         <MetricCard
           label="Hours This Week"

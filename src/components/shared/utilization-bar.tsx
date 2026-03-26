@@ -58,6 +58,7 @@ export function UtilizationBar({
   label,
   showHours = true,
   compact = false,
+  overridePct,
 }: {
   usedUnits: number;
   approvedUnits: number;
@@ -67,8 +68,11 @@ export function UtilizationBar({
   showHours?: boolean;
   /** Compact mode for table cells — colored percentage text only, no full bar */
   compact?: boolean;
+  /** Override the displayed percentage (e.g., worst-case service line utilization) — color threshold uses this value */
+  overridePct?: number;
 }) {
-  const pct = approvedUnits > 0 ? Math.round((usedUnits / approvedUnits) * 100) : 0;
+  const computedPct = approvedUnits > 0 ? Math.round((usedUnits / approvedUnits) * 100) : 0;
+  const pct = overridePct ?? computedPct;
   const level = getUtilizationLevel(pct);
   const colors = LEVEL_COLORS[level];
   const remaining = Math.max(0, approvedUnits - usedUnits);

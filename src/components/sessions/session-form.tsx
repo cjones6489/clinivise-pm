@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
@@ -208,18 +208,25 @@ export function SessionForm({
 
   // Cascade 1.5: Client change → pre-fill CPT + POS from last session
   const { executeAsync: loadDefaults } = useAction(fetchClientSessionDefaults);
+  // Track whether user has manually touched CPT or POS — never overwrite manual selections
+  const userTouchedCpt = useRef(false);
+  const userTouchedPos = useRef(false);
 
   useEffect(() => {
     if (!selectedClientId || isEdit) return;
-    // Only pre-fill if CPT is currently empty (user hasn't selected one yet)
-    const currentCpt = watch("cptCode");
-    if (currentCpt) return;
+    // Skip if user has already manually selected CPT or POS
+    if (userTouchedCpt.current) return;
 
     loadDefaults({ clientId: selectedClientId }).then((result) => {
       if (result?.data?.data) {
         const { cptCode, placeOfService } = result.data.data;
-        if (cptCode) setValue("cptCode", cptCode as CreateSessionInput["cptCode"]);
-        if (placeOfService) setValue("placeOfService", placeOfService as CreateSessionInput["placeOfService"]);
+        // Only set if user hasn't manually touched the field since the fetch started
+        if (cptCode && !userTouchedCpt.current) {
+          setValue("cptCode", cptCode as CreateSessionInput["cptCode"]);
+        }
+        if (placeOfService && !userTouchedPos.current) {
+          setValue("placeOfService", placeOfService as CreateSessionInput["placeOfService"]);
+        }
       }
     }).catch(() => {
       // Silently ignore — pre-fill is optional
@@ -525,7 +532,7 @@ export function SessionForm({
               name="cptCode"
               control={control}
               render={({ field }) => (
-                <Select value={field.value || ""} onValueChange={field.onChange}>
+                <Select value={field.value || ""} onValueChange={(v) => { userTouchedCpt.current = true; field.onChange(v); }}>
                   <SelectTrigger className="h-8 w-full text-xs">
                     <SelectValue placeholder="Select CPT code" />
                   </SelectTrigger>
@@ -547,7 +554,7 @@ export function SessionForm({
               name="placeOfService"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => { userTouchedPos.current = true; field.onChange(v); }}>
                   <SelectTrigger className="h-8 w-full text-xs">
                     <SelectValue />
                   </SelectTrigger>

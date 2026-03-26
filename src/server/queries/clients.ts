@@ -26,6 +26,7 @@ export type ClientListItem = {
   totalApproved: number;
   totalUsed: number;
   nearestExpiry: string | null;
+  maxUtilizationPct: number;
 };
 
 function scopedWhere(orgId: string) {
@@ -85,12 +86,19 @@ export async function getClientsForList(orgId: string): Promise<ClientListItem[]
   const todayStr = new Date().toISOString().slice(0, 10);
 
   // Subquery: per-client auth utilization for active auths
+  // Uses max individual service utilization % (not blended aggregate) to surface worst-case auth
   const authUtil = db
     .select({
       clientId: authorizations.clientId,
       totalApproved: sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.as("total_approved"),
       totalUsed: sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.as("total_used"),
       nearestExpiry: sql<string>`min(${authorizations.endDate})`.as("nearest_expiry"),
+      maxUtilizationPct: sql<number>`coalesce(max(
+        case when ${authorizationServices.approvedUnits} > 0
+          then round(${authorizationServices.usedUnits}::numeric / ${authorizationServices.approvedUnits} * 100)
+          else 0
+        end
+      ), 0)::int`.as("max_utilization_pct"),
     })
     .from(authorizations)
     .leftJoin(authorizationServices, eq(authorizations.id, authorizationServices.authorizationId))
@@ -136,6 +144,7 @@ export async function getClientsForList(orgId: string): Promise<ClientListItem[]
       totalApproved: sql<number>`coalesce(${authUtil.totalApproved}, 0)`.mapWith(Number),
       totalUsed: sql<number>`coalesce(${authUtil.totalUsed}, 0)`.mapWith(Number),
       nearestExpiry: authUtil.nearestExpiry,
+      maxUtilizationPct: sql<number>`coalesce(${authUtil.maxUtilizationPct}, 0)`.mapWith(Number),
     })
     .from(clients)
     .leftJoin(providers, eq(clients.assignedBcbaId, providers.id))

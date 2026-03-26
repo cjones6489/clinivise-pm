@@ -577,6 +577,8 @@ export const fetchMatchingAuthorizations = authActionClient
     }),
   )
   .action(async ({ parsedInput, ctx }) => {
+    requirePermission(ctx.userRole, "sessions.read");
+
     const rows = await db
       .select({
         authServiceId: authorizationServices.id,
@@ -618,6 +620,8 @@ export const fetchMatchingAuthorizations = authActionClient
 export const fetchClientSessionDefaults = authActionClient
   .schema(z.object({ clientId: idSchema }))
   .action(async ({ parsedInput, ctx }) => {
+    requirePermission(ctx.userRole, "sessions.read");
+
     const [row] = await db
       .select({
         cptCode: sessions.cptCode,

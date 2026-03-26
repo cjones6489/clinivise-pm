@@ -82,9 +82,10 @@ export function getClientColumns(opts: {
       id: "utilization",
       header: "Auth Utilization",
       cell: ({ row }) => {
-        const { totalApproved, totalUsed } = row.original;
+        const { totalApproved, totalUsed, maxUtilizationPct } = row.original;
         if (totalApproved === 0) return <span className="text-muted-foreground">—</span>;
-        return <UtilizationBar usedUnits={totalUsed} approvedUnits={totalApproved} compact />;
+        // Show worst-case service line utilization (not blended aggregate) to surface problems
+        return <UtilizationBar usedUnits={totalUsed} approvedUnits={totalApproved} compact overridePct={maxUtilizationPct} />;
       },
     },
     {
