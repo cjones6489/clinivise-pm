@@ -669,40 +669,177 @@ Tests:
 
 #### 2B — Team Page (`/team`)
 
-> Team member management with ABA-specific role assignment. Clerk handles auth/invite, we handle role display and assignment.
+> Custom team management with ABA-specific role assignment. Based on deep RBAC research (5 documents, 46+ searches, 9 platforms analyzed). Do NOT use Clerk's `<OrganizationProfile>` — it shows generic "admin/member" roles instead of our ABA-specific roles. Build a custom Team page that reads from our `users` table and uses Clerk's API for invite/remove only.
+>
+> See: `docs/research/rbac-role-design-research.md` (permission matrix), `docs/research/rbac-architecture-research.md` (Clerk integration), `docs/research/rbac-competitor-research.md` (UI patterns)
 
-- [ ] Create `/team` route (owner/admin only)
-- [ ] **Members list**: table showing name, email, role badge (Owner/Admin/BCBA/BCaBA/RBT/Billing Staff), last active date. Data from our `users` table joined with Clerk user metadata.
-- [ ] **Invite member**: Clerk `<OrganizationProfile>` component for invite flow (handles email invite, org membership)
-- [ ] **Change role**: dropdown per member row to reassign ABA-specific role. Updates our `users.role` field. Owner/admin only.
-- [ ] **Role descriptions**: tooltip or info section explaining what each role can access (from `src/lib/permissions.ts` permission map)
-- [ ] Update sidebar nav: add Team item with roles `["owner", "admin"]`
+**Architecture decision**: Stay on Option A (DB-stored roles, `PERMISSIONS` map). No Clerk custom roles add-on ($100/mo, overkill for small practices). Our 6 preset roles are validated by BACB scope of practice and competitor analysis.
+
+**Wireframe**:
+```
+/team
+┌─────────────────────────────────────────────────────────────────┐
+│ Team                                                            │
+│ 6 members in your practice                    [Invite Member]   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ ┌─ MEMBERS ───────────────────────────────────────────────────┐ │
+│ │ NAME            │ EMAIL              │ ROLE       │ STATUS  │ │
+│ │─────────────────│────────────────────│────────────│─────────│ │
+│ │ Sarah Chen      │ sarah@clinic.com   │ ● Owner    │ Active  │ │
+│ │  BCBA-D         │                    │            │         │ │
+│ │─────────────────│────────────────────│────────────│─────────│ │
+│ │ David Park      │ david@clinic.com   │ [RBT    ▼] │ Active  │ │
+│ │  RBT            │                    │            │         │ │
+│ │─────────────────│────────────────────│────────────│─────────│ │
+│ │ Jessica Torres  │ jess@clinic.com    │ [BCBA   ▼] │ Active  │ │
+│ │  BCBA           │                    │            │         │ │
+│ │─────────────────│────────────────────│────────────│─────────│ │
+│ │ Mike Johnson    │ mike@clinic.com    │ [Billing▼] │ Active  │ │
+│ │  Billing Staff  │                    │            │         │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│ ┌─ ROLE DESCRIPTIONS ─────────────────────────────────────────┐ │
+│ │ Owner     Full access. Manage billing, team, settings.      │ │
+│ │ Admin     Full access except subscription management.       │ │
+│ │ BCBA      Clinical access for assigned caseload. Create     │ │
+│ │           auths, log sessions, manage treatment plans.      │ │
+│ │ BCaBA     Limited clinical access under BCBA supervision.   │ │
+│ │           Cannot create auths or sign off sessions.         │ │
+│ │ RBT       Session logging for assigned clients only.        │ │
+│ │           Cannot see billing, insurance, or other clients.  │ │
+│ │ Billing   Insurance, claims, payments, payers.              │ │
+│ │           Cannot see clinical notes or treatment data.      │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Backend**:
+- [ ] `getTeamMembers(orgId)` query — users table joined with provider record (for credential type). Returns: id, name, email, role, credentialType, lastActiveAt, clerkUserId
+- [ ] `updateMemberRole` action — owner/admin only. Validates: can't change own role, can't demote the last owner, can't assign owner role (only one owner). Audit log.
+- [ ] Update `PERMISSIONS` map in `src/lib/permissions.ts` to cover full matrix from research (expand from ~7 permissions to ~20 covering all features)
+
+**Frontend**:
+- [ ] Create `/team` route with PageHeader ("Team" + "{N} members") + "Invite Member" button
+- [ ] **Members table**: name (bold + credential subtitle), email, role (Select dropdown for owner/admin, static badge for others), status badge
+- [ ] **Role change**: inline Select dropdown per row. Only visible to owner/admin. Owner role is locked (displayed as badge, not dropdown).
+- [ ] **Invite flow**: "Invite Member" button opens a dialog that calls Clerk's invite API + sets initial role in our DB. Fields: email, role (Select from 6 options).
+- [ ] **Remove member**: action menu with "Remove" option (confirmation dialog). Calls Clerk API to revoke org membership.
+- [ ] **Role descriptions card**: collapsible section card below the table explaining what each role can access. Helps admins make informed role assignments.
+- [ ] **Empty state**: "No team members yet. Invite your first team member to get started."
+
+**Permission enforcement upgrades**:
+- [ ] Create `<Can permission="...">` wrapper component for declarative UI gating (shows/hides children based on current user's role)
+- [ ] Expand `PERMISSIONS` map to cover: `clients.read`, `clients.write`, `sessions.read`, `sessions.write`, `sessions.cancel`, `authorizations.read`, `authorizations.write`, `providers.read`, `providers.write`, `payers.read`, `payers.write`, `team.manage`, `settings.manage`, `billing.read`, `billing.write`, `reports.read`
+- [ ] Apply `<Can>` to all action buttons, form sections, and nav items that should be role-gated
+
+Tests:
+- [ ] Owner can change any member's role (except own)
+- [ ] Admin can change roles but cannot assign/remove owner
+- [ ] BCBA/RBT/billing_staff cannot access /team
+- [ ] Role change persists and affects permission checks on next request
+- [ ] Cannot remove the last owner from the organization
 
 #### 2C — Settings Page Rebuild (`/settings`)
 
 > **Decision**: Display-first UI (key-value pairs) with "Edit" button. Progressive disclosure: practice name + timezone minimum, NPI/Tax ID as "Complete your billing profile" soft nudge. See [Architecture Decision #10](#architecture-decisions-reference).
 
-**Practice Info tab** (display-first, "Edit" button opens form):
+**Wireframe — Practice Info tab**:
+```
+/settings
+┌─────────────────────────────────────────────────────────────────┐
+│ Settings                                                        │
+├─────────────────────────────────────────────────────────────────┤
+│ [Practice Info]  [Profile]                                      │
+│                                                                 │
+│ ┌─ PRACTICE INFORMATION ────────────────────────── [Edit] ────┐ │
+│ │ Practice Name     Bright Futures ABA Therapy                │ │
+│ │ Timezone          America/Chicago (CST)                     │ │
+│ │ Phone             (512) 555-0100                            │ │
+│ │ Address           1234 Main St, Austin, TX 78701            │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│ ┌─ BILLING IDENTIFIERS ───────────────────────── [Edit] ──────┐ │
+│ │ NPI               1234567893  ✓ Valid                       │ │
+│ │ Tax ID            74-1234567                                │ │
+│ │ Taxonomy Code     103K00000X (Behavioral Analyst)           │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│ ── OR if NPI/Tax ID empty: ──                                   │
+│ ┌ COMPLETE YOUR BILLING PROFILE (blue info) ──────────────────┐ │
+│ │ ℹ Add your NPI and Tax ID to prepare for claims submission. │ │
+│ │ These identifiers are required on every insurance claim.    │ │
+│ │                                         [Add Billing Info]  │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Wireframe — Profile tab**:
+```
+/settings?tab=profile
+┌─────────────────────────────────────────────────────────────────┐
+│ Settings                                                        │
+├─────────────────────────────────────────────────────────────────┤
+│ [Practice Info]  [Profile]                                      │
+│                                                                 │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │               Clerk <UserProfile> component                 │ │
+│ │                                                             │ │
+│ │  Name, email, password, connected accounts, 2FA             │ │
+│ │  (Managed entirely by Clerk — we just embed it)             │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Backend**:
 - [ ] `getOrganization(orgId)` query — org record with all fields
 - [ ] `updateOrganizationSchema` — Zod validator with NPI Luhn check digit (80840 prefix algorithm), Tax ID format (`/^\d{2}-?\d{7}$/`), taxonomy code from curated ABA dropdown, timezone from IANA list
 - [ ] `updateOrganization` action — owner/admin only, audit log for billing-critical fields
 - [ ] `isValidNpi(npi)` utility — Luhn algorithm with `80840` prefix
-- [ ] KV pair display: Practice Name, Timezone, NPI, Tax ID, Taxonomy Code, Address, Phone
-- [ ] "Complete your billing profile" soft nudge when NPI/Tax ID empty
-- [ ] NPI inline validation on edit: "Invalid NPI — check digit does not match"
 
-**Profile tab** (Clerk `<UserProfile>` component):
-- [ ] Embed Clerk `<UserProfile>` — handles name, email, password, 2FA
-- [ ] Minimal wrapper with consistent page styling
+**Frontend**:
+- [ ] 2 tabs: Practice Info (default) + Profile
+- [ ] **Practice Info**: two section cards (Practice Information + Billing Identifiers), each with KV pairs and an "Edit" button that opens inline form
+- [ ] **Billing nudge**: blue info card when NPI/Tax ID empty, with CTA button
+- [ ] NPI inline validation on edit: "Invalid NPI — check digit does not match"
+- [ ] Taxonomy code as curated dropdown (default: 103K00000X — Behavioral Analyst)
+- [ ] Timezone from IANA list dropdown
+- [ ] **Profile tab**: embed Clerk `<UserProfile>` with consistent page styling
+
+**Wireframe — Payers page**:
+```
+/payers
+┌─────────────────────────────────────────────────────────────────┐
+│ Payers                                                          │
+│ 4 payers configured                              [Add Payer]    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ NAME               │ TYPE       │ PAYER ID    │ STATUS │ ⋯  │ │
+│ │────────────────────│────────────│─────────────│────────│    │ │
+│ │ Blue Cross Blue    │ Commercial │ 00234       │ Active │ ⋯  │ │
+│ │  Shield of Texas   │            │             │        │    │ │
+│ │────────────────────│────────────│─────────────│────────│    │ │
+│ │ United Healthcare  │ Commercial │ 00413       │ Active │ ⋯  │ │
+│ │────────────────────│────────────│─────────────│────────│    │ │
+│ │ Texas Medicaid     │ Medicaid   │ TXMED       │ Active │ ⋯  │ │
+│ │────────────────────│────────────│─────────────│────────│    │ │
+│ │ TRICARE            │ TRICARE    │ 99726       │ Active │ ⋯  │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 Tests:
 - [ ] NPI Luhn validation: valid NPIs pass, transposed digits fail, non-10-digit rejected
 - [ ] Non-owner/admin role cannot update org settings
 - [ ] Non-owner/admin cannot access Team page
+- [ ] Billing staff can access /payers but not /team or /settings
 
 Phase 2+ noted:
 - [ ] NPPES registry lookup ("Verify against NPPES" button, advisory not blocking)
 - [ ] Confirmation dialog for NPI/Tax ID changes when claims exist
+- [ ] Fee schedules (rate per CPT per payer) on Payers page
+- [ ] Per-feature permission overrides (Option B from research) if user demand materializes
 
 ### Design Quality Pass — COMPLETE
 
