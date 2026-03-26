@@ -25,7 +25,7 @@ function AlertRow({ alert }: { alert: DashboardAlert }) {
         <HugeiconsIcon
           icon={Alert02Icon}
           size={16}
-          className={cn("shrink-0", isCritical ? "text-red-600" : "text-amber-600")}
+          className={cn("shrink-0", isCritical ? "text-red-600 dark:text-red-400" : "text-amber-600 dark:text-amber-400")}
         />
         <div className="min-w-0 flex-1">
           <span className="text-xs font-semibold">{alert.entityName}</span>

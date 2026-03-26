@@ -31,7 +31,7 @@ export async function DashboardMetrics({ orgId }: { orgId: string }) {
         label="Action Items"
         value={String(metrics.actionItemCount)}
         sub={metrics.criticalCount > 0 ? `${metrics.criticalCount} critical` : "All clear"}
-        accent={metrics.criticalCount > 0 ? "text-red-600 dark:text-red-400" : undefined}
+        accent={metrics.criticalCount > 0 ? LEVEL_COLORS.critical.text : undefined}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { requireAuth } from "@/lib/auth";
-import { getClients } from "@/server/queries/clients";
+import { hasClients } from "@/server/queries/clients";
 import { Button } from "@/components/ui/button";
 import { SectionErrorBoundary, SectionError } from "@/components/shared/section-error-boundary";
 import { DashboardMetrics, DashboardMetricsSkeleton } from "@/components/dashboard/dashboard-metrics";
@@ -18,9 +18,8 @@ export default async function OverviewPage() {
   const user = await requireAuth();
   const orgId = user.organizationId;
 
-  // Quick check for empty practice (for Getting Started card)
-  const clients = await getClients(orgId);
-  const showGettingStarted = clients.length === 0;
+  // Lightweight existence check (SELECT 1 LIMIT 1) — doesn't block streaming
+  const showGettingStarted = !(await hasClients(orgId));
 
   return (
     <div className="space-y-4">

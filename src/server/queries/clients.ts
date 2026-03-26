@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/server/db";
 import { clients, clientContacts, clientInsurance, payers } from "@/server/db/schema";
 import { providers } from "@/server/db/schema";
-import { eq, and, isNull, ne, inArray, asc } from "drizzle-orm";
+import { eq, and, isNull, ne, inArray, asc, sql } from "drizzle-orm";
 
 export type Client = typeof clients.$inferSelect;
 export type ClientContact = typeof clientContacts.$inferSelect;
@@ -15,6 +15,16 @@ export type ClientWithBcba = Client & {
 
 function scopedWhere(orgId: string) {
   return and(eq(clients.organizationId, orgId), isNull(clients.deletedAt));
+}
+
+/** Lightweight existence check — avoids fetching all clients just to check emptiness. */
+export async function hasClients(orgId: string): Promise<boolean> {
+  const [row] = await db
+    .select({ exists: sql<number>`1` })
+    .from(clients)
+    .where(and(eq(clients.organizationId, orgId), isNull(clients.deletedAt)))
+    .limit(1);
+  return !!row;
 }
 
 export async function getClients(orgId: string): Promise<ClientWithBcba[]> {

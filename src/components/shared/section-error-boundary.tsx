@@ -21,6 +21,11 @@ export class SectionErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
+  componentDidCatch(error: Error) {
+    // Log to console in dev; Sentry will capture in production
+    console.error("[SectionErrorBoundary]", error);
+  }
+
   render() {
     if (this.state.hasError) {
       return this.props.fallback;
