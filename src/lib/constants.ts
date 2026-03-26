@@ -3,6 +3,9 @@
 export const USER_ROLES = ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
+export const USER_STATUSES = ["invited", "active", "deactivated"] as const;
+export type UserStatus = (typeof USER_STATUSES)[number];
+
 export const CREDENTIAL_TYPES = ["bcba", "bcba_d", "bcaba", "rbt", "other"] as const;
 export type CredentialType = (typeof CREDENTIAL_TYPES)[number];
 

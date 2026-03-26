@@ -25,7 +25,7 @@ export const PERMISSIONS = {
   "providers.write": ["owner", "admin"],
 
   // Payers
-  "payers.read": ["owner", "admin", "billing_staff"],
+  "payers.read": ["owner", "admin", "bcba", "billing_staff"],
   "payers.write": ["owner", "admin", "billing_staff"],
 
   // Team

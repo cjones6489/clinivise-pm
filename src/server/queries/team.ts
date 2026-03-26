@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@/server/db";
 import { users, providers } from "@/server/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, isNull, sql } from "drizzle-orm";
 
 export type TeamMember = {
   id: string;
@@ -35,14 +35,9 @@ export async function getTeamMembers(orgId: string): Promise<TeamMember[]> {
     .leftJoin(
       providers,
       and(
+        eq(providers.userId, users.id),
         eq(providers.organizationId, users.organizationId),
-        sql`${providers.id} = (
-          SELECT p.id FROM providers p
-          WHERE p.organization_id = ${users.organizationId}
-            AND p.email = ${users.email}
-            AND p.deleted_at IS NULL
-          LIMIT 1
-        )`,
+        isNull(providers.deletedAt),
       ),
     )
     .where(eq(users.organizationId, orgId))

@@ -99,6 +99,11 @@ export async function getCurrentUser() {
     return devAutoProvision(userId, orgId);
   }
 
+  // Block deactivated users
+  if (user.status === "deactivated" || !user.isActive) {
+    return null;
+  }
+
   return user;
 }
 

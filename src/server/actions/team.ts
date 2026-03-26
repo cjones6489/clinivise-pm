@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
 import { USER_ROLES } from "@/lib/constants";
-import { NotFoundError, ConflictError, ForbiddenError } from "@/lib/errors";
+import { NotFoundError, ConflictError } from "@/lib/errors";
 import { idSchema } from "@/lib/validators";
 
 // ── Update Member Role ──────────────────────────────────────────────────────
@@ -40,19 +40,17 @@ export const updateMemberRole = authActionClient
 
     if (!member) throw new NotFoundError("Team member");
 
-    // Can't demote/change the owner (only one owner allowed)
+    // Can't change owner role or assign owner to someone else
     if (member.role === "owner") {
       throw new ConflictError("The owner role cannot be changed. Transfer ownership first.");
     }
-
-    // Only owner can assign owner role
-    if (newRole === "owner" && ctx.userRole !== "owner") {
-      throw new ForbiddenError();
-    }
-
-    // Can't assign owner role (there should only be one)
     if (newRole === "owner") {
       throw new ConflictError("Cannot assign owner role. Transfer ownership instead.");
+    }
+
+    // Can't change role of deactivated members
+    if (member.status === "deactivated") {
+      throw new ConflictError("Cannot change role of a deactivated member.");
     }
 
     const oldRole = member.role;
@@ -87,7 +85,8 @@ export const inviteMember = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     requirePermission(ctx.userRole, "settings.write");
 
-    const { email, role } = parsedInput;
+    const email = parsedInput.email.toLowerCase().trim();
+    const { role } = parsedInput;
 
     // Check if user already exists in this org
     const [existing] = await db
@@ -95,6 +94,8 @@ export const inviteMember = authActionClient
       .from(users)
       .where(and(eq(users.email, email), eq(users.organizationId, ctx.organizationId)))
       .limit(1);
+
+    let memberId: string;
 
     if (existing) {
       if (existing.status === "active") {
@@ -106,18 +107,20 @@ export const inviteMember = authActionClient
       // If deactivated, reactivate with new role
       await db
         .update(users)
-        .set({ role, status: "invited", invitedBy: ctx.userId, invitedAt: new Date() })
+        .set({ role, status: "invited", isActive: true, invitedBy: ctx.userId, invitedAt: new Date() })
         .where(eq(users.id, existing.id));
+      memberId = existing.id;
     } else {
       // Pre-create user row with invited status
-      await db.insert(users).values({
+      const [newUser] = await db.insert(users).values({
         email,
         organizationId: ctx.organizationId,
         role,
         status: "invited",
         invitedBy: ctx.userId,
         invitedAt: new Date(),
-      });
+      }).returning({ id: users.id });
+      memberId = newUser!.id;
     }
 
     // TODO: Call Clerk org invite API to send email
@@ -132,8 +135,8 @@ export const inviteMember = authActionClient
       userId: ctx.userId,
       action: "create",
       entityType: "user",
-      entityId: email,
-      metadata: { role, action: "invite" },
+      entityId: memberId,
+      metadata: { email, role, action: "invite" },
     });
 
     revalidatePath("/team");
