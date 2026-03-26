@@ -38,6 +38,8 @@ const COMMON_TIMEZONES = [
   "America/Phoenix",
   "America/Anchorage",
   "Pacific/Honolulu",
+  "America/Puerto_Rico",
+  "Pacific/Guam",
 ] as const;
 
 function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -153,7 +155,7 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
           )}
         </SectionCard>
 
-        {org.npi && org.taxId ? (
+        {org.npi || org.taxId ? (
           <SectionCard
             title="Billing Identifiers"
             action={
@@ -228,11 +230,11 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
             <div className="grid grid-cols-2 gap-3">
               <Field>
                 <Label className="text-xs font-medium">Phone</Label>
-                <Input {...register("phone")} className="h-8 text-xs" placeholder="(512) 555-0100" />
+                <Input type="tel" {...register("phone")} className="h-8 text-xs" placeholder="(512) 555-0100" />
               </Field>
               <Field>
                 <Label className="text-xs font-medium">Email</Label>
-                <Input {...register("email")} className="h-8 text-xs" placeholder="office@clinic.com" />
+                <Input type="email" {...register("email")} className="h-8 text-xs" placeholder="office@clinic.com" />
                 <FieldError>{errors.email?.message}</FieldError>
               </Field>
             </div>
@@ -261,7 +263,7 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
           <div className="space-y-3">
             <Field>
               <Label className="text-xs font-medium">NPI</Label>
-              <Input {...register("npi")} className="h-8 font-mono text-xs" placeholder="10-digit NPI" maxLength={10} />
+              <Input {...register("npi")} className="h-8 font-mono text-xs" placeholder="10-digit NPI" maxLength={10} inputMode="numeric" />
               <FieldError>{errors.npi?.message}</FieldError>
             </Field>
             <Field>

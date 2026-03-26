@@ -11,10 +11,12 @@ export const updateOrganizationSchema = z.object({
     .transform((v) => v || undefined),
   email: z
     .string()
-    .email("Invalid email")
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => v || undefined)
+    .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), {
+      message: "Invalid email address",
+    }),
   addressLine1: z
     .string()
     .optional()
@@ -54,7 +56,7 @@ export const updateOrganizationSchema = z.object({
     .or(z.literal(""))
     .transform((v) => v || undefined)
     .refine((v) => !v || /^\d{2}-?\d{7}$/.test(v), {
-      message: "Tax ID must be in XX-XXXXXXX format",
+      message: "Tax ID must be 9 digits (XX-XXXXXXX or XXXXXXXXX)",
     }),
   taxonomyCode: z
     .string()
