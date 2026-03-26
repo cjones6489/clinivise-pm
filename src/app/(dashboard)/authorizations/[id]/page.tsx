@@ -15,6 +15,7 @@ import { UtilizationBar } from "@/components/shared/utilization-bar";
 import { ExpiryBadge, getExpiryLevel } from "@/components/shared/expiry-badge";
 import { MetricCard } from "@/components/shared/metric-card";
 import { getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { cn, formatDate, daysUntilExpiry } from "@/lib/utils";
 
@@ -60,13 +61,17 @@ export default async function AuthorizationDetailPage({
 
   return (
     <div className="space-y-4">
-      {/* Back link */}
-      <Link
-        href="/authorizations"
-        className="text-primary inline-flex items-center gap-1 text-xs hover:underline"
-      >
-        &larr; Back to Authorizations
-      </Link>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild><Link href="/authorizations">Authorizations</Link></BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{authorization.authorizationNumber ?? `${authorization.clientLastName}, ${authorization.clientFirstName}`}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* Expiry alert banner — only for critical (<=7d) and warning (8-30d) */}
       {expiryMessage && (

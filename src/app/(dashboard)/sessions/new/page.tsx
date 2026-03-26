@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { getClientOptions } from "@/server/queries/authorizations";
 import { getProviderOptions } from "@/server/queries/sessions";
 import { PageHeader } from "@/components/layout/page-header";
@@ -27,9 +28,17 @@ export default async function NewSessionPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/sessions" className="text-xs text-primary hover:underline">
-        &larr; Back to Sessions
-      </Link>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild><Link href="/sessions">Sessions</Link></BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Log Session</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <PageHeader
         title="Log Session"
         description="Record a therapy session with unit tracking and authorization linking."

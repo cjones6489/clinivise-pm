@@ -97,7 +97,7 @@ function DataTableRenderer<TData>({
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="text-muted-foreground px-3 py-2.5 text-[11px] font-semibold tracking-wide uppercase"
+                    className="text-muted-foreground px-3 py-2.5 text-[11px] font-semibold tracking-wider uppercase"
                   >
                     {header.isPlaceholder
                       ? null

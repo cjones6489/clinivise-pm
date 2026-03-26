@@ -15,6 +15,7 @@ import { ExpiryBadge } from "@/components/shared/expiry-badge";
 import { Button } from "@/components/ui/button";
 import { getProviderById } from "@/server/queries/providers";
 import { ClientDetail } from "@/components/clients/client-detail";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_VARIANT, type ClientStatus } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
@@ -60,13 +61,17 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
 
   return (
     <div className="space-y-3">
-      {/* Back link */}
-      <Link
-        href="/clients"
-        className="text-primary inline-flex items-center gap-1 text-xs hover:underline"
-      >
-        &larr; Back to Clients
-      </Link>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild><Link href="/clients">Clients</Link></BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{client.firstName} {client.lastName}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* Rich header — matching wireframe */}
       <div className="flex items-start justify-between">

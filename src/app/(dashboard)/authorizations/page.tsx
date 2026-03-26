@@ -67,7 +67,7 @@ export default async function AuthorizationsPage({
         actions={
           canCreate ? (
             <Button asChild size="sm" className="text-xs">
-              <Link href="/authorizations/new">Upload Auth Letter</Link>
+              <Link href="/authorizations/new">Add Authorization</Link>
             </Button>
           ) : undefined
         }
@@ -155,7 +155,7 @@ export default async function AuthorizationsPage({
           action={
             canCreate ? (
               <Button asChild size="sm" className="text-xs">
-                <Link href="/authorizations/new">Upload Auth Letter</Link>
+                <Link href="/authorizations/new">Add Authorization</Link>
               </Button>
             ) : undefined
           }
