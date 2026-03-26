@@ -76,15 +76,25 @@ export async function DashboardClients({ orgId }: { orgId: string }) {
 
   if (clients.length === 0) return null;
 
+  const needsAttention = clients.filter((c) => c.urgencyScore > 0);
+  const healthy = clients.filter((c) => c.urgencyScore === 0);
+
   return (
     <div className="fade-in border-border bg-card overflow-hidden rounded-xl border shadow-sm">
       <div className="border-border/60 bg-muted/20 flex items-center justify-between border-b px-4 py-2.5">
         <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
           Client Overview
         </span>
-        <Button asChild variant="ghost" size="sm" className="h-7 text-xs">
-          <Link href="/clients">View All &rarr;</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {needsAttention.length > 0 && (
+            <span className="text-[11px] text-muted-foreground">
+              {needsAttention.length} need{needsAttention.length !== 1 ? "" : "s"} attention
+            </span>
+          )}
+          <Button asChild variant="ghost" size="sm" className="h-7 text-xs">
+            <Link href="/clients">View All &rarr;</Link>
+          </Button>
+        </div>
       </div>
 
       {/* Desktop header */}
@@ -97,7 +107,16 @@ export async function DashboardClients({ orgId }: { orgId: string }) {
       </div>
 
       <div>
-        {clients.map((client) => (
+        {/* Show clients needing attention first, then healthy */}
+        {needsAttention.map((client) => (
+          <ClientRow key={client.id} client={client} />
+        ))}
+        {healthy.length > 0 && needsAttention.length > 0 && (
+          <div className="border-border/40 bg-muted/20 border-b px-4 py-1.5 text-[11px] text-muted-foreground">
+            On track ({healthy.length})
+          </div>
+        )}
+        {healthy.map((client) => (
           <ClientRow key={client.id} client={client} />
         ))}
       </div>

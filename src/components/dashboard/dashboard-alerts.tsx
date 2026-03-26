@@ -7,10 +7,93 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 
-const MAX_VISIBLE_ALERTS = 5;
+const MAX_VISIBLE_ROWS = 5;
 
-function AlertRow({ alert }: { alert: DashboardAlert }) {
-  const isCritical = alert.severity === "critical";
+// ── Alert grouping (anti-fatigue: "3 auths expiring within 14d" instead of 3 rows) ──
+
+type AlertGroup = {
+  type: DashboardAlert["type"];
+  severity: DashboardAlert["severity"];
+  items: DashboardAlert[];
+  label: string;
+  description: string;
+  actionHref: string;
+  actionLabel: string;
+};
+
+function groupAlerts(alerts: DashboardAlert[]): AlertGroup[] {
+  // Group by type + severity
+  const groups = new Map<string, DashboardAlert[]>();
+  for (const alert of alerts) {
+    const key = `${alert.type}:${alert.severity}`;
+    const existing = groups.get(key) ?? [];
+    existing.push(alert);
+    groups.set(key, existing);
+  }
+
+  const result: AlertGroup[] = [];
+  for (const [, items] of groups) {
+    const first = items[0]!;
+    if (items.length === 1) {
+      // Single alert — show as-is
+      result.push({
+        type: first.type,
+        severity: first.severity,
+        items,
+        label: first.entityName,
+        description: first.description,
+        actionHref: first.actionHref,
+        actionLabel: first.actionLabel,
+      });
+    } else {
+      // Multiple alerts of same type+severity — aggregate
+      const typeLabels: Record<DashboardAlert["type"], string> = {
+        expired: "expired authorization",
+        expiring: "authorization expiring soon",
+        high_utilization: "authorization nearing limit",
+        flagged_session: "flagged session",
+      };
+      const noun = typeLabels[first.type];
+      const plural = items.length > 1 ? "s" : "";
+      result.push({
+        type: first.type,
+        severity: first.severity,
+        items,
+        label: `${items.length} ${noun}${plural}`,
+        description:
+          first.type === "expiring"
+            ? `within ${first.severity === "critical" ? "7" : "30"} days`
+            : first.type === "high_utilization"
+              ? `at ${first.severity === "critical" ? "≥95%" : "≥80%"} utilization`
+              : "",
+        // Link to the relevant list page with filter
+        actionHref:
+          first.type === "flagged_session"
+            ? "/sessions?filter=flagged"
+            : first.type === "expired"
+              ? "/authorizations?filter=expired"
+              : first.type === "expiring"
+                ? "/authorizations?filter=expiring"
+                : "/authorizations?filter=active",
+        actionLabel: "View All",
+      });
+    }
+  }
+
+  // Sort: critical first, then by type priority
+  const typePriority = { expired: 0, expiring: 1, high_utilization: 2, flagged_session: 3 };
+  result.sort((a, b) => {
+    if (a.severity !== b.severity) return a.severity === "critical" ? -1 : 1;
+    return typePriority[a.type] - typePriority[b.type];
+  });
+
+  return result;
+}
+
+// ── Components ───────────────────────────────────────────────────────────────
+
+function AlertRow({ group }: { group: AlertGroup }) {
+  const isCritical = group.severity === "critical";
 
   return (
     <div
@@ -28,12 +111,14 @@ function AlertRow({ alert }: { alert: DashboardAlert }) {
           className={cn("shrink-0", isCritical ? "text-red-600 dark:text-red-400" : "text-amber-600 dark:text-amber-400")}
         />
         <div className="min-w-0 flex-1">
-          <span className="text-xs font-semibold">{alert.entityName}</span>
-          <span className="text-muted-foreground ml-1.5 text-xs">{alert.description}</span>
+          <span className="text-xs font-semibold">{group.label}</span>
+          {group.description && (
+            <span className="text-muted-foreground ml-1.5 text-xs">{group.description}</span>
+          )}
         </div>
       </div>
       <Button asChild size="sm" variant="outline" className="h-7 w-full shrink-0 text-xs sm:w-auto">
-        <Link href={alert.actionHref}>{alert.actionLabel}</Link>
+        <Link href={group.actionHref}>{group.actionLabel}</Link>
       </Button>
     </div>
   );
@@ -63,6 +148,9 @@ export async function DashboardAlerts({ orgId }: { orgId: string }) {
     );
   }
 
+  // Group similar alerts to reduce fatigue
+  const groups = groupAlerts(alerts);
+
   return (
     <div className="fade-in border-border bg-card overflow-hidden rounded-xl border shadow-sm">
       <div className="border-border/60 bg-muted/20 flex items-center justify-between border-b px-4 py-2.5">
@@ -76,12 +164,12 @@ export async function DashboardAlerts({ orgId }: { orgId: string }) {
         )}
       </div>
       <div>
-        {alerts.slice(0, MAX_VISIBLE_ALERTS).map((alert, i) => (
-          <AlertRow key={`${alert.type}-${alert.entityId}-${i}`} alert={alert} />
+        {groups.slice(0, MAX_VISIBLE_ROWS).map((group, i) => (
+          <AlertRow key={`${group.type}-${group.severity}-${i}`} group={group} />
         ))}
-        {alerts.length > MAX_VISIBLE_ALERTS && (
+        {groups.length > MAX_VISIBLE_ROWS && (
           <div className="text-muted-foreground px-4 py-2 text-center text-xs">
-            +{alerts.length - MAX_VISIBLE_ALERTS} more alerts
+            +{groups.length - MAX_VISIBLE_ROWS} more alert groups
           </div>
         )}
       </div>
