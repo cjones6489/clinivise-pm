@@ -262,12 +262,18 @@ export function ClientOverview({
               );
             })}
           </div>
+        ) : authUtilization ? (
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <p className="text-muted-foreground text-xs">
+              Active authorization has no service lines defined. Add service lines to track utilization.
+            </p>
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-6 text-center">
             <p className="text-muted-foreground text-xs">
               {authorizations.length === 0
                 ? "No authorizations on file. Add one to start tracking utilization."
-                : "No active authorization. All authorizations have expired or are pending."}
+                : "No active authorization found for today's date."}
             </p>
           </div>
         )}

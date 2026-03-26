@@ -332,7 +332,7 @@ export async function getClientAuthUtilization(
 ): Promise<ClientAuthUtilization | null> {
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  // Find the active authorization (approved, not expired, not deleted)
+  // Find the active authorization (approved, started, not expired, not deleted)
   const [activeAuth] = await db
     .select({
       id: authorizations.id,
@@ -347,6 +347,7 @@ export async function getClientAuthUtilization(
         eq(authorizations.clientId, clientId),
         eq(authorizations.status, "approved"),
         isNull(authorizations.deletedAt),
+        sql`${authorizations.startDate} <= ${todayStr}`,
         sql`${authorizations.endDate} >= ${todayStr}`,
       ),
     )
@@ -378,7 +379,7 @@ export async function getClientAuthUtilization(
   const endMs = new Date(activeAuth.endDate).getTime();
   const nowMs = Date.now();
   const daysTotal = Math.max(1, Math.round((endMs - startMs) / 86400000));
-  const daysElapsed = Math.max(0, Math.round((nowMs - startMs) / 86400000));
+  const daysElapsed = Math.min(daysTotal, Math.max(0, Math.round((nowMs - startMs) / 86400000)));
 
   return {
     authorizationId: activeAuth.id,

@@ -52,12 +52,11 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const age = differenceInYears(new Date(), new Date(client.dateOfBirth));
   const guardian = contacts.find((c) => c.isLegalGuardian);
 
-  // Resolve BCBA name
-  let bcbaName: string | null = null;
-  if (client.assignedBcbaId) {
-    const bcba = await getProviderById(user.organizationId, client.assignedBcbaId);
-    if (bcba) bcbaName = `${bcba.firstName} ${bcba.lastName}`;
-  }
+  // Resolve BCBA name (parallel-safe — client is already loaded)
+  const bcba = client.assignedBcbaId
+    ? await getProviderById(user.organizationId, client.assignedBcbaId)
+    : null;
+  const bcbaName = bcba ? `${bcba.firstName} ${bcba.lastName}` : null;
 
   return (
     <div className="space-y-3">
@@ -102,7 +101,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             </Badge>
           )}
           {authUtilization && (
-            <ExpiryBadge endDate={authUtilization.endDate} />
+            <ExpiryBadge endDate={authUtilization.endDate} startDate={authUtilization.startDate} />
           )}
         </div>
       </div>
