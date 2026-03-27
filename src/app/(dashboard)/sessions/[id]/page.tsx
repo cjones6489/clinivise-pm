@@ -24,11 +24,12 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const user = await requireAuth();
   const canEdit = hasPermission(user.role, "sessions.write");
+  const canReadNotes = hasPermission(user.role, "notes.read");
   const canWriteNotes = hasPermission(user.role, "notes.write");
 
   const [session, noteState] = await Promise.all([
     getSessionById(user.organizationId, id),
-    sessionHasNote(user.organizationId, id),
+    canReadNotes ? sessionHasNote(user.organizationId, id) : Promise.resolve(null),
   ]);
   if (!session) {
     notFound();
@@ -61,9 +62,9 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
             canCancel={!!canCancel}
             canWriteNotes={canWriteNotes}
             noteState={{
-              hasNote: noteState.hasNote,
-              noteId: noteState.noteId,
-              noteStatus: noteState.noteStatus,
+              hasNote: noteState?.hasNote ?? false,
+              noteId: noteState?.noteId ?? null,
+              noteStatus: noteState?.noteStatus ?? null,
             }}
           />
         }
@@ -71,14 +72,14 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
       <SessionDetailView
         session={session}
         noteInfo={{
-          hasNote: noteState.hasNote,
-          noteId: noteState.noteId,
-          noteStatus: noteState.noteStatus,
-          noteType: noteState.noteType,
-          signedByName: noteState.signedByName,
-          signedAt: noteState.signedAt?.toISOString() ?? null,
-          cosignedByName: noteState.cosignedByName,
-          cosignedAt: noteState.cosignedAt?.toISOString() ?? null,
+          hasNote: noteState?.hasNote ?? false,
+          noteId: noteState?.noteId ?? null,
+          noteStatus: noteState?.noteStatus ?? null,
+          noteType: noteState?.noteType ?? null,
+          signedByName: noteState?.signedByName ?? null,
+          signedAt: noteState?.signedAt?.toISOString() ?? null,
+          cosignedByName: noteState?.cosignedByName ?? null,
+          cosignedAt: noteState?.cosignedAt?.toISOString() ?? null,
         }}
       />
     </div>
