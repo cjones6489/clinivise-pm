@@ -12,6 +12,10 @@ import {
   getProviderSessionBreakdown,
   getSupervisorOptions,
 } from "@/server/queries/providers";
+import type {
+  ProviderSessionBreakdown,
+  ProviderRecentSession,
+} from "@/server/queries/providers";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +24,52 @@ import { ProviderDetailView } from "@/components/providers/provider-detail";
 import { CREDENTIAL_LABELS, type CredentialType } from "@/lib/constants";
 import { hasPermission } from "@/lib/permissions";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
+
+// ── Mock data for demo (used when provider has no real sessions) ─────────────
+
+const MOCK_SESSION_BREAKDOWN: ProviderSessionBreakdown = {
+  totalSessions: 47,
+  completedSessions: 38,
+  scheduledSessions: 4,
+  cancelledSessions: 3,
+  noShowSessions: 1,
+  flaggedSessions: 1,
+  totalHours: 47.5,
+  avgSessionMinutes: 75,
+  cptDistribution: [
+    { cptCode: "97153", count: 24 },
+    { cptCode: "97155", count: 9 },
+    { cptCode: "97156", count: 4 },
+    { cptCode: "97151", count: 3 },
+  ],
+};
+
+const MOCK_METRICS = {
+  activeClients: 8,
+  hoursThisWeek: 12.5,
+  sessionsThisMonth: 14,
+};
+
+function getMockRecentSessions(): ProviderRecentSession[] {
+  const today = new Date();
+  const day = (daysAgo: number): string => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - daysAgo);
+    return d.toISOString().slice(0, 10);
+  };
+  return [
+    { id: "mock-1", sessionDate: day(0), clientFirstName: "Marcus", clientLastName: "Rivera", cptCode: "97153", units: 8, status: "scheduled" },
+    { id: "mock-2", sessionDate: day(1), clientFirstName: "Aiden", clientLastName: "Chen", cptCode: "97153", units: 8, status: "completed" },
+    { id: "mock-3", sessionDate: day(1), clientFirstName: "Sophia", clientLastName: "Williams", cptCode: "97155", units: 4, status: "completed" },
+    { id: "mock-4", sessionDate: day(2), clientFirstName: "Liam", clientLastName: "Patel", cptCode: "97153", units: 6, status: "completed" },
+    { id: "mock-5", sessionDate: day(2), clientFirstName: "Emma", clientLastName: "Johnson", cptCode: "97156", units: 4, status: "completed" },
+    { id: "mock-6", sessionDate: day(3), clientFirstName: "Aiden", clientLastName: "Chen", cptCode: "97153", units: 8, status: "completed" },
+    { id: "mock-7", sessionDate: day(3), clientFirstName: "Olivia", clientLastName: "Brooks", cptCode: "97153", units: 6, status: "no_show" },
+    { id: "mock-8", sessionDate: day(4), clientFirstName: "Noah", clientLastName: "Garcia", cptCode: "97155", units: 4, status: "completed" },
+    { id: "mock-9", sessionDate: day(5), clientFirstName: "Marcus", clientLastName: "Rivera", cptCode: "97153", units: 8, status: "completed" },
+    { id: "mock-10", sessionDate: day(6), clientFirstName: "Sophia", clientLastName: "Williams", cptCode: "97151", units: 12, status: "completed" },
+  ];
+}
 
 export const metadata: Metadata = {
   title: "Provider | Clinivise",
@@ -49,6 +99,12 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
     canEdit ? getSupervisorOptions(user.organizationId, id) : Promise.resolve([]),
   ]);
 
+  // Use mock data when no real sessions exist
+  const useMock = sessionBreakdown.totalSessions === 0;
+  const displayBreakdown = useMock ? MOCK_SESSION_BREAKDOWN : sessionBreakdown;
+  const displayMetrics = useMock ? MOCK_METRICS : metrics;
+  const displayRecentSessions = useMock && recentSessions.length === 0 ? getMockRecentSessions() : recentSessions;
+
   const credLabel = CREDENTIAL_LABELS[provider.credentialType as CredentialType] ?? provider.credentialType;
   const credDaysLeft = provider.credentialExpiry ? daysUntilExpiry(provider.credentialExpiry) : null;
   const credExpiryAccent =
@@ -59,6 +115,13 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-3">
+      {useMock && (
+        <div className="border-border bg-muted/50 flex items-center gap-2 rounded-lg border px-3 py-2">
+          <span className="text-muted-foreground text-xs">
+            Showing demo data — log sessions to see real metrics
+          </span>
+        </div>
+      )}
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -118,17 +181,17 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <MetricCard
           label="Clients Served"
-          value={String(metrics.activeClients)}
+          value={String(displayMetrics.activeClients)}
           sub="all time"
         />
         <MetricCard
           label="Hours This Week"
-          value={`${Number(metrics.hoursThisWeek).toFixed(1)}h`}
+          value={`${Number(displayMetrics.hoursThisWeek).toFixed(1)}h`}
           sub="completed sessions"
         />
         <MetricCard
           label="Sessions This Month"
-          value={String(metrics.sessionsThisMonth)}
+          value={String(displayMetrics.sessionsThisMonth)}
           sub="non-cancelled"
         />
         <MetricCard
@@ -153,9 +216,9 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
         } : null}
         caseload={caseload}
         availableClients={availableClients}
-        recentSessions={recentSessions}
+        recentSessions={displayRecentSessions}
         supervisees={supervisees}
-        sessionBreakdown={sessionBreakdown}
+        sessionBreakdown={displayBreakdown}
         canEdit={canEdit}
         canManageCaseload={canManageCaseload}
         supervisorOptions={canEdit ? supervisorOptions : []}

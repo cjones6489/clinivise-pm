@@ -8,7 +8,7 @@ import type {
   ClientInsuranceWithPayer,
   PayerOption,
 } from "@/server/queries/clients";
-import type { GoalWithObjectives } from "@/server/queries/goals";
+import type { GoalWithObjectives, GoalDomain } from "@/server/queries/goals";
 import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
 import { ClientOverview } from "./client-overview";
@@ -27,6 +27,7 @@ export function ClientDetail({
   careTeam,
   availableProviders,
   goals,
+  goalDomains,
   insurance,
   payerOptions,
   authorizations,
@@ -40,6 +41,7 @@ export function ClientDetail({
   careTeam: CareTeamMember[];
   availableProviders: AvailableProvider[];
   goals: GoalWithObjectives[];
+  goalDomains: GoalDomain[];
   insurance: ClientInsuranceWithPayer[];
   payerOptions: PayerOption[];
   authorizations: AuthorizationListItem[];
@@ -82,7 +84,7 @@ export function ClientDetail({
       </TabsContent>
 
       <TabsContent value="goals" className="pt-4">
-        <ClientGoals goals={goals} canEdit={canEdit} />
+        <ClientGoals clientId={client.id} goals={goals} goalDomains={goalDomains} canEdit={canEdit} />
       </TabsContent>
 
       <TabsContent value="contacts" className="pt-4">
