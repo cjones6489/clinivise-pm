@@ -41,6 +41,10 @@ export const authorizations = pgTable(
     status: text("status").notNull().default("pending"),
     startDate: date("start_date").notNull(),
     endDate: date("end_date").notNull(),
+    authType: text("auth_type"), // initial | recertification | concurrent_review | peer_to_peer
+    requestingProviderId: text("requesting_provider_id"), // BCBA who requested the auth
+    denialReason: text("denial_reason"), // When status = denied
+    appealDeadline: date("appeal_deadline"), // Typically 30-60 days from denial
     diagnosisCode: text("diagnosis_code").default("F84.0"),
     notes: text("notes"),
     aiParsedData: text("ai_parsed_data"),

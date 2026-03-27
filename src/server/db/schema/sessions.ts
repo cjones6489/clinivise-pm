@@ -39,6 +39,9 @@ export const sessions = pgTable(
     units: integer("units").notNull(),
     placeOfService: text("place_of_service").notNull().default("12"),
     status: text("status").notNull().default("completed"),
+    cancellationReason: text("cancellation_reason"), // client_illness | provider_illness | family_emergency | weather | transportation | schedule_conflict | late_cancel | no_reason_given | other
+    cancelledBy: text("cancelled_by"), // client | provider | practice
+    serviceAddress: text("service_address"), // Actual address for home/community sessions (CMS-1500 Box 32)
     actualMinutes: integer("actual_minutes"),
     unitCalcMethod: text("unit_calc_method"),
     idempotencyKey: text("idempotency_key"),

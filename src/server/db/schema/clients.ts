@@ -25,6 +25,12 @@ export const clients = pgTable(
     zipCode: text("zip_code"),
     diagnosisCode: text("diagnosis_code").default("F84.0"),
     diagnosisDescription: text("diagnosis_description").default("Autism Spectrum Disorder"),
+    secondaryDiagnosisCodes: text("secondary_diagnosis_codes").array(), // Comorbidities: ADHD (F90.9), anxiety (F41.1), etc. CMS-1500 Box 21
+    primaryLanguage: text("primary_language"), // BACB ethics + state Medicaid requirement
+    interpreterNeeded: boolean("interpreter_needed"),
+    referringProviderName: text("referring_provider_name"), // CMS-1500 Box 17 — ordering/referring physician
+    referringProviderNpi: text("referring_provider_npi"), // CMS-1500 Box 17b
+    medicaidId: text("medicaid_id"), // State Medicaid recipient ID (separate from insurance memberId)
     intakeDate: date("intake_date"),
     status: text("status").default("inquiry").notNull(),
     referralSource: text("referral_source"),

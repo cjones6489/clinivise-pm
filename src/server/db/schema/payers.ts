@@ -13,9 +13,12 @@ export const payers = pgTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     stediPayerId: text("stedi_payer_id"),
+    electronicPayerId: text("electronic_payer_id"), // 5-digit EDI payer ID for electronic claims
     payerType: text("payer_type").default("commercial"),
     phone: text("phone"),
     authPhone: text("auth_phone"),
+    authDepartmentEmail: text("auth_department_email"),
+    portalUrl: text("portal_url"), // Payer provider portal URL
     claimsAddress: text("claims_address"),
     timelyFilingDays: integer("timely_filing_days"),
     unitCalcMethod: text("unit_calc_method").default("ama"),

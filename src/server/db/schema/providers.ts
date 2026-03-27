@@ -29,6 +29,11 @@ export const providers = pgTable(
     credentialType: text("credential_type").notNull(),
     credentialNumber: text("credential_number"),
     credentialExpiry: date("credential_expiry"),
+    stateLicenseNumber: text("state_license_number"), // State behavior analyst license (40 states require, separate from BACB cert)
+    stateLicenseExpiry: date("state_license_expiry"),
+    taxonomyCode: text("taxonomy_code"), // Per-provider taxonomy (e.g., 103K00000X for behavior analysts)
+    email: text("email"),
+    phone: text("phone"),
     supervisorId: text("supervisor_id").references((): AnyPgColumn => providers.id, {
       onDelete: "set null",
     }),
