@@ -48,6 +48,15 @@ function getInitials(first: string, last: string): string {
 
 // ── Team Member Row ──────────────────────────────────────────────────────────
 
+// Credential-based avatar colors for visual differentiation
+const CREDENTIAL_AVATAR = {
+  bcba: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+  bcba_d: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+  bcaba: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
+  rbt: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  other: "bg-muted text-muted-foreground",
+} as Record<string, string>;
+
 function TeamMemberRow({
   member,
   onSetPrimary,
@@ -59,36 +68,58 @@ function TeamMemberRow({
   onRemove: () => void;
   isPending: boolean;
 }) {
+  const avatarColor = CREDENTIAL_AVATAR[member.credentialType] ?? CREDENTIAL_AVATAR.other;
+
   return (
-    <div className="border-border/30 flex items-center gap-3 border-b px-4 py-2.5 last:border-b-0">
-      <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-semibold">
-        {getInitials(member.providerFirstName, member.providerLastName)}
+    <div className="hover:bg-accent/30 group flex items-center gap-3.5 px-4 py-3 transition-colors last:rounded-b-lg">
+      {/* Avatar — larger, credential-colored */}
+      <div className="relative shrink-0">
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold ${avatarColor}`}
+        >
+          {getInitials(member.providerFirstName, member.providerLastName)}
+        </div>
+        {member.isPrimary && (
+          <div className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 shadow-sm dark:bg-amber-500">
+            <HugeiconsIcon icon={StarIcon} size={10} className="text-background" strokeWidth={2.5} />
+          </div>
+        )}
       </div>
+
+      {/* Info */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <Link
             href={`/providers/${member.providerId}`}
-            className="text-xs font-medium hover:underline"
+            className="text-sm font-semibold tracking-tight hover:underline"
           >
             {member.providerFirstName} {member.providerLastName}
           </Link>
-          <Badge variant="outline" className="text-[9px]">
+          <Badge
+            variant="secondary"
+            className="text-[10px] font-medium"
+          >
             {CREDENTIAL_LABELS[member.credentialType as CredentialType] ??
               member.credentialType.toUpperCase()}
           </Badge>
-          {member.isPrimary && (
-            <Badge className="border-amber-200 bg-amber-50 text-[9px] text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400">
-              Primary
-            </Badge>
+        </div>
+        <div className="text-muted-foreground mt-0.5 text-xs">
+          {CARE_TEAM_ROLE_LABELS[member.role as CareTeamRole] ?? member.role}
+          {member.startDate && (
+            <span className="ml-1.5">· since {formatDate(member.startDate)}</span>
           )}
         </div>
-        <div className="text-muted-foreground text-[11px]">
-          {CARE_TEAM_ROLE_LABELS[member.role as CareTeamRole] ?? member.role}
-        </div>
       </div>
+
+      {/* Actions — visible on hover */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={isPending}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
+            disabled={isPending}
+          >
             <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
             <span className="sr-only">Actions</span>
           </Button>
@@ -449,63 +480,68 @@ export function ClientCareTeam({
 
       {/* Empty state */}
       {careTeam.length === 0 ? (
-        <div className="border-border/40 bg-card flex flex-col items-center justify-center rounded-lg border py-8 text-center shadow-sm">
-          <div className="bg-muted mb-3 rounded-lg p-3">
-            <HugeiconsIcon icon={UserIcon} size={24} className="text-muted-foreground" />
+        <div className="border-border bg-card flex flex-col items-center justify-center rounded-xl border py-12 text-center shadow-sm">
+          <div className="mb-4 flex -space-x-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-violet-100 text-xs font-bold text-violet-600 dark:bg-violet-900/40 dark:text-violet-300">BC</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-emerald-100 text-xs font-bold text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300">RT</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-sky-100 text-xs font-bold text-sky-600 dark:bg-sky-900/40 dark:text-sky-300">BT</div>
           </div>
-          <p className="text-xs font-medium">No team members assigned</p>
-          <p className="text-muted-foreground mt-1 text-[11px]">
-            Add providers to this client&apos;s care team to track assignments and supervision.
+          <p className="text-sm font-semibold">Build the care team</p>
+          <p className="text-muted-foreground mt-1 max-w-xs text-xs">
+            Add BCBAs, RBTs, and other providers to track assignments, supervision, and session coverage.
           </p>
           {canEdit && (
             <Button
-              variant="outline"
               size="sm"
-              className="mt-3 text-xs"
+              className="mt-4 text-xs"
               onClick={() => setModalOpen(true)}
             >
               <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
-              Manage Team
+              Add Team Members
             </Button>
           )}
         </div>
       ) : (
         <>
           {bcbaMembers.length > 0 && (
-            <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
-              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
-                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-                  BCBAs & Supervisors
-                </span>
+            <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+              <div className="flex items-center gap-2 border-b px-4 py-2.5">
+                <div className="h-2 w-2 rounded-full bg-violet-500" />
+                <span className="text-xs font-semibold">BCBAs & Supervisors</span>
+                <span className="text-muted-foreground text-xs">({bcbaMembers.length})</span>
               </div>
-              {bcbaMembers.map((m) => (
-                <TeamMemberRow
-                  key={m.id}
-                  member={m}
-                  isPending={isUpdating}
-                  onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
-                  onRemove={() => setRemoveTarget(m)}
-                />
-              ))}
+              <div className="divide-border/30 divide-y">
+                {bcbaMembers.map((m) => (
+                  <TeamMemberRow
+                    key={m.id}
+                    member={m}
+                    isPending={isUpdating}
+                    onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
+                    onRemove={() => setRemoveTarget(m)}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
           {rbtMembers.length > 0 && (
-            <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
-              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
-                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-                  RBTs & Technicians
-                </span>
+            <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+              <div className="flex items-center gap-2 border-b px-4 py-2.5">
+                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="text-xs font-semibold">RBTs & Technicians</span>
+                <span className="text-muted-foreground text-xs">({rbtMembers.length})</span>
               </div>
-              {rbtMembers.map((m) => (
-                <TeamMemberRow
-                  key={m.id}
-                  member={m}
-                  isPending={isUpdating}
-                  onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
-                  onRemove={() => setRemoveTarget(m)}
-                />
-              ))}
+              <div className="divide-border/30 divide-y">
+                {rbtMembers.map((m) => (
+                  <TeamMemberRow
+                    key={m.id}
+                    member={m}
+                    isPending={isUpdating}
+                    onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
+                    onRemove={() => setRemoveTarget(m)}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </>
@@ -513,46 +549,55 @@ export function ClientCareTeam({
 
       {/* Past Assignments (collapsible) */}
       {pastCareTeam.length > 0 && (
-        <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
+        <div className="border-border/50 overflow-hidden rounded-xl border">
           <button
             type="button"
             onClick={() => setShowPast(!showPast)}
-            className="bg-muted/20 hover:bg-muted/40 flex w-full items-center justify-between border-b px-4 py-2 transition-colors"
+            className="bg-muted/30 hover:bg-muted/50 flex w-full items-center justify-between px-4 py-2.5 transition-colors"
           >
-            <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-              Past Assignments ({pastCareTeam.length})
-            </span>
-            <span className="text-muted-foreground text-[11px]">{showPast ? "▲ Hide" : "▼ Show"}</span>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+              <span className="text-muted-foreground text-xs font-medium">
+                Past Assignments
+              </span>
+              <span className="text-muted-foreground/60 text-xs">({pastCareTeam.length})</span>
+            </div>
+            <span className="text-muted-foreground text-xs">{showPast ? "Hide" : "Show"}</span>
           </button>
           {showPast && (
-            <div>
-              {pastCareTeam.map((m) => (
-                <div
-                  key={m.id}
-                  className="bg-muted/10 border-border/20 flex items-center gap-3 border-b px-4 py-2.5 last:border-b-0"
-                >
-                  <div className="bg-muted text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-semibold">
-                    {getInitials(m.providerFirstName, m.providerLastName)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/providers/${m.providerId}`}
-                        className="text-muted-foreground text-xs font-medium hover:underline"
-                      >
-                        {m.providerFirstName} {m.providerLastName}
-                      </Link>
-                      <Badge variant="outline" className="text-[9px]">
-                        {CREDENTIAL_LABELS[m.credentialType as CredentialType] ?? m.credentialType.toUpperCase()}
-                      </Badge>
+            <div className="divide-border/20 divide-y">
+              {pastCareTeam.map((m) => {
+                const avatarColor = CREDENTIAL_AVATAR[m.credentialType] ?? CREDENTIAL_AVATAR.other;
+                return (
+                  <div
+                    key={m.id}
+                    className="flex items-center gap-3.5 px-4 py-3 opacity-60"
+                  >
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ${avatarColor}`}
+                    >
+                      {getInitials(m.providerFirstName, m.providerLastName)}
                     </div>
-                    <div className="text-muted-foreground text-[11px]">
-                      {formatDate(m.startDate)} — {formatDate(m.endDate)}
-                      {m.notes && <span className="ml-2">· {m.notes}</span>}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/providers/${m.providerId}`}
+                          className="text-sm font-medium hover:underline"
+                        >
+                          {m.providerFirstName} {m.providerLastName}
+                        </Link>
+                        <Badge variant="secondary" className="text-[10px]">
+                          {CREDENTIAL_LABELS[m.credentialType as CredentialType] ?? m.credentialType.toUpperCase()}
+                        </Badge>
+                      </div>
+                      <div className="text-muted-foreground mt-0.5 text-xs">
+                        {formatDate(m.startDate)} — {formatDate(m.endDate)}
+                        {m.notes && <span className="ml-1.5 italic">· {m.notes}</span>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
