@@ -30,6 +30,14 @@ const serviceLineSchema = z.object({
     .transform((v) => v || undefined),
 });
 
+const AUTH_TYPES = ["initial", "recertification", "concurrent_review", "peer_to_peer"] as const;
+
+const optionalText = z
+  .string()
+  .optional()
+  .or(z.literal(""))
+  .transform((v) => v || undefined);
+
 const authorizationFieldsSchema = z.object({
   clientId: idSchema,
   payerId: idSchema,
@@ -39,24 +47,27 @@ const authorizationFieldsSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => (v === NONE_VALUE || !v ? undefined : v)),
-  authorizationNumber: z
+  authorizationNumber: optionalText,
+  authType: z
+    .string()
+    .optional()
+    .transform((v) => (v === NONE_VALUE || !v ? undefined : v))
+    .pipe(z.enum(AUTH_TYPES).optional()),
+  requestingProviderId: z
     .string()
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => (v === NONE_VALUE || !v ? undefined : v)),
   status: authStatusSchema.default("pending"),
   startDate: dateStringSchema,
   endDate: dateStringSchema,
-  diagnosisCode: z
-    .string()
+  diagnosisCode: optionalText,
+  denialReason: optionalText,
+  appealDeadline: dateStringSchema
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
-  notes: z
-    .string()
-    .optional()
-    .or(z.literal(""))
-    .transform((v) => v || undefined),
+  notes: optionalText,
   services: z
     .array(serviceLineSchema)
     .min(1, "At least one service line is required")

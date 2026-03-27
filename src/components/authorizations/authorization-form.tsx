@@ -92,10 +92,14 @@ export function AuthorizationForm({
       clientInsuranceId: authorization?.clientInsuranceId ?? "",
       previousAuthorizationId: authorization?.previousAuthorizationId ?? "",
       authorizationNumber: authorization?.authorizationNumber ?? "",
+      authType: authorization?.authType ?? "",
+      requestingProviderId: authorization?.requestingProviderId ?? "",
       status: (authorization?.status as CreateAuthorizationInput["status"]) ?? "pending",
       startDate: authorization?.startDate ?? "",
       endDate: authorization?.endDate ?? "",
       diagnosisCode: authorization?.diagnosisCode ?? "",
+      denialReason: authorization?.denialReason ?? "",
+      appealDeadline: authorization?.appealDeadline ?? "",
       notes: authorization?.notes ?? "",
       services: authorization?.services.map((s) => ({
         id: s.id,
@@ -122,6 +126,7 @@ export function AuthorizationForm({
   });
 
   const selectedClientId = watch("clientId");
+  const currentStatus = watch("status");
 
   // Cascade: fetch insurance + authorization options when client changes
   const { executeAsync: loadInsurance } = useAction(fetchClientInsuranceOptions);
@@ -346,6 +351,42 @@ export function AuthorizationForm({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Field>
+            <Label className="text-xs font-medium">Auth Type</Label>
+            <Controller
+              name="authType"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value || NONE_VALUE}
+                  onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className="h-8 w-full text-xs">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                    <SelectItem value="initial" className="text-xs">Initial</SelectItem>
+                    <SelectItem value="recertification" className="text-xs">Recertification</SelectItem>
+                    <SelectItem value="concurrent_review" className="text-xs">Concurrent Review</SelectItem>
+                    <SelectItem value="peer_to_peer" className="text-xs">Peer-to-Peer</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </Field>
+          <Field>
+            <Label className="text-xs font-medium">Requesting Provider</Label>
+            <Input
+              {...register("requestingProviderId")}
+              placeholder="BCBA who requested this auth"
+              className="h-8 text-xs"
+              disabled={disabled}
+            />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Field>
             <Label className="text-xs font-medium">Start Date</Label>
             <Input
               type="date"
@@ -407,6 +448,28 @@ export function AuthorizationForm({
             />
           </Field>
         </div>
+        {currentStatus === "denied" && (
+          <div className="grid grid-cols-2 gap-4">
+            <Field>
+              <Label className="text-xs font-medium">Denial Reason</Label>
+              <Input
+                {...register("denialReason")}
+                placeholder="Reason for denial"
+                className="h-8 text-xs"
+                disabled={disabled}
+              />
+            </Field>
+            <Field>
+              <Label className="text-xs font-medium">Appeal Deadline</Label>
+              <Input
+                type="date"
+                {...register("appealDeadline")}
+                className="h-8 text-xs"
+                disabled={disabled}
+              />
+            </Field>
+          </div>
+        )}
       </div>
 
       {/* Service Lines */}

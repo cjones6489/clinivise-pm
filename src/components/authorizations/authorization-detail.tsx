@@ -87,6 +87,17 @@ export function AuthorizationDetail({
             />
           )}
           <KVRow label="Status" value={<AuthStatusBadge status={authorization.status} />} />
+          {authorization.authType && (
+            <KVRow
+              label="Auth Type"
+              value={{
+                initial: "Initial",
+                recertification: "Recertification",
+                concurrent_review: "Concurrent Review",
+                peer_to_peer: "Peer-to-Peer",
+              }[authorization.authType] ?? authorization.authType}
+            />
+          )}
           <KVRow
             label="Period"
             value={`${formatDate(authorization.startDate)} — ${formatDate(authorization.endDate)}`}
@@ -106,6 +117,12 @@ export function AuthorizationDetail({
           )}
           {authorization.clientInsuranceMemberId && (
             <KVRow label="Member ID" value={authorization.clientInsuranceMemberId} />
+          )}
+          {authorization.denialReason && (
+            <KVRow label="Denial Reason" value={authorization.denialReason} />
+          )}
+          {authorization.appealDeadline && (
+            <KVRow label="Appeal Deadline" value={formatDate(authorization.appealDeadline)} />
           )}
           {authorization.notes && (
             <KVRow
