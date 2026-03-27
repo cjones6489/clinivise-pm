@@ -361,12 +361,12 @@ No new schema, queries, or actions needed for the remaining UI changes.
 ```
 Client Detail Page
 ├── Goals Tab (list view — Layer 1, redesigning now)
-│   └── Goal Detail Drawer (click to expand — Layer 2, design now)
-│       ├── Description, mastery criteria, status history
+│   └── Goal Inline Expansion (click to expand in place — Layer 2)
+│       ├── Description, protocol (RBT instructions)
+│       ├── Mastery criteria, baseline, mini progress chart
 │       ├── Objectives with progress indicators
-│       ├── Mini line chart (from session note data)
-│       ├── Behavior reduction details (function, BIP info)
 │       ├── Recent session data for this goal
+│       ├── Behavior reduction details (function, BIP info)
 │       └── "Open in Programs →" link (when Phase 3 exists)
 │
 └── [Future: "Programs" link in client header — Phase 3-4]
@@ -378,7 +378,7 @@ Client Detail Page
         └── Report generation for re-authorization
 ```
 
-**Why two levels:** Passage Health does this — the Goal Detail Drawer is the quick-view for BCBAs checking in. The full clinical workspace (separate page) is where BCBAs do deep analysis, configure programs, and generate reports. The drawer becomes the "preview" that links into the deeper view. No wasted work.
+**Why inline expansion, not drawer or modal:** Motivity and ABA Matrix use inline expansion — click a goal and it expands in place to show detail. No context loss (the list stays visible), fast multi-goal scanning (expand/collapse without overlay management), works great on tablet. 0 of 5 competitors use a modal for goal detail. The full clinical workspace (separate page) is where BCBAs do deep analysis in Phase 3-4.
 
 #### Who uses this
 - **BCBA** — reviewing progress, checking mastery status, planning next steps
@@ -458,104 +458,75 @@ Daily (BCBAs checking progress), before each session (RBTs reviewing targets).
 - Goal number (no competitor uses numbered IDs — show as subtle sort prefix only)
 - Inline graph (no competitor renders graphs inline on the list)
 
-#### Layer 2: Goal Detail Drawer (NEW — to design and build)
+#### Layer 2: Goal Inline Expansion (NEW — to design and build)
 
-When you click a goal card, a drawer slides out from the right showing the full detail.
+When you click a goal card, it **expands in place** to reveal detail sections. The rest of the page shifts down. Click again or click another goal to collapse.
 
-**Wireframe — Goal Detail Drawer (verified against 5 competitors, 2026-03-27):**
+> **Design decision (2026-03-27):** Inline expansion, NOT a drawer or modal.
+> Motivity + ABA Matrix = inline expansion. Passage = drawer. CentralReach + Catalyst = full page. 0/5 use modal.
+> Why: no context loss, fast multi-goal scanning, works on tablet.
 
-> Competitor finding: ALL 5 platforms show mastery, baseline, protocol, objectives, session data, and progress graphs in the detail view. 4 of 5 have a protocol/procedure field for RBT instructions. 0 of 5 show treatment plan reference.
+**Wireframe — Goal Expanded (verified field set against 5 competitors):**
 
 ```
-+----------------------------------------+
-| ← Goals                               |
-| Manding for preferred items            |
-| [Active]  Skill Acquisition    [···]   |
-+========================================+
-| DESCRIPTION                            |
-| Given natural environment, client will |
-| independently mand for 15+ items using |
-| 2-word phrases with 80% accuracy.     |
-|                                         |
-| PROTOCOL (RBT instructions)           |
-| Use NET during play. Present 3-second  |
-| time delay. Reinforce with preferred   |
-| edible on VR3 schedule.               |
-+----------------------------------------+
-| MASTERY & PROGRESS                     |
-| Mastery: 80% across 3 sessions         |
-| Baseline: 20% at intake                |
-| Current: 70% (trending ↑)              |
-|                                         |
-| [LINE CHART: accuracy % over time]     |
-| ─────────────────────────────────      |
-| Jan    Feb    Mar                       |
-| 20%    45%    70%                       |
-+----------------------------------------+
-| OBJECTIVES (3)                         |
-| ● 1.1 Request preferred edibles        |
-|   75% · Partially met · DTT            |
-| ✓ 1.2 Request preferred toys           |
-|   Met Mar 15 · DTT                     |
-| ○ 1.3 Request during transitions       |
-|   Baseline · NET                        |
-+----------------------------------------+
-| RECENT SESSIONS (3)                    |
-| Mar 26 · 70% · Smith, J · 97153       |
-| Mar 24 · 65% · Smith, J · 97153       |
-| Mar 22 · 68% · Park, D  · 97153       |
-+----------------------------------------+
-| BEHAVIOR DETAILS (BR goals only)       |
-| Function: Escape                        |
-| Severity: Moderate                      |
-| Definition: Client leaves assigned area |
-|   without permission during structured  |
-|   activities                            |
-| Replacement: Verbal request for break   |
-| Antecedent strategies: ...              |
-| Crisis protocol: ...                    |
-+----------------------------------------+
-| DETAILS (collapsed by default)         |
-| Started: Jan 15, 2026                  |
-| Target: Jun 30, 2026                   |
-| Assessment: VB-MAPP Mand Level 2, M8  |
-| Notes: ...                              |
-+----------------------------------------+
-| [Open in Programs →] (Phase 3 link)   |
-+----------------------------------------+
+┃ Manding for preferred items
+┃ [Active]  Skill Acquisition                          [▴] [···]
+┃ ● 1.1 Request preferred edibles — partially met
+┃ ✓ 1.2 Request preferred toys — met
+┃ ○ 1.3 Request during transitions — baseline
+┃ ─────────────────────────────────────────────────────────
+┃ DESCRIPTION
+┃ Given natural environment, client will independently
+┃ mand for 15+ items using 2-word phrases with 80% accuracy.
+┃
+┃ PROTOCOL (RBT Instructions)
+┃ Use NET during play. Present 3-second time delay.
+┃ Reinforce with preferred edible on VR3 schedule.
+┃
+┃ MASTERY & PROGRESS
+┃ Mastery: 80% across 3 sessions · Baseline: 20% at intake
+┃ [MINI LINE CHART: accuracy % over time]
+┃
+┃ RECENT SESSIONS
+┃ Mar 26 · 70% · Smith, J · 97153
+┃ Mar 24 · 65% · Smith, J · 97153
+┃ Mar 22 · 68% · Park, D  · 97153
+┃
+┃ BEHAVIOR DETAILS (BR goals only)
+┃ Function: Escape · Severity: Moderate
+┃ Definition: Client leaves assigned area without permission...
+┃ Replacement: Verbal request for break
+┃
+┃ DETAILS ▾
+┃ Started: Jan 15, 2026 · Target: Jun 30, 2026
+┃ Assessment: VB-MAPP Mand Level 2, M8
+┃
+┃ [Open in Programs →] (Phase 3 link)
 ```
 
-**Drawer fields (verified — matches competitor detail views):**
+**Expansion fields (verified — matches competitor detail views):**
 - Description — full SMART goal statement (all 5 competitors)
-- Protocol — RBT instructions for how to run the program (4 of 5 competitors — NEW field needed)
+- Protocol — RBT instructions (4 of 5 competitors)
 - Mastery criteria + baseline data (all 5 competitors)
 - Mini progress chart from session_note_goals data (all 5 have graphs)
-- Objectives with individual progress + data collection type (4 of 5)
 - Recent sessions that addressed this goal (all 5)
-- Behavior reduction details (function, severity, definition, replacement, strategies)
-- Dates + assessment source (collapsed, secondary importance)
-- Notes (only Passage has comments — we have notes field)
+- Behavior reduction details (BR goals only — function, severity, definition, replacement, strategies)
+- Dates + assessment source (in a collapsible "Details" sub-section)
+- Notes (if populated)
 
-**NOT in the drawer (verified — no competitor shows these):**
+**NOT shown (verified — no competitor shows these):**
 - Treatment plan reference (0 of 5 — removed from UI, kept in schema)
-- Goal creation author (only Catalyst — not needed for our tier)
+- Goal creation author (only Catalyst — not needed)
 - Version history (0 of 5)
-- File attachments (only Passage + CentralReach — defer to Phase 2 documents tab)
+- File attachments (defer to documents tab)
 
-**Drawer behavior:**
-- Slides in from right side (~480px wide)
-- Client page stays visible (dimmed) behind it
-- Close via X, Escape, or click outside
-- Mini line chart generated from `session_note_goals` data (accuracy % over time)
-- "Recent Sessions" lists the last 3-5 sessions that referenced this goal
-- "Open in Programs →" link is a placeholder for Phase 3 clinical workspace
-
-**For behavior reduction goals, the drawer also shows:**
-- Function of behavior, severity level
-- Operational definition
-- Replacement behavior
-- Antecedent/consequence strategies
-- Crisis protocol (if populated)
+**Expansion behavior:**
+- Click anywhere on the goal card to toggle expand/collapse
+- Chevron rotates (▾ collapsed → ▴ expanded)
+- Smooth animation (~200ms height transition)
+- Only one goal expanded at a time (clicking another collapses the first)
+- Overflow menu click does NOT toggle expansion
+- Expanded state not persisted across navigation
 
 #### Layer 3: Clinical Workspace (Phase 3-4 — NOT designing now)
 
@@ -592,14 +563,14 @@ This is NOT a tab on the client detail page — it's a separate page linked from
 - [ ] **Objective progress icons** at useful size with clear status (● active, ✓ met, ○ baseline)
 - [ ] **Remove treatment plan ref from UI** (0/5 competitors show this — keep in schema)
 
-**Layer 2 — Goal Detail Drawer:**
-- [ ] **Drawer component** — shadcn Sheet, right-aligned, ~480px
-- [ ] **Description + Protocol** sections
-- [ ] **Mastery & Progress** — criteria, baseline, current performance, mini line chart
-- [ ] **Objectives** with individual progress and data collection type
+**Layer 2 — Goal Inline Expansion:**
+- [ ] **Expand/collapse** — click card to toggle, chevron rotation, smooth animation
+- [ ] **Only one expanded** at a time (accordion behavior)
+- [ ] **Description + Protocol** sections in expanded area
+- [ ] **Mastery & Progress** — criteria, baseline, mini line chart
 - [ ] **Recent sessions** list for this goal
-- [ ] **Behavior details** section (BR goals only — function, severity, definition, replacement, strategies)
-- [ ] **Details** section (collapsed — dates, assessment source, notes)
+- [ ] **Behavior details** section (BR goals only)
+- [ ] **Details** sub-section (collapsed — dates, assessment source, notes)
 - [ ] **Query**: `getGoalSessionHistory(orgId, goalId)` — session_note_goals → sessions
 
 **Layer 3 — Clinical Workspace (Phase 3-4):**
@@ -615,7 +586,7 @@ This is NOT a tab on the client detail page — it's a separate page linked from
 
 **Layer 2 — needs one new query:**
 - `getGoalSessionHistory(orgId, goalId)` — join `session_note_goals` → `session_notes` → `sessions` to get date + accuracy + provider for each session that addressed this goal
-- This powers both the mini line chart and the "Recent Sessions" list in the drawer
+- This powers both the mini line chart and the "Recent Sessions" list in the expanded view
 - This powers both the mini line chart and the "Recent Sessions" list in the drawer
 
 **Layer 3 — needs full data collection schema (Phase 3).**
