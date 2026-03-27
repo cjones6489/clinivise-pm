@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 # PostToolUse hook: auto-format files after Edit/Write operations
-# Receives tool result JSON on stdin with the edited file path
+# Receives tool input JSON on stdin
 
-set -euo pipefail
+set -uo pipefail
 
-# Extract file path from the tool result JSON
-FILE_PATH=$(echo "$CLAUDE_TOOL_INPUT" | grep -oP '"file_path"\s*:\s*"([^"]*)"' | head -1 | sed 's/.*"\([^"]*\)"/\1/')
+# Read stdin
+INPUT=$(cat)
+
+# Extract file path using node (avoids grep -P locale issues)
+FILE_PATH=$(echo "$INPUT" | node -e "
+  let d = '';
+  process.stdin.on('data', c => d += c);
+  process.stdin.on('end', () => {
+    try { const o = JSON.parse(d); console.log(o.file_path || ''); }
+    catch { console.log(''); }
+  });
+" 2>/dev/null || true)
 
 if [ -z "$FILE_PATH" ]; then
   exit 0

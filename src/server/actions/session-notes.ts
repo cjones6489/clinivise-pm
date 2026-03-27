@@ -193,12 +193,19 @@ export const saveSessionNote = authActionClient
       }
 
       for (let i = 0; i < goalInputs.length; i++) {
-        const { id: goalRowId, ...goalData } = goalInputs[i];
+        const goalInput = goalInputs[i];
+        if (!goalInput) continue;
+        const { id: goalRowId, percentageCorrect, ratePerMinute, ...goalData } = goalInput;
+        // Drizzle numeric columns expect string, Zod outputs number
+        const numericFields = {
+          percentageCorrect: percentageCorrect != null ? String(percentageCorrect) : null,
+          ratePerMinute: ratePerMinute != null ? String(ratePerMinute) : null,
+        };
         if (goalRowId && inputGoalIds.has(goalRowId)) {
           // Update existing goal — verify it belongs to this note
           await tx
             .update(sessionNoteGoals)
-            .set({ ...goalData, sortOrder: i })
+            .set({ ...goalData, ...numericFields, sortOrder: i })
             .where(
               and(
                 eq(sessionNoteGoals.id, goalRowId),
@@ -212,6 +219,7 @@ export const saveSessionNote = authActionClient
             organizationId: ctx.organizationId,
             sessionNoteId: noteId,
             ...goalData,
+            ...numericFields,
             sortOrder: i,
           });
         }
@@ -246,7 +254,9 @@ export const saveSessionNote = authActionClient
       }
 
       for (let i = 0; i < behaviorInputs.length; i++) {
-        const { id: behaviorRowId, ...behaviorData } = behaviorInputs[i];
+        const behaviorInput = behaviorInputs[i];
+        if (!behaviorInput) continue;
+        const { id: behaviorRowId, ...behaviorData } = behaviorInput;
         if (behaviorRowId && inputBehaviorIds.has(behaviorRowId)) {
           // Update existing behavior — verify it belongs to this note
           await tx

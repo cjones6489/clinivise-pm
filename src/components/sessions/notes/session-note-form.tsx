@@ -25,6 +25,9 @@ import { Add01Icon } from "@hugeicons/core-free-icons";
 import {
   NOTE_TYPE_LABELS,
   type NoteType,
+  type MeasurementType,
+  type PromptLevel,
+  type GoalProgressStatus,
 } from "@/lib/constants";
 
 import { GoalEntry } from "./goal-entry";
@@ -135,7 +138,7 @@ export function SessionNoteForm({
         goalId: g.goalId ?? "",
         goalName: g.goalName,
         procedure: g.procedure ?? "",
-        measurementType: g.measurementType as SaveSessionNoteInput["goals"][number]["measurementType"],
+        measurementType: g.measurementType as MeasurementType,
         trialsCompleted: g.trialsCompleted ?? undefined,
         trialsCorrect: g.trialsCorrect ?? undefined,
         percentageCorrect: g.percentageCorrect != null ? Number(g.percentageCorrect) : undefined,
@@ -151,9 +154,9 @@ export function SessionNoteForm({
         ratingScaleMax: g.ratingScaleMax ?? undefined,
         intervalsScored: g.intervalsScored ?? undefined,
         intervalsTotal: g.intervalsTotal ?? undefined,
-        promptLevel: (g.promptLevel ?? "") as SaveSessionNoteInput["goals"][number]["promptLevel"],
+        promptLevel: (g.promptLevel ?? "") as PromptLevel | "",
         reinforcement: g.reinforcement ?? "",
-        progressStatus: g.progressStatus as SaveSessionNoteInput["goals"][number]["progressStatus"],
+        progressStatus: g.progressStatus as GoalProgressStatus,
         notes: g.notes ?? "",
       })) ?? [],
       behaviors: existingNote?.behaviors.map((b) => ({
@@ -164,7 +167,7 @@ export function SessionNoteForm({
         behaviorDescription: b.behaviorDescription ?? "",
         consequence: b.consequence ?? "",
         durationSeconds: b.durationSeconds ?? undefined,
-        intensity: (b.intensity ?? "") as SaveSessionNoteInput["behaviors"][number]["intensity"],
+        intensity: (b.intensity ?? "") as "" | "mild" | "moderate" | "severe",
         notes: b.notes ?? "",
       })) ?? [],
     },
@@ -232,7 +235,7 @@ export function SessionNoteForm({
   // ── Render ─────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleSubmit(onSave)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSave as Parameters<typeof handleSubmit>[0])} className="space-y-6">
       {/* Session Context (read-only) */}
       <SectionCard title="Session Context">
         <dl className="grid grid-cols-2 gap-x-8 gap-y-2 text-xs sm:grid-cols-4">
