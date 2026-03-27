@@ -27,6 +27,11 @@ export type CareTeamMember = {
   startDate: string;
 };
 
+export type PastCareTeamMember = CareTeamMember & {
+  endDate: string;
+  notes: string | null;
+};
+
 export type ClientListItem = {
   id: string;
   firstName: string;
@@ -204,6 +209,36 @@ export async function getCareTeam(orgId: string, clientId: string): Promise<Care
       ),
     )
     .orderBy(desc(clientProviders.isPrimary), providers.lastName, providers.firstName);
+}
+
+/** Past care team members (endDate is set) — for assignment history */
+export async function getPastCareTeam(
+  orgId: string,
+  clientId: string,
+): Promise<PastCareTeamMember[]> {
+  return db
+    .select({
+      id: clientProviders.id,
+      providerId: clientProviders.providerId,
+      providerFirstName: providers.firstName,
+      providerLastName: providers.lastName,
+      credentialType: providers.credentialType,
+      role: clientProviders.role,
+      isPrimary: clientProviders.isPrimary,
+      startDate: clientProviders.startDate,
+      endDate: clientProviders.endDate,
+      notes: clientProviders.notes,
+    })
+    .from(clientProviders)
+    .innerJoin(providers, eq(clientProviders.providerId, providers.id))
+    .where(
+      and(
+        eq(clientProviders.organizationId, orgId),
+        eq(clientProviders.clientId, clientId),
+        sql`${clientProviders.endDate} IS NOT NULL`,
+      ),
+    )
+    .orderBy(desc(clientProviders.endDate)) as unknown as Promise<PastCareTeamMember[]>;
 }
 
 export type AvailableProvider = {

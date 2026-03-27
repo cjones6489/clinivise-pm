@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
-import type { CareTeamMember, AvailableProvider } from "@/server/queries/clients";
+import type { CareTeamMember, PastCareTeamMember, AvailableProvider } from "@/server/queries/clients";
+import { formatDate } from "@/lib/utils";
 import { addToTeam, updateTeamMember, removeFromTeam } from "@/server/actions/care-team";
 import {
   CARE_TEAM_ROLE_LABELS,
@@ -64,9 +66,12 @@ function TeamMemberRow({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium">
+          <Link
+            href={`/providers/${member.providerId}`}
+            className="text-xs font-medium hover:underline"
+          >
             {member.providerFirstName} {member.providerLastName}
-          </span>
+          </Link>
           <Badge variant="outline" className="text-[9px]">
             {CREDENTIAL_LABELS[member.credentialType as CredentialType] ??
               member.credentialType.toUpperCase()}
@@ -173,23 +178,14 @@ function ManageTeamModal({
   const [search, setSearch] = useState("");
 
   const { execute: executeAdd, isPending: isAdding } = useAction(addToTeam, {
-    onSuccess: ({ data }) => {
-      if (data?.success) toast.success("Provider added to care team");
-    },
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to add provider"),
   });
 
   const { execute: executeRemoveAction } = useAction(removeFromTeam, {
-    onSuccess: ({ data }) => {
-      if (data?.success) toast.success("Provider removed from care team");
-    },
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to remove provider"),
   });
 
   const { execute: executeUpdate } = useAction(updateTeamMember, {
-    onSuccess: ({ data }) => {
-      if (data?.success) toast.success("Care team updated");
-    },
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to update"),
   });
 
@@ -400,28 +396,25 @@ function ManageTeamModal({
 export function ClientCareTeam({
   clientId,
   careTeam,
+  pastCareTeam,
   availableProviders,
   canEdit,
 }: {
   clientId: string;
   careTeam: CareTeamMember[];
+  pastCareTeam: PastCareTeamMember[];
   availableProviders: AvailableProvider[];
   canEdit: boolean;
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<CareTeamMember | null>(null);
+  const [showPast, setShowPast] = useState(false);
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(updateTeamMember, {
-    onSuccess: ({ data }) => {
-      if (data?.success) toast.success("Care team updated");
-    },
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to update care team"),
   });
 
   const { executeAsync: executeRemove } = useAction(removeFromTeam, {
-    onSuccess: ({ data }) => {
-      if (data?.success) toast.success("Provider removed from care team");
-    },
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to remove provider"),
   });
 
@@ -438,7 +431,7 @@ export function ClientCareTeam({
       <div className="flex items-center justify-between">
         <div className="text-muted-foreground text-xs">
           {careTeam.length > 0
-            ? `${bcbaMembers.length} BCBA${bcbaMembers.length !== 1 ? "s" : ""} · ${rbtMembers.length} RBT${rbtMembers.length !== 1 ? "s" : ""}`
+            ? `${bcbaMembers.length} BCBA${bcbaMembers.length !== 1 ? "s" : ""} · ${rbtMembers.length} RBT${rbtMembers.length !== 1 ? "s" : ""}${pastCareTeam.length > 0 ? ` · ${pastCareTeam.length} past` : ""}`
             : null}
         </div>
         {canEdit && (
@@ -516,6 +509,53 @@ export function ClientCareTeam({
             </div>
           )}
         </>
+      )}
+
+      {/* Past Assignments (collapsible) */}
+      {pastCareTeam.length > 0 && (
+        <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
+          <button
+            type="button"
+            onClick={() => setShowPast(!showPast)}
+            className="bg-muted/20 hover:bg-muted/40 flex w-full items-center justify-between border-b px-4 py-2 transition-colors"
+          >
+            <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+              Past Assignments ({pastCareTeam.length})
+            </span>
+            <span className="text-muted-foreground text-[11px]">{showPast ? "▲ Hide" : "▼ Show"}</span>
+          </button>
+          {showPast && (
+            <div>
+              {pastCareTeam.map((m) => (
+                <div
+                  key={m.id}
+                  className="bg-muted/10 border-border/20 flex items-center gap-3 border-b px-4 py-2.5 last:border-b-0"
+                >
+                  <div className="bg-muted text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-semibold">
+                    {getInitials(m.providerFirstName, m.providerLastName)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/providers/${m.providerId}`}
+                        className="text-muted-foreground text-xs font-medium hover:underline"
+                      >
+                        {m.providerFirstName} {m.providerLastName}
+                      </Link>
+                      <Badge variant="outline" className="text-[9px]">
+                        {CREDENTIAL_LABELS[m.credentialType as CredentialType] ?? m.credentialType.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <div className="text-muted-foreground text-[11px]">
+                      {formatDate(m.startDate)} — {formatDate(m.endDate)}
+                      {m.notes && <span className="ml-2">· {m.notes}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Manage Team Modal */}

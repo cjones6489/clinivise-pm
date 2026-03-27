@@ -4,6 +4,7 @@ import type {
   Client,
   ClientContact,
   CareTeamMember,
+  PastCareTeamMember,
   AvailableProvider,
   ClientInsuranceWithPayer,
   PayerOption,
@@ -23,6 +24,7 @@ export function ClientDetail({
   client,
   contacts,
   careTeam,
+  pastCareTeam,
   availableProviders,
   goals,
   goalDomains,
@@ -37,6 +39,7 @@ export function ClientDetail({
   client: Client;
   contacts: ClientContact[];
   careTeam: CareTeamMember[];
+  pastCareTeam: PastCareTeamMember[];
   availableProviders: AvailableProvider[];
   goals: GoalWithObjectives[];
   goalDomains: GoalDomain[];
@@ -78,6 +81,7 @@ export function ClientDetail({
         <ClientCareTeam
           clientId={client.id}
           careTeam={careTeam}
+          pastCareTeam={pastCareTeam}
           availableProviders={availableProviders}
           canEdit={canEdit}
         />

@@ -6,6 +6,7 @@ import {
   getClientById,
   getClientContacts,
   getCareTeam,
+  getPastCareTeam,
   getAvailableProviders,
   getClientInsurance,
   getPayerOptions,
@@ -44,6 +45,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     client,
     contacts,
     careTeam,
+    pastCareTeam,
     availableProviders,
     goals,
     goalDomains,
@@ -56,6 +58,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     getClientById(user.organizationId, id),
     getClientContacts(user.organizationId, id),
     getCareTeam(user.organizationId, id),
+    getPastCareTeam(user.organizationId, id),
     canEdit ? getAvailableProviders(user.organizationId, id) : Promise.resolve([]),
     getClientGoals(user.organizationId, id),
     canEdit ? getGoalDomains(user.organizationId) : Promise.resolve([]),
@@ -152,6 +155,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         client={client}
         contacts={contacts}
         careTeam={careTeam}
+        pastCareTeam={pastCareTeam}
         availableProviders={availableProviders}
         goals={goals}
         goalDomains={goalDomains}
