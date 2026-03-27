@@ -38,6 +38,13 @@ export const navItems: NavItem[] = [
     roles: ["owner", "admin", "bcba", "bcaba", "billing_staff"],
     group: "core",
   },
+  {
+    title: "Notes",
+    href: "/notes",
+    iconName: "NoteEditIcon",
+    roles: ["owner", "admin", "bcba"],
+    group: "core",
+  },
 
   // ── Management (setup, admin/bcba/billing) ──
   {
