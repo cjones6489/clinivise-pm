@@ -72,12 +72,12 @@ export function SessionDetailView({ session }: { session: SessionDetailType }) {
             {session.serviceAddress && (
               <KV label="Service Address">{session.serviceAddress}</KV>
             )}
-            {session.cancellationReason && (
+            {(session.status === "cancelled" || session.status === "no_show") && session.cancellationReason && (
               <KV label="Cancellation Reason">
                 {CANCELLATION_REASON_LABELS[session.cancellationReason as CancellationReason] ?? session.cancellationReason}
               </KV>
             )}
-            {session.cancelledBy && (
+            {(session.status === "cancelled" || session.status === "no_show") && session.cancelledBy && (
               <KV label="Cancelled By">
                 {CANCELLED_BY_LABELS[session.cancelledBy as CancelledBy] ?? session.cancelledBy}
               </KV>

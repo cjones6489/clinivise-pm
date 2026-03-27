@@ -497,6 +497,9 @@ export const updateSession = authActionClient
           actualMinutes,
           placeOfService: input.placeOfService,
           status: input.status,
+          cancellationReason: input.cancellationReason ?? null,
+          cancelledBy: input.cancelledBy ?? null,
+          serviceAddress: input.serviceAddress ?? null,
           notes: input.notes ?? null,
         })
         .where(
@@ -601,9 +604,7 @@ export const cancelSession = authActionClient
         .update(sessions)
         .set({
           status: "cancelled",
-          notes: parsedInput.reason
-            ? `${session.notes ? session.notes + "\n" : ""}Cancellation reason: ${parsedInput.reason}`
-            : session.notes,
+          cancellationReason: parsedInput.reason ?? null,
         })
         .where(
           and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)),
