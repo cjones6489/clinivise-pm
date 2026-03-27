@@ -4,6 +4,24 @@ All-in-one ABA therapy platform — clinical operations, practice management, an
 
 @AGENTS.md
 
+## Product Positioning: Entry-Level All-in-One EHR/PM
+
+**Clinivise is NOT CentralReach.** We are building a modern, simplified all-in-one EHR/PM in the same tier as:
+
+- **Raven Health** — AI-powered, mobile-first, per-learner pricing, BCBA-founded
+- **Hipp Health** — Multi-modal capture, payer-calibrated AI notes, "practice on autopilot"
+- **Passage Health** — Clean PM + Frontera AI for clinical intelligence
+- **TherapyPM** — Simplified practice management for small therapy practices
+- **Therapy Lake** — Entry-level all-in-one for growing practices
+
+**What this means for every feature decision:**
+
+1. **Simple first.** If Raven/Hipp solve it with one screen, we don't need three. No multi-step approval workflows, no configurable pipelines, no enterprise admin panels.
+2. **Follow established patterns.** Don't invent new workflows. Research what simplified EHRs actually do, then build that. The industry has converged on standard patterns — follow them.
+3. **Clinical features should feel lightweight.** Session notes, goals, data collection — these should be fast to complete, not bureaucratic. An RBT should finish a note in under 2 minutes.
+4. **No premature complexity.** Don't build payer-specific configurations, template builders, or approval chains for MVP. Ship the 80% case. Add configurability when practices ask for it.
+5. **Validate assumptions with domain experts.** Before building any clinical workflow, ask: "Does a practicing BCBA actually do this?" If you can't confirm, research or ask — don't assume.
+
 ## Development Philosophy
 
 **The interface IS the product.** Backend and frontend are not separate phases — they are two sides of the same user workflow, designed together.
