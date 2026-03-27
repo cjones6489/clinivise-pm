@@ -554,3 +554,233 @@ export const QHP_ONLY_CPT_CODES = ["97151", "97155", "97156", "97157", "97158"] 
 
 /** Group therapy codes — multiple clients simultaneously, so overlapping sessions for the same provider are valid. */
 export const GROUP_CPT_CODES = ["97154", "97157", "97158"] as const;
+
+// ── Session Note Types ────────────────────────────────────────────────────────
+
+export const NOTE_TYPES = [
+  "97153_direct",
+  "97155_modification",
+  "97156_caregiver",
+  "97151_assessment",
+] as const;
+export type NoteType = (typeof NOTE_TYPES)[number];
+
+export const NOTE_TYPE_LABELS: Record<NoteType, string> = {
+  "97153_direct": "Direct Therapy (97153)",
+  "97155_modification": "Protocol Modification (97155)",
+  "97156_caregiver": "Caregiver Training (97156)",
+  "97151_assessment": "Assessment (97151)",
+};
+
+/** Map CPT codes to note types */
+export const CPT_TO_NOTE_TYPE: Record<string, NoteType> = {
+  "97153": "97153_direct",
+  "97154": "97153_direct", // Group therapy uses same note structure as direct
+  "97155": "97155_modification",
+  "97156": "97156_caregiver",
+  "97157": "97156_caregiver", // Group caregiver uses same note structure
+  "97151": "97151_assessment",
+  "97152": "97151_assessment", // Supporting assessment uses same structure
+  "97158": "97155_modification", // Group protocol modification
+};
+
+// ── Session Note Statuses ─────────────────────────────────────────────────────
+
+export const NOTE_STATUSES = ["draft", "signed", "cosigned", "locked"] as const;
+export type NoteStatus = (typeof NOTE_STATUSES)[number];
+
+export const NOTE_STATUS_LABELS: Record<NoteStatus, string> = {
+  draft: "Draft",
+  signed: "Signed",
+  cosigned: "Co-signed",
+  locked: "Locked",
+};
+
+export const NOTE_STATUS_VARIANT: Record<NoteStatus, "secondary" | "outline" | "default" | "destructive"> = {
+  draft: "secondary",
+  signed: "outline",
+  cosigned: "default",
+  locked: "default",
+};
+
+// ── Goal Progress Statuses (per-goal within a session note) ──────────────────
+
+export const GOAL_PROGRESS_STATUSES = [
+  "met",
+  "partially_met",
+  "not_met",
+  "regression",
+  "maintenance",
+  "not_assessed",
+] as const;
+export type GoalProgressStatus = (typeof GOAL_PROGRESS_STATUSES)[number];
+
+export const GOAL_PROGRESS_LABELS: Record<GoalProgressStatus, string> = {
+  met: "Met",
+  partially_met: "Partially Met",
+  not_met: "Not Met",
+  regression: "Regression",
+  maintenance: "Maintenance",
+  not_assessed: "Not Assessed",
+};
+
+export const GOAL_PROGRESS_VARIANT: Record<GoalProgressStatus, "default" | "secondary" | "outline" | "destructive"> = {
+  met: "default",
+  partially_met: "outline",
+  not_met: "secondary",
+  regression: "destructive",
+  maintenance: "outline",
+  not_assessed: "secondary",
+};
+
+// ── ABA Prompt Levels ─────────────────────────────────────────────────────────
+
+export const PROMPT_LEVELS = ["FP", "PP", "M", "V", "G", "PO", "TX", "VS", "EC", "I"] as const;
+export type PromptLevel = (typeof PROMPT_LEVELS)[number];
+
+export const PROMPT_LEVEL_LABELS: Record<PromptLevel, string> = {
+  FP: "Full Physical",
+  PP: "Partial Physical",
+  M: "Model",
+  V: "Verbal",
+  G: "Gestural",
+  PO: "Positional",
+  TX: "Textual",
+  VS: "Visual",
+  EC: "Echoic",
+  I: "Independent",
+};
+
+// ── Measurement Types (per-goal data collection) ──────────────────────────────
+
+export const MEASUREMENT_TYPES = [
+  "discrete_trial",
+  "frequency",
+  "duration",
+  "rate",
+  "latency",
+  "task_analysis",
+  "interval",
+  "other",
+] as const;
+export type MeasurementType = (typeof MEASUREMENT_TYPES)[number];
+
+export const MEASUREMENT_TYPE_LABELS: Record<MeasurementType, string> = {
+  discrete_trial: "Discrete Trial",
+  frequency: "Frequency Count",
+  duration: "Duration",
+  rate: "Rate",
+  latency: "Latency",
+  task_analysis: "Task Analysis",
+  interval: "Interval Recording",
+  other: "Other",
+};
+
+// ── ABA Techniques ────────────────────────────────────────────────────────────
+
+export const ABA_TECHNIQUES = [
+  "dtt",
+  "net",
+  "incidental_teaching",
+  "pivotal_response",
+  "fluency_training",
+  "chaining_forward",
+  "chaining_backward",
+  "shaping",
+  "task_analysis",
+  "modeling",
+  "prompting",
+  "fading",
+  "reinforcement",
+  "extinction",
+  "dra",
+  "dri",
+  "dro",
+  "functional_communication",
+  "social_skills_training",
+  "self_management",
+  "video_modeling",
+  "visual_supports",
+  "token_economy",
+  "other",
+] as const;
+export type AbaTechnique = (typeof ABA_TECHNIQUES)[number];
+
+export const ABA_TECHNIQUE_LABELS: Record<AbaTechnique, string> = {
+  dtt: "Discrete Trial Training (DTT)",
+  net: "Natural Environment Teaching (NET)",
+  incidental_teaching: "Incidental Teaching",
+  pivotal_response: "Pivotal Response Training (PRT)",
+  fluency_training: "Fluency Training",
+  chaining_forward: "Forward Chaining",
+  chaining_backward: "Backward Chaining",
+  shaping: "Shaping",
+  task_analysis: "Task Analysis",
+  modeling: "Modeling",
+  prompting: "Prompting",
+  fading: "Fading",
+  reinforcement: "Reinforcement",
+  extinction: "Extinction",
+  dra: "DRA (Differential Reinforcement of Alt.)",
+  dri: "DRI (Differential Reinforcement of Incompat.)",
+  dro: "DRO (Differential Reinforcement of Other)",
+  functional_communication: "Functional Communication Training (FCT)",
+  social_skills_training: "Social Skills Training",
+  self_management: "Self-Management",
+  video_modeling: "Video Modeling",
+  visual_supports: "Visual Supports",
+  token_economy: "Token Economy",
+  other: "Other",
+};
+
+// ── Behavior Intensity ────────────────────────────────────────────────────────
+
+export const BEHAVIOR_INTENSITIES = ["mild", "moderate", "severe"] as const;
+export type BehaviorIntensity = (typeof BEHAVIOR_INTENSITIES)[number];
+
+export const BEHAVIOR_INTENSITY_LABELS: Record<BehaviorIntensity, string> = {
+  mild: "Mild",
+  moderate: "Moderate",
+  severe: "Severe",
+};
+
+// ── Caregiver Relationships (for 97156 notes) ────────────────────────────────
+
+export const CAREGIVER_RELATIONSHIPS = [
+  "mother",
+  "father",
+  "parent",
+  "grandparent",
+  "sibling",
+  "teacher",
+  "aide",
+  "other",
+] as const;
+export type CaregiverRelationship = (typeof CAREGIVER_RELATIONSHIPS)[number];
+
+export const CAREGIVER_RELATIONSHIP_LABELS: Record<CaregiverRelationship, string> = {
+  mother: "Mother",
+  father: "Father",
+  parent: "Parent/Guardian",
+  grandparent: "Grandparent",
+  sibling: "Sibling",
+  teacher: "Teacher",
+  aide: "Aide",
+  other: "Other",
+};
+
+// ── Assessment Tools (for 97151 notes) ────────────────────────────────────────
+
+export const ASSESSMENT_TOOLS = [
+  "VB-MAPP",
+  "ABLLS-R",
+  "AFLS",
+  "Vineland-3",
+  "PEAK",
+  "ESDM Curriculum",
+  "FBA",
+  "FA",
+  "FAST",
+  "MAS",
+  "Other",
+] as const;

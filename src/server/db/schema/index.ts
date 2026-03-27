@@ -8,6 +8,7 @@ export * from "./client-goals";
 export * from "./payers";
 export * from "./authorizations";
 export * from "./sessions";
+export * from "./session-notes";
 export * from "./claims";
 export * from "./eligibility";
 export * from "./documents";
