@@ -809,15 +809,59 @@ draft → signed (author signs, note locks)
 - Goal template library (practice-level, reusable across clients)
 - Import goals from Motivity/Catalyst API (clinical integration)
 
-### What's Explicitly Out of Scope (Phase 2+)
+### All-in-One Strategy (from 2026-03-26 market research)
 
-- Claims submission / ERA processing / eligibility checks (Stedi)
-- Denial management / Billing dashboard
-- Analytics & reporting
-- Parent portal
-- Clinical integrations (Motivity, Hi Rasmus)
-- Postgres RLS (defense-in-depth before production PHI)
+**Strategic pivot: Clinivise is an all-in-one ABA platform, not a PM-only tool.**
+
+The market has bifurcated: PM-only tools (AlohaABA) force double-entry with clinical tools (Motivity). All-in-one tools (CentralReach) are powerful but have terrible UX. The opportunity: **be the all-in-one that doesn't suck.**
+
+Research findings:
+- ABA practitioners' #1 complaint is using too many software tools
+- AlohaABA + Motivity goals do NOT sync — BCBAs manually reference goals by name
+- CentralReach users complain about complexity but don't switch because consolidation is valuable
+- Goals without data collection is "a skeleton without muscles" — the hierarchy only matters if it powers data collection
+- Nobody has nailed both clinical + PM with good UX for small practices
+
+**The build order matters.** PM foundation (complete) → Clinical goals + notes → Data collection → Graphing + mastery → Billing. Each layer unlocks the next.
+
+### Clinical Platform Roadmap
+
+```
+Phase 2: Goals + Session Notes (current)
+  └─ Goal Domains (custom per org)
+  └─ Client Goals (treatment plan goals)
+  └─ Goal Objectives (measurable milestones)
+  └─ Structured Session Notes (CPT-specific, goal-linked, signature workflow)
+
+Phase 3: Data Collection
+  └─ Targets under Objectives (atomic data-collection units)
+  └─ Data Collection Types (DTT, frequency, duration, task analysis, interval)
+  └─ Mobile/Tablet Data Entry Interface
+  └─ Real-time session data (live collection during sessions)
+
+Phase 4: Graphing + Intelligence
+  └─ Per-target data graphing + trend lines
+  └─ Mastery criteria automation (configurable per target)
+  └─ Phase progression (baseline → acquisition → maintenance)
+  └─ AI Note Generation (structured data → narrative → human review)
+  └─ Progress Reports (aggregated for re-authorization)
+
+Phase 5: Billing
+  └─ Claims submission (Stedi EDI 837P)
+  └─ ERA processing (835 remittance)
+  └─ Eligibility checks (270/271)
+  └─ Denial management + appeal workflow
+
+Future:
+  └─ Assessment integration (VB-MAPP, ABLLS-R → auto-generate goals)
+  └─ Treatment plan authoring (BIP with structured sections)
+  └─ Scheduling / Calendar
+  └─ Parent portal
+  └─ Analytics + reporting dashboards
+  └─ Supervision compliance tracking
+  └─ Goal template library (practice-level, community-shared)
+```
 
 ---
 
-_Last updated: 2026-03-26 — Phase 1-Core complete. 271 tests passing. Billing math + modifier codes audited. Care team model built. Session validation rules implemented. Clinical documentation roadmap designed._
+_Last updated: 2026-03-26 — Phase 1 PM complete. Strategic pivot to all-in-one clinical + PM platform. Phase 2 (goals + session notes) ready to build. 271 tests passing._

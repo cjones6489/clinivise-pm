@@ -8,7 +8,9 @@
 
 ## Competitor Context
 
-What ABA PM tools typically include, so we know what practitioners expect:
+Clinivise is an **all-in-one ABA platform** — clinical operations (goals, data collection, session notes) AND practice management (billing, authorizations, scheduling) in a single product. The #1 practitioner complaint is using multiple software tools. We eliminate that.
+
+What ABA tools typically include, so we know what practitioners expect:
 
 | Feature Area | CentralReach | AlohaABA | Theralytics | Raven Health | SimplePractice |
 |---|---|---|---|---|---|

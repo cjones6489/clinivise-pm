@@ -1,6 +1,6 @@
 # Clinivise
 
-ABA therapy practice management & AI-native billing platform. HIPAA-compliant, multi-tenant SaaS for small practices (1–50 staff). Free PM tool, monetized via 2–4% of collected revenue on billing.
+All-in-one ABA therapy platform — clinical operations, practice management, and AI-native billing in a single product. HIPAA-compliant, multi-tenant SaaS for small practices (1–50 staff). The goal: eliminate the need for multiple software tools (CentralReach for billing, Motivity for data collection, etc.) by building both sides with exceptional UX. Free PM tier, monetized via 2–4% of collected revenue on billing.
 
 @AGENTS.md
 
@@ -121,15 +121,22 @@ src/
 - **Session validation**: Only 2 hard blocks at session creation: (1) same provider overlapping 1:1 sessions, (2) RBT billing QHP-only codes. Everything else is a WARNING (auth date range, MUE, missing supervisor, expired credentials, BCaBA QHP codes). Session logging captures what happened — never block it for billing issues. Warn at creation, hard-block at claim generation. See `ROADMAP.md` "Session Validation Rules" for full details.
 - **RBT supervision on claims**: NOT universal. Three billing models exist (bill under BCBA NPI, bill under RBT NPI + supervisor, group billing). Which model depends on the payer. BACB supervision (5% monthly) is a certification requirement, separate from claim requirements.
 
-- **Clinical documentation**: Goals-first approach — `client_goals` table is the registry of treatment plan goals that session notes reference. Full treatment plan authoring is NOT built; BCBAs write plans externally. `session_notes` table has CPT-code-specific structured fields + narrative + signature workflow (draft→signed→approved). Notes are NOT submitted with claims — kept on file for audits. See ROADMAP.md "Clinical Documentation" for full schema.
+- **Clinical data model**: Full hierarchy: `goal_domains` (custom per org) → `client_goals` (treatment plan goals with domain, type, mastery criteria) → `client_goal_objectives` (measurable milestones) → targets + data collection (future). Session notes reference goals with per-goal structured data entry. Notes are NOT submitted with claims — kept on file for audits.
+- **All-in-one strategy**: Clinivise replaces both the PM tool (AlohaABA) AND the clinical tool (Motivity/Catalyst). No double-entry, no integration friction. Build clinical features incrementally on top of the PM foundation. See ROADMAP.md "Clinical Platform" for full plan.
 
 ## Phase Context
 
-**Phase 1 (current):** Auth, multi-tenant foundation, client/provider/authorization CRUD, session logging, care team management, dashboard overview, Clerk webhooks, session validation.
+**Phase 1 (complete):** Multi-tenant foundation, client/provider/authorization CRUD, session logging, care team management, dashboard overview, Clerk webhooks, session validation.
 
-**Next up:** Client goals registry → Structured session notes → AI note generation.
+**Phase 2 (current):** Clinical foundation — goal domains, treatment goals + objectives, structured session notes, signature workflow.
 
-**Out of scope now:** Claims submission, ERA processing, eligibility checks, denial management, analytics, parent portal, full treatment plan authoring, supervision ratio tracking.
+**Phase 3:** Data collection during sessions (DTT, frequency, duration, task analysis), mobile/tablet interface, real-time data entry.
+
+**Phase 4:** Graphing + mastery automation, phase progression, AI note generation, progress reports.
+
+**Phase 5:** Claims submission (Stedi), ERA processing, eligibility checks, denial management.
+
+**Future:** Analytics, parent portal, scheduling/calendar, supervision compliance tracking.
 
 ## Documentation
 
