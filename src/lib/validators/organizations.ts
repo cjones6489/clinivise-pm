@@ -63,6 +63,49 @@ export const updateOrganizationSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
+  // Billing entity (may differ from practice)
+  billingName: z
+    .string()
+    .max(200)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  billingNpi: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined)
+    .refine((v) => !v || isValidNpi(v), {
+      message: "Invalid billing NPI — check digit does not match",
+    }),
+  billingTaxId: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined)
+    .refine((v) => !v || /^\d{2}-?\d{7}$/.test(v), {
+      message: "Tax ID must be 9 digits (XX-XXXXXXX or XXXXXXXXX)",
+    }),
+  billingAddressLine1: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  billingCity: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  billingState: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  billingZipCode: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
 });
 
 export type UpdateOrganizationInput = z.input<typeof updateOrganizationSchema>;

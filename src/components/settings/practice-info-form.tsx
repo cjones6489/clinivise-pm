@@ -74,7 +74,7 @@ function SectionCard({
 }
 
 export function PracticeInfoForm({ org }: { org: Organization }) {
-  const [editing, setEditing] = useState<"practice" | "billing" | null>(null);
+  const [editing, setEditing] = useState<"practice" | "billing" | "billing_entity" | null>(null);
 
   const {
     register,
@@ -97,6 +97,13 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
       npi: org.npi ?? "",
       taxId: org.taxId ?? "",
       taxonomyCode: org.taxonomyCode ?? "",
+      billingName: org.billingName ?? "",
+      billingNpi: org.billingNpi ?? "",
+      billingTaxId: org.billingTaxId ?? "",
+      billingAddressLine1: org.billingAddressLine1 ?? "",
+      billingCity: org.billingCity ?? "",
+      billingState: org.billingState ?? "",
+      billingZipCode: org.billingZipCode ?? "",
     },
   });
 
@@ -192,6 +199,56 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
             <p className="mt-1 text-xs text-blue-600 dark:text-blue-400/80">
               Add your NPI and Tax ID to prepare for claims submission. These identifiers are
               required on every insurance claim.
+            </p>
+          </div>
+        )}
+
+        {/* Billing Entity — only shown if any billing entity fields are populated */}
+        {(org.billingName || org.billingNpi || org.billingTaxId || org.billingAddressLine1) ? (
+          <SectionCard
+            title="Billing Entity"
+            action={
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 text-xs"
+                onClick={() => setEditing("billing_entity")}
+              >
+                Edit
+              </Button>
+            }
+          >
+            {org.billingName && <KVRow label="Billing Name" value={org.billingName} />}
+            {org.billingNpi && (
+              <KVRow label="Billing NPI" value={<span className="font-mono tabular-nums">{org.billingNpi}</span>} />
+            )}
+            {org.billingTaxId && (
+              <KVRow label="Billing Tax ID" value={<span className="font-mono tabular-nums">{org.billingTaxId}</span>} />
+            )}
+            {org.billingAddressLine1 && (
+              <KVRow
+                label="Billing Address"
+                value={
+                  org.billingCity && org.billingState
+                    ? `${org.billingAddressLine1}, ${org.billingCity}, ${org.billingState} ${org.billingZipCode ?? ""}`
+                    : org.billingAddressLine1
+                }
+              />
+            )}
+            <p className="text-muted-foreground pt-1 text-[10px]">
+              Used on CMS-1500 Box 33 when the billing entity differs from the practice.
+            </p>
+          </SectionCard>
+        ) : (
+          <div
+            className="cursor-pointer rounded-lg border border-border/40 bg-muted/20 px-4 py-3 transition-colors hover:bg-muted/40"
+            onClick={() => setEditing("billing_entity")}
+          >
+            <div className="text-muted-foreground text-xs font-medium">
+              Billing entity (optional)
+            </div>
+            <p className="text-muted-foreground mt-0.5 text-[11px]">
+              Set a separate billing name, NPI, and address if your billing entity differs from the practice.
             </p>
           </div>
         )}
@@ -324,6 +381,65 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
                 )}
               />
             </Field>
+          </div>
+        </SectionCard>
+      )}
+
+      {editing === "billing_entity" && (
+        <SectionCard title="Billing Entity">
+          <div className="space-y-3">
+            <p className="text-muted-foreground text-[11px]">
+              Only fill this in if your billing entity (CMS-1500 Box 33) differs from the practice. Leave blank to use practice info for billing.
+            </p>
+            <Field>
+              <Label className="text-xs font-medium">Billing Entity Name</Label>
+              <Input
+                {...register("billingName")}
+                className="h-8 text-xs"
+                placeholder="Legal entity name (e.g., Bright Futures ABA LLC)"
+              />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field>
+                <Label className="text-xs font-medium">Billing NPI</Label>
+                <Input
+                  {...register("billingNpi")}
+                  className="h-8 font-mono text-xs"
+                  placeholder="10-digit NPI"
+                  maxLength={10}
+                  inputMode="numeric"
+                />
+                <FieldError>{errors.billingNpi?.message}</FieldError>
+              </Field>
+              <Field>
+                <Label className="text-xs font-medium">Billing Tax ID</Label>
+                <Input
+                  {...register("billingTaxId")}
+                  className="h-8 font-mono text-xs"
+                  placeholder="XX-XXXXXXX"
+                />
+                <FieldError>{errors.billingTaxId?.message}</FieldError>
+              </Field>
+            </div>
+            <Field>
+              <Label className="text-xs font-medium">Billing Address</Label>
+              <Input
+                {...register("billingAddressLine1")}
+                className="h-8 text-xs"
+                placeholder="Street address"
+              />
+            </Field>
+            <div className="grid grid-cols-3 gap-3">
+              <Field>
+                <Input {...register("billingCity")} className="h-8 text-xs" placeholder="City" />
+              </Field>
+              <Field>
+                <Input {...register("billingState")} className="h-8 text-xs" placeholder="State" />
+              </Field>
+              <Field>
+                <Input {...register("billingZipCode")} className="h-8 text-xs" placeholder="ZIP" />
+              </Field>
+            </div>
           </div>
         </SectionCard>
       )}

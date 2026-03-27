@@ -18,6 +18,13 @@ export type Organization = {
   zipCode: string | null;
   taxonomyCode: string | null;
   timezone: string;
+  billingName: string | null;
+  billingNpi: string | null;
+  billingTaxId: string | null;
+  billingAddressLine1: string | null;
+  billingCity: string | null;
+  billingState: string | null;
+  billingZipCode: string | null;
 };
 
 /** Fetch org settings for display. Excludes sensitive fields (stediApiKey). */
@@ -37,6 +44,13 @@ export async function getOrganization(orgId: string): Promise<Organization | nul
       zipCode: organizations.zipCode,
       taxonomyCode: organizations.taxonomyCode,
       timezone: organizations.timezone,
+      billingName: organizations.billingName,
+      billingNpi: organizations.billingNpi,
+      billingTaxId: organizations.billingTaxId,
+      billingAddressLine1: organizations.billingAddressLine1,
+      billingCity: organizations.billingCity,
+      billingState: organizations.billingState,
+      billingZipCode: organizations.billingZipCode,
     })
     .from(organizations)
     .where(eq(organizations.id, orgId))
