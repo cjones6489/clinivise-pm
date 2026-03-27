@@ -365,11 +365,21 @@ export function AuthorizationForm({
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
-                    <SelectItem value="initial" className="text-xs">Initial</SelectItem>
-                    <SelectItem value="recertification" className="text-xs">Recertification</SelectItem>
-                    <SelectItem value="concurrent_review" className="text-xs">Concurrent Review</SelectItem>
-                    <SelectItem value="peer_to_peer" className="text-xs">Peer-to-Peer</SelectItem>
+                    <SelectItem value={NONE_VALUE} className="text-xs">
+                      Not specified
+                    </SelectItem>
+                    <SelectItem value="initial" className="text-xs">
+                      Initial
+                    </SelectItem>
+                    <SelectItem value="recertification" className="text-xs">
+                      Recertification
+                    </SelectItem>
+                    <SelectItem value="concurrent_review" className="text-xs">
+                      Concurrent Review
+                    </SelectItem>
+                    <SelectItem value="peer_to_peer" className="text-xs">
+                      Peer-to-Peer
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               )}

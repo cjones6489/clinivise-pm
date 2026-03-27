@@ -169,7 +169,11 @@ export function PayerForm({ payer, onSuccess }: { payer?: Payer; onSuccess: () =
 
       <Field>
         <Label className="text-xs font-medium">Stedi Payer ID</Label>
-        <Input {...register("stediPayerId")} placeholder="Stedi internal ID" className="h-8 text-xs" />
+        <Input
+          {...register("stediPayerId")}
+          placeholder="Stedi internal ID"
+          className="h-8 text-xs"
+        />
       </Field>
 
       <Field>

@@ -204,7 +204,7 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
         )}
 
         {/* Billing Entity — only shown if any billing entity fields are populated */}
-        {(org.billingName || org.billingNpi || org.billingTaxId || org.billingAddressLine1) ? (
+        {org.billingName || org.billingNpi || org.billingTaxId || org.billingAddressLine1 ? (
           <SectionCard
             title="Billing Entity"
             action={
@@ -220,10 +220,16 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
           >
             {org.billingName && <KVRow label="Billing Name" value={org.billingName} />}
             {org.billingNpi && (
-              <KVRow label="Billing NPI" value={<span className="font-mono tabular-nums">{org.billingNpi}</span>} />
+              <KVRow
+                label="Billing NPI"
+                value={<span className="font-mono tabular-nums">{org.billingNpi}</span>}
+              />
             )}
             {org.billingTaxId && (
-              <KVRow label="Billing Tax ID" value={<span className="font-mono tabular-nums">{org.billingTaxId}</span>} />
+              <KVRow
+                label="Billing Tax ID"
+                value={<span className="font-mono tabular-nums">{org.billingTaxId}</span>}
+              />
             )}
             {org.billingAddressLine1 && (
               <KVRow
@@ -241,14 +247,15 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
           </SectionCard>
         ) : (
           <div
-            className="cursor-pointer rounded-lg border border-border/40 bg-muted/20 px-4 py-3 transition-colors hover:bg-muted/40"
+            className="border-border/40 bg-muted/20 hover:bg-muted/40 cursor-pointer rounded-lg border px-4 py-3 transition-colors"
             onClick={() => setEditing("billing_entity")}
           >
             <div className="text-muted-foreground text-xs font-medium">
               Billing entity (optional)
             </div>
             <p className="text-muted-foreground mt-0.5 text-[11px]">
-              Set a separate billing name, NPI, and address if your billing entity differs from the practice.
+              Set a separate billing name, NPI, and address if your billing entity differs from the
+              practice.
             </p>
           </div>
         )}
@@ -389,7 +396,8 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
         <SectionCard title="Billing Entity">
           <div className="space-y-3">
             <p className="text-muted-foreground text-[11px]">
-              Only fill this in if your billing entity (CMS-1500 Box 33) differs from the practice. Leave blank to use practice info for billing.
+              Only fill this in if your billing entity (CMS-1500 Box 33) differs from the practice.
+              Leave blank to use practice info for billing.
             </p>
             <Field>
               <Label className="text-xs font-medium">Billing Entity Name</Label>

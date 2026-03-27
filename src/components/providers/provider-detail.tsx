@@ -158,16 +158,18 @@ export function ProviderDetailView({
                   <span>
                     <span className="font-mono">{provider.stateLicenseNumber}</span>
                     {provider.stateLicenseExpiry && (
-                      <span className={cn(
-                        "ml-1 text-[11px]",
-                        daysUntilExpiry(provider.stateLicenseExpiry) <= 7
-                          ? "text-red-600 dark:text-red-400"
-                          : daysUntilExpiry(provider.stateLicenseExpiry) <= 30
-                            ? "text-amber-600 dark:text-amber-400"
-                            : "text-muted-foreground",
-                      )}>
-                        exp {formatDate(provider.stateLicenseExpiry)}
-                        {" "}({daysUntilExpiry(provider.stateLicenseExpiry)}d)
+                      <span
+                        className={cn(
+                          "ml-1 text-[11px]",
+                          daysUntilExpiry(provider.stateLicenseExpiry) <= 7
+                            ? "text-red-600 dark:text-red-400"
+                            : daysUntilExpiry(provider.stateLicenseExpiry) <= 30
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        exp {formatDate(provider.stateLicenseExpiry)} (
+                        {daysUntilExpiry(provider.stateLicenseExpiry)}d)
                       </span>
                     )}
                   </span>
@@ -175,7 +177,10 @@ export function ProviderDetailView({
               />
             )}
             {provider.taxonomyCode && (
-              <KVRow label="Taxonomy" value={<span className="font-mono">{provider.taxonomyCode}</span>} />
+              <KVRow
+                label="Taxonomy"
+                value={<span className="font-mono">{provider.taxonomyCode}</span>}
+              />
             )}
             {provider.modifierCode && <KVRow label="Modifier Code" value={provider.modifierCode} />}
             {provider.email && <KVRow label="Email" value={provider.email} />}

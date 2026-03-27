@@ -900,11 +900,17 @@ export function SessionForm({
                       value={field.value || NONE_VALUE}
                       onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
                     >
-                      <SelectTrigger className="h-8 w-full text-xs"><SelectValue placeholder="Select reason" /></SelectTrigger>
+                      <SelectTrigger className="h-8 w-full text-xs">
+                        <SelectValue placeholder="Select reason" />
+                      </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                        <SelectItem value={NONE_VALUE} className="text-xs">
+                          Not specified
+                        </SelectItem>
                         {CANCELLATION_REASONS.map((r) => (
-                          <SelectItem key={r} value={r} className="text-xs">{CANCELLATION_REASON_LABELS[r]}</SelectItem>
+                          <SelectItem key={r} value={r} className="text-xs">
+                            {CANCELLATION_REASON_LABELS[r]}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -921,11 +927,17 @@ export function SessionForm({
                       value={field.value || NONE_VALUE}
                       onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
                     >
-                      <SelectTrigger className="h-8 w-full text-xs"><SelectValue placeholder="Select" /></SelectTrigger>
+                      <SelectTrigger className="h-8 w-full text-xs">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                        <SelectItem value={NONE_VALUE} className="text-xs">
+                          Not specified
+                        </SelectItem>
                         {CANCELLED_BY_OPTIONS.map((o) => (
-                          <SelectItem key={o} value={o} className="text-xs">{CANCELLED_BY_LABELS[o]}</SelectItem>
+                          <SelectItem key={o} value={o} className="text-xs">
+                            {CANCELLED_BY_LABELS[o]}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

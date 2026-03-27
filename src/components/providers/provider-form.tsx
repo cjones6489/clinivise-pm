@@ -199,7 +199,7 @@ export function ProviderForm({
           <Input
             {...register("taxonomyCode")}
             placeholder="103K00000X"
-            className="h-8 text-xs font-mono"
+            className="h-8 font-mono text-xs"
           />
         </Field>
         <Field>
@@ -207,7 +207,7 @@ export function ProviderForm({
           <Input
             {...register("modifierCode")}
             placeholder="HM, HN, HO, HP"
-            className="h-8 text-xs font-mono"
+            className="h-8 font-mono text-xs"
           />
         </Field>
       </div>

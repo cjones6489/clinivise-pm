@@ -797,16 +797,16 @@ draft → signed (author signs, note locks)
 
 28 fields added across 6 tables based on CMS-1500, payer audit, and competitor verification. Schema is applied but **UI forms/displays are not yet updated**.
 
-| #    | Task                                                                                                             | Files                                                | Status |
-| ---- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------ |
-| SA-1 | Client form: primaryLanguage, interpreterNeeded, secondaryDiagnosisCodes, referringProvider, medicaidId           | `client-form.tsx`, `client-overview.tsx`             | `[x]`  |
-| SA-2 | Provider form: email, phone, stateLicenseNumber/Expiry, taxonomyCode, modifierCode                               | `provider-form.tsx`, `provider-detail.tsx`           | `[x]`  |
-| SA-3 | Authorization form: authType, requestingProviderId, denialReason, appealDeadline                                  | `authorization-form.tsx`, `authorization-detail.tsx` | `[x]`  |
-| SA-4 | Session form: cancellationReason, cancelledBy, serviceAddress                                                     | `session-form.tsx`, `session-detail.tsx`             | `[x]`  |
-| SA-5 | Payer form: electronicPayerId, portalUrl, authDepartmentEmail                                                     | `payer-form.tsx`                                     | `[x]`  |
-| SA-6 | Org settings: billing entity section (billingName, billingNpi, billingTaxId, billingAddress)                      | `practice-info-form.tsx`                             | `[x]`  |
-| SA-7 | Goal UI: behavior reduction fields, assessment source, expanded status lifecycle                                  | `client-goals.tsx`                                   | `[x]`  |
-| SA-8 | Validators updated inline with each SA task                                                                       | `validators/*.ts`                                    | `[x]`  |
+| #    | Task                                                                                                    | Files                                                | Status |
+| ---- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------ |
+| SA-1 | Client form: primaryLanguage, interpreterNeeded, secondaryDiagnosisCodes, referringProvider, medicaidId | `client-form.tsx`, `client-overview.tsx`             | `[x]`  |
+| SA-2 | Provider form: email, phone, stateLicenseNumber/Expiry, taxonomyCode, modifierCode                      | `provider-form.tsx`, `provider-detail.tsx`           | `[x]`  |
+| SA-3 | Authorization form: authType, requestingProviderId, denialReason, appealDeadline                        | `authorization-form.tsx`, `authorization-detail.tsx` | `[x]`  |
+| SA-4 | Session form: cancellationReason, cancelledBy, serviceAddress                                           | `session-form.tsx`, `session-detail.tsx`             | `[x]`  |
+| SA-5 | Payer form: electronicPayerId, portalUrl, authDepartmentEmail                                           | `payer-form.tsx`                                     | `[x]`  |
+| SA-6 | Org settings: billing entity section (billingName, billingNpi, billingTaxId, billingAddress)            | `practice-info-form.tsx`                             | `[x]`  |
+| SA-7 | Goal UI: behavior reduction fields, assessment source, expanded status lifecycle                        | `client-goals.tsx`                                   | `[x]`  |
+| SA-8 | Validators updated inline with each SA task                                                             | `validators/*.ts`                                    | `[x]`  |
 
 ---
 
