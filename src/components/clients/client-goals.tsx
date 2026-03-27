@@ -15,9 +15,18 @@ import {
   GOAL_STATUS_VARIANT,
   DATA_COLLECTION_TYPES,
   DATA_COLLECTION_TYPE_LABELS,
+  BEHAVIOR_FUNCTIONS,
+  BEHAVIOR_FUNCTION_LABELS,
+  BEHAVIOR_SEVERITIES,
+  BEHAVIOR_SEVERITY_LABELS,
+  ASSESSMENT_SOURCES,
+  ASSESSMENT_SOURCE_LABELS,
   type GoalType,
   type GoalStatus,
   type DataCollectionType,
+  type BehaviorFunction,
+  type BehaviorSeverity,
+  type AssessmentSource,
 } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -187,7 +196,40 @@ function GoalCard({
         {goal.targetDate && <span>Target: {formatDate(goal.targetDate)}</span>}
         {goal.metDate && <span>Met {formatDate(goal.metDate)}</span>}
         {goal.treatmentPlanRef && <span>Ref: {goal.treatmentPlanRef}</span>}
+        {goal.assessmentSource && (
+          <span>Source: {ASSESSMENT_SOURCE_LABELS[goal.assessmentSource as AssessmentSource] ?? goal.assessmentSource}{goal.assessmentItemRef ? ` (${goal.assessmentItemRef})` : ""}</span>
+        )}
       </div>
+
+      {/* Behavior reduction details */}
+      {goal.goalType === "behavior_reduction" && (goal.functionOfBehavior || goal.replacementBehavior || goal.operationalDefinition) && (
+        <div className="bg-muted/20 mt-2 rounded-md px-3 py-2 text-[11px]">
+          {goal.functionOfBehavior && (
+            <div className="flex gap-1">
+              <span className="text-muted-foreground shrink-0">Function:</span>
+              <span>{BEHAVIOR_FUNCTION_LABELS[goal.functionOfBehavior as BehaviorFunction] ?? goal.functionOfBehavior}</span>
+            </div>
+          )}
+          {goal.operationalDefinition && (
+            <div className="flex gap-1">
+              <span className="text-muted-foreground shrink-0">Definition:</span>
+              <span>{goal.operationalDefinition}</span>
+            </div>
+          )}
+          {goal.replacementBehavior && (
+            <div className="flex gap-1">
+              <span className="text-muted-foreground shrink-0">Replacement:</span>
+              <span>{goal.replacementBehavior}</span>
+            </div>
+          )}
+          {goal.severityLevel && (
+            <div className="flex gap-1">
+              <span className="text-muted-foreground shrink-0">Severity:</span>
+              <span>{BEHAVIOR_SEVERITY_LABELS[goal.severityLevel as BehaviorSeverity] ?? goal.severityLevel}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Objectives */}
       {goal.objectives.length > 0 && (
@@ -266,6 +308,7 @@ function AddGoalDialog({
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(createGoalSchema),
@@ -275,6 +318,8 @@ function AddGoalDialog({
       goalType: "skill_acquisition",
     },
   });
+
+  const watchedGoalType = watch("goalType");
 
   const { execute, isPending } = useAction(createGoal, {
     onSuccess: ({ data }) => {
@@ -404,6 +449,90 @@ function AddGoalDialog({
             />
           </Field>
 
+          {/* Behavior reduction fields — only shown when goalType is behavior_reduction */}
+          {watchedGoalType === "behavior_reduction" && (
+            <div className="border-border/40 space-y-3 rounded-lg border p-3">
+              <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                Behavior Details
+              </span>
+              <div className="grid grid-cols-2 gap-3">
+                <Field>
+                  <Label className="text-xs font-medium">Function of Behavior</Label>
+                  <Controller
+                    name="functionOfBehavior"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || NONE_VALUE}
+                        onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                      >
+                        <SelectTrigger className="h-8 w-full text-xs"><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                          {BEHAVIOR_FUNCTIONS.map((f) => (
+                            <SelectItem key={f} value={f} className="text-xs">{BEHAVIOR_FUNCTION_LABELS[f]}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </Field>
+                <Field>
+                  <Label className="text-xs font-medium">Severity</Label>
+                  <Controller
+                    name="severityLevel"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || NONE_VALUE}
+                        onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                      >
+                        <SelectTrigger className="h-8 w-full text-xs"><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                          {BEHAVIOR_SEVERITIES.map((s) => (
+                            <SelectItem key={s} value={s} className="text-xs">{BEHAVIOR_SEVERITY_LABELS[s]}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </Field>
+              </div>
+              <Field>
+                <Label className="text-xs font-medium">Operational Definition</Label>
+                <Textarea
+                  {...register("operationalDefinition")}
+                  placeholder="Observable, measurable description of the target behavior"
+                  className="text-xs"
+                  rows={2}
+                />
+              </Field>
+              <Field>
+                <Label className="text-xs font-medium">Replacement Behavior</Label>
+                <Input
+                  {...register("replacementBehavior")}
+                  placeholder="Functionally equivalent alternative behavior"
+                  className="h-8 text-xs"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field>
+                  <Label className="text-xs font-medium">Antecedent Strategies</Label>
+                  <Textarea {...register("antecedentStrategies")} placeholder="Prevention strategies" className="text-xs" rows={2} />
+                </Field>
+                <Field>
+                  <Label className="text-xs font-medium">Consequence Strategies</Label>
+                  <Textarea {...register("consequenceStrategies")} placeholder="Response strategies" className="text-xs" rows={2} />
+                </Field>
+              </div>
+              <Field>
+                <Label className="text-xs font-medium">Crisis Protocol</Label>
+                <Textarea {...register("crisisProtocol")} placeholder="Steps if behavior escalates to dangerous levels" className="text-xs" rows={2} />
+              </Field>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <Field>
               <Label className="text-xs font-medium">Start Date</Label>
@@ -415,11 +544,43 @@ function AddGoalDialog({
             </Field>
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <Field>
+              <Label className="text-xs font-medium">Treatment Plan Reference</Label>
+              <Input
+                {...register("treatmentPlanRef")}
+                placeholder="ITP v2, Section 3.1"
+                className="h-8 text-xs"
+              />
+            </Field>
+            <Field>
+              <Label className="text-xs font-medium">Assessment Source</Label>
+              <Controller
+                name="assessmentSource"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || NONE_VALUE}
+                    onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                  >
+                    <SelectTrigger className="h-8 w-full text-xs"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                      {ASSESSMENT_SOURCES.map((s) => (
+                        <SelectItem key={s} value={s} className="text-xs">{ASSESSMENT_SOURCE_LABELS[s]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </Field>
+          </div>
+
           <Field>
-            <Label className="text-xs font-medium">Treatment Plan Reference</Label>
+            <Label className="text-xs font-medium">Assessment Item Reference</Label>
             <Input
-              {...register("treatmentPlanRef")}
-              placeholder="ITP v2, Section 3.1"
+              {...register("assessmentItemRef")}
+              placeholder="e.g., VB-MAPP Mand Level 2, M8"
               className="h-8 text-xs"
             />
           </Field>

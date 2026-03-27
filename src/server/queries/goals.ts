@@ -18,6 +18,17 @@ export type GoalWithObjectives = {
   baselineData: string | null;
   masteryCriteria: string | null;
   targetBehavior: string | null;
+  // Behavior reduction fields
+  functionOfBehavior: string | null;
+  replacementBehavior: string | null;
+  operationalDefinition: string | null;
+  severityLevel: string | null;
+  crisisProtocol: string | null;
+  antecedentStrategies: string | null;
+  consequenceStrategies: string | null;
+  // Assessment provenance
+  assessmentSource: string | null;
+  assessmentItemRef: string | null;
   startDate: string | null;
   targetDate: string | null;
   metDate: string | null;
@@ -70,6 +81,15 @@ export async function getClientGoals(
       baselineData: clientGoals.baselineData,
       masteryCriteria: clientGoals.masteryCriteria,
       targetBehavior: clientGoals.targetBehavior,
+      functionOfBehavior: clientGoals.functionOfBehavior,
+      replacementBehavior: clientGoals.replacementBehavior,
+      operationalDefinition: clientGoals.operationalDefinition,
+      severityLevel: clientGoals.severityLevel,
+      crisisProtocol: clientGoals.crisisProtocol,
+      antecedentStrategies: clientGoals.antecedentStrategies,
+      consequenceStrategies: clientGoals.consequenceStrategies,
+      assessmentSource: clientGoals.assessmentSource,
+      assessmentItemRef: clientGoals.assessmentItemRef,
       startDate: clientGoals.startDate,
       targetDate: clientGoals.targetDate,
       metDate: clientGoals.metDate,
