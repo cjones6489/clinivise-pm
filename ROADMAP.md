@@ -669,16 +669,16 @@ GOAL_DOMAIN_LABELS = { communication: "Communication", social_skills: "Social Sk
 
 | # | Task | Files | Status |
 |---|------|-------|--------|
-| CD-1.1 | Create `client_goals` + `client_goal_objectives` schema | `src/server/db/schema/client-goals.ts` | `[ ]` |
-| CD-1.2 | Add goal constants (domains, types, statuses, labels) | `src/lib/constants.ts` | `[ ]` |
-| CD-1.3 | Create Zod validators for goal CRUD | `src/lib/validators/goals.ts` | `[ ]` |
-| CD-1.4 | Generate + run migration | `drizzle/` | `[ ]` |
-| CD-1.5 | Goal read queries (list by client, grouped by domain) | `src/server/queries/goals.ts` | `[ ]` |
-| CD-1.6 | Goal server actions (create, update, change status, add objective) | `src/server/actions/goals.ts` | `[ ]` |
-| CD-1.7 | Goals tab component (card list grouped by domain) | `src/components/clients/client-goals.tsx` | `[ ]` |
-| CD-1.8 | Add Goal sheet/drawer form | `src/components/clients/goal-form.tsx` | `[ ]` |
-| CD-1.9 | Wire Goals tab into client detail page | `src/components/clients/client-detail.tsx` | `[ ]` |
-| CD-1.10 | Seed data with realistic goals per client | `src/server/db/seed.ts` | `[ ]` |
+| CD-1.1 | Create `client_goals` + `client_goal_objectives` + `client_goal_targets` schema | `src/server/db/schema/client-goals.ts` | `[x]` |
+| CD-1.2 | Add goal constants (domains, types, statuses, labels, behavior functions, assessment sources) | `src/lib/constants.ts` | `[x]` |
+| CD-1.3 | Create Zod validators for goal/objective/target CRUD | `src/lib/validators/goals.ts` | `[x]` |
+| CD-1.4 | Generate + run migrations | `drizzle/` | `[x]` |
+| CD-1.5 | Goal read queries (list by client, grouped by domain) | `src/server/queries/goals.ts` | `[x]` |
+| CD-1.6 | Goal server actions (create, update, change status, add objective) | `src/server/actions/goals.ts` | `[x]` |
+| CD-1.7 | Goals tab component (card list grouped by domain) | `src/components/clients/client-goals.tsx` | `[x]` |
+| CD-1.8 | Add Goal dialog + Add Objective dialog | `src/components/clients/client-goals.tsx` | `[x]` |
+| CD-1.9 | Wire Goals tab into client detail page | `src/components/clients/client-detail.tsx` | `[x]` |
+| CD-1.10 | Update UI for new goal fields (behavior reduction, targets, expanded statuses) | Multiple | `[ ]` |
 | CD-1.11 | Unit tests: goal validators, status transitions | `src/lib/validators/goals.test.ts` | `[ ]` |
 
 ---
@@ -763,9 +763,9 @@ draft → signed (author signs, note locks)
 
 | # | Task | Files | Status |
 |---|------|-------|--------|
-| CD-2.1 | Create `session_notes` schema | `src/server/db/schema/session-notes.ts` | `[ ]` |
-| CD-2.2 | Create note validators (per-CPT required fields) | `src/lib/validators/session-notes.ts` | `[ ]` |
-| CD-2.3 | Generate + run migration | `drizzle/` | `[ ]` |
+| CD-2.1 | Create `session_notes` + `session_note_goals` + `session_note_behaviors` schema | `src/server/db/schema/session-notes.ts` | `[x]` |
+| CD-2.2 | Create note validators (per-CPT required fields) | `src/lib/validators/session-notes.ts` | `[x]` |
+| CD-2.3 | Generate + run migrations (verified against CASP/TRICARE/Optum) | `drizzle/` | `[x]` |
 | CD-2.4 | Note read queries (by session, BCBA review queue) | `src/server/queries/session-notes.ts` | `[ ]` |
 | CD-2.5 | Note server actions (create, update, sign, approve/reject) | `src/server/actions/session-notes.ts` | `[ ]` |
 | CD-2.6 | "Complete Note" button on session detail page | `src/app/(dashboard)/sessions/[id]/page.tsx` | `[ ]` |
@@ -776,6 +776,23 @@ draft → signed (author signs, note locks)
 | CD-2.11 | "Billing readiness" indicator per session (green/amber/red) | `src/components/sessions/` | `[ ]` |
 
 **Current state:** Sessions have a `notes` text field for quick free-text entry. This stays as the "30-second log" quick note. The full structured session note is completed later via the "Complete Note" action on the session detail page.
+
+---
+
+#### Cross-Table Schema Audit (completed 2026-03-26)
+
+28 fields added across 6 tables based on CMS-1500, payer audit, and competitor verification. Schema is applied but **UI forms/displays are not yet updated**.
+
+| # | Task | Files | Status |
+|---|------|-------|--------|
+| SA-1 | Client form: add primaryLanguage, interpreterNeeded, secondaryDiagnosisCodes, referringProvider, medicaidId | `client-form.tsx`, `client-overview.tsx` | `[ ]` |
+| SA-2 | Provider form: add email, phone, stateLicenseNumber/Expiry, taxonomyCode (+ fix missing modifierCode) | `provider-form.tsx`, `provider-detail.tsx` | `[ ]` |
+| SA-3 | Authorization form: add authType, requestingProviderId, denialReason, appealDeadline | `authorization-form.tsx`, `authorization-detail.tsx` | `[ ]` |
+| SA-4 | Session form: add cancellationReason, cancelledBy (when cancelling), serviceAddress (when POS is home/community) | `session-form.tsx`, `session-detail.tsx` | `[ ]` |
+| SA-5 | Payer form: add electronicPayerId, portalUrl, authDepartmentEmail | `payer-form.tsx` | `[ ]` |
+| SA-6 | Org settings: add billing entity section (billingName, billingNpi, billingTaxId, billingAddress) | `practice-info-form.tsx` | `[ ]` |
+| SA-7 | Goal editing UI: add behavior reduction fields, target CRUD, expanded status lifecycle | `client-goals.tsx` | `[ ]` |
+| SA-8 | Update validators for new client/provider/auth fields in forms | `validators/*.ts` | `[ ]` |
 
 ---
 
@@ -922,4 +939,4 @@ Verified against CentralReach, AlohaABA, Motivity, Theralytics, Raven Health, Ca
 
 ---
 
-_Last updated: 2026-03-26 — Phase 1 PM complete. Clinical platform: goals schema verified against VB-MAPP/ABLLS-R/AFLS/CASP/TRICARE standards, session notes schema verified against CASP/TRICARE/Optum audit requirements. Competitive gap analysis complete._
+_Last updated: 2026-03-26 — Phase 1 PM complete. CD-1 goals (schema + UI) done. CD-2 session notes (schema + validators) done. Cross-table schema audit complete (28 fields added across 6 tables). Schema reference doc created. UI updates for new fields tracked as SA-1 through SA-8. Competitive gap analysis in roadmap. Process note: always research clinical data models BEFORE building._

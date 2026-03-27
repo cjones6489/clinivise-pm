@@ -301,9 +301,14 @@ clinivise/
 
 ---
 
-## 3. Complete Drizzle Database Schema
+## 3. Database Schema
 
-### 3.1 Shared Enums
+> **The authoritative schema reference has moved to [`schema-reference.md`](schema-reference.md).**
+> It covers all 24 tables, 400+ columns, indexes, constraints, and all constant/enum values.
+> The schema below is the ORIGINAL spec from project inception and is preserved for historical context only.
+> **Always refer to `schema-reference.md` for the current state.**
+
+### 3.1 Shared Enums (HISTORICAL — now uses `text` + `as const` arrays, not pgEnum)
 
 ```typescript
 // src/db/schema/enums.ts
