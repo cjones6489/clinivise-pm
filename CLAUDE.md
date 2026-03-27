@@ -121,11 +121,15 @@ src/
 - **Session validation**: Only 2 hard blocks at session creation: (1) same provider overlapping 1:1 sessions, (2) RBT billing QHP-only codes. Everything else is a WARNING (auth date range, MUE, missing supervisor, expired credentials, BCaBA QHP codes). Session logging captures what happened — never block it for billing issues. Warn at creation, hard-block at claim generation. See `ROADMAP.md` "Session Validation Rules" for full details.
 - **RBT supervision on claims**: NOT universal. Three billing models exist (bill under BCBA NPI, bill under RBT NPI + supervisor, group billing). Which model depends on the payer. BACB supervision (5% monthly) is a certification requirement, separate from claim requirements.
 
+- **Clinical documentation**: Goals-first approach — `client_goals` table is the registry of treatment plan goals that session notes reference. Full treatment plan authoring is NOT built; BCBAs write plans externally. `session_notes` table has CPT-code-specific structured fields + narrative + signature workflow (draft→signed→approved). Notes are NOT submitted with claims — kept on file for audits. See ROADMAP.md "Clinical Documentation" for full schema.
+
 ## Phase Context
 
-**Phase 1 (current):** Auth, multi-tenant foundation, client/provider/authorization CRUD, session logging, dashboard overview, AI auth letter parsing, audit logging.
+**Phase 1 (current):** Auth, multi-tenant foundation, client/provider/authorization CRUD, session logging, care team management, dashboard overview, Clerk webhooks, session validation.
 
-**Out of scope now:** Claims submission, ERA processing, eligibility checks, denial management, analytics, parent portal, full care team management (Phase 2), supervision ratio tracking (Phase 3).
+**Next up:** Client goals registry → Structured session notes → AI note generation.
+
+**Out of scope now:** Claims submission, ERA processing, eligibility checks, denial management, analytics, parent portal, full treatment plan authoring, supervision ratio tracking.
 
 ## Documentation
 

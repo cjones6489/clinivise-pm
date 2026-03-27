@@ -356,7 +356,7 @@ SETTINGS
 - Secondary: Upload Auth Letter (→ upload + AI parse, Phase 2), Run Eligibility Check (Phase 2)
 - Tab-specific: Add/edit insurance (Insurance tab), Add/edit authorization (Authorizations tab), view/edit session (Sessions tab)
 
-**MVP scope**: Rich header with contextual metadata + Overview tab (metric cards, insurance snapshot, care team summary, utilization bars) + Care Team tab (Phase 1: single BCBA display; Phase 2: full team management) + Insurance tab (built) + Authorizations tab (Sprint 2D) + Sessions tab (Sprint 3A) + Edit tab (built). Documents tab deferred to Phase 2.
+**MVP scope**: Rich header with contextual metadata + Overview tab (metric cards, insurance snapshot, care team summary, utilization bars) + Care Team tab (built — full team management with search-to-add modal) + Goals tab (next — treatment plan goal registry for structured session notes) + Insurance tab (built) + Authorizations tab (Sprint 2D) + Sessions tab (Sprint 3A) + Edit tab (built). Documents tab deferred to Phase 2.
 
 **Phase 2+**: Full care team management (add/remove/roles via `client_providers`), eligibility check button (Stedi), AI auth letter parsing, document management, session graphing, supervision notes.
 

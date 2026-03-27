@@ -574,6 +574,139 @@ Migration: Seed from existing `assignedBcbaId`. Keep `assignedBcbaId` as denorma
 - At least 1 must include direct observation of RBT with client
 - Non-compliance = RBT certification suspension/revocation + retroactive claim denials
 
+### Clinical Documentation — Goals, Session Notes, Treatment Plans (from 2026-03-26 research)
+
+Multi-agent research across CentralReach, Motivity, ABA Matrix, Brellium, Raven Health, CMS documentation requirements, ABA Coding Coalition, state Medicaid provider manuals, and ABA billing practitioner forums.
+
+**Key insight: Session notes are NOT submitted with claims — they're kept on file and produced during audits. But inadequate notes lead to retroactive denial and recoupment. Indiana Medicaid found $56M in improper ABA payments from documentation deficiencies.**
+
+**Dependency chain:**
+```
+Treatment Plan / BIP → Goals → Session Notes → Progress Reports → Claims
+```
+
+Session notes reference treatment plan goals. Without a goals registry, notes are unstructured free text that won't survive an audit. But building a full treatment plan authoring system is enormous scope. Solution: **goals-first, lightweight.**
+
+**Design principle: Don't build a treatment plan authoring tool. Build a goals registry that session notes can reference. The full treatment plan lives wherever the BCBA writes it (Word, PDF, other platform). Clinivise just needs the goal list.**
+
+#### Step 1: Client Goals Registry
+
+New `client_goals` table — simple list of active treatment goals per client:
+
+```
+client_goals:
+  id                — nanoid PK
+  organization_id   — FK organizations
+  client_id         — FK clients
+  goal_number       — integer (1, 2, 3...)
+  description       — text ("Manding for preferred items using 2-word phrases")
+  target_behavior   — text ("Manding")
+  mastery_criteria  — text ("80% accuracy across 3 consecutive sessions")
+  domain            — text: 'communication' | 'social' | 'adaptive' | 'behavior_reduction' | 'academic' | 'play' | 'self_care'
+  status            — text: 'active' | 'met' | 'on_hold' | 'discontinued'
+  baseline_data     — text nullable ("20% accuracy at intake")
+  start_date        — date
+  met_date          — date nullable
+  notes             — text nullable
+  created_at, updated_at
+```
+
+- New "Goals" tab on client detail page
+- BCBA adds goals from their treatment plan
+- Simple CRUD — add, edit status, archive
+- Goals drive session note structure
+
+#### Step 2: Structured Session Notes
+
+New `session_notes` table (separate from `sessions.notes` text field):
+
+```
+session_notes:
+  id                  — nanoid PK
+  organization_id     — FK organizations
+  session_id          — FK sessions (unique — one note per session)
+  cpt_code            — text (copied from session, drives template)
+
+  -- Structured clinical content
+  goals_addressed     — jsonb [{goalId, goalDescription, trials, correct, accuracy, promptLevel, progress, notes}]
+  interventions_used  — text[] ('DTT', 'NET', 'prompting', 'reinforcement', etc.)
+  client_presentation — text (brief observation at session start)
+  behavioral_incidents— text (ABC data if behaviors occurred)
+
+  -- CPT-specific fields
+  caregiver_present   — boolean (required for 97156)
+  caregiver_name      — text (required for 97156)
+  protocol_modifications — text (required for 97155 — what changed and why)
+  assessment_tools    — text[] (required for 97151 — VB-MAPP, ABLLS-R, etc.)
+
+  -- Narrative
+  narrative           — text (free text or AI-generated summary)
+
+  -- AI generation tracking
+  ai_generated        — boolean DEFAULT false
+  ai_edited           — boolean DEFAULT false
+
+  -- Signature workflow
+  author_id           — FK providers (who wrote the note)
+  author_signed_at    — timestamp (locks the note)
+  supervisor_id       — FK providers (BCBA who reviewed)
+  supervisor_signed_at— timestamp (co-signature)
+  caregiver_signed_at — timestamp
+
+  -- Status
+  status              — text: 'draft' | 'signed' | 'pending_review' | 'approved' | 'rejected' | 'amended'
+  rejection_reason    — text
+  amended_from_id     — FK session_notes (self-ref for amendments)
+
+  created_at, updated_at
+```
+
+**Different CPT codes need different templates:**
+
+| CPT | Who Writes | Template Focus |
+|-----|-----------|---------------|
+| 97153 (RBT therapy) | RBT | Goals data, interventions, trial scores, prompt levels |
+| 97155 (BCBA modification) | BCBA | Data analysis, what was changed, clinical rationale |
+| 97156 (caregiver training) | BCBA | Caregiver name, topics taught, BST components, competency |
+| 97151 (assessment) | BCBA | Tools used, domains assessed, findings |
+
+**Signature workflow (Motivity model):**
+```
+draft → signed (author signs, note locks)
+      → pending_review (auto if BCBA review required)
+      → approved (BCBA co-signs)
+      → OR rejected (BCBA sends back, note unlocks)
+      → amended (correction after approval, new version links to original)
+```
+
+**Minimum audit-proof note for 97153:** Must show that the RBT (1) implemented specific protocols from the treatment plan, (2) collected objective data per goal, and (3) that the service was medically necessary. "Ran programs, played outside" fails. "Implemented DTT for manding targets per Goal 2. Client achieved 80% accuracy across 20 trials (up from 65% last session). Reinforcement: token economy. Prompt level: verbal." passes.
+
+#### Step 3: AI Note Generation (Phase 2)
+
+- Structured goal data → AI generates narrative (ABA Matrix model)
+- "Load previous note" for recurring sessions (SimplePractice pattern)
+- AI-generated notes flagged with `ai_generated = true`, edits tracked
+- Human review always required before signing
+
+#### Step 4: Note Compliance & Auditing (Phase 3)
+
+- Payer-specific compliance checks (Brellium model)
+- Copy-paste / similarity detection (OIG fraud indicator #1)
+- "Unsigned notes" dashboard alert
+- Timeliness tracking (24-72 hour signing requirement)
+- Note quality scoring
+
+#### Step 5: Full Treatment Plan Management (Phase 3+, if needed)
+
+- BIP authoring with structured sections
+- Assessment integration (97151 results → treatment plan → goals)
+- Progress report generation from aggregated session note data
+- Treatment plan version history
+
+**Current state:** Sessions have a `notes` text field for quick free-text entry. This stays as the "30-second log" quick note. The full structured session note is completed later via the "Complete Note" action on the session detail page.
+
+**What CentralReach admits:** 80% of their session notes fail at least one payer requirement. This is the core problem — and the opportunity.
+
 ### What's Explicitly Out of Scope (Phase 2+)
 
 - Claims submission / ERA processing / eligibility checks (Stedi)
@@ -585,4 +718,4 @@ Migration: Seed from existing `assignedBcbaId`. Keep `assignedBcbaId` as denorma
 
 ---
 
-_Last updated: 2026-03-26 — Phase 1-Core complete. 263 tests passing. Billing math + modifier codes audited. Care team model researched and designed._
+_Last updated: 2026-03-26 — Phase 1-Core complete. 271 tests passing. Billing math + modifier codes audited. Care team model built. Session validation rules implemented. Clinical documentation roadmap designed._
