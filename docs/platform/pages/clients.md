@@ -182,7 +182,173 @@ The "at a glance" tab. Everything a provider needs to know about this client wit
 
 ### Care Team Tab
 
-No changes from current implementation. Search-to-add modal, primary toggle, role groups.
+> **Competitive context:** Only Motivity and CentralReach have a dedicated care team section among our competitors. Most platforms (Raven, AlohaABA, TherapyPM) rely on scheduling relationships — no explicit team management. Our dedicated tab with roles, primary toggle, and grouped display already puts us ahead. ABA Matrix has the best assignment history UX (white/gray for current/past).
+
+#### Who uses this
+- **BCBA** — managing who's on the case, setting primary provider, adding/removing RBTs
+- **Admin** — onboarding new staff, reassigning clients during staff transitions
+- **RBT/BT** — read-only view of who else is on the team (for coordination)
+
+#### How often
+Weekly (BCBAs managing caseloads), occasionally (admin during staff changes).
+
+#### Wireframe
+
+```
++------------------------------------------------------------------+
+| CARE TEAM                                    [+ Add Team Member]  |
++------------------------------------------------------------------+
+| 3 active members · 1 past                                         |
++==================================================================+
+| BCBAs & SUPERVISORS                                               |
++------------------------------------------------------------------+
+| SC  Dr. Sarah Chen         BCBA     ★ Primary    [···]           |
+|     Supervising BCBA                                              |
++------------------------------------------------------------------+
+| RBTs & TECHNICIANS                                                |
++------------------------------------------------------------------+
+| JS  Jessica Smith          RBT      ★ Primary    [···]           |
+|     Lead RBT                                                      |
+|                                                                    |
+| DP  David Park             RBT                    [···]           |
+|     RBT                                                           |
++==================================================================+
+| PAST ASSIGNMENTS                                    [v Expand]    |
++------------------------------------------------------------------+
+| (collapsed by default — click to expand)                          |
+| AR  Alex Rodriguez         RBT      Jan 15 — Mar 01, 2026       |
+|     Transferred to different caseload                             |
++------------------------------------------------------------------+
+```
+
+#### Team Member Row
+
+Each row shows:
+- **Avatar** — initials circle, primary-colored if primary
+- **Name** — full name, clickable link to provider detail page
+- **Credential** — badge (BCBA, RBT, BCaBA, etc.)
+- **Primary badge** — ★ star icon, primary-colored, with "Primary" label
+- **Role** — subtitle text (Supervising BCBA, Lead RBT, RBT, etc.)
+- **Overflow menu** [···] — Set as Primary, Remove from Team
+
+#### Role Groups
+
+Team members are visually grouped by credential tier:
+1. **BCBAs & Supervisors** — BCBA, BCBA-D, BCaBA with supervising roles
+2. **RBTs & Technicians** — RBT, BT, lead RBT
+
+Within each group, primary member sorts first.
+
+#### Past Assignments Section (NEW — to implement)
+
+Below active members, a collapsible "Past Assignments" section:
+- Gray background to distinguish from active
+- Shows: name, credential, assignment date range (start — end)
+- Notes field visible if populated (e.g., "Transferred to different caseload")
+- Collapsed by default. Expand to see full history.
+- Only shown if there are past assignments (endDate is set).
+
+This matches ABA Matrix's white/gray current/past visual pattern.
+
+#### Add Team Member Dialog
+
+```
++------------------------------------------------------------------+
+| Add Team Member                                         [x]      |
+|                                                                    |
+| Search providers...                                               |
+| [________________________________] (search input)                 |
+|                                                                    |
+| BCBAs & SUPERVISORS                                               |
+| +--------------------------------------------------------------+ |
+| | SC  Dr. Sarah Chen          BCBA        [Already on team]    | |
+| | MJ  Dr. Maria Johnson       BCBA        [+ Add]             | |
+| +--------------------------------------------------------------+ |
+|                                                                    |
+| RBTs & TECHNICIANS                                                |
+| +--------------------------------------------------------------+ |
+| | JS  Jessica Smith           RBT         [Already on team]    | |
+| | DP  David Park              RBT         [Already on team]    | |
+| | TW  Tanya Williams          RBT         [+ Add]             | |
+| +--------------------------------------------------------------+ |
+|                                                                    |
+| (all active org providers shown, grouped by credential)           |
+| (providers already on team shown as disabled "Already on team")   |
++------------------------------------------------------------------+
+```
+
+**Add flow:**
+1. Open dialog → see all org providers grouped by credential
+2. Search to filter by name
+3. Click "+ Add" → provider is added with auto-role from credential
+4. Dialog stays open (can add multiple)
+5. Close dialog → team refreshes
+
+**Auto-role mapping:**
+- BCBA/BCBA-D → `supervising_bcba` role
+- BCaBA → `bcaba` role
+- RBT → `rbt` role
+
+#### Overflow Menu Actions
+
+```
+[···] menu per team member:
+├── ★ Set as Primary     (if not already primary)
+├── Change Role →         (submenu with role options)
+├── ─────────────
+└── Remove from Team     (confirmation dialog)
+```
+
+**Remove confirmation:** "Remove Jessica Smith from Marcus Thompson's care team? They can still log sessions for this client."
+
+Remove sets `endDate` to today (soft remove — preserves history).
+
+#### States
+
+**Empty state:**
+```
++------------------------------------------------------------------+
+|  [team icon]                                                      |
+|  No team members assigned                                         |
+|  Add providers from your practice to this client's care team.     |
+|  [+ Add Team Member]                                              |
++------------------------------------------------------------------+
+```
+
+**Loading:** Skeleton rows matching the team member row layout.
+
+**All providers assigned:**
+```
+(in the add dialog, when all active providers are already on the team)
+"All active providers are already on this client's care team."
+```
+
+#### Implementation Status
+
+- [x] Team member list with role groups (BCBAs & Supervisors, RBTs & Technicians)
+- [x] Primary toggle with star indicator
+- [x] Search-to-add dialog with credential grouping
+- [x] Auto-role from credential on add
+- [x] Remove from team with confirmation (soft remove via endDate)
+- [x] Overflow menu (set primary, remove)
+- [x] Empty state with CTA
+- [x] "Already on team" disabled state in add dialog
+- [ ] **Past assignments section** (endDate history, collapsible, gray styling)
+- [ ] **Assignment notes display** (notes field from client_providers)
+- [ ] **Name links to provider detail** page
+- [ ] **Change Role submenu** in overflow menu
+
+#### Data Requirements
+
+**Existing (no changes needed):**
+- Table: `client_providers` with role, isPrimary, startDate, endDate, notes
+- Query: `getCareTeam(orgId, clientId)` — active members where endDate IS NULL
+- Query: `getAvailableProviders(orgId, clientId)` — active providers NOT on team
+- Actions: `addToTeam`, `updateTeamMember`, `removeFromTeam`
+
+**New for past assignments:**
+- [ ] Query: `getPastCareTeam(orgId, clientId)` — members where endDate IS NOT NULL, ordered by endDate desc
+- [ ] Pass `pastCareTeam` to the Care Team tab component
 
 ---
 
