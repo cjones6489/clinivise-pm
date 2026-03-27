@@ -95,6 +95,9 @@ export function AuthorizationDetail({
               value={AUTH_TYPE_LABELS[authorization.authType as AuthType] ?? authorization.authType}
             />
           )}
+          {authorization.requestingProviderId && (
+            <KVRow label="Requesting Provider" value={authorization.requestingProviderId} />
+          )}
           <KVRow
             label="Period"
             value={`${formatDate(authorization.startDate)} — ${formatDate(authorization.endDate)}`}

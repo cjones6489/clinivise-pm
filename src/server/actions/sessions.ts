@@ -301,6 +301,9 @@ export const createSession = authActionClient
           unitCalcMethod: "ama",
           placeOfService: parsedInput.placeOfService,
           status: parsedInput.status,
+          cancellationReason: parsedInput.cancellationReason ?? null,
+          cancelledBy: parsedInput.cancelledBy ?? null,
+          serviceAddress: parsedInput.serviceAddress ?? null,
           notes: parsedInput.notes ?? null,
           idempotencyKey: parsedInput.idempotencyKey ?? null,
         })
@@ -605,6 +608,7 @@ export const cancelSession = authActionClient
         .set({
           status: "cancelled",
           cancellationReason: parsedInput.reason ?? null,
+          cancelledBy: parsedInput.cancelledBy ?? null,
         })
         .where(
           and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)),

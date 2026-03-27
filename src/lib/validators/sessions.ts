@@ -158,6 +158,11 @@ export const cancelSessionSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
+  cancelledBy: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
 });
 
 export type CreateSessionInput = z.input<typeof createSessionSchema>;

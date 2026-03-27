@@ -16,6 +16,7 @@ import { revalidatePath } from "next/cache";
 import { NotFoundError, ConflictError } from "@/lib/errors";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
+import { stripUndefined } from "@/lib/utils";
 
 // ── Valid goal status transitions ────────────────────────────────────────────
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -68,20 +69,8 @@ export const createGoal = authActionClient
     const [goal] = await db
       .insert(clientGoals)
       .values({
+        ...stripUndefined(parsedInput),
         organizationId: ctx.organizationId,
-        clientId: parsedInput.clientId,
-        domainId: parsedInput.domainId ?? null,
-        goalNumber: parsedInput.goalNumber,
-        title: parsedInput.title,
-        description: parsedInput.description ?? null,
-        goalType: parsedInput.goalType,
-        baselineData: parsedInput.baselineData ?? null,
-        masteryCriteria: parsedInput.masteryCriteria ?? null,
-        targetBehavior: parsedInput.targetBehavior ?? null,
-        startDate: parsedInput.startDate ?? null,
-        targetDate: parsedInput.targetDate ?? null,
-        treatmentPlanRef: parsedInput.treatmentPlanRef ?? null,
-        notes: parsedInput.notes ?? null,
       })
       .returning();
 
