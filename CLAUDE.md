@@ -4,6 +4,24 @@ All-in-one ABA therapy platform — clinical operations, practice management, an
 
 @AGENTS.md
 
+## Product Positioning: Entry-Level All-in-One EHR/PM
+
+**Clinivise is NOT CentralReach.** We are building a modern, simplified all-in-one EHR/PM in the same tier as:
+
+- **Raven Health** — AI-powered, mobile-first, per-learner pricing, BCBA-founded
+- **Hipp Health** — Multi-modal capture, payer-calibrated AI notes, "practice on autopilot"
+- **Passage Health** — Clean PM + Frontera AI for clinical intelligence
+- **TherapyPM** — Simplified practice management for small therapy practices
+- **Therapy Lake** — Entry-level all-in-one for growing practices
+
+**What this means for every feature decision:**
+
+1. **Simple first.** If Raven/Hipp solve it with one screen, we don't need three. No multi-step approval workflows, no configurable pipelines, no enterprise admin panels.
+2. **Follow established patterns.** Don't invent new workflows. Research what simplified EHRs actually do, then build that. The industry has converged on standard patterns — follow them.
+3. **Clinical features should feel lightweight.** Session notes, goals, data collection — these should be fast to complete, not bureaucratic. An RBT should finish a note in under 2 minutes.
+4. **No premature complexity.** Don't build payer-specific configurations, template builders, or approval chains for MVP. Ship the 80% case. Add configurability when practices ask for it.
+5. **Validate assumptions with domain experts.** Before building any clinical workflow, ask: "Does a practicing BCBA actually do this?" If you can't confirm, research or ask — don't assume.
+
 ## Development Philosophy
 
 **The interface IS the product.** Backend and frontend are not separate phases — they are two sides of the same user workflow, designed together.
@@ -12,19 +30,39 @@ All-in-one ABA therapy platform — clinical operations, practice management, an
 
 Every feature follows this sequence. **No step can be skipped.** Steps 1-3 happen BEFORE any code is written.
 
-**Step 1 — Clinical Data Model Research (MANDATORY GATE)**
+**Step 1 — Clinical Data Model Research**
 
-Before building ANY feature that touches clinical data (goals, session notes, assessments, treatment plans, billing, scheduling), research the real-world data model:
+Research isn't the goal — **avoiding wrong assumptions about clinical data models** is the goal. Research is just the tool. The decision rule:
 
-1. **Fetch real templates and standards** — Use web search to find CASP templates, TRICARE requirements, CMS-1500 field requirements, payer audit checklists, and BACB standards relevant to the feature.
-2. **Verify against competitor implementations** — Check what CentralReach, Motivity, Catalyst/Rethink, Raven Health, and AlohaABA include. What fields do ALL of them have?
-3. **Verify against assessment tools** — For clinical features, check VB-MAPP, ABLLS-R, AFLS, PEAK structures. ABA has specific data hierarchies (Domain → Goal → Objective → Target) and measurement types (discrete trial, frequency, duration, rate, latency, task analysis, interval) that must be modeled correctly.
-4. **Create a research doc** — Save findings to `docs/research/` with sources. This becomes the blueprint.
-5. **Verify the proposed schema** against the research BEFORE writing any migration. Every field should trace to a real requirement, not an assumption.
+> **"Does this decision affect what fields exist in the database, or what compliance rules apply?"**
+> If yes → research (Tier 1 or 2). If no → build with confidence.
+
+**Tier 1 — Full research required**
+New clinical domain with no prior research doc. Things like:
+- A new note type you haven't modeled (SOAP vs. DAP vs. narrative)
+- A new billing concept (ERA processing, eligibility checks)
+- A new assessment tool (VB-MAPP, ABLLS-R)
+- Supervision compliance tracking
+
+Risk if wrong: schema migration, compliance failure, payer audit gaps.
+
+Action: Fetch real templates/standards, verify against competitors (CentralReach, Motivity, Catalyst/Rethink, Raven Health, AlohaABA), verify against assessment tools, create a research doc in `docs/research/` with sources, verify proposed schema against research BEFORE writing any migration.
+
+**Tier 2 — Quick targeted check (15–30 min)**
+Extending an existing, well-researched domain. Things like:
+- Adding a field to session notes that might have payer-specific requirements
+- A new CPT code you haven't handled before
+- Edge cases in an existing workflow (what happens when an auth spans multiple dates?)
+
+Action: Scan the existing research doc first. If it covers it — done. If there's a gap, do a targeted search on that specific question, not a full pass.
+
+**Tier 3 — No research needed**
+- Building UI on top of an already-correct schema
+- Server actions / queries for an already-modeled domain
+- Infrastructure, refactoring, bug fixes
+- Design and UX work
 
 **Why this gate exists:** During the goals and session notes build, assumptions about clinical data structures led to 3 rounds of gap-fixing: missing goal statuses (baseline/mastered/maintenance/generalization), missing behavior reduction fields (function/replacement/operational definition), missing Target level, wrong measurement types, missing audit-critical session note fields. Researching first would have gotten it right in one pass.
-
-**This gate applies to:** Goals, session notes, data collection, treatment plans, assessments, scheduling (auth-aware), billing/claims, progress reports, supervision tracking. It does NOT apply to purely technical features (auth setup, UI components, infrastructure).
 
 **Step 2 — User Story**: Who does what, when, and why? Write a concrete scenario.
 
@@ -43,11 +81,11 @@ Before building ANY feature that touches clinical data (goals, session notes, as
 
 **Step 6 — Audit**: Run `/audit-build` after implementation. Fix all critical and high findings before moving to the next feature.
 
-### When to use the abbreviated flow
+### When to skip or abbreviate steps
 
-If a thorough research doc already exists for the feature (e.g., `docs/research/session-note-requirements-research.md`), skip Step 1 and use the existing doc as the blueprint. Still do Steps 2-6.
-
-For purely technical tasks (infrastructure, refactoring, bug fixes), skip Steps 1-3. Still audit after building.
+- **Tier 1 features** (new clinical domain): All 6 steps, no shortcuts.
+- **Tier 2 features** (extending researched domain): Quick targeted check for Step 1, then Steps 2-6.
+- **Tier 3 features** (UI on existing schema, infra, bug fixes): Skip Step 1, use existing research. For purely technical tasks, skip Steps 1-3. Still audit after building.
 
 ### Why this order matters
 

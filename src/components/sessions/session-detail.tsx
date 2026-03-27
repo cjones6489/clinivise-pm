@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { SessionDetail as SessionDetailType } from "@/server/queries/sessions";
 import { SessionStatusBadge } from "./session-status-badge";
+import { NoteStatusBadge } from "./note-status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatDateTime, utilizationPercent } from "@/lib/utils";
 import { getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
@@ -11,11 +12,13 @@ import {
   ABA_CPT_CODES,
   CANCELLATION_REASON_LABELS,
   CANCELLED_BY_LABELS,
+  NOTE_TYPE_LABELS,
   type CredentialType,
   type CptCode,
   type PlaceOfServiceCode,
   type CancellationReason,
   type CancelledBy,
+  type NoteType,
 } from "@/lib/constants";
 
 function KV({ label, children }: { label: string; children: React.ReactNode }) {
@@ -27,7 +30,22 @@ function KV({ label, children }: { label: string; children: React.ReactNode }) {
   );
 }
 
-export function SessionDetailView({ session }: { session: SessionDetailType }) {
+type NoteInfo = {
+  hasNote: boolean;
+  noteId: string | null;
+  noteStatus: string | null;
+  noteType?: string | null;
+  signedByName?: string | null;
+  signedAt?: string | null;
+};
+
+export function SessionDetailView({
+  session,
+  noteInfo,
+}: {
+  session: SessionDetailType;
+  noteInfo: NoteInfo;
+}) {
   const cptMeta = ABA_CPT_CODES[session.cptCode as CptCode];
 
   return (
@@ -157,11 +175,40 @@ export function SessionDetailView({ session }: { session: SessionDetailType }) {
         </Card>
       )}
 
-      {/* Notes */}
+      {/* Session Note Status */}
+      {noteInfo.hasNote && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Session Note</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3">
+              <KV label="Status">
+                <NoteStatusBadge status={noteInfo.noteStatus ?? "draft"} />
+              </KV>
+              {noteInfo.noteType && (
+                <KV label="Note Type">
+                  {NOTE_TYPE_LABELS[noteInfo.noteType as NoteType] ?? noteInfo.noteType}
+                </KV>
+              )}
+              {noteInfo.signedByName && (
+                <KV label="Signed By">
+                  {noteInfo.signedByName}
+                  {noteInfo.signedAt && (
+                    <span className="text-muted-foreground"> — {formatDate(noteInfo.signedAt)}</span>
+                  )}
+                </KV>
+              )}
+            </dl>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Quick Notes */}
       {session.notes && (
         <Card>
           <CardHeader>
-            <CardTitle>Notes</CardTitle>
+            <CardTitle>Quick Notes</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs whitespace-pre-wrap">{session.notes}</p>

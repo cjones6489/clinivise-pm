@@ -66,7 +66,7 @@ export const sessionNotes = pgTable(
     recommendations: text("recommendations"),
 
     // ── Compliance & signatures ──────────────────────────────────────────
-    status: text("status").notNull().default("draft"), // draft | signed | cosigned | locked
+    status: text("status").notNull().default("draft"), // draft | signed
     signedById: text("signed_by_id").references(() => providers.id, {
       onDelete: "set null",
     }),

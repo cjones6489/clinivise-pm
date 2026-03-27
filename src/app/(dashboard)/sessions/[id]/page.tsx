@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { getSessionById } from "@/server/queries/sessions";
+import { sessionHasNote } from "@/server/queries/session-notes";
 import { PageHeader } from "@/components/layout/page-header";
 import { SessionDetailView } from "@/components/sessions/session-detail";
 import { SessionActions } from "@/components/sessions/session-actions";
@@ -23,8 +24,13 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const user = await requireAuth();
   const canEdit = hasPermission(user.role, "sessions.write");
+  const canReadNotes = hasPermission(user.role, "notes.read");
+  const canWriteNotes = hasPermission(user.role, "notes.write");
 
-  const session = await getSessionById(user.organizationId, id);
+  const [session, noteState] = await Promise.all([
+    getSessionById(user.organizationId, id),
+    canReadNotes ? sessionHasNote(user.organizationId, id) : Promise.resolve(null),
+  ]);
   if (!session) {
     notFound();
   }
@@ -54,10 +60,26 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
             sessionStatus={session.status}
             canEdit={canEdit}
             canCancel={!!canCancel}
+            canWriteNotes={canWriteNotes}
+            noteState={{
+              hasNote: noteState?.hasNote ?? false,
+              noteId: noteState?.noteId ?? null,
+              noteStatus: noteState?.noteStatus ?? null,
+            }}
           />
         }
       />
-      <SessionDetailView session={session} />
+      <SessionDetailView
+        session={session}
+        noteInfo={{
+          hasNote: noteState?.hasNote ?? false,
+          noteId: noteState?.noteId ?? null,
+          noteStatus: noteState?.noteStatus ?? null,
+          noteType: noteState?.noteType ?? null,
+          signedByName: noteState?.signedByName ?? null,
+          signedAt: noteState?.signedAt?.toISOString() ?? null,
+        }}
+      />
     </div>
   );
 }
