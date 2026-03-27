@@ -16,6 +16,12 @@ export const PERMISSIONS = {
   "sessions.write": ["owner", "admin", "bcba", "bcaba", "rbt"],
   "sessions.cancel": ["owner", "admin", "bcba"],
 
+  // Session Notes
+  "notes.read": ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"],
+  "notes.write": ["owner", "admin", "bcba", "bcaba", "rbt"],
+  "notes.sign": ["owner", "admin", "bcba", "bcaba", "rbt"],
+  "notes.cosign": ["owner", "admin", "bcba"],
+
   // Authorizations
   "authorizations.read": ["owner", "admin", "bcba", "bcaba", "billing_staff"],
   "authorizations.write": ["owner", "admin", "bcba", "billing_staff"],

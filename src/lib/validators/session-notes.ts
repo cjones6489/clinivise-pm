@@ -5,6 +5,7 @@ import {
   MEASUREMENT_TYPES,
   PROMPT_LEVELS,
   BEHAVIOR_INTENSITIES,
+  type NoteType,
 } from "@/lib/constants";
 
 const optionalText = z
@@ -14,81 +15,63 @@ const optionalText = z
   .or(z.literal(""))
   .transform((v) => v || undefined);
 
+// ── Shared note field shapes ─────────────────────────────────────────────────
+
+const universalNoteFields = {
+  othersPresent: optionalText,
+  subjectiveNotes: optionalText,
+  clientPresentation: optionalText,
+  sessionNarrative: optionalText,
+  barriersToPerformance: optionalText,
+  caregiverCommunication: optionalText,
+  planNextSession: optionalText,
+};
+
+const modificationFields = {
+  modificationRationale: optionalText,
+  modificationDescription: optionalText,
+  clientResponseToModification: optionalText,
+  updatedProtocol: optionalText,
+};
+
+const caregiverFields = {
+  caregiverName: optionalText,
+  caregiverRelationship: optionalText,
+  clientPresent: z.boolean().optional(),
+  trainingObjectives: optionalText,
+  teachingMethod: optionalText,
+  caregiverCompetency: optionalText,
+  generalizationPlan: optionalText,
+  homeworkAssigned: optionalText,
+};
+
+const assessmentFields = {
+  assessmentToolsUsed: z.array(z.string()).optional(),
+  faceToFaceMinutes: z.coerce.number().int().min(0).optional(),
+  nonFaceToFaceMinutes: z.coerce.number().int().min(0).optional(),
+  caregiverParticipated: z.boolean().optional(),
+  findingsSummary: optionalText,
+  recommendations: optionalText,
+};
+
 // ── Session Note CRUD ────────────────────────────────────────────────────────
 
 export const createSessionNoteSchema = z.object({
   sessionId: z.string().min(1),
   noteType: z.enum(NOTE_TYPES),
-
-  // Universal
-  othersPresent: optionalText,
-  subjectiveNotes: optionalText,
-  clientPresentation: optionalText,
-  sessionNarrative: optionalText,
-  barriersToPerformance: optionalText,
-  caregiverCommunication: optionalText,
-  planNextSession: optionalText,
-
-  // 97155-specific
-  modificationRationale: optionalText,
-  modificationDescription: optionalText,
-  clientResponseToModification: optionalText,
-  updatedProtocol: optionalText,
-
-  // 97156-specific
-  caregiverName: optionalText,
-  caregiverRelationship: optionalText,
-  clientPresent: z.boolean().optional(),
-  trainingObjectives: optionalText,
-  teachingMethod: optionalText,
-  caregiverCompetency: optionalText,
-  generalizationPlan: optionalText,
-  homeworkAssigned: optionalText,
-
-  // 97151-specific
-  assessmentToolsUsed: z.array(z.string()).optional(),
-  faceToFaceMinutes: z.coerce.number().int().min(0).optional(),
-  nonFaceToFaceMinutes: z.coerce.number().int().min(0).optional(),
-  caregiverParticipated: z.boolean().optional(),
-  findingsSummary: optionalText,
-  recommendations: optionalText,
+  ...universalNoteFields,
+  ...modificationFields,
+  ...caregiverFields,
+  ...assessmentFields,
 });
 
 export const updateSessionNoteSchema = z.object({
   id: z.string().min(1),
-
-  // Universal
-  othersPresent: optionalText,
-  subjectiveNotes: optionalText,
-  clientPresentation: optionalText,
-  sessionNarrative: optionalText,
-  barriersToPerformance: optionalText,
-  caregiverCommunication: optionalText,
-  planNextSession: optionalText,
-
-  // 97155-specific
-  modificationRationale: optionalText,
-  modificationDescription: optionalText,
-  clientResponseToModification: optionalText,
-  updatedProtocol: optionalText,
-
-  // 97156-specific
-  caregiverName: optionalText,
-  caregiverRelationship: optionalText,
-  clientPresent: z.boolean().optional(),
-  trainingObjectives: optionalText,
-  teachingMethod: optionalText,
-  caregiverCompetency: optionalText,
-  generalizationPlan: optionalText,
-  homeworkAssigned: optionalText,
-
-  // 97151-specific
-  assessmentToolsUsed: z.array(z.string()).optional(),
-  faceToFaceMinutes: z.coerce.number().int().min(0).optional(),
-  nonFaceToFaceMinutes: z.coerce.number().int().min(0).optional(),
-  caregiverParticipated: z.boolean().optional(),
-  findingsSummary: optionalText,
-  recommendations: optionalText,
+  updatedAt: z.string().min(1), // Optimistic locking
+  ...universalNoteFields,
+  ...modificationFields,
+  ...caregiverFields,
+  ...assessmentFields,
 });
 
 export const signSessionNoteSchema = z.object({
@@ -99,10 +82,13 @@ export const cosignSessionNoteSchema = z.object({
   id: z.string().min(1),
 });
 
-// ── Session Note Goals ───────────────────────────────────────────────────────
+export const deleteSessionNoteSchema = z.object({
+  id: z.string().min(1),
+});
 
-export const createNoteGoalSchema = z.object({
-  sessionNoteId: z.string().min(1),
+// ── Bulk Save (note + goals + behaviors in one transaction) ──────────────────
+
+const goalDataFields = {
   goalId: z
     .string()
     .min(1)
@@ -113,36 +99,19 @@ export const createNoteGoalSchema = z.object({
   procedure: optionalText,
   measurementType: z.enum(MEASUREMENT_TYPES).default("discrete_trial"),
 
-  // Discrete trial
   trialsCompleted: z.coerce.number().int().min(0).optional(),
   trialsCorrect: z.coerce.number().int().min(0).optional(),
   percentageCorrect: z.coerce.number().min(0).max(100).optional(),
-
-  // Frequency
   frequencyCount: z.coerce.number().int().min(0).optional(),
-
-  // Duration
   durationSeconds: z.coerce.number().int().min(0).optional(),
-
-  // Rate
   ratePerMinute: z.coerce.number().min(0).optional(),
-
-  // Latency
   latencySeconds: z.coerce.number().int().min(0).optional(),
-
-  // Task analysis
   stepsCompleted: z.coerce.number().int().min(0).optional(),
   stepsTotal: z.coerce.number().int().min(1).optional(),
-
-  // Probe
   probeCorrect: z.coerce.number().int().min(0).optional(),
   probeTotal: z.coerce.number().int().min(0).optional(),
-
-  // Rating scale
   ratingScaleValue: z.coerce.number().int().min(0).optional(),
   ratingScaleMax: z.coerce.number().int().min(1).optional(),
-
-  // Interval recording
   intervalsScored: z.coerce.number().int().min(0).optional(),
   intervalsTotal: z.coerce.number().int().min(0).optional(),
 
@@ -154,6 +123,58 @@ export const createNoteGoalSchema = z.object({
   reinforcement: optionalText,
   progressStatus: z.enum(GOAL_PROGRESS_STATUSES).default("not_assessed"),
   notes: optionalText,
+};
+
+const behaviorDataFields = {
+  behaviorName: z.string().trim().min(1, "Behavior name is required").max(200),
+  occurrenceTime: optionalText,
+  antecedent: optionalText,
+  behaviorDescription: optionalText,
+  consequence: optionalText,
+  durationSeconds: z.coerce.number().int().min(0).optional(),
+  intensity: z
+    .enum(BEHAVIOR_INTENSITIES)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  notes: optionalText,
+};
+
+export const saveSessionNoteSchema = z.object({
+  sessionId: z.string().min(1),
+
+  // Note fields (all optional for draft saves)
+  ...universalNoteFields,
+  ...modificationFields,
+  ...caregiverFields,
+  ...assessmentFields,
+
+  // Goals — full replace (send all current goals, server reconciles)
+  goals: z
+    .array(
+      z.object({
+        id: z.string().optional(), // Existing goal ID (omit for new)
+        ...goalDataFields,
+      }),
+    )
+    .default([]),
+
+  // Behaviors — full replace
+  behaviors: z
+    .array(
+      z.object({
+        id: z.string().optional(), // Existing behavior ID (omit for new)
+        ...behaviorDataFields,
+      }),
+    )
+    .default([]),
+});
+
+// ── Individual goal/behavior schemas (kept for standalone operations) ─────────
+
+export const createNoteGoalSchema = z.object({
+  sessionNoteId: z.string().min(1),
+  ...goalDataFields,
 });
 
 export const updateNoteGoalSchema = z.object({
@@ -162,36 +183,19 @@ export const updateNoteGoalSchema = z.object({
   procedure: optionalText,
   measurementType: z.enum(MEASUREMENT_TYPES).optional(),
 
-  // Discrete trial
   trialsCompleted: z.coerce.number().int().min(0).optional(),
   trialsCorrect: z.coerce.number().int().min(0).optional(),
   percentageCorrect: z.coerce.number().min(0).max(100).optional(),
-
-  // Frequency
   frequencyCount: z.coerce.number().int().min(0).optional(),
-
-  // Duration
   durationSeconds: z.coerce.number().int().min(0).optional(),
-
-  // Rate
   ratePerMinute: z.coerce.number().min(0).optional(),
-
-  // Latency
   latencySeconds: z.coerce.number().int().min(0).optional(),
-
-  // Task analysis
   stepsCompleted: z.coerce.number().int().min(0).optional(),
   stepsTotal: z.coerce.number().int().min(1).optional(),
-
-  // Probe
   probeCorrect: z.coerce.number().int().min(0).optional(),
   probeTotal: z.coerce.number().int().min(0).optional(),
-
-  // Rating scale
   ratingScaleValue: z.coerce.number().int().min(0).optional(),
   ratingScaleMax: z.coerce.number().int().min(1).optional(),
-
-  // Interval recording
   intervalsScored: z.coerce.number().int().min(0).optional(),
   intervalsTotal: z.coerce.number().int().min(0).optional(),
 
@@ -209,22 +213,9 @@ export const deleteNoteGoalSchema = z.object({
   id: z.string().min(1),
 });
 
-// ── Session Note Behaviors ───────────────────────────────────────────────────
-
 export const createNoteBehaviorSchema = z.object({
   sessionNoteId: z.string().min(1),
-  behaviorName: z.string().trim().min(1, "Behavior name is required").max(200),
-  occurrenceTime: optionalText,
-  antecedent: optionalText,
-  behaviorDescription: optionalText,
-  consequence: optionalText,
-  durationSeconds: z.coerce.number().int().min(0).optional(),
-  intensity: z
-    .enum(BEHAVIOR_INTENSITIES)
-    .optional()
-    .or(z.literal(""))
-    .transform((v) => v || undefined),
-  notes: optionalText,
+  ...behaviorDataFields,
 });
 
 export const updateNoteBehaviorSchema = z.object({
@@ -246,3 +237,47 @@ export const updateNoteBehaviorSchema = z.object({
 export const deleteNoteBehaviorSchema = z.object({
   id: z.string().min(1),
 });
+
+// ── Sign-readiness validation (CPT-specific minimum fields for audit) ────────
+// These are NOT Zod schemas — they're runtime checks run before signing.
+// Returns an array of human-readable missing field messages.
+
+type NoteData = Record<string, unknown>;
+
+export function validateSignReadiness(noteType: NoteType, note: NoteData, goalCount: number): string[] {
+  const missing: string[] = [];
+
+  // Universal requirements for all CPT codes
+  if (!note.sessionNarrative) missing.push("Session narrative is required");
+  if (!note.planNextSession) missing.push("Plan for next session is required");
+
+  switch (noteType) {
+    case "97153_direct":
+      // Direct therapy: must have at least one goal with data
+      if (goalCount === 0) missing.push("At least one goal with data is required for direct therapy notes");
+      break;
+
+    case "97155_modification":
+      if (!note.modificationRationale) missing.push("Modification rationale is required");
+      if (!note.modificationDescription) missing.push("Modification description is required");
+      break;
+
+    case "97156_caregiver":
+      if (!note.caregiverName) missing.push("Caregiver name is required");
+      if (!note.trainingObjectives) missing.push("Training objectives are required");
+      break;
+
+    case "97151_assessment":
+      if (!note.findingsSummary) missing.push("Assessment findings summary is required");
+      if (
+        !note.assessmentToolsUsed ||
+        !Array.isArray(note.assessmentToolsUsed) ||
+        note.assessmentToolsUsed.length === 0
+      ) {
+        missing.push("At least one assessment tool must be specified");
+      }
+      break;
+  }
+
+  return missing;
+}
