@@ -780,13 +780,13 @@ draft → signed (author signs, note locks)
 | CD-2.1  | Create `session_notes` + `session_note_goals` + `session_note_behaviors` schema | `src/server/db/schema/session-notes.ts`         | `[x]`  |
 | CD-2.2  | Create note validators (per-CPT required fields)                                | `src/lib/validators/session-notes.ts`           | `[x]`  |
 | CD-2.3  | Generate + run migrations (verified against CASP/TRICARE/Optum)                 | `drizzle/`                                      | `[x]`  |
-| CD-2.4  | Note read queries (by session, BCBA review queue)                               | `src/server/queries/session-notes.ts`           | `[ ]`  |
-| CD-2.5  | Note server actions (create, update, sign, approve/reject)                      | `src/server/actions/session-notes.ts`           | `[ ]`  |
-| CD-2.6  | "Complete Note" button on session detail page                                   | `src/app/(dashboard)/sessions/[id]/page.tsx`    | `[ ]`  |
-| CD-2.7  | Session note form (CPT-aware template, goals multi-select)                      | `src/components/sessions/session-note-form.tsx` | `[ ]`  |
-| CD-2.8  | BCBA review queue page (unsigned notes pending co-signature)                    | `src/app/(dashboard)/notes/page.tsx`            | `[ ]`  |
-| CD-2.9  | Dashboard: "Unsigned notes" alert count                                         | `src/server/queries/dashboard.ts`               | `[ ]`  |
-| CD-2.10 | Note status badges + signature display on session detail                        | `src/components/sessions/session-detail.tsx`    | `[ ]`  |
+| CD-2.4  | Note read queries (by session, batch status check)                              | `src/server/queries/session-notes.ts`           | `[x]`  |
+| CD-2.5  | Note server actions (create, update, sign, delete)                              | `src/server/actions/session-notes.ts`           | `[x]`  |
+| CD-2.6  | "Complete Note" button on session detail page                                   | `src/app/(dashboard)/sessions/[id]/page.tsx`    | `[x]`  |
+| CD-2.7  | Session note form (CPT-aware template, goals multi-select)                      | `src/components/sessions/session-note-form.tsx` | `[x]`  |
+| CD-2.8  | ~~BCBA review queue page~~ — Removed: co-sign not a standard ABA EHR workflow  | —                                               | `N/A`  |
+| CD-2.9  | ~~Dashboard unsigned notes alert~~ — Removed with co-sign workflow             | —                                               | `N/A`  |
+| CD-2.10 | Note status badges + signature display on session detail                        | `src/components/sessions/session-detail.tsx`    | `[x]`  |
 | CD-2.11 | "Billing readiness" indicator per session (green/amber/red)                     | `src/components/sessions/`                      | `[ ]`  |
 
 **Current state:** Sessions have a `notes` text field for quick free-text entry. This stays as the "30-second log" quick note. The full structured session note is completed later via the "Complete Note" action on the session detail page.
@@ -908,7 +908,7 @@ Verified against CentralReach, AlohaABA, Motivity, Theralytics, Raven Health, Ca
 | **Basic Reports (exportable)** | Minimal (dashboard only)         | P1                                | Auth utilization, session summaries, staff hours, cancellation rates. CSV/PDF export. Enables payroll workflows without building payroll module.                   |
 | **Document Management UI**     | Schema exists, no UI             | P1                                | Per-client document library: upload, categorize (consent, assessment, treatment plan, auth letter), retrieve. Payer audits request docs within 5-10 business days. |
 | **Claims / Billing (RCM)**     | Schema stubs (Phase 2 via Stedi) | P1                                | Session-to-claim conversion, claims scrubbing, clearinghouse submission (837P), ERA/835 processing, denial management. Monetization engine (2-4% of collections).  |
-| **E-Signatures (full UI)**     | Schema + workflow exists         | P1                                | Provider sign, supervisor co-sign, bulk signing for BCBA review queue, timestamped audit trail.                                                                    |
+| **E-Signatures (full UI)**     | Schema + workflow exists         | P1                                | Provider sign on session notes, timestamped audit trail. Co-sign available in schema if payer requires it.                                                         |
 | **Eligibility Verification**   | Schema stub                      | P2                                | Real-time 270/271 checks, batch verification for weekly schedule, coverage lapse alerts. Reduces claim denials 25-30%.                                             |
 
 #### Differentiators (some competitors have, would set us apart)

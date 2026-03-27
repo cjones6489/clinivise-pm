@@ -124,29 +124,6 @@ export type SessionNoteBehaviorRow = {
   sortOrder: number;
 };
 
-/** Summary row for session list badges */
-export type SessionNoteListItem = {
-  id: string;
-  sessionId: string;
-  noteType: string;
-  status: string;
-  signedAt: Date | null;
-  signerFirstName: string | null;
-  signerLastName: string | null;
-  createdAt: Date;
-
-  // Session context
-  sessionDate: string;
-  cptCode: string;
-  clientId: string;
-  clientFirstName: string;
-  clientLastName: string;
-  providerId: string;
-  providerFirstName: string;
-  providerLastName: string;
-  providerCredentialType: string;
-};
-
 // ── Queries ──────────────────────────────────────────────────────────────────
 
 /** Get a session note by session ID (the primary lookup — one note per session) */
