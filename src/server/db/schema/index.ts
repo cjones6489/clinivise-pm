@@ -3,6 +3,8 @@ export * from "./users";
 export * from "./providers";
 export * from "./clients";
 export * from "./client-providers";
+export * from "./goal-domains";
+export * from "./client-goals";
 export * from "./payers";
 export * from "./authorizations";
 export * from "./sessions";

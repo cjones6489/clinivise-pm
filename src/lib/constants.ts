@@ -46,6 +46,71 @@ export function defaultCareTeamRole(credentialType: string): CareTeamRole {
   }
 }
 
+// ── Goal Domains (defaults seeded per org) ──────────────────────────────────
+
+export const DEFAULT_GOAL_DOMAINS = [
+  "Communication",
+  "Social Skills",
+  "Adaptive Behavior",
+  "Behavior Reduction",
+  "Academic",
+  "Play & Leisure",
+  "Self-Care",
+  "Motor Skills",
+  "Vocational",
+  "Other",
+] as const;
+
+// ── Goal Types & Statuses ───────────────────────────────────────────────────
+
+export const GOAL_TYPES = ["skill_acquisition", "behavior_reduction"] as const;
+export type GoalType = (typeof GOAL_TYPES)[number];
+
+export const GOAL_TYPE_LABELS: Record<GoalType, string> = {
+  skill_acquisition: "Skill Acquisition",
+  behavior_reduction: "Behavior Reduction",
+};
+
+export const GOAL_STATUSES = ["active", "met", "on_hold", "discontinued"] as const;
+export type GoalStatus = (typeof GOAL_STATUSES)[number];
+
+export const GOAL_STATUS_LABELS: Record<GoalStatus, string> = {
+  active: "Active",
+  met: "Met",
+  on_hold: "On Hold",
+  discontinued: "Discontinued",
+};
+
+export const GOAL_STATUS_VARIANT: Record<GoalStatus, "default" | "secondary" | "outline" | "destructive"> = {
+  active: "default",
+  met: "secondary",
+  on_hold: "outline",
+  discontinued: "outline",
+};
+
+// ── Data Collection Types (for Phase 3 readiness) ───────────────────────────
+
+export const DATA_COLLECTION_TYPES = [
+  "dtt",
+  "frequency",
+  "duration",
+  "task_analysis",
+  "interval",
+  "probe",
+  "rating_scale",
+] as const;
+export type DataCollectionType = (typeof DATA_COLLECTION_TYPES)[number];
+
+export const DATA_COLLECTION_TYPE_LABELS: Record<DataCollectionType, string> = {
+  dtt: "Discrete Trial (DTT)",
+  frequency: "Frequency / Event",
+  duration: "Duration",
+  task_analysis: "Task Analysis",
+  interval: "Interval Recording",
+  probe: "Probe / Cold Probe",
+  rating_scale: "Rating Scale",
+};
+
 export const AUTH_STATUSES = ["pending", "approved", "denied", "expired", "exhausted"] as const;
 export type AuthStatus = (typeof AUTH_STATUSES)[number];
 
