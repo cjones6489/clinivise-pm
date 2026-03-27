@@ -23,12 +23,12 @@ import {
   ASSESSMENT_SOURCE_LABELS,
   type GoalType,
   type GoalStatus,
-  type DataCollectionType,
   type BehaviorFunction,
   type BehaviorSeverity,
   type AssessmentSource,
 } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -64,236 +64,320 @@ import {
   CheckmarkCircle02Icon,
   MoreHorizontalCircle01Icon,
   Delete01Icon,
+  ArrowDown01Icon,
+  ArrowUp01Icon,
 } from "@hugeicons/core-free-icons";
 
 const NONE_VALUE = "__none__";
 
-// ── Goal Card ────────────────────────────────────────────────────────────────
+// Goal type accent colors
+const GOAL_TYPE_ACCENT = {
+  skill_acquisition: "border-l-emerald-500",
+  behavior_reduction: "border-l-amber-500",
+} as Record<string, string>;
+
+// Objective status icons
+function ObjectiveIcon({ status }: { status: string }) {
+  if (status === "met") {
+    return (
+      <HugeiconsIcon
+        icon={CheckmarkCircle02Icon}
+        size={16}
+        className="mt-0.5 shrink-0 text-emerald-500"
+      />
+    );
+  }
+  if (status === "baseline") {
+    return (
+      <div className="bg-muted-foreground/20 mt-0.5 h-4 w-4 shrink-0 rounded-full border-2 border-dashed border-muted-foreground/40" />
+    );
+  }
+  // active, on_hold, etc
+  return (
+    <HugeiconsIcon
+      icon={Target01Icon}
+      size={16}
+      className="text-primary mt-0.5 shrink-0"
+    />
+  );
+}
+
+// ── Goal Card (collapsed + expandable) ───────────────────────────────────────
 
 function GoalCard({
   goal,
   canEdit,
+  isExpanded,
+  onToggle,
   onAddObjective,
   onDelete,
   onStatusChange,
 }: {
   goal: GoalWithObjectives;
   canEdit: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
   onAddObjective: (goalId: string, nextNumber: number) => void;
   onDelete: (goal: GoalWithObjectives) => void;
   onStatusChange: (goalId: string, status: string) => void;
 }) {
+  const accentClass = GOAL_TYPE_ACCENT[goal.goalType] ?? "border-l-muted-foreground";
+
   return (
-    <div className="border-border/30 border-b px-4 py-3 last:border-b-0">
-      <div className="flex items-start justify-between gap-2">
+    <div className={cn("border-l-[3px] transition-colors", accentClass)}>
+      {/* Collapsed card — always visible */}
+      <div
+        className="hover:bg-accent/30 flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors"
+        onClick={onToggle}
+      >
+        {/* Expand/collapse chevron */}
+        <div className="mt-0.5 shrink-0">
+          <HugeiconsIcon
+            icon={isExpanded ? ArrowUp01Icon : ArrowDown01Icon}
+            size={14}
+            className="text-muted-foreground"
+          />
+        </div>
+
+        {/* Goal info */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-xs font-bold tabular-nums">
-              {goal.goalNumber}.
-            </span>
-            <span className="text-xs font-semibold">{goal.title}</span>
-            <Badge variant={GOAL_STATUS_VARIANT[goal.status as GoalStatus]} className="text-[9px]">
+            <span className="text-sm font-semibold tracking-tight">{goal.title}</span>
+            <Badge
+              variant={GOAL_STATUS_VARIANT[goal.status as GoalStatus]}
+              className="text-[10px]"
+            >
               {GOAL_STATUS_LABELS[goal.status as GoalStatus] ?? goal.status}
             </Badge>
-            <Badge variant="outline" className="text-[9px]">
+            <Badge variant="outline" className="text-[10px]">
               {GOAL_TYPE_LABELS[goal.goalType as GoalType] ?? goal.goalType}
             </Badge>
           </div>
-          {goal.description && (
-            <p className="text-muted-foreground mt-1 text-[11px] leading-relaxed">
-              {goal.description}
-            </p>
+
+          {/* Objectives — always visible */}
+          {goal.objectives.length > 0 && (
+            <div className="mt-2 space-y-1">
+              {goal.objectives.map((obj) => (
+                <div key={obj.id} className="flex items-start gap-2">
+                  <ObjectiveIcon status={obj.status} />
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs">
+                      <span className="text-muted-foreground tabular-nums">
+                        {goal.goalNumber}.{obj.objectiveNumber}
+                      </span>{" "}
+                      {obj.description}
+                    </span>
+                    {obj.status !== "active" && obj.status !== "baseline" && (
+                      <Badge
+                        variant={GOAL_STATUS_VARIANT[obj.status as GoalStatus]}
+                        className="ml-1.5 px-1 py-0 text-[8px]"
+                      >
+                        {GOAL_STATUS_LABELS[obj.status as GoalStatus] ?? obj.status}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
+
+        {/* Overflow menu — stop propagation so it doesn't toggle expand */}
         {canEdit && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0">
-                <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onAddObjective(goal.id, goal.objectives.length + 1)}>
-                <HugeiconsIcon icon={Add01Icon} size={14} className="mr-2" />
-                Add Objective
-              </DropdownMenuItem>
-              {/* Status transitions based on current status */}
-              {goal.status === "baseline" && (
-                <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
-                  Start Teaching
+          <div onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 shrink-0 opacity-40 transition-opacity hover:opacity-100 data-[state=open]:opacity-100"
+                >
+                  <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => onAddObjective(goal.id, goal.objectives.length + 1)}
+                >
+                  <HugeiconsIcon icon={Add01Icon} size={14} className="mr-2" />
+                  Add Objective
                 </DropdownMenuItem>
-              )}
-              {goal.status === "active" && (
-                <>
-                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "mastered")}>
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mr-2" />
-                    Mark Mastered
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "on_hold")}>
-                    Put on Hold
-                  </DropdownMenuItem>
-                </>
-              )}
-              {goal.status === "mastered" && (
-                <>
-                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "maintenance")}>
-                    Move to Maintenance
-                  </DropdownMenuItem>
+                {goal.status === "baseline" && (
                   <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
-                    Return to Active
+                    Start Teaching
                   </DropdownMenuItem>
-                </>
-              )}
-              {goal.status === "maintenance" && (
-                <>
-                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "generalization")}>
-                    Move to Generalization
-                  </DropdownMenuItem>
+                )}
+                {goal.status === "active" && (
+                  <>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "mastered")}>
+                      <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mr-2" />
+                      Mark Mastered
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "on_hold")}>
+                      Put on Hold
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {goal.status === "mastered" && (
+                  <>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "maintenance")}>
+                      Move to Maintenance
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                      Return to Active
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {goal.status === "maintenance" && (
+                  <>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "generalization")}>
+                      Move to Generalization
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                      Return to Active
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {goal.status === "generalization" && (
+                  <>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "met")}>
+                      <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mr-2" />
+                      Mark as Met
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                      Return to Active
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {goal.status === "on_hold" && (
                   <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
-                    Return to Active
+                    Reactivate
                   </DropdownMenuItem>
-                </>
-              )}
-              {goal.status === "generalization" && (
-                <>
-                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "met")}>
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mr-2" />
-                    Mark as Met
-                  </DropdownMenuItem>
+                )}
+                {(goal.status === "met" || goal.status === "discontinued") && (
                   <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
-                    Return to Active
+                    Reactivate
                   </DropdownMenuItem>
-                </>
-              )}
-              {goal.status === "on_hold" && (
-                <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
-                  Reactivate
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onDelete(goal)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <HugeiconsIcon icon={Delete01Icon} size={14} className="mr-2" />
+                  Archive Goal
                 </DropdownMenuItem>
-              )}
-              {(goal.status === "met" || goal.status === "discontinued") && (
-                <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
-                  Reactivate
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onDelete(goal)}
-                className="text-destructive focus:text-destructive"
-              >
-                <HugeiconsIcon icon={Delete01Icon} size={14} className="mr-2" />
-                Archive Goal
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-
-      {/* Metadata */}
-      <div className="text-muted-foreground mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
-        {goal.masteryCriteria && <span>Mastery: {goal.masteryCriteria}</span>}
-        {goal.baselineData && <span>Baseline: {goal.baselineData}</span>}
-        {goal.startDate && <span>Started {formatDate(goal.startDate)}</span>}
-        {goal.targetDate && <span>Target: {formatDate(goal.targetDate)}</span>}
-        {goal.metDate && <span>Met {formatDate(goal.metDate)}</span>}
-        {goal.treatmentPlanRef && <span>Ref: {goal.treatmentPlanRef}</span>}
-        {goal.assessmentSource && (
-          <span>
-            Source:{" "}
-            {ASSESSMENT_SOURCE_LABELS[goal.assessmentSource as AssessmentSource] ??
-              goal.assessmentSource}
-            {goal.assessmentItemRef ? ` (${goal.assessmentItemRef})` : ""}
-          </span>
-        )}
-      </div>
-
-      {/* Behavior reduction details */}
-      {goal.goalType === "behavior_reduction" &&
-        (goal.functionOfBehavior || goal.replacementBehavior || goal.operationalDefinition) && (
-          <div className="bg-muted/20 mt-2 rounded-md px-3 py-2 text-[11px]">
-            {goal.functionOfBehavior && (
-              <div className="flex gap-1">
-                <span className="text-muted-foreground shrink-0">Function:</span>
-                <span>
-                  {BEHAVIOR_FUNCTION_LABELS[goal.functionOfBehavior as BehaviorFunction] ??
-                    goal.functionOfBehavior}
-                </span>
-              </div>
-            )}
-            {goal.operationalDefinition && (
-              <div className="flex gap-1">
-                <span className="text-muted-foreground shrink-0">Definition:</span>
-                <span>{goal.operationalDefinition}</span>
-              </div>
-            )}
-            {goal.replacementBehavior && (
-              <div className="flex gap-1">
-                <span className="text-muted-foreground shrink-0">Replacement:</span>
-                <span>{goal.replacementBehavior}</span>
-              </div>
-            )}
-            {goal.severityLevel && (
-              <div className="flex gap-1">
-                <span className="text-muted-foreground shrink-0">Severity:</span>
-                <span>
-                  {BEHAVIOR_SEVERITY_LABELS[goal.severityLevel as BehaviorSeverity] ??
-                    goal.severityLevel}
-                </span>
-              </div>
-            )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
+      </div>
 
-      {/* Objectives */}
-      {goal.objectives.length > 0 && (
-        <div className="mt-2.5 space-y-1">
-          {goal.objectives.map((obj) => (
-            <div
-              key={obj.id}
-              className="bg-muted/30 flex items-start gap-2 rounded-md px-2.5 py-1.5"
-            >
-              {obj.status === "met" ? (
-                <HugeiconsIcon
-                  icon={CheckmarkCircle02Icon}
-                  size={14}
-                  className="mt-0.5 shrink-0 text-emerald-500"
-                />
-              ) : (
-                <HugeiconsIcon
-                  icon={Target01Icon}
-                  size={14}
-                  className="text-muted-foreground mt-0.5 shrink-0"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-muted-foreground text-[11px] font-medium tabular-nums">
-                    {goal.goalNumber}.{obj.objectiveNumber}
-                  </span>
-                  <span className="text-[11px]">{obj.description}</span>
-                </div>
-                <div className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5 text-[10px]">
-                  {obj.masteryCriteria && <span>Mastery: {obj.masteryCriteria}</span>}
-                  {obj.currentPerformance && (
-                    <span className="text-foreground font-medium">{obj.currentPerformance}</span>
-                  )}
-                  {obj.dataCollectionType && (
-                    <span>
-                      {DATA_COLLECTION_TYPE_LABELS[obj.dataCollectionType as DataCollectionType] ??
-                        obj.dataCollectionType}
+      {/* Expanded detail — inline below the card */}
+      {isExpanded && (
+        <div className="bg-muted/10 border-border/30 border-t px-4 py-4 pl-11">
+          <div className="space-y-4">
+            {/* Description + Protocol */}
+            {(goal.description || goal.protocol) && (
+              <div className="space-y-2">
+                {goal.description && (
+                  <div>
+                    <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                      Description
                     </span>
-                  )}
-                  {obj.status !== "active" && (
-                    <Badge
-                      variant={GOAL_STATUS_VARIANT[obj.status as GoalStatus]}
-                      className="px-1 py-0 text-[8px]"
-                    >
-                      {GOAL_STATUS_LABELS[obj.status as GoalStatus] ?? obj.status}
-                    </Badge>
-                  )}
+                    <p className="mt-0.5 text-xs leading-relaxed">{goal.description}</p>
+                  </div>
+                )}
+                {goal.protocol && (
+                  <div>
+                    <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                      Protocol
+                    </span>
+                    <p className="bg-muted/50 mt-0.5 rounded-md px-2.5 py-2 text-xs leading-relaxed">
+                      {goal.protocol}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Mastery & Progress */}
+            {(goal.masteryCriteria || goal.baselineData) && (
+              <div>
+                <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                  Mastery & Progress
+                </span>
+                <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                  {goal.masteryCriteria && <span>Mastery: {goal.masteryCriteria}</span>}
+                  {goal.baselineData && <span>Baseline: {goal.baselineData}</span>}
                 </div>
               </div>
+            )}
+
+            {/* Behavior reduction details */}
+            {goal.goalType === "behavior_reduction" &&
+              (goal.functionOfBehavior ||
+                goal.replacementBehavior ||
+                goal.operationalDefinition) && (
+                <div>
+                  <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                    Behavior Details
+                  </span>
+                  <div className="mt-1 space-y-1 text-xs">
+                    {goal.functionOfBehavior && (
+                      <div className="flex gap-1.5">
+                        <span className="text-muted-foreground shrink-0">Function:</span>
+                        <span>
+                          {BEHAVIOR_FUNCTION_LABELS[
+                            goal.functionOfBehavior as BehaviorFunction
+                          ] ?? goal.functionOfBehavior}
+                        </span>
+                      </div>
+                    )}
+                    {goal.severityLevel && (
+                      <div className="flex gap-1.5">
+                        <span className="text-muted-foreground shrink-0">Severity:</span>
+                        <span>
+                          {BEHAVIOR_SEVERITY_LABELS[goal.severityLevel as BehaviorSeverity] ??
+                            goal.severityLevel}
+                        </span>
+                      </div>
+                    )}
+                    {goal.operationalDefinition && (
+                      <div className="flex gap-1.5">
+                        <span className="text-muted-foreground shrink-0">Definition:</span>
+                        <span>{goal.operationalDefinition}</span>
+                      </div>
+                    )}
+                    {goal.replacementBehavior && (
+                      <div className="flex gap-1.5">
+                        <span className="text-muted-foreground shrink-0">Replacement:</span>
+                        <span>{goal.replacementBehavior}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+            {/* Details */}
+            <div>
+              <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                Details
+              </span>
+              <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                {goal.startDate && <span>Started {formatDate(goal.startDate)}</span>}
+                {goal.targetDate && <span>Target: {formatDate(goal.targetDate)}</span>}
+                {goal.metDate && <span>Met {formatDate(goal.metDate)}</span>}
+                {goal.assessmentSource && (
+                  <span>
+                    {ASSESSMENT_SOURCE_LABELS[goal.assessmentSource as AssessmentSource] ??
+                      goal.assessmentSource}
+                    {goal.assessmentItemRef ? ` (${goal.assessmentItemRef})` : ""}
+                  </span>
+                )}
+              </div>
             </div>
-          ))}
+          </div>
         </div>
       )}
     </div>
@@ -347,7 +431,7 @@ function AddGoalDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-sm font-semibold">Add Treatment Goal</DialogTitle>
+          <DialogTitle className="text-base font-semibold">Add Treatment Goal</DialogTitle>
           <DialogDescription className="text-muted-foreground text-xs">
             Add a goal from the client&apos;s treatment plan.
           </DialogDescription>
@@ -433,6 +517,16 @@ function AddGoalDialog({
             />
           </Field>
 
+          <Field>
+            <Label className="text-xs font-medium">Protocol (RBT instructions)</Label>
+            <Textarea
+              {...register("protocol")}
+              placeholder="How to run this program during sessions (e.g., Use NET during play. Present 3-second time delay.)"
+              className="text-xs"
+              rows={3}
+            />
+          </Field>
+
           <div className="grid grid-cols-2 gap-3">
             <Field>
               <Label className="text-xs font-medium">Mastery Criteria</Label>
@@ -461,7 +555,7 @@ function AddGoalDialog({
             />
           </Field>
 
-          {/* Behavior reduction fields — only shown when goalType is behavior_reduction */}
+          {/* Behavior reduction fields */}
           {watchedGoalType === "behavior_reduction" && (
             <div className="border-border/40 space-y-3 rounded-lg border p-3">
               <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
@@ -583,43 +677,33 @@ function AddGoalDialog({
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field>
-              <Label className="text-xs font-medium">Treatment Plan Reference</Label>
-              <Input
-                {...register("treatmentPlanRef")}
-                placeholder="ITP v2, Section 3.1"
-                className="h-8 text-xs"
-              />
-            </Field>
-            <Field>
-              <Label className="text-xs font-medium">Assessment Source</Label>
-              <Controller
-                name="assessmentSource"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value || NONE_VALUE}
-                    onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
-                  >
-                    <SelectTrigger className="h-8 w-full text-xs">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={NONE_VALUE} className="text-xs">
-                        Not specified
+          <Field>
+            <Label className="text-xs font-medium">Assessment Source</Label>
+            <Controller
+              name="assessmentSource"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value || NONE_VALUE}
+                  onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                >
+                  <SelectTrigger className="h-8 w-full text-xs">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE_VALUE} className="text-xs">
+                      Not specified
+                    </SelectItem>
+                    {ASSESSMENT_SOURCES.map((s) => (
+                      <SelectItem key={s} value={s} className="text-xs">
+                        {ASSESSMENT_SOURCE_LABELS[s]}
                       </SelectItem>
-                      {ASSESSMENT_SOURCES.map((s) => (
-                        <SelectItem key={s} value={s} className="text-xs">
-                          {ASSESSMENT_SOURCE_LABELS[s]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </Field>
-          </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </Field>
 
           <Field>
             <Label className="text-xs font-medium">Assessment Item Reference</Label>
@@ -775,10 +859,13 @@ export function ClientGoals({
   canEdit: boolean;
 }) {
   const [addGoalOpen, setAddGoalOpen] = useState(false);
-  const [addObjective, setAddObjective] = useState<{ goalId: string; nextNumber: number } | null>(
-    null,
-  );
+  const [addObjective, setAddObjective] = useState<{
+    goalId: string;
+    nextNumber: number;
+  } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<GoalWithObjectives | null>(null);
+  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
+  const [showInactive, setShowInactive] = useState(false);
 
   const { execute: executeUpdate } = useAction(updateGoal, {
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to update goal"),
@@ -800,6 +887,7 @@ export function ClientGoals({
   const activeGoals = goals.filter((g) => ACTIVE_STATUSES.includes(g.status));
   const inactiveGoals = goals.filter((g) => INACTIVE_STATUSES.includes(g.status));
 
+  // Group active goals by domain
   const domainGroups = new Map<string, GoalWithObjectives[]>();
   for (const goal of activeGoals) {
     const domain = goal.domainName ?? "Uncategorized";
@@ -808,13 +896,12 @@ export function ClientGoals({
     domainGroups.set(domain, list);
   }
 
-  const nextGoalNumber = goals.length > 0 ? Math.max(...goals.map((g) => g.goalNumber)) + 1 : 1;
+  const nextGoalNumber =
+    goals.length > 0 ? Math.max(...goals.map((g) => g.goalNumber)) + 1 : 1;
 
-  const totalObjectives = goals.reduce((sum, g) => sum + g.objectives.length, 0);
-  const metObjectives = goals.reduce(
-    (sum, g) => sum + g.objectives.filter((o) => o.status === "met").length,
-    0,
-  );
+  function toggleGoal(goalId: string) {
+    setExpandedGoalId((prev) => (prev === goalId ? null : goalId));
+  }
 
   return (
     <div className="space-y-4">
@@ -822,7 +909,7 @@ export function ClientGoals({
       <div className="flex items-center justify-between">
         <div className="text-muted-foreground text-xs">
           {goals.length > 0
-            ? `${activeGoals.length} active · ${totalObjectives} objective${totalObjectives !== 1 ? "s" : ""}${metObjectives > 0 ? ` · ${metObjectives} met` : ""}`
+            ? `${activeGoals.length} active${inactiveGoals.length > 0 ? ` · ${inactiveGoals.length} met/discontinued` : ""}`
             : null}
         </div>
         {canEdit && (
@@ -840,19 +927,23 @@ export function ClientGoals({
 
       {/* Empty state */}
       {goals.length === 0 ? (
-        <div className="border-border/40 bg-card flex flex-col items-center justify-center rounded-lg border py-8 text-center shadow-sm">
-          <div className="bg-muted mb-3 rounded-lg p-3">
-            <HugeiconsIcon icon={Target01Icon} size={24} className="text-muted-foreground" />
+        <div className="border-border bg-card flex flex-col items-center justify-center rounded-xl border py-12 text-center shadow-sm">
+          <div className="mb-4 flex -space-x-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-emerald-100 text-xs font-bold text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300">
+              SA
+            </div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-amber-100 text-xs font-bold text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">
+              BR
+            </div>
           </div>
-          <p className="text-xs font-medium">No treatment goals yet</p>
-          <p className="text-muted-foreground mt-1 text-[11px]">
+          <p className="text-sm font-semibold">No treatment goals yet</p>
+          <p className="text-muted-foreground mt-1 max-w-xs text-xs">
             Add goals from the treatment plan so session notes can reference them.
           </p>
           {canEdit && (
             <Button
-              variant="outline"
               size="sm"
-              className="mt-3 text-xs"
+              className="mt-4 text-xs"
               onClick={() => setAddGoalOpen(true)}
             >
               <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
@@ -861,86 +952,114 @@ export function ClientGoals({
           )}
         </div>
       ) : (
-        <>
-          {[...domainGroups.entries()].map(([domain, domainGoals]) => (
-            <div
-              key={domain}
-              className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm"
-            >
-              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
-                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-                  {domain}
-                </span>
-                <span className="text-muted-foreground ml-2 text-[11px] font-normal tracking-normal normal-case">
-                  ({domainGoals.length})
-                </span>
-              </div>
-              {domainGoals.map((goal) => (
-                <GoalCard
-                  key={goal.id}
-                  goal={goal}
-                  canEdit={canEdit}
-                  onAddObjective={(goalId, nextNum) =>
-                    setAddObjective({ goalId, nextNumber: nextNum })
-                  }
-                  onDelete={(g) => setDeleteTarget(g)}
-                  onStatusChange={(id, status) =>
-                    executeUpdate({
-                      id,
-                      status: status as
-                        | "baseline"
-                        | "active"
-                        | "mastered"
-                        | "maintenance"
-                        | "generalization"
-                        | "met"
-                        | "on_hold"
-                        | "discontinued",
-                    })
-                  }
-                />
-              ))}
-            </div>
-          ))}
+        /* Single card containing all domain groups */
+        <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+          {[...domainGroups.entries()].map(([domain, domainGoals], groupIdx) => {
+            const domainActive = domainGoals.filter((g) => g.status === "active").length;
+            const domainMastered = domainGoals.filter((g) =>
+              ["mastered", "maintenance", "generalization"].includes(g.status),
+            ).length;
 
-          {inactiveGoals.length > 0 && (
-            <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
-              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
-                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-                  Met & Discontinued
-                </span>
-                <span className="text-muted-foreground ml-2 text-[11px] font-normal tracking-normal normal-case">
-                  ({inactiveGoals.length})
-                </span>
+            return (
+              <div key={domain}>
+                {/* Domain header */}
+                <div
+                  className={cn(
+                    "flex items-center gap-2 border-b px-4 py-2",
+                    groupIdx > 0 && "border-t",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "h-2 w-2 rounded-full",
+                      domainGoals.some((g) => g.goalType === "behavior_reduction")
+                        ? "bg-amber-500"
+                        : "bg-emerald-500",
+                    )}
+                  />
+                  <span className="text-xs font-semibold">{domain}</span>
+                  <span className="text-muted-foreground text-xs">
+                    {domainActive > 0 && `${domainActive} active`}
+                    {domainActive > 0 && domainMastered > 0 && " · "}
+                    {domainMastered > 0 && `${domainMastered} mastered`}
+                    {domainActive === 0 && domainMastered === 0 &&
+                      `${domainGoals.length} goal${domainGoals.length !== 1 ? "s" : ""}`}
+                  </span>
+                </div>
+
+                {/* Goals in this domain */}
+                <div className="divide-border/20 divide-y">
+                  {domainGoals.map((goal) => (
+                    <GoalCard
+                      key={goal.id}
+                      goal={goal}
+                      canEdit={canEdit}
+                      isExpanded={expandedGoalId === goal.id}
+                      onToggle={() => toggleGoal(goal.id)}
+                      onAddObjective={(goalId, nextNum) =>
+                        setAddObjective({ goalId, nextNumber: nextNum })
+                      }
+                      onDelete={(g) => setDeleteTarget(g)}
+                      onStatusChange={(id, status) =>
+                        executeUpdate({
+                          id,
+                          status: status as GoalStatus,
+                        })
+                      }
+                    />
+                  ))}
+                </div>
               </div>
-              {inactiveGoals.map((goal) => (
-                <GoalCard
-                  key={goal.id}
-                  goal={goal}
-                  canEdit={canEdit}
-                  onAddObjective={(goalId, nextNum) =>
-                    setAddObjective({ goalId, nextNumber: nextNum })
-                  }
-                  onDelete={(g) => setDeleteTarget(g)}
-                  onStatusChange={(id, status) =>
-                    executeUpdate({
-                      id,
-                      status: status as
-                        | "baseline"
-                        | "active"
-                        | "mastered"
-                        | "maintenance"
-                        | "generalization"
-                        | "met"
-                        | "on_hold"
-                        | "discontinued",
-                    })
-                  }
-                />
-              ))}
-            </div>
+            );
+          })}
+
+          {/* Met & Discontinued — collapsible at bottom of same card */}
+          {inactiveGoals.length > 0 && (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowInactive(!showInactive)}
+                className="bg-muted/20 hover:bg-muted/40 flex w-full items-center justify-between border-t px-4 py-2 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="bg-muted-foreground/30 h-1.5 w-1.5 rounded-full" />
+                  <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                    Met & Discontinued
+                  </span>
+                  <span className="text-muted-foreground/50 text-[10px]">
+                    ({inactiveGoals.length})
+                  </span>
+                </div>
+                <span className="text-muted-foreground text-[10px]">
+                  {showInactive ? "Hide" : "Show"}
+                </span>
+              </button>
+              {showInactive && (
+                <div className="divide-border/20 divide-y opacity-60">
+                  {inactiveGoals.map((goal) => (
+                    <GoalCard
+                      key={goal.id}
+                      goal={goal}
+                      canEdit={canEdit}
+                      isExpanded={expandedGoalId === goal.id}
+                      onToggle={() => toggleGoal(goal.id)}
+                      onAddObjective={(goalId, nextNum) =>
+                        setAddObjective({ goalId, nextNumber: nextNum })
+                      }
+                      onDelete={(g) => setDeleteTarget(g)}
+                      onStatusChange={(id, status) =>
+                        executeUpdate({
+                          id,
+                          status: status as GoalStatus,
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
-        </>
+        </div>
       )}
 
       {/* Add Goal Dialog */}
