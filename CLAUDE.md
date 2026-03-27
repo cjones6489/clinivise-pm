@@ -4,32 +4,54 @@ All-in-one ABA therapy platform — clinical operations, practice management, an
 
 @AGENTS.md
 
-## Development Philosophy: Workflow-First
+## Development Philosophy
 
 **The interface IS the product.** Backend and frontend are not separate phases — they are two sides of the same user workflow, designed together.
 
 ### How we build features
 
-Every feature follows this sequence. Steps 1-2 happen BEFORE any code is written.
+Every feature follows this sequence. **No step can be skipped.** Steps 1-3 happen BEFORE any code is written.
 
-**Step 1 — User Story**: Who does what, when, and why? Write a concrete scenario.
+**Step 1 — Clinical Data Model Research (MANDATORY GATE)**
+
+Before building ANY feature that touches clinical data (goals, session notes, assessments, treatment plans, billing, scheduling), research the real-world data model:
+
+1. **Fetch real templates and standards** — Use web search to find CASP templates, TRICARE requirements, CMS-1500 field requirements, payer audit checklists, and BACB standards relevant to the feature.
+2. **Verify against competitor implementations** — Check what CentralReach, Motivity, Catalyst/Rethink, Raven Health, and AlohaABA include. What fields do ALL of them have?
+3. **Verify against assessment tools** — For clinical features, check VB-MAPP, ABLLS-R, AFLS, PEAK structures. ABA has specific data hierarchies (Domain → Goal → Objective → Target) and measurement types (discrete trial, frequency, duration, rate, latency, task analysis, interval) that must be modeled correctly.
+4. **Create a research doc** — Save findings to `docs/research/` with sources. This becomes the blueprint.
+5. **Verify the proposed schema** against the research BEFORE writing any migration. Every field should trace to a real requirement, not an assumption.
+
+**Why this gate exists:** During the goals and session notes build, assumptions about clinical data structures led to 3 rounds of gap-fixing: missing goal statuses (baseline/mastered/maintenance/generalization), missing behavior reduction fields (function/replacement/operational definition), missing Target level, wrong measurement types, missing audit-critical session note fields. Researching first would have gotten it right in one pass.
+
+**This gate applies to:** Goals, session notes, data collection, treatment plans, assessments, scheduling (auth-aware), billing/claims, progress reports, supervision tracking. It does NOT apply to purely technical features (auth setup, UI components, infrastructure).
+
+**Step 2 — User Story**: Who does what, when, and why? Write a concrete scenario.
 
 > _"A BCBA opens a client's page Monday morning to check if their authorization is running low before scheduling this week's sessions."_
 
-**Step 2 — Page Design**: What do they see? What do they click? What data appears where? Reference the wireframe (`docs/design/clinivise-wireframes.jsx`) for layout patterns. Describe:
+**Step 3 — Page Design**: What do they see? What do they click? What data appears where? Reference the wireframe (`docs/design/clinivise-wireframes.jsx`) for layout patterns. Describe:
 
 - The page layout (metric cards, section cards, tables, action buttons)
 - The information hierarchy (what's the hero moment? what's secondary? what's metadata?)
 - The user's primary and secondary actions from this page
 - All states: empty, loading, populated, error, edge cases
 
-**Step 3 — Data & Actions**: What schema, queries, and mutations power the page design from Step 2? The schema serves the UI, not the other way around.
+**Step 4 — Data & Actions**: What schema, queries, and mutations power the page design from Step 3? The schema serves the UI, not the other way around. Cross-check every field against the Step 1 research doc.
 
-**Step 4 — Build**: Implement schema + actions + UI as one integrated vertical slice. The page component is not an afterthought — it's built WITH the same care as the data layer.
+**Step 5 — Build**: Implement schema + actions + UI as one integrated vertical slice. The page component is not an afterthought — it's built WITH the same care as the data layer.
+
+**Step 6 — Audit**: Run `/audit-build` after implementation. Fix all critical and high findings before moving to the next feature.
+
+### When to use the abbreviated flow
+
+If a thorough research doc already exists for the feature (e.g., `docs/research/session-note-requirements-research.md`), skip Step 1 and use the existing doc as the blueprint. Still do Steps 2-6.
+
+For purely technical tasks (infrastructure, refactoring, bug fixes), skip Steps 1-3. Still audit after building.
 
 ### Why this order matters
 
-When you start with the schema and "slap a form on top," you get a database admin panel. When you start with the user's workflow, the schema naturally follows and the UI reflects actual usage patterns. Jeff Atwood: _"Before writing a single line of code, you need to have a clear idea of what the user interface will look like first."_
+When you start with the schema and "slap a form on top," you get a database admin panel. When you start with the user's workflow, the schema naturally follows and the UI reflects actual usage patterns. When you skip research, you make assumptions about clinical data that lead to rework.
 
 ### Design quality standard
 
