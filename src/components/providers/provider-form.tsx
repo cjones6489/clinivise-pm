@@ -54,6 +54,12 @@ export function ProviderForm({
       npi: provider?.npi ?? "",
       credentialNumber: provider?.credentialNumber ?? "",
       credentialExpiry: provider?.credentialExpiry ?? "",
+      stateLicenseNumber: provider?.stateLicenseNumber ?? "",
+      stateLicenseExpiry: provider?.stateLicenseExpiry ?? "",
+      taxonomyCode: provider?.taxonomyCode ?? "",
+      email: provider?.email ?? "",
+      phone: provider?.phone ?? "",
+      modifierCode: provider?.modifierCode ?? "",
       supervisorId: provider?.supervisorId ?? "",
       isActive: provider?.isActive ?? true,
     },
@@ -110,6 +116,18 @@ export function ProviderForm({
         </Field>
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <Label className="text-xs font-medium">Email</Label>
+          <Input {...register("email")} type="email" className="h-8 text-xs" />
+          <FieldError>{errors.email?.message}</FieldError>
+        </Field>
+        <Field>
+          <Label className="text-xs font-medium">Phone</Label>
+          <Input {...register("phone")} className="h-8 text-xs" />
+        </Field>
+      </div>
+
       <Field>
         <Label className="text-xs font-medium">Credential Type</Label>
         <Controller
@@ -157,6 +175,40 @@ export function ProviderForm({
             className="h-8 text-xs"
           />
           <FieldError>{errors.credentialExpiry?.message}</FieldError>
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <Label className="text-xs font-medium">State License #</Label>
+          <Input {...register("stateLicenseNumber")} className="h-8 text-xs" />
+        </Field>
+        <Field>
+          <Label className="text-xs font-medium">State License Expiry</Label>
+          <Input
+            {...register("stateLicenseExpiry")}
+            placeholder="YYYY-MM-DD"
+            className="h-8 text-xs"
+          />
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <Label className="text-xs font-medium">Taxonomy Code</Label>
+          <Input
+            {...register("taxonomyCode")}
+            placeholder="103K00000X"
+            className="h-8 text-xs font-mono"
+          />
+        </Field>
+        <Field>
+          <Label className="text-xs font-medium">Modifier Code</Label>
+          <Input
+            {...register("modifierCode")}
+            placeholder="HM, HN, HO, HP"
+            className="h-8 text-xs font-mono"
+          />
         </Field>
       </div>
 

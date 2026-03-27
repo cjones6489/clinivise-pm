@@ -151,7 +151,27 @@ export function ProviderDetailView({
                 }
               />
             )}
+            {provider.stateLicenseNumber && (
+              <KVRow
+                label="State License"
+                value={
+                  <span>
+                    <span className="font-mono">{provider.stateLicenseNumber}</span>
+                    {provider.stateLicenseExpiry && (
+                      <span className="text-muted-foreground ml-1 text-[11px]">
+                        exp {formatDate(provider.stateLicenseExpiry)}
+                      </span>
+                    )}
+                  </span>
+                }
+              />
+            )}
+            {provider.taxonomyCode && (
+              <KVRow label="Taxonomy" value={<span className="font-mono">{provider.taxonomyCode}</span>} />
+            )}
             {provider.modifierCode && <KVRow label="Modifier Code" value={provider.modifierCode} />}
+            {provider.email && <KVRow label="Email" value={provider.email} />}
+            {provider.phone && <KVRow label="Phone" value={provider.phone} />}
             {!provider.npi &&
               !provider.credentialNumber &&
               !provider.credentialExpiry &&

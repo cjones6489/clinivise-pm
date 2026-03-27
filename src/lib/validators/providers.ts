@@ -7,25 +7,37 @@ import {
   updatedAtSchema,
 } from "./index";
 
+const optionalText = z
+  .string()
+  .optional()
+  .or(z.literal(""))
+  .transform((v) => v || undefined);
+
 export const createProviderSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
   lastName: z.string().trim().min(1, "Last name is required"),
   credentialType: credentialTypeSchema,
   npi: npiSchema.or(z.literal("")).transform((v) => v || undefined),
-  credentialNumber: z
-    .string()
-    .optional()
-    .or(z.literal(""))
-    .transform((v) => v || undefined),
+  credentialNumber: optionalText,
   credentialExpiry: dateStringSchema
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
-  supervisorId: z
-    .string()
+  stateLicenseNumber: optionalText,
+  stateLicenseExpiry: dateStringSchema
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
+  taxonomyCode: optionalText,
+  email: z
+    .string()
+    .email()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  phone: optionalText,
+  modifierCode: optionalText,
+  supervisorId: optionalText,
   isActive: z.boolean().default(true),
 });
 
