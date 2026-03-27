@@ -34,7 +34,7 @@ export const createProviderSchema = z.object({
     .email()
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => (v ? v.toLowerCase() : undefined)),
   phone: optionalText,
   modifierCode: optionalText,
   supervisorId: optionalText,

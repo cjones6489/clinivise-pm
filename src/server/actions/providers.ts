@@ -37,7 +37,9 @@ export const createProvider = authActionClient
       }
     }
 
-    const modifierCode = CREDENTIAL_MODIFIERS[parsedInput.credentialType] ?? null;
+    // Auto-set modifierCode from credential type only if user didn't provide one
+    const modifierCode =
+      parsedInput.modifierCode ?? CREDENTIAL_MODIFIERS[parsedInput.credentialType] ?? null;
 
     const [provider] = await db
       .insert(providers)
@@ -102,10 +104,11 @@ export const updateProvider = authActionClient
       }
     }
 
-    // Auto-update modifierCode if credentialType changed
-    const modifierUpdate = updates.credentialType
-      ? { modifierCode: CREDENTIAL_MODIFIERS[updates.credentialType] ?? null }
-      : {};
+    // Auto-update modifierCode if credentialType changed and user didn't manually set one
+    const modifierUpdate =
+      updates.credentialType && !updates.modifierCode
+        ? { modifierCode: CREDENTIAL_MODIFIERS[updates.credentialType] ?? null }
+        : {};
 
     const [provider] = await db
       .update(providers)
