@@ -799,14 +799,14 @@ draft → signed (author signs, note locks)
 
 | #    | Task                                                                                                             | Files                                                | Status |
 | ---- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------ |
-| SA-1 | Client form: add primaryLanguage, interpreterNeeded, secondaryDiagnosisCodes, referringProvider, medicaidId      | `client-form.tsx`, `client-overview.tsx`             | `[ ]`  |
-| SA-2 | Provider form: add email, phone, stateLicenseNumber/Expiry, taxonomyCode (+ fix missing modifierCode)            | `provider-form.tsx`, `provider-detail.tsx`           | `[ ]`  |
-| SA-3 | Authorization form: add authType, requestingProviderId, denialReason, appealDeadline                             | `authorization-form.tsx`, `authorization-detail.tsx` | `[ ]`  |
-| SA-4 | Session form: add cancellationReason, cancelledBy (when cancelling), serviceAddress (when POS is home/community) | `session-form.tsx`, `session-detail.tsx`             | `[ ]`  |
-| SA-5 | Payer form: add electronicPayerId, portalUrl, authDepartmentEmail                                                | `payer-form.tsx`                                     | `[ ]`  |
-| SA-6 | Org settings: add billing entity section (billingName, billingNpi, billingTaxId, billingAddress)                 | `practice-info-form.tsx`                             | `[ ]`  |
-| SA-7 | Goal editing UI: add behavior reduction fields, target CRUD, expanded status lifecycle                           | `client-goals.tsx`                                   | `[ ]`  |
-| SA-8 | Update validators for new client/provider/auth fields in forms                                                   | `validators/*.ts`                                    | `[ ]`  |
+| SA-1 | Client form: primaryLanguage, interpreterNeeded, secondaryDiagnosisCodes, referringProvider, medicaidId           | `client-form.tsx`, `client-overview.tsx`             | `[x]`  |
+| SA-2 | Provider form: email, phone, stateLicenseNumber/Expiry, taxonomyCode, modifierCode                               | `provider-form.tsx`, `provider-detail.tsx`           | `[x]`  |
+| SA-3 | Authorization form: authType, requestingProviderId, denialReason, appealDeadline                                  | `authorization-form.tsx`, `authorization-detail.tsx` | `[x]`  |
+| SA-4 | Session form: cancellationReason, cancelledBy, serviceAddress                                                     | `session-form.tsx`, `session-detail.tsx`             | `[x]`  |
+| SA-5 | Payer form: electronicPayerId, portalUrl, authDepartmentEmail                                                     | `payer-form.tsx`                                     | `[x]`  |
+| SA-6 | Org settings: billing entity section (billingName, billingNpi, billingTaxId, billingAddress)                      | `practice-info-form.tsx`                             | `[x]`  |
+| SA-7 | Goal UI: behavior reduction fields, assessment source, expanded status lifecycle                                  | `client-goals.tsx`                                   | `[x]`  |
+| SA-8 | Validators updated inline with each SA task                                                                       | `validators/*.ts`                                    | `[x]`  |
 
 ---
 
@@ -954,4 +954,4 @@ Verified against CentralReach, AlohaABA, Motivity, Theralytics, Raven Health, Ca
 
 ---
 
-_Last updated: 2026-03-26 — Phase 1 PM complete. CD-1 goals (schema + UI) done. CD-2 session notes (schema + validators) done. Cross-table schema audit complete (28 fields added across 6 tables). Schema reference doc created. UI updates for new fields tracked as SA-1 through SA-8. Competitive gap analysis in roadmap. Process note: always research clinical data models BEFORE building._
+_Last updated: 2026-03-27 — Phase 1 PM complete. CD-1 goals done. CD-2 session notes schema done (queries/actions/UI next). SA-1–8 UI sync complete (28 new fields across 6 tables now in all forms + detail views). Each SA audited. QA audit fixed (status transitions, org scope, validation). Competitive gap analysis in roadmap. Target CRUD deferred (needs new server actions)._
