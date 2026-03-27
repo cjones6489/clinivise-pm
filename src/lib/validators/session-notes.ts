@@ -1,6 +1,5 @@
 import { z } from "zod/v4";
 import {
-  NOTE_TYPES,
   GOAL_PROGRESS_STATUSES,
   MEASUREMENT_TYPES,
   PROMPT_LEVELS,
@@ -54,25 +53,7 @@ const assessmentFields = {
   recommendations: optionalText,
 };
 
-// ── Session Note CRUD ────────────────────────────────────────────────────────
-
-export const createSessionNoteSchema = z.object({
-  sessionId: z.string().min(1),
-  noteType: z.enum(NOTE_TYPES),
-  ...universalNoteFields,
-  ...modificationFields,
-  ...caregiverFields,
-  ...assessmentFields,
-});
-
-export const updateSessionNoteSchema = z.object({
-  id: z.string().min(1),
-  updatedAt: z.string().min(1), // Optimistic locking
-  ...universalNoteFields,
-  ...modificationFields,
-  ...caregiverFields,
-  ...assessmentFields,
-});
+// ── Session Note Signature & Delete ──────────────────────────────────────────
 
 export const signSessionNoteSchema = z.object({
   id: z.string().min(1),
@@ -168,74 +149,6 @@ export const saveSessionNoteSchema = z.object({
       }),
     )
     .default([]),
-});
-
-// ── Individual goal/behavior schemas (kept for standalone operations) ─────────
-
-export const createNoteGoalSchema = z.object({
-  sessionNoteId: z.string().min(1),
-  ...goalDataFields,
-});
-
-export const updateNoteGoalSchema = z.object({
-  id: z.string().min(1),
-  goalName: z.string().trim().min(1).max(500).optional(),
-  procedure: optionalText,
-  measurementType: z.enum(MEASUREMENT_TYPES).optional(),
-
-  trialsCompleted: z.coerce.number().int().min(0).optional(),
-  trialsCorrect: z.coerce.number().int().min(0).optional(),
-  percentageCorrect: z.coerce.number().min(0).max(100).optional(),
-  frequencyCount: z.coerce.number().int().min(0).optional(),
-  durationSeconds: z.coerce.number().int().min(0).optional(),
-  ratePerMinute: z.coerce.number().min(0).optional(),
-  latencySeconds: z.coerce.number().int().min(0).optional(),
-  stepsCompleted: z.coerce.number().int().min(0).optional(),
-  stepsTotal: z.coerce.number().int().min(1).optional(),
-  probeCorrect: z.coerce.number().int().min(0).optional(),
-  probeTotal: z.coerce.number().int().min(0).optional(),
-  ratingScaleValue: z.coerce.number().int().min(0).optional(),
-  ratingScaleMax: z.coerce.number().int().min(1).optional(),
-  intervalsScored: z.coerce.number().int().min(0).optional(),
-  intervalsTotal: z.coerce.number().int().min(0).optional(),
-
-  promptLevel: z
-    .enum(PROMPT_LEVELS)
-    .optional()
-    .or(z.literal(""))
-    .transform((v) => v || undefined),
-  reinforcement: optionalText,
-  progressStatus: z.enum(GOAL_PROGRESS_STATUSES).optional(),
-  notes: optionalText,
-});
-
-export const deleteNoteGoalSchema = z.object({
-  id: z.string().min(1),
-});
-
-export const createNoteBehaviorSchema = z.object({
-  sessionNoteId: z.string().min(1),
-  ...behaviorDataFields,
-});
-
-export const updateNoteBehaviorSchema = z.object({
-  id: z.string().min(1),
-  behaviorName: z.string().trim().min(1).max(200).optional(),
-  occurrenceTime: optionalText,
-  antecedent: optionalText,
-  behaviorDescription: optionalText,
-  consequence: optionalText,
-  durationSeconds: z.coerce.number().int().min(0).optional(),
-  intensity: z
-    .enum(BEHAVIOR_INTENSITIES)
-    .optional()
-    .or(z.literal(""))
-    .transform((v) => v || undefined),
-  notes: optionalText,
-});
-
-export const deleteNoteBehaviorSchema = z.object({
-  id: z.string().min(1),
 });
 
 // ── Sign-readiness validation (CPT-specific minimum fields for audit) ────────

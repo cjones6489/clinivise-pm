@@ -16,7 +16,7 @@ import {
   sessions,
   providers,
 } from "@/server/db/schema";
-import { eq, and, sql, inArray } from "drizzle-orm";
+import { eq, and, sql, inArray, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
@@ -25,7 +25,7 @@ import { CPT_TO_NOTE_TYPE, SUPERVISOR_CREDENTIAL_TYPES, type NoteType } from "@/
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Look up the provider record linked to the current user (via users.id → providers.userId) */
+/** Look up the active provider record linked to the current user (via users.id → providers.userId) */
 async function getProviderForUser(orgId: string, userId: string) {
   const [provider] = await db
     .select({ id: providers.id, credentialType: providers.credentialType })
@@ -34,6 +34,8 @@ async function getProviderForUser(orgId: string, userId: string) {
       and(
         eq(providers.organizationId, orgId),
         eq(providers.userId, userId),
+        eq(providers.isActive, true),
+        isNull(providers.deletedAt),
       ),
     )
     .limit(1);
@@ -55,8 +57,14 @@ async function loadSessionForNote(orgId: string, sessionId: string) {
     .limit(1);
 
   if (!session) throw new NotFoundError("Session");
-  if (session.status === "cancelled") {
-    throw new ConflictError("Cannot create or edit notes for cancelled sessions");
+
+  const blockedStatuses = ["cancelled", "no_show", "scheduled"];
+  if (blockedStatuses.includes(session.status)) {
+    throw new ConflictError(
+      session.status === "scheduled"
+        ? "Cannot create notes for sessions that haven't occurred yet"
+        : `Cannot create or edit notes for ${session.status.replace("_", " ")} sessions`,
+    );
   }
 
   return session;
@@ -95,23 +103,6 @@ export const saveSessionNote = authActionClient
       throw new ConflictError(`No note template for CPT code ${session.cptCode}`);
     }
 
-    // Check if note already exists for this session
-    const [existing] = await db
-      .select({ id: sessionNotes.id, status: sessionNotes.status })
-      .from(sessionNotes)
-      .where(
-        and(
-          eq(sessionNotes.organizationId, ctx.organizationId),
-          eq(sessionNotes.sessionId, parsedInput.sessionId),
-        ),
-      )
-      .limit(1);
-
-    // Cannot edit signed/cosigned notes
-    if (existing && existing.status !== "draft") {
-      throw new ConflictError("Cannot edit a note that has already been signed");
-    }
-
     const {
       sessionId,
       goals: goalInputs,
@@ -120,6 +111,24 @@ export const saveSessionNote = authActionClient
     } = parsedInput;
 
     const result = await db.transaction(async (tx) => {
+      // Lock existing note row (if any) inside transaction to prevent TOCTOU race
+      const [existing] = await tx
+        .select({ id: sessionNotes.id, status: sessionNotes.status })
+        .from(sessionNotes)
+        .where(
+          and(
+            eq(sessionNotes.organizationId, ctx.organizationId),
+            eq(sessionNotes.sessionId, sessionId),
+          ),
+        )
+        .for("update")
+        .limit(1);
+
+      // Cannot edit signed/cosigned notes
+      if (existing && existing.status !== "draft") {
+        throw new ConflictError("Cannot edit a note that has already been signed");
+      }
+
       let noteId: string;
 
       if (existing) {
@@ -188,13 +197,14 @@ export const saveSessionNote = authActionClient
       for (let i = 0; i < goalInputs.length; i++) {
         const { id: goalRowId, ...goalData } = goalInputs[i];
         if (goalRowId && inputGoalIds.has(goalRowId)) {
-          // Update existing goal
+          // Update existing goal — verify it belongs to this note
           await tx
             .update(sessionNoteGoals)
             .set({ ...goalData, sortOrder: i })
             .where(
               and(
                 eq(sessionNoteGoals.id, goalRowId),
+                eq(sessionNoteGoals.sessionNoteId, noteId),
                 eq(sessionNoteGoals.organizationId, ctx.organizationId),
               ),
             );
@@ -240,12 +250,14 @@ export const saveSessionNote = authActionClient
       for (let i = 0; i < behaviorInputs.length; i++) {
         const { id: behaviorRowId, ...behaviorData } = behaviorInputs[i];
         if (behaviorRowId && inputBehaviorIds.has(behaviorRowId)) {
+          // Update existing behavior — verify it belongs to this note
           await tx
             .update(sessionNoteBehaviors)
             .set({ ...behaviorData, sortOrder: i })
             .where(
               and(
                 eq(sessionNoteBehaviors.id, behaviorRowId),
+                eq(sessionNoteBehaviors.sessionNoteId, noteId),
                 eq(sessionNoteBehaviors.organizationId, ctx.organizationId),
               ),
             );
@@ -259,20 +271,20 @@ export const saveSessionNote = authActionClient
         }
       }
 
-      return noteId;
+      return { noteId, isUpdate: !!existing };
     });
 
     await logAudit({
       organizationId: ctx.organizationId,
       userId: ctx.userId,
-      action: existing ? "update" : "create",
+      action: result.isUpdate ? "update" : "create",
       entityType: "session_note",
-      entityId: result,
+      entityId: result.noteId,
       metadata: { sessionId, noteType, goalCount: goalInputs.length, behaviorCount: behaviorInputs.length },
     });
 
     revalidateNotePaths(sessionId, session.clientId);
-    return { success: true as const, data: { noteId: result } };
+    return { success: true as const, data: { noteId: result.noteId } };
   });
 
 // ── Sign Session Note ────────────────────────────────────────────────────────
@@ -336,7 +348,7 @@ export const signSessionNote = authActionClient
       throw new ConflictError("You must have a provider profile to sign notes");
     }
 
-    await db
+    const [signed] = await db
       .update(sessionNotes)
       .set({
         status: "signed",
@@ -349,7 +361,12 @@ export const signSessionNote = authActionClient
           eq(sessionNotes.organizationId, ctx.organizationId),
           eq(sessionNotes.status, "draft"), // Prevent double-sign race
         ),
-      );
+      )
+      .returning({ id: sessionNotes.id });
+
+    if (!signed) {
+      throw new StaleDataError();
+    }
 
     await logAudit({
       organizationId: ctx.organizationId,
@@ -405,7 +422,7 @@ export const cosignSessionNote = authActionClient
       throw new ConflictError("Cannot co-sign a note you already signed");
     }
 
-    await db
+    const [cosigned] = await db
       .update(sessionNotes)
       .set({
         status: "cosigned",
@@ -418,7 +435,12 @@ export const cosignSessionNote = authActionClient
           eq(sessionNotes.organizationId, ctx.organizationId),
           eq(sessionNotes.status, "signed"), // Prevent race
         ),
-      );
+      )
+      .returning({ id: sessionNotes.id });
+
+    if (!cosigned) {
+      throw new StaleDataError();
+    }
 
     await logAudit({
       organizationId: ctx.organizationId,
