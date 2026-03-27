@@ -144,57 +144,11 @@ function TeamMemberRow({
   );
 }
 
-// ── Modal Team Row (visible star + remove buttons) ───────────────────────────
+// ── Add Team Member Dialog ────────────────────────────────────────────────────
+// Single purpose: search and add providers. Managing (primary, remove) happens
+// on the main tab — not in this dialog.
 
-function ModalTeamRow({
-  member,
-  onSetPrimary,
-  onRemove,
-}: {
-  member: CareTeamMember;
-  onSetPrimary: () => void;
-  onRemove: () => void;
-}) {
-  const avatarColor = CREDENTIAL_AVATAR[member.credentialType] ?? CREDENTIAL_AVATAR.other;
-  return (
-    <div className="border-border/20 flex items-center gap-2.5 border-b px-4 py-2 last:border-b-0">
-      <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${avatarColor}`}>
-        {getInitials(member.providerFirstName, member.providerLastName)}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="text-xs font-medium">
-          {member.providerFirstName} {member.providerLastName}
-        </div>
-        <div className="text-muted-foreground text-[10px]">
-          {CARE_TEAM_ROLE_LABELS[member.role as CareTeamRole] ?? member.role}
-        </div>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className={`h-6 w-6 ${member.isPrimary ? "cursor-default text-amber-500" : "text-muted-foreground/40 hover:text-amber-500"}`}
-        onClick={member.isPrimary ? undefined : onSetPrimary}
-        disabled={member.isPrimary}
-        title={member.isPrimary ? "Primary provider" : "Set as primary"}
-      >
-        <HugeiconsIcon icon={StarIcon} size={14} strokeWidth={member.isPrimary ? 2 : 1.5} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="text-muted-foreground/40 hover:text-destructive h-6 w-6"
-        onClick={onRemove}
-        title="Remove from team"
-      >
-        <HugeiconsIcon icon={Delete01Icon} size={14} />
-      </Button>
-    </div>
-  );
-}
-
-// ── Manage Team Modal ────────────────────────────────────────────────────────
-
-function ManageTeamModal({
+function AddTeamMemberDialog({
   open,
   onOpenChange,
   clientId,
@@ -213,30 +167,27 @@ function ManageTeamModal({
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to add provider"),
   });
 
-  const { execute: executeRemoveAction } = useAction(removeFromTeam, {
-    onError: ({ error }) => toast.error(error.serverError ?? "Failed to remove provider"),
-  });
-
-  const { execute: executeUpdate } = useAction(updateTeamMember, {
-    onError: ({ error }) => toast.error(error.serverError ?? "Failed to update"),
-  });
-
-  // Filter available providers by search
+  // Filter by search
   const filtered = search
     ? availableProviders.filter(
         (p) =>
           `${p.firstName} ${p.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
-          p.credentialType.toLowerCase().includes(search.toLowerCase()),
+          (CREDENTIAL_LABELS[p.credentialType as CredentialType] ?? p.credentialType)
+            .toLowerCase()
+            .includes(search.toLowerCase()),
       )
     : availableProviders;
 
-  // Group available by credential
-  const bcbas = filtered.filter((p) => ["bcba", "bcba_d", "bcaba"].includes(p.credentialType));
-  const rbts = filtered.filter((p) => !["bcba", "bcba_d", "bcaba"].includes(p.credentialType));
+  // Group by credential tier
+  const supervisors = filtered.filter((p) =>
+    ["bcba", "bcba_d", "bcaba"].includes(p.credentialType),
+  );
+  const technicians = filtered.filter(
+    (p) => !["bcba", "bcba_d", "bcaba"].includes(p.credentialType),
+  );
 
-  // Group current team
-  const teamBcbas = careTeam.filter((m) => ["bcba", "bcba_d", "bcaba"].includes(m.credentialType));
-  const teamRbts = careTeam.filter((m) => !["bcba", "bcba_d", "bcaba"].includes(m.credentialType));
+  // Already on team set for quick lookup
+  const onTeamIds = new Set(careTeam.map((m) => m.providerId));
 
   function handleAdd(provider: AvailableProvider) {
     executeAdd({
@@ -247,176 +198,137 @@ function ManageTeamModal({
     });
   }
 
+  function ProviderRow({ provider }: { provider: AvailableProvider }) {
+    const avatarColor =
+      CREDENTIAL_AVATAR[provider.credentialType] ?? CREDENTIAL_AVATAR.other;
+    const alreadyAdded = onTeamIds.has(provider.id);
+
+    return (
+      <button
+        type="button"
+        disabled={isAdding || alreadyAdded}
+        onClick={() => handleAdd(provider)}
+        className="hover:bg-accent/40 flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent"
+      >
+        <div
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${avatarColor}`}
+        >
+          {getInitials(provider.firstName, provider.lastName)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium">
+            {provider.firstName} {provider.lastName}
+          </div>
+          <div className="text-muted-foreground text-xs">
+            {CREDENTIAL_LABELS[provider.credentialType as CredentialType] ??
+              provider.credentialType.toUpperCase()}
+          </div>
+        </div>
+        {alreadyAdded ? (
+          <span className="text-muted-foreground shrink-0 text-xs">On team</span>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0 text-xs"
+            disabled={isAdding}
+            tabIndex={-1}
+          >
+            <HugeiconsIcon icon={Add01Icon} size={12} className="mr-1" />
+            Add
+          </Button>
+        )}
+      </button>
+    );
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-lg">
-        <DialogHeader className="px-5 pt-5 pb-3">
-          <DialogTitle className="text-sm font-semibold">Manage Care Team</DialogTitle>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setSearch(""); }}>
+      <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
+        <DialogHeader className="space-y-1 px-5 pt-5 pb-0">
+          <DialogTitle className="text-base font-semibold">Add Team Member</DialogTitle>
           <DialogDescription className="text-muted-foreground text-xs">
-            Search and add providers. Use the menu on each member to set primary or remove.
+            Select a provider to add to this client&apos;s care team.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Search + Add section */}
-        <div className="border-border/40 border-t">
-          <div className="px-4 py-3">
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Search01Icon}
-                size={14}
-                strokeWidth={1.5}
-                className="text-muted-foreground absolute top-1/2 left-2.5 -translate-y-1/2"
-              />
-              <Input
-                placeholder="Search providers to add..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-8 pl-8 text-xs"
-                autoFocus
-              />
-            </div>
-          </div>
-
-          {/* Available providers list */}
-          <div className="border-border/30 max-h-48 overflow-y-auto border-t">
-            {availableProviders.length > 0 ? (
-              <>
-                {bcbas.length > 0 && (
-                  <>
-                    <div className="bg-muted/50 sticky top-0 z-10 px-4 py-1.5">
-                      <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                        BCBAs & Supervisors
-                      </span>
-                    </div>
-                    {bcbas.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        disabled={isAdding}
-                        onClick={() => handleAdd(p)}
-                        className="hover:bg-accent/50 flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors disabled:opacity-50"
-                      >
-                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${CREDENTIAL_AVATAR[p.credentialType] ?? CREDENTIAL_AVATAR.other}`}>
-                          {getInitials(p.firstName, p.lastName)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="font-medium">
-                            {p.firstName} {p.lastName}
-                          </span>
-                        </div>
-                        <Badge variant="outline" className="shrink-0 text-[9px]">
-                          {CREDENTIAL_LABELS[p.credentialType as CredentialType] ??
-                            p.credentialType.toUpperCase()}
-                        </Badge>
-                        <span className="text-primary shrink-0 text-[11px] font-medium">+ Add</span>
-                      </button>
-                    ))}
-                  </>
-                )}
-                {rbts.length > 0 && (
-                  <>
-                    <div className="bg-muted/50 sticky top-0 z-10 px-4 py-1.5">
-                      <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                        RBTs & Technicians
-                      </span>
-                    </div>
-                    {rbts.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        disabled={isAdding}
-                        onClick={() => handleAdd(p)}
-                        className="hover:bg-accent/50 flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors disabled:opacity-50"
-                      >
-                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${CREDENTIAL_AVATAR[p.credentialType] ?? CREDENTIAL_AVATAR.other}`}>
-                          {getInitials(p.firstName, p.lastName)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="font-medium">
-                            {p.firstName} {p.lastName}
-                          </span>
-                        </div>
-                        <Badge variant="outline" className="shrink-0 text-[9px]">
-                          {CREDENTIAL_LABELS[p.credentialType as CredentialType] ??
-                            p.credentialType.toUpperCase()}
-                        </Badge>
-                        <span className="text-primary shrink-0 text-[11px] font-medium">+ Add</span>
-                      </button>
-                    ))}
-                  </>
-                )}
-                {filtered.length === 0 && (
-                  <div className="text-muted-foreground px-4 py-4 text-center text-xs">
-                    No providers match your search.
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="text-muted-foreground px-4 py-4 text-center text-xs">
-                All providers are already on this team.
-              </div>
-            )}
+        {/* Search */}
+        <div className="px-5 pt-3 pb-2">
+          <div className="relative">
+            <HugeiconsIcon
+              icon={Search01Icon}
+              size={15}
+              strokeWidth={1.5}
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+            />
+            <Input
+              placeholder="Search by name or credential..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 rounded-lg pl-9 text-sm"
+              autoFocus
+            />
           </div>
         </div>
 
-        {/* Current team */}
-        <div className="border-border/40 flex-1 overflow-y-auto border-t">
-          <div className="px-4 py-2.5">
-            <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-              Current Team
-              {careTeam.length > 0 && (
-                <span className="ml-1.5 font-normal tracking-normal normal-case">
-                  ({careTeam.length})
-                </span>
-              )}
-            </span>
-          </div>
-
-          {careTeam.length > 0 ? (
+        {/* Provider list */}
+        <div className="flex-1 overflow-y-auto">
+          {filtered.length > 0 ? (
             <>
-              {teamBcbas.length > 0 && (
+              {supervisors.length > 0 && (
                 <div>
-                  <div className="bg-muted/30 border-border/20 border-y px-4 py-1">
-                    <span className="text-muted-foreground text-[10px] font-medium">
+                  <div className="sticky top-0 z-10 flex items-center gap-2 bg-background px-4 py-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-violet-500" />
+                    <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                       BCBAs & Supervisors
                     </span>
                   </div>
-                  {teamBcbas.map((m) => (
-                    <ModalTeamRow
-                      key={m.id}
-                      member={m}
-                      onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
-                      onRemove={() => executeRemoveAction({ id: m.id })}
-                    />
+                  {supervisors.map((p) => (
+                    <ProviderRow key={p.id} provider={p} />
                   ))}
                 </div>
               )}
-              {teamRbts.length > 0 && (
+              {technicians.length > 0 && (
                 <div>
-                  <div className="bg-muted/30 border-border/20 border-y px-4 py-1">
-                    <span className="text-muted-foreground text-[10px] font-medium">
+                  <div className="sticky top-0 z-10 flex items-center gap-2 bg-background px-4 py-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                       RBTs & Technicians
                     </span>
                   </div>
-                  {teamRbts.map((m) => (
-                    <ModalTeamRow
-                      key={m.id}
-                      member={m}
-                      onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
-                      onRemove={() => executeRemoveAction({ id: m.id })}
-                    />
+                  {technicians.map((p) => (
+                    <ProviderRow key={p.id} provider={p} />
                   ))}
                 </div>
               )}
             </>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <HugeiconsIcon icon={UserIcon} size={20} className="text-muted-foreground mb-2" />
-              <p className="text-muted-foreground text-xs">
-                No team members yet. Add providers above.
+          ) : availableProviders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="bg-muted mb-3 flex h-10 w-10 items-center justify-center rounded-full">
+                <HugeiconsIcon icon={UserIcon} size={20} className="text-muted-foreground" />
+              </div>
+              <p className="text-sm font-medium">All providers assigned</p>
+              <p className="text-muted-foreground mt-1 text-xs">
+                Every active provider is already on this care team.
               </p>
             </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <p className="text-muted-foreground text-sm">No providers match &ldquo;{search}&rdquo;</p>
+            </div>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="border-border/40 border-t px-5 py-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full text-xs"
+            onClick={() => onOpenChange(false)}
+          >
+            Done
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -474,7 +386,7 @@ export function ClientCareTeam({
             onClick={() => setModalOpen(true)}
           >
             <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
-            Manage Team
+            Add Member
           </Button>
         )}
       </div>
@@ -606,7 +518,7 @@ export function ClientCareTeam({
 
       {/* Manage Team Modal */}
       {canEdit && (
-        <ManageTeamModal
+        <AddTeamMemberDialog
           open={modalOpen}
           onOpenChange={setModalOpen}
           clientId={clientId}
