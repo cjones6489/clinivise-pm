@@ -11,7 +11,6 @@ import { CONTACT_RELATIONSHIP_LABELS, type ContactRelationshipType } from "@/lib
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -57,18 +56,18 @@ export function ClientContactsCard({
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Contacts</CardTitle>
+      <div className="fade-in border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+        <div className="border-border/60 bg-muted/20 flex items-center justify-between border-b px-4 py-2.5">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+            Contacts
+          </span>
           {canEdit && (
-            <CardAction>
-              <Button size="sm" className="text-xs" onClick={openAddDialog}>
-                Add Contact
-              </Button>
-            </CardAction>
+            <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={openAddDialog}>
+              Add Contact
+            </Button>
           )}
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="p-4">
           {contacts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <div className="bg-muted mb-3 rounded-lg p-3">
@@ -149,8 +148,8 @@ export function ClientContactsCard({
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-lg">
