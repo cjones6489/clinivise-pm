@@ -41,6 +41,9 @@ export type SessionListItem = {
   actualMinutes: number | null;
   placeOfService: string;
   status: string;
+  cancellationReason: string | null;
+  cancelledBy: string | null;
+  serviceAddress: string | null;
   notes: string | null;
   createdAt: Date;
 };
@@ -126,6 +129,9 @@ const SESSION_LIST_COLUMNS = {
   actualMinutes: sessions.actualMinutes,
   placeOfService: sessions.placeOfService,
   status: sessions.status,
+  cancellationReason: sessions.cancellationReason,
+  cancelledBy: sessions.cancelledBy,
+  serviceAddress: sessions.serviceAddress,
   notes: sessions.notes,
   createdAt: sessions.createdAt,
 } as const;
@@ -264,6 +270,9 @@ export async function getSessionById(orgId: string, id: string): Promise<Session
       unitCalcMethod: sessions.unitCalcMethod,
       placeOfService: sessions.placeOfService,
       status: sessions.status,
+      cancellationReason: sessions.cancellationReason,
+      cancelledBy: sessions.cancelledBy,
+      serviceAddress: sessions.serviceAddress,
       notes: sessions.notes,
       createdAt: sessions.createdAt,
       updatedAt: sessions.updatedAt,
@@ -313,6 +322,9 @@ export async function getClientSessions(
       actualMinutes: sessions.actualMinutes,
       placeOfService: sessions.placeOfService,
       status: sessions.status,
+      cancellationReason: sessions.cancellationReason,
+      cancelledBy: sessions.cancelledBy,
+      serviceAddress: sessions.serviceAddress,
       notes: sessions.notes,
       createdAt: sessions.createdAt,
     })
@@ -354,6 +366,9 @@ export async function getAuthorizationSessions(
       actualMinutes: sessions.actualMinutes,
       placeOfService: sessions.placeOfService,
       status: sessions.status,
+      cancellationReason: sessions.cancellationReason,
+      cancelledBy: sessions.cancelledBy,
+      serviceAddress: sessions.serviceAddress,
       notes: sessions.notes,
       createdAt: sessions.createdAt,
     })

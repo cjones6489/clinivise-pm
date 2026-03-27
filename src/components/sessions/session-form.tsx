@@ -29,6 +29,10 @@ import {
   QHP_ONLY_CPT_CODES,
   ADDITIONAL_MODIFIER_OPTIONS,
   MAX_MODIFIERS_PER_LINE,
+  CANCELLATION_REASONS,
+  CANCELLATION_REASON_LABELS,
+  CANCELLED_BY_OPTIONS,
+  CANCELLED_BY_LABELS,
   type CredentialType,
   type PlaceOfServiceCode,
 } from "@/lib/constants";
@@ -135,6 +139,9 @@ export function SessionForm({
         prefilledPlaceOfService ??
         "12") as CreateSessionInput["placeOfService"],
       status: (session?.status ?? "completed") as CreateSessionInput["status"],
+      cancellationReason: session?.cancellationReason ?? "",
+      cancelledBy: session?.cancelledBy ?? "",
+      serviceAddress: session?.serviceAddress ?? "",
       modifierCodes: initialUserModifiers,
       notes: session?.notes ?? "",
       idempotencyKey: "",
@@ -871,6 +878,75 @@ export function SessionForm({
             )}
           </div>
         </div>
+      )}
+
+      {/* Cancellation details — shown when status is cancelled or no_show */}
+      {(watchedStatus === "cancelled" || watchedStatus === "no_show") && (
+        <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+          <div className="border-border/60 bg-muted/20 border-b px-4 py-2.5">
+            <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+              Cancellation Details
+            </span>
+          </div>
+          <div className="space-y-3 p-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <Label className="text-xs font-medium">Reason</Label>
+                <Controller
+                  name="cancellationReason"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || NONE_VALUE}
+                      onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                    >
+                      <SelectTrigger className="h-8 w-full text-xs"><SelectValue placeholder="Select reason" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                        {CANCELLATION_REASONS.map((r) => (
+                          <SelectItem key={r} value={r} className="text-xs">{CANCELLATION_REASON_LABELS[r]}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </Field>
+              <Field>
+                <Label className="text-xs font-medium">Cancelled By</Label>
+                <Controller
+                  name="cancelledBy"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || NONE_VALUE}
+                      onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                    >
+                      <SelectTrigger className="h-8 w-full text-xs"><SelectValue placeholder="Select" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                        {CANCELLED_BY_OPTIONS.map((o) => (
+                          <SelectItem key={o} value={o} className="text-xs">{CANCELLED_BY_LABELS[o]}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </Field>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Service address — shown for home (12) and community (99) POS */}
+      {(watchedPlaceOfService === "12" || watchedPlaceOfService === "99") && (
+        <Field>
+          <Label className="text-xs font-medium">Service Address</Label>
+          <Input
+            {...register("serviceAddress")}
+            placeholder="Address where session was delivered"
+            className="h-8 text-xs"
+          />
+        </Field>
       )}
 
       {/* Section 4: Notes */}

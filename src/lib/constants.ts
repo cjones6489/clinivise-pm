@@ -627,6 +627,42 @@ export const SESSION_STATUS_VARIANT: Record<
   flagged: "destructive",
 };
 
+// ── Session Cancellation Reasons ─────────────────────────────────────────────
+
+export const CANCELLATION_REASONS = [
+  "client_illness",
+  "provider_illness",
+  "family_emergency",
+  "weather",
+  "transportation",
+  "schedule_conflict",
+  "late_cancel",
+  "no_reason_given",
+  "other",
+] as const;
+export type CancellationReason = (typeof CANCELLATION_REASONS)[number];
+
+export const CANCELLATION_REASON_LABELS: Record<CancellationReason, string> = {
+  client_illness: "Client Illness",
+  provider_illness: "Provider Illness",
+  family_emergency: "Family Emergency",
+  weather: "Weather",
+  transportation: "Transportation",
+  schedule_conflict: "Schedule Conflict",
+  late_cancel: "Late Cancellation",
+  no_reason_given: "No Reason Given",
+  other: "Other",
+};
+
+export const CANCELLED_BY_OPTIONS = ["client", "provider", "practice"] as const;
+export type CancelledBy = (typeof CANCELLED_BY_OPTIONS)[number];
+
+export const CANCELLED_BY_LABELS: Record<CancelledBy, string> = {
+  client: "Client/Family",
+  provider: "Provider",
+  practice: "Practice",
+};
+
 // ── Valid Session Status Transitions ────────────────────────────────────────
 
 export const VALID_SESSION_TRANSITIONS: Record<SessionStatus, readonly SessionStatus[]> = {

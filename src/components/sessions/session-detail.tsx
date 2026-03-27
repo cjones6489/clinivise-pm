@@ -9,9 +9,13 @@ import {
   CREDENTIAL_LABELS,
   PLACE_OF_SERVICE_LABELS,
   ABA_CPT_CODES,
+  CANCELLATION_REASON_LABELS,
+  CANCELLED_BY_LABELS,
   type CredentialType,
   type CptCode,
   type PlaceOfServiceCode,
+  type CancellationReason,
+  type CancelledBy,
 } from "@/lib/constants";
 
 function KV({ label, children }: { label: string; children: React.ReactNode }) {
@@ -64,6 +68,19 @@ export function SessionDetailView({ session }: { session: SessionDetailType }) {
             )}
             {session.unitCalcMethod && (
               <KV label="Calc Method">{session.unitCalcMethod === "cms" ? "CMS" : "AMA"}</KV>
+            )}
+            {session.serviceAddress && (
+              <KV label="Service Address">{session.serviceAddress}</KV>
+            )}
+            {session.cancellationReason && (
+              <KV label="Cancellation Reason">
+                {CANCELLATION_REASON_LABELS[session.cancellationReason as CancellationReason] ?? session.cancellationReason}
+              </KV>
+            )}
+            {session.cancelledBy && (
+              <KV label="Cancelled By">
+                {CANCELLED_BY_LABELS[session.cancelledBy as CancelledBy] ?? session.cancelledBy}
+              </KV>
             )}
           </dl>
         </CardContent>

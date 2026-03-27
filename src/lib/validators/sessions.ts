@@ -58,6 +58,22 @@ const sessionFieldsSchema = z.object({
   units: z.coerce.number().int().min(0, "Units must be 0 or more"),
   placeOfService: placeOfServiceSchema.default("12"),
   status: sessionStatusSchema.default("completed"),
+  cancellationReason: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  cancelledBy: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  serviceAddress: z
+    .string()
+    .max(500)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   notes: z
     .string()
     .max(5000, "Notes must be 5,000 characters or fewer")
