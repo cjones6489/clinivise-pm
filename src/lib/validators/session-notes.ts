@@ -129,6 +129,18 @@ export const createNoteGoalSchema = z.object({
   stepsCompleted: z.coerce.number().int().min(0).optional(),
   stepsTotal: z.coerce.number().int().min(1).optional(),
 
+  // Probe
+  probeCorrect: z.coerce.number().int().min(0).optional(),
+  probeTotal: z.coerce.number().int().min(0).optional(),
+
+  // Rating scale
+  ratingScaleValue: z.coerce.number().int().min(0).optional(),
+  ratingScaleMax: z.coerce.number().int().min(1).optional(),
+
+  // Interval recording
+  intervalsScored: z.coerce.number().int().min(0).optional(),
+  intervalsTotal: z.coerce.number().int().min(0).optional(),
+
   promptLevel: z.enum(PROMPT_LEVELS).optional().or(z.literal("")).transform((v) => v || undefined),
   reinforcement: optionalText,
   progressStatus: z.enum(GOAL_PROGRESS_STATUSES).default("not_assessed"),
@@ -161,6 +173,18 @@ export const updateNoteGoalSchema = z.object({
   // Task analysis
   stepsCompleted: z.coerce.number().int().min(0).optional(),
   stepsTotal: z.coerce.number().int().min(1).optional(),
+
+  // Probe
+  probeCorrect: z.coerce.number().int().min(0).optional(),
+  probeTotal: z.coerce.number().int().min(0).optional(),
+
+  // Rating scale
+  ratingScaleValue: z.coerce.number().int().min(0).optional(),
+  ratingScaleMax: z.coerce.number().int().min(1).optional(),
+
+  // Interval recording
+  intervalsScored: z.coerce.number().int().min(0).optional(),
+  intervalsTotal: z.coerce.number().int().min(0).optional(),
 
   promptLevel: z.enum(PROMPT_LEVELS).optional().or(z.literal("")).transform((v) => v || undefined),
   reinforcement: optionalText,

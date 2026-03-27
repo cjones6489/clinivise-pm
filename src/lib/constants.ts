@@ -71,21 +71,94 @@ export const GOAL_TYPE_LABELS: Record<GoalType, string> = {
   behavior_reduction: "Behavior Reduction",
 };
 
-export const GOAL_STATUSES = ["active", "met", "on_hold", "discontinued"] as const;
+export const GOAL_STATUSES = [
+  "baseline",
+  "active",
+  "mastered",
+  "maintenance",
+  "generalization",
+  "met",
+  "on_hold",
+  "discontinued",
+] as const;
 export type GoalStatus = (typeof GOAL_STATUSES)[number];
 
 export const GOAL_STATUS_LABELS: Record<GoalStatus, string> = {
+  baseline: "Baseline",
   active: "Active",
+  mastered: "Mastered",
+  maintenance: "Maintenance",
+  generalization: "Generalization",
   met: "Met",
   on_hold: "On Hold",
   discontinued: "Discontinued",
 };
 
 export const GOAL_STATUS_VARIANT: Record<GoalStatus, "default" | "secondary" | "outline" | "destructive"> = {
+  baseline: "outline",
   active: "default",
+  mastered: "default",
+  maintenance: "outline",
+  generalization: "outline",
   met: "secondary",
   on_hold: "outline",
   discontinued: "outline",
+};
+
+// ── Behavior Function (for behavior_reduction goals) ─────────────────────────
+
+export const BEHAVIOR_FUNCTIONS = [
+  "escape",
+  "attention",
+  "tangible",
+  "sensory",
+  "automatic",
+  "multiple",
+] as const;
+export type BehaviorFunction = (typeof BEHAVIOR_FUNCTIONS)[number];
+
+export const BEHAVIOR_FUNCTION_LABELS: Record<BehaviorFunction, string> = {
+  escape: "Escape / Avoidance",
+  attention: "Attention",
+  tangible: "Tangible / Access",
+  sensory: "Sensory / Automatic",
+  automatic: "Automatic",
+  multiple: "Multiple Functions",
+};
+
+// ── Behavior Severity ────────────────────────────────────────────────────────
+
+export const BEHAVIOR_SEVERITIES = ["mild", "moderate", "severe", "crisis"] as const;
+export type BehaviorSeverity = (typeof BEHAVIOR_SEVERITIES)[number];
+
+export const BEHAVIOR_SEVERITY_LABELS: Record<BehaviorSeverity, string> = {
+  mild: "Mild",
+  moderate: "Moderate",
+  severe: "Severe",
+  crisis: "Crisis",
+};
+
+// ── Assessment Sources (for goal provenance) ─────────────────────────────────
+
+export const ASSESSMENT_SOURCES = [
+  "vb_mapp",
+  "ablls_r",
+  "afls",
+  "peak",
+  "vineland",
+  "clinical_observation",
+  "other",
+] as const;
+export type AssessmentSource = (typeof ASSESSMENT_SOURCES)[number];
+
+export const ASSESSMENT_SOURCE_LABELS: Record<AssessmentSource, string> = {
+  vb_mapp: "VB-MAPP",
+  ablls_r: "ABLLS-R",
+  afls: "AFLS",
+  peak: "PEAK",
+  vineland: "Vineland-3",
+  clinical_observation: "Clinical Observation",
+  other: "Other",
 };
 
 // ── Data Collection Types (for Phase 3 readiness) ───────────────────────────
@@ -660,7 +733,12 @@ export const MEASUREMENT_TYPES = [
   "rate",
   "latency",
   "task_analysis",
-  "interval",
+  "whole_interval",
+  "partial_interval",
+  "momentary_time_sampling",
+  "probe",
+  "rating_scale",
+  "permanent_product",
   "other",
 ] as const;
 export type MeasurementType = (typeof MEASUREMENT_TYPES)[number];
@@ -672,7 +750,12 @@ export const MEASUREMENT_TYPE_LABELS: Record<MeasurementType, string> = {
   rate: "Rate",
   latency: "Latency",
   task_analysis: "Task Analysis",
-  interval: "Interval Recording",
+  whole_interval: "Whole Interval Recording",
+  partial_interval: "Partial Interval Recording",
+  momentary_time_sampling: "Momentary Time Sampling",
+  probe: "Probe / Cold Probe",
+  rating_scale: "Rating Scale",
+  permanent_product: "Permanent Product",
   other: "Other",
 };
 

@@ -864,4 +864,62 @@ Future:
 
 ---
 
-_Last updated: 2026-03-26 — Phase 1 PM complete. Strategic pivot to all-in-one clinical + PM platform. Phase 2 (goals + session notes) ready to build. 271 tests passing._
+### Competitive Gap Analysis (2026-03-26)
+
+Verified against CentralReach, AlohaABA, Motivity, Theralytics, Raven Health, Catalyst/RethinkBH, Artemis, Passage Health, and practitioner reviews/complaints from Capterra, G2, and Reddit.
+
+#### Table Stakes (must build — every competitor has these)
+
+| Feature | Status | Priority | Notes |
+|---------|--------|----------|-------|
+| **Scheduling / Calendar** | Not started | **P0 — next after session notes** | Auth-aware scheduling (block over-scheduling), recurring templates, conflict detection, drag-and-drop. The #1 gap — without it, practices need a second tool. |
+| **Basic Reports (exportable)** | Minimal (dashboard only) | P1 | Auth utilization, session summaries, staff hours, cancellation rates. CSV/PDF export. Enables payroll workflows without building payroll module. |
+| **Document Management UI** | Schema exists, no UI | P1 | Per-client document library: upload, categorize (consent, assessment, treatment plan, auth letter), retrieve. Payer audits request docs within 5-10 business days. |
+| **Claims / Billing (RCM)** | Schema stubs (Phase 2 via Stedi) | P1 | Session-to-claim conversion, claims scrubbing, clearinghouse submission (837P), ERA/835 processing, denial management. Monetization engine (2-4% of collections). |
+| **E-Signatures (full UI)** | Schema + workflow exists | P1 | Provider sign, supervisor co-sign, bulk signing for BCBA review queue, timestamped audit trail. |
+| **Eligibility Verification** | Schema stub | P2 | Real-time 270/271 checks, batch verification for weekly schedule, coverage lapse alerts. Reduces claim denials 25-30%. |
+
+#### Differentiators (some competitors have, would set us apart)
+
+| Feature | Status | Priority | Notes |
+|---------|--------|----------|-------|
+| **Progress Graphing** | Not started | P1 | We already capture per-goal session data. Auto-generate line graphs from that data. BCBAs need this for treatment decisions + insurance submissions. Low effort / high value. |
+| **AI Treatment Plan / Progress Report Generation** | Not started | P2 | Strongest AI-native play. Goals data + session data → compliant documents. Saves BCBAs 3-5 hours per client per quarter. |
+| **Supervision Tracking** | Not started | P2 | BACB 5% monthly requirement. Track supervision hours per RBT, ensure 2+ contacts/month, exportable logs. Few competitors do well. |
+| **Intake Pipeline** | Not started | P2 | Referral → eligibility → assessment → onboarded. Simple status + checklist. Practices lose clients during this funnel. |
+| **Cancellation Analytics** | Not started | P2 | Cancellations = #1 revenue leak. Report on existing session status data by client, provider, reason code. |
+| **Enhanced Credentialing** | Basic (expiry dates) | P3 | Multi-credential tracking per provider, CAQH status, payer panel enrollment, background check tracking, credential-based scheduling blocks. |
+| **Goal Template Library** | Not started | P3 | Org-level reusable goal templates (with objectives + targets). Motivity has 30,000+ community templates. |
+| **Assessment-Linked Goal Generation** | Not started | P3 | After VB-MAPP/ABLLS-R assessment, auto-suggest goals for unmastered milestones. CentralReach does this. |
+
+#### Nice-to-Have (low priority for Phase 1-2)
+
+| Feature | Notes |
+|---------|-------|
+| Telehealth | Integrate (Zoom/Doxy.me link from calendar), don't build |
+| Payroll integration | CSV hours export to QuickBooks/Gusto sufficient |
+| Parent/caregiver portal | Phase 3. Becomes important when billing is live |
+| Appointment reminders (SMS/email) | Build with scheduling. Use Twilio/Resend |
+| EVV (Electronic Visit Verification) | Only mandated for ABA in CO and FL. Monitor for expansion |
+| Mobile data collection | Phase 3+. Lightweight tap-to-record on existing goals |
+
+#### Not Applicable for Small Practices (1-50 staff)
+
+- LMS / Training content (use Relias, BACB courses)
+- Multi-entity / holding company management
+- Custom workflow engine / automation builder
+- E-prescribing (BCBAs cannot prescribe)
+- Built-in clearinghouse (use Stedi)
+- Advanced BI dashboards (AI-native insights instead)
+
+#### Top Practitioner Pain Points (why they switch)
+
+1. **Cost** — CentralReach at $50/user/month unsustainable for small practices. Our free PM tier wins.
+2. **Data loss** — Crashes losing session notes is the most emotionally charged complaint. We need auto-save.
+3. **Complexity** — Enterprise tools require weeks of training. Target: RBT proficiency in minutes.
+4. **Multi-tool hell** — 3-5 separate tools with broken integration. Our all-in-one play addresses this.
+5. **Vendor lock-in** — CentralReach makes export painful. Guarantee easy data export.
+
+---
+
+_Last updated: 2026-03-26 — Phase 1 PM complete. Clinical platform: goals schema verified against VB-MAPP/ABLLS-R/AFLS/CASP/TRICARE standards, session notes schema verified against CASP/TRICARE/Optum audit requirements. Competitive gap analysis complete._

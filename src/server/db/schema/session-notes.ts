@@ -139,6 +139,18 @@ export const sessionNoteGoals = pgTable(
     stepsCompleted: integer("steps_completed"),
     stepsTotal: integer("steps_total"),
 
+    // Probe data (cold probe / warm probe)
+    probeCorrect: integer("probe_correct"),
+    probeTotal: integer("probe_total"),
+
+    // Rating scale data (e.g., 1-5 independence rating)
+    ratingScaleValue: integer("rating_scale_value"),
+    ratingScaleMax: integer("rating_scale_max"),
+
+    // Interval recording data (whole, partial, momentary)
+    intervalsScored: integer("intervals_scored"),
+    intervalsTotal: integer("intervals_total"),
+
     promptLevel: text("prompt_level"), // Most common prompt: FP, PP, M, V, G, PO, TX, VS, EC, I
     reinforcement: text("reinforcement"), // Type and schedule
     progressStatus: text("progress_status").notNull().default("not_assessed"), // met | partially_met | not_met | regression | maintenance | not_assessed
