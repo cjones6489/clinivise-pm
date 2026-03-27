@@ -11,6 +11,7 @@ Central index of all project documentation.
 | Project Overview   | [`CLAUDE.md`](../CLAUDE.md)   | Tech stack, architecture, constraints, phase context |
 | Agent Instructions | [`AGENTS.md`](../AGENTS.md)   | AI coding assistant behavioral rules                 |
 | Working Roadmap    | [`ROADMAP.md`](../ROADMAP.md) | Phase 1 task breakdown with status tracking          |
+| **Platform Architecture** | [`platform/PLATFORM.md`](platform/PLATFORM.md) | **Master doc**: nav structure, page inventory, feature matrix, build status. Start here for "what is this platform." |
 
 ## Specs
 
