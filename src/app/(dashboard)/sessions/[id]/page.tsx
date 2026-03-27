@@ -78,8 +78,6 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
           noteType: noteState?.noteType ?? null,
           signedByName: noteState?.signedByName ?? null,
           signedAt: noteState?.signedAt?.toISOString() ?? null,
-          cosignedByName: noteState?.cosignedByName ?? null,
-          cosignedAt: noteState?.cosignedAt?.toISOString() ?? null,
         }}
       />
     </div>

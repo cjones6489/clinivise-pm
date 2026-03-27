@@ -723,14 +723,12 @@ export const CPT_TO_NOTE_TYPE: Record<string, NoteType> = {
 
 // ── Session Note Statuses ─────────────────────────────────────────────────────
 
-export const NOTE_STATUSES = ["draft", "signed", "cosigned", "locked"] as const;
+export const NOTE_STATUSES = ["draft", "signed"] as const;
 export type NoteStatus = (typeof NOTE_STATUSES)[number];
 
 export const NOTE_STATUS_LABELS: Record<NoteStatus, string> = {
   draft: "Draft",
   signed: "Signed",
-  cosigned: "Co-signed",
-  locked: "Locked",
 };
 
 export const NOTE_STATUS_VARIANT: Record<
@@ -738,9 +736,7 @@ export const NOTE_STATUS_VARIANT: Record<
   "secondary" | "outline" | "default" | "destructive"
 > = {
   draft: "secondary",
-  signed: "outline",
-  cosigned: "default",
-  locked: "default",
+  signed: "default",
 };
 
 // ── Goal Progress Statuses (per-goal within a session note) ──────────────────

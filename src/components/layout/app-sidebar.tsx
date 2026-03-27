@@ -13,7 +13,6 @@ import {
   Settings01Icon,
   BankIcon,
   UserGroupIcon,
-  NoteEditIcon,
 } from "@hugeicons/core-free-icons";
 import {
   Sidebar,
@@ -38,7 +37,6 @@ const iconMap: Record<string, typeof DashboardSquare01Icon> = {
   Settings01Icon,
   BankIcon,
   UserGroupIcon,
-  NoteEditIcon,
 };
 
 const GROUP_LABELS: Record<string, string> = {

@@ -59,10 +59,6 @@ export const signSessionNoteSchema = z.object({
   id: z.string().min(1),
 });
 
-export const cosignSessionNoteSchema = z.object({
-  id: z.string().min(1),
-});
-
 export const deleteSessionNoteSchema = z.object({
   id: z.string().min(1),
 });

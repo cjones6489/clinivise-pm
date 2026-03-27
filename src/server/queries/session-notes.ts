@@ -9,13 +9,12 @@ import {
   clients,
   providers,
 } from "@/server/db/schema";
-import { eq, and, asc, desc, inArray, sql } from "drizzle-orm";
+import { eq, and, asc, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 // ── Aliases ──────────────────────────────────────────────────────────────────
 
 const signerAlias = alias(providers, "signer");
-const cosignerAlias = alias(providers, "cosigner");
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -64,10 +63,6 @@ export type SessionNoteDetail = {
   signedAt: Date | null;
   signerFirstName: string | null;
   signerLastName: string | null;
-  cosignedById: string | null;
-  cosignedAt: Date | null;
-  cosignerFirstName: string | null;
-  cosignerLastName: string | null;
 
   createdAt: Date;
   updatedAt: Date;
@@ -129,19 +124,18 @@ export type SessionNoteBehaviorRow = {
   sortOrder: number;
 };
 
-/** Summary row for the BCBA review queue and session list badges */
+/** Summary row for session list badges */
 export type SessionNoteListItem = {
   id: string;
   sessionId: string;
   noteType: string;
   status: string;
   signedAt: Date | null;
-  cosignedAt: Date | null;
   signerFirstName: string | null;
   signerLastName: string | null;
   createdAt: Date;
 
-  // Session context for the review queue
+  // Session context
   sessionDate: string;
   cptCode: string;
   clientId: string;
@@ -201,11 +195,6 @@ export async function getSessionNoteBySessionId(
       signedAt: sessionNotes.signedAt,
       signerFirstName: signerAlias.firstName,
       signerLastName: signerAlias.lastName,
-      cosignedById: sessionNotes.cosignedById,
-      cosignedAt: sessionNotes.cosignedAt,
-      cosignerFirstName: cosignerAlias.firstName,
-      cosignerLastName: cosignerAlias.lastName,
-
       createdAt: sessionNotes.createdAt,
       updatedAt: sessionNotes.updatedAt,
 
@@ -224,7 +213,6 @@ export async function getSessionNoteBySessionId(
     .innerJoin(clients, eq(sessions.clientId, clients.id))
     .innerJoin(providers, eq(sessions.providerId, providers.id))
     .leftJoin(signerAlias, eq(sessionNotes.signedById, signerAlias.id))
-    .leftJoin(cosignerAlias, eq(sessionNotes.cosignedById, cosignerAlias.id))
     .where(
       and(
         eq(sessionNotes.organizationId, orgId),
@@ -300,76 +288,6 @@ export async function getSessionNoteBySessionId(
   return { ...row, goals, behaviors };
 }
 
-/** BCBA review queue: notes in "signed" status awaiting cosignature.
- *  Only shows notes where the session provider is NOT a BCBA/BCBA-D
- *  (BCBA-authored notes don't require cosignature). */
-export async function getNotesAwaitingCosign(
-  orgId: string,
-): Promise<SessionNoteListItem[]> {
-  return db
-    .select({
-      id: sessionNotes.id,
-      sessionId: sessionNotes.sessionId,
-      noteType: sessionNotes.noteType,
-      status: sessionNotes.status,
-      signedAt: sessionNotes.signedAt,
-      cosignedAt: sessionNotes.cosignedAt,
-      signerFirstName: signerAlias.firstName,
-      signerLastName: signerAlias.lastName,
-      createdAt: sessionNotes.createdAt,
-
-      sessionDate: sessions.sessionDate,
-      cptCode: sessions.cptCode,
-      clientId: sessions.clientId,
-      clientFirstName: clients.firstName,
-      clientLastName: clients.lastName,
-      providerId: sessions.providerId,
-      providerFirstName: providers.firstName,
-      providerLastName: providers.lastName,
-      providerCredentialType: providers.credentialType,
-    })
-    .from(sessionNotes)
-    .innerJoin(sessions, eq(sessionNotes.sessionId, sessions.id))
-    .innerJoin(clients, eq(sessions.clientId, clients.id))
-    .innerJoin(providers, eq(sessions.providerId, providers.id))
-    .leftJoin(signerAlias, eq(sessionNotes.signedById, signerAlias.id))
-    .where(
-      and(
-        eq(sessionNotes.organizationId, orgId),
-        eq(sessionNotes.status, "signed"),
-        // Only notes from non-BCBA providers need cosignature
-        sql`${providers.credentialType} NOT IN ('bcba', 'bcba_d')`,
-      ),
-    )
-    .orderBy(asc(sessionNotes.signedAt)); // Oldest first
-}
-
-/** Count of unsigned notes for dashboard alert badge */
-export async function getUnsignedNoteCount(orgId: string): Promise<{
-  draftCount: number;
-  awaitingCosignCount: number;
-}> {
-  const [result] = await db
-    .select({
-      draftCount: sql<number>`count(*) filter (
-        where ${sessionNotes.status} = 'draft'
-      )::int`,
-      awaitingCosignCount: sql<number>`count(*) filter (
-        where ${sessionNotes.status} = 'signed'
-        and ${providers.credentialType} not in ('bcba', 'bcba_d')
-      )::int`,
-    })
-    .from(sessionNotes)
-    .innerJoin(sessions, eq(sessionNotes.sessionId, sessions.id))
-    .innerJoin(providers, eq(sessions.providerId, providers.id))
-    .where(eq(sessionNotes.organizationId, orgId));
-
-  return {
-    draftCount: result?.draftCount ?? 0,
-    awaitingCosignCount: result?.awaitingCosignCount ?? 0,
-  };
-}
-
 /** Check if a session already has a note (for "Complete Note" button state and detail card) */
 export async function sessionHasNote(
   orgId: string,
@@ -381,8 +299,6 @@ export async function sessionHasNote(
   noteType: string | null;
   signedByName: string | null;
   signedAt: Date | null;
-  cosignedByName: string | null;
-  cosignedAt: Date | null;
 }> {
   const [row] = await db
     .select({
@@ -390,15 +306,11 @@ export async function sessionHasNote(
       status: sessionNotes.status,
       noteType: sessionNotes.noteType,
       signedAt: sessionNotes.signedAt,
-      cosignedAt: sessionNotes.cosignedAt,
       signerFirstName: signerAlias.firstName,
       signerLastName: signerAlias.lastName,
-      cosignerFirstName: cosignerAlias.firstName,
-      cosignerLastName: cosignerAlias.lastName,
     })
     .from(sessionNotes)
     .leftJoin(signerAlias, eq(sessionNotes.signedById, signerAlias.id))
-    .leftJoin(cosignerAlias, eq(sessionNotes.cosignedById, cosignerAlias.id))
     .where(
       and(
         eq(sessionNotes.organizationId, orgId),
@@ -415,18 +327,12 @@ export async function sessionHasNote(
       noteType: null,
       signedByName: null,
       signedAt: null,
-      cosignedByName: null,
-      cosignedAt: null,
     };
   }
 
   const signedByName =
     row.signerFirstName && row.signerLastName
       ? `${row.signerLastName}, ${row.signerFirstName}`
-      : null;
-  const cosignedByName =
-    row.cosignerFirstName && row.cosignerLastName
-      ? `${row.cosignerLastName}, ${row.cosignerFirstName}`
       : null;
 
   return {
@@ -436,8 +342,6 @@ export async function sessionHasNote(
     noteType: row.noteType,
     signedByName,
     signedAt: row.signedAt,
-    cosignedByName,
-    cosignedAt: row.cosignedAt,
   };
 }
 

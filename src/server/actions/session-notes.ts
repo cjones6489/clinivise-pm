@@ -4,7 +4,6 @@ import { authActionClient } from "@/lib/safe-action";
 import {
   saveSessionNoteSchema,
   signSessionNoteSchema,
-  cosignSessionNoteSchema,
   deleteSessionNoteSchema,
   validateSignReadiness,
 } from "@/lib/validators/session-notes";
@@ -21,7 +20,7 @@ import { revalidatePath } from "next/cache";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
 import { NotFoundError, ConflictError, StaleDataError } from "@/lib/errors";
-import { CPT_TO_NOTE_TYPE, SUPERVISOR_CREDENTIAL_TYPES, type NoteType } from "@/lib/constants";
+import { CPT_TO_NOTE_TYPE, type NoteType } from "@/lib/constants";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -84,7 +83,6 @@ async function loadNoteWithOrgCheck(orgId: string, noteId: string) {
 function revalidateNotePaths(sessionId: string, clientId: string) {
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath("/sessions");
-  revalidatePath("/notes");
   revalidatePath(`/clients/${clientId}`);
 }
 
@@ -124,7 +122,7 @@ export const saveSessionNote = authActionClient
         .for("update")
         .limit(1);
 
-      // Cannot edit signed/cosigned notes
+      // Cannot edit signed notes
       if (existing && existing.status !== "draft") {
         throw new ConflictError("Cannot edit a note that has already been signed");
       }
@@ -375,80 +373,6 @@ export const signSessionNote = authActionClient
       entityType: "session_note",
       entityId: note.id,
       metadata: { sessionId: note.sessionId, signedById: signerProvider.id },
-    });
-
-    revalidateNotePaths(note.sessionId, session.clientId);
-    return { success: true as const };
-  });
-
-// ── Cosign Session Note ──────────────────────────────────────────────────────
-// A supervising BCBA reviews and cosigns a note authored by an RBT/BCaBA.
-// BCBA-authored notes don't require cosignature.
-
-export const cosignSessionNote = authActionClient
-  .schema(cosignSessionNoteSchema)
-  .action(async ({ parsedInput, ctx }) => {
-    requirePermission(ctx.userRole, "notes.cosign");
-
-    const note = await loadNoteWithOrgCheck(ctx.organizationId, parsedInput.id);
-
-    if (note.status !== "signed") {
-      throw new ConflictError("Only signed notes can be co-signed");
-    }
-
-    // Load session for revalidation paths
-    const [session] = await db
-      .select({ id: sessions.id, clientId: sessions.clientId })
-      .from(sessions)
-      .where(
-        and(eq(sessions.id, note.sessionId), eq(sessions.organizationId, ctx.organizationId)),
-      )
-      .limit(1);
-
-    if (!session) throw new NotFoundError("Session");
-
-    // Verify cosigner is a BCBA/BCBA-D
-    const cosignerProvider = await getProviderForUser(ctx.organizationId, ctx.userId);
-    if (!cosignerProvider) {
-      throw new ConflictError("You must have a provider profile to co-sign notes");
-    }
-
-    if (!(SUPERVISOR_CREDENTIAL_TYPES as readonly string[]).includes(cosignerProvider.credentialType)) {
-      throw new ConflictError("Only BCBA or BCBA-D providers can co-sign notes");
-    }
-
-    // Cannot cosign your own note
-    if (cosignerProvider.id === note.signedById) {
-      throw new ConflictError("Cannot co-sign a note you already signed");
-    }
-
-    const [cosigned] = await db
-      .update(sessionNotes)
-      .set({
-        status: "cosigned",
-        cosignedById: cosignerProvider.id,
-        cosignedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(sessionNotes.id, note.id),
-          eq(sessionNotes.organizationId, ctx.organizationId),
-          eq(sessionNotes.status, "signed"), // Prevent race
-        ),
-      )
-      .returning({ id: sessionNotes.id });
-
-    if (!cosigned) {
-      throw new StaleDataError();
-    }
-
-    await logAudit({
-      organizationId: ctx.organizationId,
-      userId: ctx.userId,
-      action: "cosign",
-      entityType: "session_note",
-      entityId: note.id,
-      metadata: { sessionId: note.sessionId, cosignedById: cosignerProvider.id },
     });
 
     revalidateNotePaths(note.sessionId, session.clientId);

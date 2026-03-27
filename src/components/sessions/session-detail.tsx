@@ -37,8 +37,6 @@ type NoteInfo = {
   noteType?: string | null;
   signedByName?: string | null;
   signedAt?: string | null;
-  cosignedByName?: string | null;
-  cosignedAt?: string | null;
 };
 
 export function SessionDetailView({
@@ -198,14 +196,6 @@ export function SessionDetailView({
                   {noteInfo.signedByName}
                   {noteInfo.signedAt && (
                     <span className="text-muted-foreground"> — {formatDate(noteInfo.signedAt)}</span>
-                  )}
-                </KV>
-              )}
-              {noteInfo.cosignedByName && (
-                <KV label="Co-signed By">
-                  {noteInfo.cosignedByName}
-                  {noteInfo.cosignedAt && (
-                    <span className="text-muted-foreground"> — {formatDate(noteInfo.cosignedAt)}</span>
                   )}
                 </KV>
               )}
