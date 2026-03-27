@@ -353,7 +353,220 @@ No new schema, queries, or actions needed for the remaining UI changes.
 
 ### Goals Tab
 
-No changes from current implementation. Domain-grouped cards, objectives, behavior reduction fields, assessment source, full lifecycle statuses.
+> **Full scope research:** `docs/research/goals-feature-scope-research.md`
+> Goals are not one feature — they're a system with layers. The Goals tab is Layer 1. A Goal Detail Drawer is Layer 2. A full Clinical Workspace is Layer 3 (Phase 3-4). Design now for Layers 1-2 only.
+
+#### Architecture (Two Levels)
+
+```
+Client Detail Page
+├── Goals Tab (list view — Layer 1, redesigning now)
+│   └── Goal Detail Drawer (click to expand — Layer 2, design now)
+│       ├── Description, mastery criteria, status history
+│       ├── Objectives with progress indicators
+│       ├── Mini line chart (from session note data)
+│       ├── Behavior reduction details (function, BIP info)
+│       ├── Recent session data for this goal
+│       └── "Open in Programs →" link (when Phase 3 exists)
+│
+└── [Future: "Programs" link in client header — Phase 3-4]
+    └── /clients/[id]/programs (full clinical workspace)
+        ├── Program builder (configure targets, protocols)
+        ├── Full graphing suite (phase lines, trends, 20+ dimensions)
+        ├── Session-by-session data table
+        ├── Mastery automation
+        └── Report generation for re-authorization
+```
+
+**Why two levels:** Passage Health does this — the Goal Detail Drawer is the quick-view for BCBAs checking in. The full clinical workspace (separate page) is where BCBAs do deep analysis, configure programs, and generate reports. The drawer becomes the "preview" that links into the deeper view. No wasted work.
+
+#### Who uses this
+- **BCBA** — reviewing progress, checking mastery status, planning next steps
+- **RBT/BT** — read-only view of goals and objectives before a session
+- **Admin** — rarely (this is clinical, not administrative)
+
+#### How often
+Daily (BCBAs checking progress), before each session (RBTs reviewing targets).
+
+#### Layer 1: Goals List (Redesign In Progress)
+
+**Current state: 4/10 on design completeness.** The data model is solid but the visual design is "developer default" — everything is text-xs, no hierarchy, no progress visualization, no visual differentiation between goal types.
+
+**Design decisions made (from plan-design-review):**
+
+| Decision | Choice | Rationale |
+|---|---|---|
+| Goal type colors | 2 colors: emerald (skill acquisition), amber (behavior reduction) | 10 domain colors would be overwhelming. Type is the clinically meaningful distinction. |
+| Progress indicator | Status badge with color weight (not dot-trail) | 8-step dot-trail is complex, most goals don't hit all 8. Bigger/bolder badge is clearer. |
+| Objectives display | Always visible (not collapsed) | Objectives are what RBTs work on. Hiding adds a click. |
+| Domain progress summary | Show counts in header ("2 active, 1 mastered") | Gives BCBAs at-a-glance progress without reading each goal. |
+| Goal cards vs flat rows | Cards with colored left accent | Creates scannable entities, visual type differentiation. |
+
+**Wireframe — Goals List:**
+
+```
++------------------------------------------------------------------+
+| 5 active · 2 met                               [+ Add Goal]      |
++==================================================================+
+| COMMUNICATION                          2 active · 1 mastered     |
+|------------------------------------------------------------------|
+| ┃ 1. Manding for preferred items                                 |
+| ┃    [Active]  Skill Acquisition                                 |
+| ┃    Mastery: 80% across 3 sessions · Baseline: 20%             |
+| ┃    Source: VB-MAPP (Mand Level 2, M8) · Since Jan 2026       |
+| ┃                                                                 |
+| ┃    Objectives:                                                  |
+| ┃    ● 1.1 Request preferred edibles — 75% (partially met)      |
+| ┃    ✓ 1.2 Request preferred toys — met                          |
+| ┃    ○ 1.3 Request during transitions — baseline                 |
+| ┃                                                         [···]  |
+|------------------------------------------------------------------|
+| ┃ 2. Gross motor imitation                                       |
+| ┃    [Mastered → Maintenance]  Skill Acquisition                 |
+| ┃    Mastery: 80% across 20 trials · Last: 80% (Mar 26)        |
+| ┃    ...                                                  [···]  |
++==================================================================+
+| BEHAVIOR REDUCTION                              1 active          |
+|------------------------------------------------------------------|
+| ┃ 3. Reduce elopement                                            |
+| ┃    [Active]  Behavior Reduction                                 |
+| ┃    Function: Escape · Severity: Moderate                        |
+| ┃    Replacement: Verbal request for break                        |
+| ┃    Mastery: <1 occurrence per session across 5 sessions        |
+| ┃                                                         [···]  |
++==================================================================+
+| MET & DISCONTINUED (2)                              [Show/Hide]  |
+|------------------------------------------------------------------|
+| (collapsed — same pattern as Care Team past assignments)          |
++------------------------------------------------------------------+
+```
+
+**Key visual elements:**
+- **Colored left accent** — emerald for skill acquisition, amber for behavior reduction
+- **Status badge** — prominent, color-coded per status (baseline=outline, active=default, mastered=emerald, maintenance=outline, met=secondary)
+- **Domain headers** — with progress summary counts
+- **Objective progress icons** — ● active, ✓ met, ○ baseline (larger than current 14px)
+- **"Last session" data** — inline on each goal (e.g., "Last: 80% (Mar 26)")
+- **Met section** — collapsible, same pattern as Care Team past assignments
+
+#### Layer 2: Goal Detail Drawer (NEW — to design and build)
+
+When you click a goal card, a drawer slides out from the right showing the full detail.
+
+**Wireframe — Goal Detail Drawer:**
+
+```
++----------------------------------------+
+| ← Back to Goals                        |
+| 1. Manding for preferred items         |
+| [Active]  Skill Acquisition            |
++========================================+
+| DESCRIPTION                            |
+| Given natural environment, client will |
+| independently mand for 15+ items using |
+| 2-word phrases with 80% accuracy.     |
++----------------------------------------+
+| MASTERY & PROGRESS                     |
+|                                         |
+| Mastery: 80% across 3 sessions         |
+| Baseline: 20% at intake                |
+| Current: 70% (trending ↑)              |
+|                                         |
+| [LINE CHART: accuracy % over time]     |
+| ─────────────────────────────────      |
+| Jan    Feb    Mar                       |
+| 20%    45%    70%                       |
++----------------------------------------+
+| OBJECTIVES (3)                         |
+| ● 1.1 Request preferred edibles        |
+|   75% · Partially met · DTT            |
+| ✓ 1.2 Request preferred toys           |
+|   Met Mar 15 · DTT                     |
+| ○ 1.3 Request during transitions       |
+|   Baseline · NET                        |
++----------------------------------------+
+| RECENT SESSIONS (3)                    |
+| Mar 26 · 70% · Smith, J · 97153       |
+| Mar 24 · 65% · Smith, J · 97153       |
+| Mar 22 · 68% · Park, D  · 97153       |
++----------------------------------------+
+| DETAILS                                |
+| Started: Jan 15, 2026                  |
+| Target: Jun 30, 2026                   |
+| Assessment: VB-MAPP Mand Level 2, M8  |
+| Treatment Plan: ITP v2, Section 3.1   |
++----------------------------------------+
+| [Open in Programs →] (future link)     |
++----------------------------------------+
+```
+
+**Drawer behavior:**
+- Slides in from right side (~480px wide)
+- Client page stays visible (dimmed) behind it
+- Close via X, Escape, or click outside
+- Mini line chart generated from `session_note_goals` data (accuracy % over time)
+- "Recent Sessions" lists the last 3-5 sessions that referenced this goal
+- "Open in Programs →" link is a placeholder for Phase 3 clinical workspace
+
+**For behavior reduction goals, the drawer also shows:**
+- Function of behavior, severity level
+- Operational definition
+- Replacement behavior
+- Antecedent/consequence strategies
+- Crisis protocol (if populated)
+
+#### Layer 3: Clinical Workspace (Phase 3-4 — NOT designing now)
+
+Documented here for planning purposes only.
+
+When data collection ships (Phase 3), a full `/clients/[id]/programs` page will provide:
+- Program builder (configure targets, protocols, prompt hierarchies)
+- Full graphing suite (phase change lines, trend lines, filter by instructor/time/condition)
+- Session-by-session data table with per-trial detail
+- Mastery automation (auto-detect criteria met, suggest phase transitions)
+- Progress report generation for insurance re-authorization
+- Target-level CRUD (schema `client_goal_targets` already exists)
+
+This is NOT a tab on the client detail page — it's a separate page linked from the client header and from the Goal Detail Drawer.
+
+#### Implementation Status
+
+**Layer 1 — Goals List:**
+- [x] Domain-grouped display
+- [x] Goal cards with status badges and type badges
+- [x] Objectives nested inline
+- [x] Behavior reduction fields (function, definition, replacement, severity)
+- [x] Assessment source + item ref
+- [x] Full 8-status lifecycle with server-side transition validation
+- [x] Add Goal dialog with conditional behavior reduction section
+- [x] Add Objective dialog
+- [x] Status change via overflow menu
+- [x] Archive goal with cascade to objectives
+- [x] Met & Discontinued collapsible section
+- [ ] **Visual redesign** — colored left accent, bigger status badges, domain progress summaries
+- [ ] **"Last session" data** inline on goal cards
+- [ ] **Objective progress icons** at useful size (currently 14px)
+
+**Layer 2 — Goal Detail Drawer:**
+- [ ] **Drawer component** — slide-in panel (~480px)
+- [ ] **Full goal description** display
+- [ ] **Mini line chart** from session_note_goals data
+- [ ] **Recent sessions list** for this goal
+- [ ] **Status history** (when each status change occurred)
+- [ ] **Query**: getGoalSessionHistory(orgId, goalId) — session note goals for this goal over time
+
+**Layer 3 — Clinical Workspace (Phase 3-4):**
+- [ ] Not designed yet. Deferred to Phase 3 with data collection.
+
+#### Data Requirements
+
+**Layer 1 — all data exists.** No new queries needed for the list redesign.
+
+**Layer 2 — needs:**
+- Query: `getGoalSessionHistory(orgId, goalId)` — join `session_note_goals` → `session_notes` → `sessions` to get date + accuracy + provider for each session that addressed this goal
+- This powers both the mini line chart and the "Recent Sessions" list in the drawer
+
+**Layer 3 — needs full data collection schema (Phase 3).**
 
 ---
 

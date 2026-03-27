@@ -382,7 +382,18 @@ ADMIN
 | Goal lifecycle | Done | baseline → active → mastered → maintenance → generalization → met |
 | Schema audit | Done | 28 fields added across 6 tables, verified against CMS-1500/CASP/TRICARE |
 
-### Phase 2: Scheduling + Billing (NOT STARTED)
+### Phase 2A: Goals UI + Visualization (IN PROGRESS)
+
+> Goals are a layered system. See `docs/research/goals-feature-scope-research.md` for full scope.
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Goals tab visual redesign | In progress | Colored accents by type, domain summaries, bigger status badges |
+| Goal Detail Drawer | Not started | Click goal → drawer with description, mastery, mini chart, recent sessions |
+| Basic progress graphing | Not started | Line chart (accuracy % over time) from session_note_goals data. Low effort. |
+| "Last session" on goal cards | Not started | Inline indicator showing most recent session data per goal |
+
+### Phase 2B: Scheduling + Billing (NOT STARTED)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
@@ -393,13 +404,21 @@ ADMIN
 | Basic reports (CSV export) | Not started | Moved from Phase 3. Hours, sessions, auth utilization. Data exists. |
 | Client document management | Not started | Documents tab on client detail. Schema + Vercel Blob exist. |
 
-### Phase 3: Clinical Intelligence (NOT STARTED)
+### Phase 3: Data Collection + Clinical Intelligence (NOT STARTED)
+
+> This is where Clinivise transitions from "PM with goals" to "all-in-one clinical platform."
+> See `docs/research/goals-feature-scope-research.md` for competitive analysis.
 
 | Feature | Status | Notes |
 |---------|--------|-------|
+| Clinical Workspace page | Not started | `/clients/[id]/programs` — full program builder, graphing, data tables |
+| Target CRUD | Not started | Schema `client_goal_targets` exists. Needs actions + UI. |
+| Data collection interface | Not started | Mobile-first tap-to-record (DTT, frequency, duration, task analysis) |
+| Mastery automation | Not started | Auto-detect criteria met, suggest phase transitions |
 | AI session note generation | Not started | Research done. Placeholder in note form. |
-| Progress graphing | Not started | Data exists in session_note_goals. Low effort. |
-| Treatment plan generation | Not started | |
+| Advanced progress graphing | Not started | Phase lines, trends, instructor filtering, cumulative mastery |
+| Progress report generation | Not started | Aggregate goal data into payer-compliant docs for re-auth |
+| Goal template library | Not started | Org-level reusable templates (50+ curated, custom) |
 | Supervision tracking | Not started | BACB 5% requirement. |
 | Intake pipeline | Not started | Client status field exists but no structured workflow |
 
