@@ -27,8 +27,7 @@ import {
   type BehaviorSeverity,
   type AssessmentSource,
 } from "@/lib/constants";
-import { formatDate } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -359,24 +358,26 @@ function GoalCard({
                 </div>
               )}
 
-            {/* Details */}
-            <div>
-              <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                Details
-              </span>
-              <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                {goal.startDate && <span>Started {formatDate(goal.startDate)}</span>}
-                {goal.targetDate && <span>Target: {formatDate(goal.targetDate)}</span>}
-                {goal.metDate && <span>Met {formatDate(goal.metDate)}</span>}
-                {goal.assessmentSource && (
-                  <span>
-                    {ASSESSMENT_SOURCE_LABELS[goal.assessmentSource as AssessmentSource] ??
-                      goal.assessmentSource}
-                    {goal.assessmentItemRef ? ` (${goal.assessmentItemRef})` : ""}
-                  </span>
-                )}
+            {/* Details — only show if any detail fields are populated */}
+            {(goal.startDate || goal.targetDate || goal.metDate || goal.assessmentSource) && (
+              <div>
+                <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                  Details
+                </span>
+                <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                  {goal.startDate && <span>Started {formatDate(goal.startDate)}</span>}
+                  {goal.targetDate && <span>Target: {formatDate(goal.targetDate)}</span>}
+                  {goal.metDate && <span>Met {formatDate(goal.metDate)}</span>}
+                  {goal.assessmentSource && (
+                    <span>
+                      {ASSESSMENT_SOURCE_LABELS[goal.assessmentSource as AssessmentSource] ??
+                        goal.assessmentSource}
+                      {goal.assessmentItemRef ? ` (${goal.assessmentItemRef})` : ""}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
