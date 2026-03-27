@@ -576,136 +576,238 @@ Migration: Seed from existing `assignedBcbaId`. Keep `assignedBcbaId` as denorma
 
 ### Clinical Documentation — Goals, Session Notes, Treatment Plans (from 2026-03-26 research)
 
-Multi-agent research across CentralReach, Motivity, ABA Matrix, Brellium, Raven Health, CMS documentation requirements, ABA Coding Coalition, state Medicaid provider manuals, and ABA billing practitioner forums.
+Multi-agent research across CentralReach, Motivity, ABA Matrix, Brellium, Raven Health, Catalyst, SimplePractice, CMS documentation requirements, ABA Coding Coalition, state Medicaid provider manuals, and ABA billing practitioner forums.
 
-**Key insight: Session notes are NOT submitted with claims — they're kept on file and produced during audits. But inadequate notes lead to retroactive denial and recoupment. Indiana Medicaid found $56M in improper ABA payments from documentation deficiencies.**
+**Key insight: Session notes are NOT submitted with claims — they're kept on file and produced during audits. But inadequate notes lead to retroactive denial and recoupment ($56M Indiana, $94M Wisconsin Medicaid improper payments). CentralReach admits 80% of session notes fail at least one payer requirement.**
 
 **Dependency chain:**
 ```
 Treatment Plan / BIP → Goals → Session Notes → Progress Reports → Claims
 ```
 
-Session notes reference treatment plan goals. Without a goals registry, notes are unstructured free text that won't survive an audit. But building a full treatment plan authoring system is enormous scope. Solution: **goals-first, lightweight.**
+**Design principle: Don't build a treatment plan authoring tool. Build a goals registry that session notes reference. Full plans live wherever the BCBA writes them. Clinivise is a PM tool, not a data collection tool — trial-by-trial data stays in Catalyst/Motivity.**
 
-**Design principle: Don't build a treatment plan authoring tool. Build a goals registry that session notes can reference. The full treatment plan lives wherever the BCBA writes it (Word, PDF, other platform). Clinivise just needs the goal list.**
+**ABA goal hierarchy (industry standard):**
+```
+Domain (Communication, Social, Behavior Reduction, ...)
+  └─ Goal/Program ("Client will functionally request preferred items")
+       └─ Objective ("Request using 2-word phrases at 80% across 3 sessions")
+            └─ Target ("Request 'more juice'") ← NOT built, stays in Catalyst/Motivity
+```
 
-#### Step 1: Client Goals Registry
+Typical client: 8-15 active goals across 3-6 domains, 2-4 objectives per goal.
 
-New `client_goals` table — simple list of active treatment goals per client:
+---
+
+#### Phase CD-1: Client Goals Registry (next to build)
+
+**Schema: `client_goals`**
 
 ```
 client_goals:
-  id                — nanoid PK
-  organization_id   — FK organizations
-  client_id         — FK clients
-  goal_number       — integer (1, 2, 3...)
-  description       — text ("Manding for preferred items using 2-word phrases")
-  target_behavior   — text ("Manding")
-  mastery_criteria  — text ("80% accuracy across 3 consecutive sessions")
-  domain            — text: 'communication' | 'social' | 'adaptive' | 'behavior_reduction' | 'academic' | 'play' | 'self_care'
-  status            — text: 'active' | 'met' | 'on_hold' | 'discontinued'
-  baseline_data     — text nullable ("20% accuracy at intake")
-  start_date        — date
-  met_date          — date nullable
-  notes             — text nullable
+  id                  — nanoid PK
+  organization_id     — FK organizations
+  client_id           — FK clients
+  goal_number         — integer (display order within domain)
+  title               — text ("Manding for preferred items")
+  description         — text (full SMART goal: "Given [context], client will [behavior] with [criteria] by [date]")
+  domain              — text: 'communication' | 'social_skills' | 'adaptive_behavior' |
+                               'behavior_reduction' | 'academic' | 'play_leisure' |
+                               'self_care' | 'motor' | 'vocational' | 'other'
+  goal_type           — text: 'skill_acquisition' | 'behavior_reduction'
+  status              — text: 'active' | 'met' | 'on_hold' | 'discontinued'
+  baseline_data       — text nullable ("20% accuracy at intake assessment")
+  mastery_criteria    — text ("80% accuracy across 3 consecutive sessions")
+  target_behavior     — text nullable ("Independent manding using 2+ word phrases")
+  start_date          — date
+  target_date         — date nullable (expected mastery)
+  met_date            — date nullable
+  treatment_plan_ref  — text nullable ("ITP v2, Section 3.1" — links to external doc)
+  sort_order          — integer (for ordering within domain groups)
+  notes               — text nullable
+  created_at, updated_at
+  deleted_at          — timestamp nullable (soft delete)
+```
+
+**Schema: `client_goal_objectives`**
+
+```
+client_goal_objectives:
+  id                  — nanoid PK
+  organization_id     — FK organizations
+  goal_id             — FK client_goals
+  objective_number    — integer (1a, 1b, 1c display)
+  description         — text ("Request 3+ preferred edibles using 2-word phrases with 80% independence across 20 trials")
+  status              — text: 'active' | 'met' | 'on_hold' | 'discontinued'
+  mastery_criteria    — text nullable
+  current_performance — text nullable ("75% accuracy as of 3/20" — updated from session notes)
+  met_date            — date nullable
+  sort_order          — integer
+  notes               — text nullable
   created_at, updated_at
 ```
 
-- New "Goals" tab on client detail page
-- BCBA adds goals from their treatment plan
-- Simple CRUD — add, edit status, archive
-- Goals drive session note structure
+**Constants:**
+```typescript
+GOAL_DOMAINS = ["communication", "social_skills", "adaptive_behavior", "behavior_reduction",
+                "academic", "play_leisure", "self_care", "motor", "vocational", "other"]
+GOAL_TYPES = ["skill_acquisition", "behavior_reduction"]
+GOAL_STATUSES = ["active", "met", "on_hold", "discontinued"]
+GOAL_DOMAIN_LABELS = { communication: "Communication", social_skills: "Social Skills", ... }
+```
 
-#### Step 2: Structured Session Notes
+**UI: Goals tab on client detail page**
+- Card-based list grouped by domain (not a table — goals are too rich for table rows)
+- Each goal card: number, title, status badge, mastery criteria, baseline, dates
+- Objectives nested inline under each goal (collapsible)
+- Met/discontinued goals collapsed at bottom ("Show 2 met goals")
+- Add Goal via Sheet/drawer (domain, type, title, description, criteria, dates)
+- Edit/archive via overflow menu
+- Permission: BCBAs and admins only (goals = treatment plan responsibility)
 
-New `session_notes` table (separate from `sessions.notes` text field):
+**Implementation tasks:**
+
+| # | Task | Files | Status |
+|---|------|-------|--------|
+| CD-1.1 | Create `client_goals` + `client_goal_objectives` schema | `src/server/db/schema/client-goals.ts` | `[ ]` |
+| CD-1.2 | Add goal constants (domains, types, statuses, labels) | `src/lib/constants.ts` | `[ ]` |
+| CD-1.3 | Create Zod validators for goal CRUD | `src/lib/validators/goals.ts` | `[ ]` |
+| CD-1.4 | Generate + run migration | `drizzle/` | `[ ]` |
+| CD-1.5 | Goal read queries (list by client, grouped by domain) | `src/server/queries/goals.ts` | `[ ]` |
+| CD-1.6 | Goal server actions (create, update, change status, add objective) | `src/server/actions/goals.ts` | `[ ]` |
+| CD-1.7 | Goals tab component (card list grouped by domain) | `src/components/clients/client-goals.tsx` | `[ ]` |
+| CD-1.8 | Add Goal sheet/drawer form | `src/components/clients/goal-form.tsx` | `[ ]` |
+| CD-1.9 | Wire Goals tab into client detail page | `src/components/clients/client-detail.tsx` | `[ ]` |
+| CD-1.10 | Seed data with realistic goals per client | `src/server/db/seed.ts` | `[ ]` |
+| CD-1.11 | Unit tests: goal validators, status transitions | `src/lib/validators/goals.test.ts` | `[ ]` |
+
+---
+
+#### Phase CD-2: Structured Session Notes
+
+**Schema: `session_notes`** (separate from `sessions.notes` quick-entry text field)
 
 ```
 session_notes:
-  id                  — nanoid PK
-  organization_id     — FK organizations
-  session_id          — FK sessions (unique — one note per session)
-  cpt_code            — text (copied from session, drives template)
+  id                    — nanoid PK
+  organization_id       — FK organizations
+  session_id            — FK sessions (unique — one structured note per session)
+  cpt_code              — text (copied from session, drives template)
 
-  -- Structured clinical content
-  goals_addressed     — jsonb [{goalId, goalDescription, trials, correct, accuracy, promptLevel, progress, notes}]
-  interventions_used  — text[] ('DTT', 'NET', 'prompting', 'reinforcement', etc.)
-  client_presentation — text (brief observation at session start)
-  behavioral_incidents— text (ABC data if behaviors occurred)
+  -- Structured clinical content (all CPT codes)
+  goals_addressed       — jsonb [{goalId, objectiveId?, goalTitle, trials?, correct?,
+                                   accuracy?, promptLevel?, progress, notes?}]
+  interventions_used    — text[] ('DTT', 'NET', 'prompting', 'reinforcement', etc.)
+  client_presentation   — text (brief observation at session start)
+  behavioral_incidents  — text (ABC data if behaviors occurred)
 
   -- CPT-specific fields
-  caregiver_present   — boolean (required for 97156)
-  caregiver_name      — text (required for 97156)
-  protocol_modifications — text (required for 97155 — what changed and why)
-  assessment_tools    — text[] (required for 97151 — VB-MAPP, ABLLS-R, etc.)
+  caregiver_present     — boolean (required for 97156)
+  caregiver_name        — text (required for 97156)
+  caregiver_relationship— text (required for 97156)
+  training_topics       — text[] (required for 97156 — BST components)
+  caregiver_competency  — text (required for 97156 — fidelity assessment)
+  protocol_modifications— text (required for 97155 — what changed, clinical rationale)
+  data_analysis         — text (required for 97155 — what data prompted the change)
+  assessment_tools      — text[] (required for 97151 — VB-MAPP, ABLLS-R, etc.)
+  assessment_domains    — text[] (required for 97151 — what domains were assessed)
 
   -- Narrative
-  narrative           — text (free text or AI-generated summary)
+  narrative             — text (free text or AI-generated summary)
 
   -- AI generation tracking
-  ai_generated        — boolean DEFAULT false
-  ai_edited           — boolean DEFAULT false
+  ai_generated          — boolean DEFAULT false
+  ai_edited             — boolean DEFAULT false
 
   -- Signature workflow
-  author_id           — FK providers (who wrote the note)
-  author_signed_at    — timestamp (locks the note)
-  supervisor_id       — FK providers (BCBA who reviewed)
-  supervisor_signed_at— timestamp (co-signature)
-  caregiver_signed_at — timestamp
+  author_id             — FK providers (who wrote the note)
+  author_signed_at      — timestamp (locks the note)
+  supervisor_id         — FK providers (BCBA who reviewed)
+  supervisor_signed_at  — timestamp (co-signature)
+  caregiver_signed_at   — timestamp
 
   -- Status
-  status              — text: 'draft' | 'signed' | 'pending_review' | 'approved' | 'rejected' | 'amended'
-  rejection_reason    — text
-  amended_from_id     — FK session_notes (self-ref for amendments)
+  status                — text: 'draft' | 'signed' | 'pending_review' | 'approved' | 'rejected' | 'amended'
+  rejection_reason      — text
+  amended_from_id       — FK session_notes (self-ref for amendments)
 
   created_at, updated_at
 ```
 
-**Different CPT codes need different templates:**
+**CPT-specific templates:**
 
-| CPT | Who Writes | Template Focus |
-|-----|-----------|---------------|
-| 97153 (RBT therapy) | RBT | Goals data, interventions, trial scores, prompt levels |
-| 97155 (BCBA modification) | BCBA | Data analysis, what was changed, clinical rationale |
-| 97156 (caregiver training) | BCBA | Caregiver name, topics taught, BST components, competency |
-| 97151 (assessment) | BCBA | Tools used, domains assessed, findings |
+| CPT | Who Writes | Required Fields | Template Focus |
+|-----|-----------|-----------------|---------------|
+| 97153 (RBT therapy) | RBT | goals_addressed, interventions_used, narrative | Goals data, trial scores, prompt levels, progress |
+| 97155 (BCBA modification) | BCBA | goals_addressed, protocol_modifications, data_analysis | What data prompted change, what was modified, rationale |
+| 97156 (caregiver training) | BCBA | caregiver_*, training_topics, caregiver_competency | Caregiver name, BST components, competency |
+| 97151 (assessment) | BCBA | assessment_tools, assessment_domains, narrative | Instruments used, domains assessed, findings |
 
 **Signature workflow (Motivity model):**
 ```
 draft → signed (author signs, note locks)
-      → pending_review (auto if BCBA review required)
+      → pending_review (auto if BCBA review required for this CPT/payer)
       → approved (BCBA co-signs)
-      → OR rejected (BCBA sends back, note unlocks)
+      → OR rejected (BCBA sends back with reason, note unlocks)
       → amended (correction after approval, new version links to original)
 ```
 
-**Minimum audit-proof note for 97153:** Must show that the RBT (1) implemented specific protocols from the treatment plan, (2) collected objective data per goal, and (3) that the service was medically necessary. "Ran programs, played outside" fails. "Implemented DTT for manding targets per Goal 2. Client achieved 80% accuracy across 20 trials (up from 65% last session). Reinforcement: token economy. Prompt level: verbal." passes.
+**Permission model:**
+- RBT: create/edit own notes in draft, view own approved notes
+- BCBA: create own, view/edit supervised RBT notes, approve/reject, co-sign
+- Admin/Billing: view all approved notes (read-only), flag for review
 
-#### Step 3: AI Note Generation (Phase 2)
+**Minimum audit-proof 97153 note:** "Implemented DTT for manding targets per Goal 2. Client achieved 80% accuracy across 20 trials (up from 65% last session). Reinforcement: token economy. Prompt level: verbal. No maladaptive behaviors observed."
 
-- Structured goal data → AI generates narrative (ABA Matrix model)
-- "Load previous note" for recurring sessions (SimplePractice pattern)
-- AI-generated notes flagged with `ai_generated = true`, edits tracked
-- Human review always required before signing
+**Implementation tasks:**
 
-#### Step 4: Note Compliance & Auditing (Phase 3)
-
-- Payer-specific compliance checks (Brellium model)
-- Copy-paste / similarity detection (OIG fraud indicator #1)
-- "Unsigned notes" dashboard alert
-- Timeliness tracking (24-72 hour signing requirement)
-- Note quality scoring
-
-#### Step 5: Full Treatment Plan Management (Phase 3+, if needed)
-
-- BIP authoring with structured sections
-- Assessment integration (97151 results → treatment plan → goals)
-- Progress report generation from aggregated session note data
-- Treatment plan version history
+| # | Task | Files | Status |
+|---|------|-------|--------|
+| CD-2.1 | Create `session_notes` schema | `src/server/db/schema/session-notes.ts` | `[ ]` |
+| CD-2.2 | Create note validators (per-CPT required fields) | `src/lib/validators/session-notes.ts` | `[ ]` |
+| CD-2.3 | Generate + run migration | `drizzle/` | `[ ]` |
+| CD-2.4 | Note read queries (by session, BCBA review queue) | `src/server/queries/session-notes.ts` | `[ ]` |
+| CD-2.5 | Note server actions (create, update, sign, approve/reject) | `src/server/actions/session-notes.ts` | `[ ]` |
+| CD-2.6 | "Complete Note" button on session detail page | `src/app/(dashboard)/sessions/[id]/page.tsx` | `[ ]` |
+| CD-2.7 | Session note form (CPT-aware template, goals multi-select) | `src/components/sessions/session-note-form.tsx` | `[ ]` |
+| CD-2.8 | BCBA review queue page (unsigned notes pending co-signature) | `src/app/(dashboard)/notes/page.tsx` | `[ ]` |
+| CD-2.9 | Dashboard: "Unsigned notes" alert count | `src/server/queries/dashboard.ts` | `[ ]` |
+| CD-2.10 | Note status badges + signature display on session detail | `src/components/sessions/session-detail.tsx` | `[ ]` |
+| CD-2.11 | "Billing readiness" indicator per session (green/amber/red) | `src/components/sessions/` | `[ ]` |
 
 **Current state:** Sessions have a `notes` text field for quick free-text entry. This stays as the "30-second log" quick note. The full structured session note is completed later via the "Complete Note" action on the session detail page.
 
-**What CentralReach admits:** 80% of their session notes fail at least one payer requirement. This is the core problem — and the opportunity.
+---
+
+#### Phase CD-3: AI Note Generation
+
+- Structured goal data → AI generates narrative (ABA Matrix model: structured data in, narrative out, human review required)
+- "Load previous note" for recurring sessions (SimplePractice pattern — RBTs run the same programs 3-5x/week)
+- AI-generated notes flagged with `ai_generated = true`, edits tracked with `ai_edited = true`
+- Manual note: 15-30 min. Template-based: 8-12 min. AI-assisted: 2-5 min (60-80% reduction)
+- Requires AI infrastructure (Vercel AI SDK + Bedrock — see AI Architecture section)
+
+---
+
+#### Phase CD-4: Note Compliance & Auditing
+
+- Payer-specific compliance checks (Brellium model — 100+ rules per payer)
+- Copy-paste / similarity detection (OIG fraud indicator #1 — "cloned notes")
+- Timeliness tracking (24-72 hour signing requirement, configurable per practice)
+- Note quality scoring (completeness, specificity, data presence)
+- "Unsigned notes" dashboard alert with aging (>24h amber, >72h red)
+- Audit trail: who edited what, when, amendment chain
+
+---
+
+#### Phase CD-5: Treatment Plan Management (if needed)
+
+- Full BIP authoring with structured sections
+- Assessment integration (97151 results → treatment plan → goals auto-populated)
+- Progress report generation from aggregated session note data (for re-authorization)
+- Treatment plan version history with diff view
+- Goal template library (practice-level, reusable across clients)
+- Import goals from Motivity/Catalyst API (clinical integration)
 
 ### What's Explicitly Out of Scope (Phase 2+)
 
