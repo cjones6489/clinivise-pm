@@ -234,37 +234,48 @@ Weekly (BCBAs managing caseloads), occasionally (admin during staff changes).
 - **Overflow menu [···]** appears on hover (opacity-40 → 100), always visible on touch
 - **Past section** is inline in the same card, collapsed, with muted styling (opacity-60)
 
-#### Wireframe — Add Member Popover
+#### Wireframe — Add Member Modal
 
 ```
-                                    +---------------------------+
-    [+ Add Member ▾] ──────────── | Search by name...          |
-                                    |---------------------------|
-                                    | ● BCBAs & Supervisors     |
-                                    | [SC] Sarah Chen    ✓      |
-                                    | [MJ] Maria Johnson [Add]  |
-                                    |---------------------------|
-                                    | ● RBTs & Technicians      |
-                                    | [JS] Jessica Smith  ✓     |
-                                    | [DP] David Park     ✓     |
-                                    | [TW] Tanya Williams [Add] |
-                                    +---------------------------+
++------------------------------------------------------------------+
+| Add Team Members                                          [x]    |
+| Select providers to add. Already-assigned show a checkmark.      |
+|                                                                    |
+| [🔍 Search by name or credential...                       ]      |
+|                                                                    |
+| ● BCBAs & Supervisors (3)                                        |
+| +--------------------------------------------------------------+ |
+| | [SC] Dr. Sarah Chen          BCBA                     ✓     | |
+| | [MJ] Dr. Maria Johnson       BCBA               [+ Add]    | |
+| | [KL] Dr. Kim Lee             BCaBA                    ✓     | |
+| +--------------------------------------------------------------+ |
+|                                                                    |
+| ● RBTs & Technicians (4)                                         |
+| +--------------------------------------------------------------+ |
+| | [JS] Jessica Smith           RBT                      ✓     | |
+| | [DP] David Park              RBT                      ✓     | |
+| | [TW] Tanya Williams          RBT                [+ Add]    | |
+| | [AR] Alex Rodriguez          BT                 [+ Add]    | |
+| +--------------------------------------------------------------+ |
++------------------------------------------------------------------+
 ```
 
-**Popover behavior:**
-- **Trigger:** "Add Member" button opens a popover anchored below it
-- **Search:** Auto-focused input, type-ahead filtering by name or credential label
-- **Provider rows:** Credential-colored avatar, name, credential label
-- **Already on team:** Checkmark ✓ instead of [Add] button (not hidden, not disabled — just marked)
-- **Click to add:** Instant — fires server action, provider gets a ✓, revalidation adds them to the team list behind the popover
-- **Close:** Click outside, press Escape, or click the trigger button again
-- **Width:** ~320px, max-height ~360px with scroll
-- **No confirmation step, no "Done" button** — it's a selection, not a form submission
+**Modal behavior:**
+- **Trigger:** "Add Member" button opens a centered modal (~500px wide)
+- **Search:** Prominent 40px input, auto-focused, filters by name or credential label
+- **Full org roster:** Shows ALL active providers (not just unassigned)
+- **Already on team:** Green checkmark ✓ (not hidden, not disabled text — clearly marked)
+- **Available:** Outline "Add" button on the right side of each row
+- **Click to add:** Instant — fires server action, checkmark appears, stays open for multi-add
+- **Provider rows:** 36px credential-colored avatar, text-sm name, text-xs credential label, rounded hover state
+- **Groups:** Colored dot headers (violet/emerald) with counts
+- **Search clears on close**
+- **Add-only:** No managing (primary/remove) in the modal. That stays on the tab.
 
-**Why popover, not modal:**
-- Adding 1-2 providers from 5-20 is a 2-click action. A modal adds unnecessary ceremony.
-- The popover keeps the team list visible — user sees the change happen in real-time.
-- Matches GitHub assignees, Notion person picker — proven patterns for small-team selection.
+**Why modal, not popover:**
+- ABA practices can have 20-50 staff. A 320px popover is too cramped for that roster.
+- The modal gives room for search + grouped display + comfortable row sizing.
+- Still focused on one action (add) — not overloaded like the original manage modal was.
 
 #### Overflow Menu Actions
 
@@ -298,39 +309,34 @@ Remove sets `endDate` to today (soft remove — preserves assignment history).
 
 **Loading:** Skeleton rows matching the member row height.
 
-**All providers assigned (in popover):**
+**No search results (in modal):**
 ```
-+---------------------------+
-| (user icon)               |
-| All providers assigned    |
-| Every active provider is  |
-| already on this team.     |
-+---------------------------+
+No providers match "xyz"
+Try a different name or credential type
 ```
 
-**No search results (in popover):**
+**No providers in org (in modal):**
 ```
-+---------------------------+
-| No providers match "xyz"  |
-+---------------------------+
+No providers in this practice yet
+Add providers on the Providers page first
 ```
 
 #### Implementation Status
 
-- [x] Team member list with credential-colored avatars (violet/emerald/sky)
-- [x] Primary toggle with gold star overlay on avatar
+- [x] Single card layout (BCBAs + RBTs + Past in one card with inline dividers)
+- [x] Team member rows with credential-colored avatars (violet/emerald/sky)
+- [x] Primary toggle with gold star overlay on avatar corner
 - [x] Name links to provider detail page
 - [x] "Since" date on every member
 - [x] Hover-reveal overflow menu (visible at 40% opacity for touch)
-- [x] Set primary action
-- [x] Remove from team with confirmation (soft remove via endDate)
+- [x] Set primary and remove from team actions
 - [x] Past assignments section (collapsible, muted styling, date range + notes)
 - [x] Past care team query (`getPastCareTeam`)
 - [x] Empty state with stacked credential avatars
 - [x] Group headers with colored dots and counts
-- [ ] **Convert modal → popover** (GitHub SelectPanel pattern)
-- [ ] **Single card layout** (merge separate group cards into one)
-- [ ] **Checkmark on already-assigned** in popover (not disabled/"On team" text)
+- [x] Focused add-member modal (500px, search, grouped roster, checkmarks)
+- [x] Green checkmark on already-assigned in modal
+- [x] No success toasts (error toasts only)
 
 #### Data Requirements
 
