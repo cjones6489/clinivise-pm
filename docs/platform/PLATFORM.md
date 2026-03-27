@@ -427,7 +427,7 @@ Decisions made during platform architecture review (2026-03-27).
 | D3 | Tier scheduling features (MVP vs enhancements) | **Decided** | MVP = calendar + appointments + recurring + auth-aware + conflicts. Drive time, credential blocking, reminders = Phase 2+. |
 | D4 | Move Reports from Phase 3 to Phase 2 | **Decided** | Basic CSV exports (hours, sessions, auth utilization) use existing data. AlohaABA ships reports from day one. |
 | D5 | Keep Payers and Authorizations as standalone nav items | **Decided** | PM-first positioning. Auth tracking is our #1 differentiator — keeping it top-level reinforces this. Payers is a daily-use item (calling payers, checking portal URLs, verifying timely filing). Both reinforce our practice management focus. |
-| D6 | Design the RBT experience | **Open** | See below. |
+| D6 | Design frontline provider experience (RBT/BT/BCaBA) | **Open** | Caseload-scoped views, simplified nav. Build for generalized case (any direct therapy provider), not just certified RBTs. BCaBA has slight variations (can edit goals, may supervise). |
 
 ---
 
@@ -435,39 +435,48 @@ Decisions made during platform architecture review (2026-03-27).
 
 The nav and pages look different per role. This needs design work before we ship to real practices.
 
-### RBT Experience (needs design)
+### Frontline Provider Experience (RBT / BT / BCaBA) — needs design
 
-RBTs are the highest-volume users — they log 20-30 hours of sessions per week and write notes for each one. Their experience must be fast and focused.
+This is the experience for **anyone delivering direct therapy**: RBTs, uncertified behavior technicians (BTs), BCaBAs, and mid-level supervisors without a BCBA. They're the highest-volume users — logging 20-30 hours of sessions per week with notes for each one. Their experience must be fast and focused.
 
-**What an RBT needs:**
-- See their caseload (assigned clients only, not all clients)
+> **Important:** Not all frontline providers are RBTs. Practices hire behavior technicians who haven't passed the RBT exam yet, or BCaBAs who function as both direct providers and mid-level supervisors. The simplified experience should be built for the **generalized frontline provider case** — anyone whose primary daily workflow is: see my clients → deliver sessions → write notes.
+
+**What a frontline provider needs:**
+- See their caseload (assigned clients, not all clients in the practice)
 - See today's schedule (when scheduling exists)
 - Log sessions quickly (pre-filled provider, CPT, client from schedule)
 - Write session notes with goal data
 - Sign notes
+- View client goals and treatment plan context (read-only for BTs, editable for BCaBAs)
 
-**What an RBT does NOT need:**
+**What a frontline provider does NOT need:**
 - All clients in the practice (only their assigned caseload)
 - Authorization management (BCBA/admin responsibility)
 - Billing, claims, payers, reports
 - Provider management, team management, settings
 
-**Current state:** RBTs see Overview, Clients (all), Sessions (all), which is too much. The Overview dashboard should be caseload-focused for RBTs (my clients, my sessions today, my unsigned notes). The Clients list should filter to their caseload by default.
+**Current state:** Frontline roles (RBT, BCaBA) see Overview, Clients (all), Sessions (all), which shows too much. The Overview dashboard should be caseload-focused (my clients, my sessions today, my unsigned notes). The Clients list should filter to their caseload by default.
 
-**Competitor reference:** AlohaABA's "My Dashboard" concept — personal data scoped to the logged-in user, not org-wide.
+**Variations by credential:**
+- **BT (no cert):** Most restricted. Log sessions, write notes, view client goals. Cannot edit goals or treatment plans.
+- **RBT (certified):** Same as BT. The RBT cert doesn't grant additional system permissions — it's a clinical credential, not an access level.
+- **BCaBA:** Can edit goals and objectives (clinical responsibility). May supervise BTs. Sees their own supervisees if applicable. Still doesn't manage authorizations or billing.
+
+**Competitor reference:** AlohaABA's "My Dashboard" — personal data scoped to the logged-in user, not org-wide. Motivity's role-based learner views — clinicians see only assigned learners by default.
 
 ### BCBA Experience
 
-BCBAs are the clinical leads. They need everything RBTs see plus:
-- All clients (not just their caseload — they supervise across RBTs)
-- Authorization tracking (managing auth renewals)
-- Goal management (writing treatment plans)
-- Session note review (reviewing RBT notes — even though co-sign is removed, BCBAs still review notes for quality)
-- Provider oversight (seeing supervisee caseloads)
+BCBAs are the clinical leads. More standardized role — less variation than frontline providers. They need everything frontline providers see plus:
+- All clients (not just their caseload — they oversee across multiple providers)
+- Authorization tracking (managing auth renewals, reviewing utilization)
+- Goal management (writing treatment plans, editing goals and objectives)
+- Session note review (reviewing provider notes for clinical quality)
+- Provider oversight (seeing supervisee caseloads, performance metrics)
+- Treatment plan documents (Phase 3)
 
 ### Admin/Owner Experience
 
-Full platform access. Billing, reports, team management, settings.
+Full platform access. Everything BCBAs see plus billing, reports, team management, payer management, practice settings. This is the most straightforward role — they see everything.
 
 ---
 
