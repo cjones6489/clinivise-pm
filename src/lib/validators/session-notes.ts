@@ -151,6 +151,8 @@ export const saveSessionNoteSchema = z.object({
     .default([]),
 });
 
+export type SaveSessionNoteInput = z.input<typeof saveSessionNoteSchema>;
+
 // ── Sign-readiness validation (CPT-specific minimum fields for audit) ────────
 // These are NOT Zod schemas — they're runtime checks run before signing.
 // Returns an array of human-readable missing field messages.
