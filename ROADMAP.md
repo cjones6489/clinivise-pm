@@ -787,7 +787,7 @@ draft → signed (author signs, note locks)
 | CD-2.8  | ~~BCBA review queue page~~ — Removed: co-sign not a standard ABA EHR workflow  | —                                               | `N/A`  |
 | CD-2.9  | ~~Dashboard unsigned notes alert~~ — Removed with co-sign workflow             | —                                               | `N/A`  |
 | CD-2.10 | Note status badges + signature display on session detail                        | `src/components/sessions/session-detail.tsx`    | `[x]`  |
-| CD-2.11 | "Billing readiness" indicator per session (green/amber/red)                     | `src/components/sessions/`                      | `[ ]`  |
+| CD-2.11 | ~~Billing readiness indicator~~ — Deferred to Phase 5 (claims/billing)         | —                                               | `N/A`  |
 
 **Current state:** Sessions have a `notes` text field for quick free-text entry. This stays as the "30-second log" quick note. The full structured session note is completed later via the "Complete Note" action on the session detail page.
 
