@@ -44,7 +44,7 @@ ADMIN (owner/admin only)
 |----------|-------|-------|-------|
 | Calendar | Core | Phase 2 | Scheduling — table stakes, every competitor has it |
 | Claims | Billing (new group) | Phase 2 | Claim submission + tracking via Stedi |
-| Reports | Billing | Phase 3 | Auth utilization, session summaries, staff hours |
+| Reports | Billing | Phase 2 | Basic CSV exports (hours, sessions, auth utilization) — data already exists |
 
 ### Phase 2 Target Nav (10 items)
 
@@ -121,18 +121,20 @@ ADMIN
 
 | Tab | Status | Description |
 |-----|--------|-------------|
-| Overview | **Built** | Clinical info, insurance, care team, auth utilization, recent sessions |
+| Overview | **Built** | Clinical info, insurance, contacts, care team, auth utilization, recent sessions |
 | Care Team | **Built** | Search-to-add modal, primary toggle, role groups |
 | Goals | **Built** | Domain-grouped cards, objectives, behavior reduction, add/edit/archive |
-| Contacts | **Built** | Emergency, guardian, billing responsible, PHI permissions |
-| Insurance | **Built** | Multi-policy, priority, subscriber info, card images |
 | Authorizations | **Built** | Client's auths with utilization bars |
 | Sessions | **Built** | Client's session history |
+| Documents | **Planned** | Upload/categorize consent forms, assessments, treatment plans, auth letters |
 | Edit | **Built** | Client form (inline tab) |
 
+> **Design decision (2026-03-27):** Consolidate from 8 tabs to 7. Merge Contacts and Insurance into the Overview tab as section cards (they're small data sets that don't warrant standalone tabs). Competitors at our tier have 3-5 client sections, not 8 tabs. Add Documents as a dedicated tab (every competitor has document management per client).
+
 **Planned additions:**
-- [ ] Note status column on Sessions tab (see notes from session list)
-- [ ] Documents tab (upload/categorize consent forms, assessments, treatment plans)
+- [ ] Note status column on Sessions tab
+- [ ] Contacts + Insurance merged into Overview as section cards
+- [ ] Documents tab (consent forms, assessments, treatment plans, auth letters)
 - [ ] Treatment Plan tab (Phase 3 — BIP, ITP document management)
 
 **Page design doc:** [pages/clients.md](pages/clients.md) *(create when redesigning)*
@@ -200,18 +202,25 @@ ADMIN
 |-------|--------|-------------|
 | `/calendar` | **Not built** | Scheduling — table stakes gap |
 
-**Required features (from competitive research):**
-- Day/week/month views with drag-and-drop
-- Recurring appointment templates
-- Client + provider availability management
-- Authorization-aware scheduling (block over-scheduling)
-- Credential-aware scheduling (block expired credentials)
-- Conflict detection (double-booking prevention)
-- Drive time between appointments
-- Cancellation/no-show tracking with reason codes
-- Session-to-billing flow (appointments convert to sessions)
-
 **This is the #1 competitive gap.** Every competitor has scheduling. Without it, practices need a second tool.
+
+**MVP (ship first — matches Raven/Passage/TherapyLake tier):**
+- Calendar view (week + day views)
+- Create/edit/cancel appointments
+- Recurring appointment templates (e.g., Mon/Wed/Fri 3-5pm)
+- Auth-aware display (show remaining units when booking)
+- Conflict detection (double-booking prevention for same provider)
+- Appointment → Session conversion (booked appointment creates a session record)
+
+**Phase 2 enhancements (after MVP is validated):**
+- [ ] Month view
+- [ ] Drag-and-drop rescheduling
+- [ ] Client + provider availability management
+- [ ] Credential-aware blocking (prevent scheduling with expired license)
+- [ ] Drive time calculation between appointments
+- [ ] Automated appointment reminders (SMS/email via Twilio/Resend)
+- [ ] Cancellation/no-show reason tracking (already in session schema)
+- [ ] Session-to-billing flow (appointments auto-generate claim drafts)
 
 **Page design doc:** [pages/calendar.md](pages/calendar.md) *(REQUIRED before building — full research + wireframe)*
 
@@ -242,15 +251,21 @@ ADMIN
 
 | Route | Status | Description |
 |-------|--------|-------------|
-| `/reports` | **Not built** | Phase 3 — exportable reports |
+| `/reports` | **Not built** | Phase 2 — basic exportable reports |
 
-**Required reports (from competitive research):**
-- Authorization utilization (by client, provider, payer)
-- Session/billing summary (billable hours by date range, provider, client)
-- Cancellation/no-show report
-- Staff productivity (scheduled vs completed)
-- Accounts receivable aging (Phase 2, requires billing)
-- Payroll hours export (CSV for QuickBooks/Gusto)
+> AlohaABA has Reports as a core nav item from day one. Even the simplest platforms ship basic reports. These are CSV exports of data we already have — low effort, high value for practices that need payroll hours and auth utilization summaries.
+
+**Phase 2 (basic CSV exports — data already exists):**
+- [ ] Hours worked by provider (for payroll — practices need this weekly)
+- [ ] Session summary by date range (filterable by client, provider, CPT)
+- [ ] Authorization utilization (by client, by payer — already on dashboard, just needs export)
+- [ ] Cancellation/no-show report (by client, by provider, with reasons)
+
+**Phase 3 (requires billing + scheduling data):**
+- [ ] Staff productivity (scheduled vs completed hours)
+- [ ] Accounts receivable aging (30/60/90/120 days)
+- [ ] Revenue by payer / by provider
+- [ ] Clinical outcomes (goal mastery rates over time)
 
 **Page design doc:** [pages/reports.md](pages/reports.md) *(create when building)*
 
@@ -289,7 +304,9 @@ ADMIN
 
 | Route | Status | Description |
 |-------|--------|-------------|
-| `/payers` | **Built** | Payer list + add/edit in settings page |
+| `/payers` | **Built** | Payer list + add/edit (currently embedded in Settings page) |
+
+> **Design decision (2026-03-27):** Payers currently exists as both a standalone nav item AND a section within Settings. This is redundant. Consider removing Payers from the sidebar and keeping it only in Settings until the Billing nav group exists in Phase 2. This would drop nav from 8 to 7 items (cleaner). When Billing ships, Payers moves to the Billing group as its own nav item.
 
 **Current features:**
 - Payer CRUD with name, type, phone, auth phone, auth email, portal URL
@@ -369,11 +386,12 @@ ADMIN
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Calendar/Scheduling | Not started | #1 competitive gap. Research needed. |
+| Calendar/Scheduling | Not started | #1 competitive gap. Research needed. MVP scoped. |
 | Claims submission (Stedi) | Not started | Schema stubs exist. Monetization engine. |
 | ERA/payment posting | Not started | |
 | Eligibility verification | Not started | Schema stub exists. |
-| Basic reports (CSV export) | Not started | Auth utilization, session summaries, staff hours |
+| Basic reports (CSV export) | Not started | Moved from Phase 3. Hours, sessions, auth utilization. Data exists. |
+| Client document management | Not started | Documents tab on client detail. Schema + Vercel Blob exist. |
 
 ### Phase 3: Clinical Intelligence (NOT STARTED)
 
@@ -387,12 +405,69 @@ ADMIN
 
 ### Out of Scope
 
-- Payroll (CSV export sufficient)
-- Telehealth (integrate Zoom/Doxy.me, don't build)
-- Real-time data collection (Motivity-level, Phase 4+)
-- LMS / Training content
-- Parent/caregiver portal (Phase 4+)
-- E-prescribing (BCBAs can't prescribe)
+| Feature | Why |
+|---------|-----|
+| Payroll | CSV hours export is sufficient for small practices. They use QuickBooks/Gusto/ADP. Only 2/7 competitors (Aloha, TherapyPM) build this in. |
+| Telehealth | Commodity feature. Practices already use Zoom/Doxy.me. Integrate (launch link from calendar), don't build a video platform. |
+| Real-time data collection | This is Motivity/Catalyst's core feature — 130+ data collection features, offline mobile apps, tap-to-record. We're PM-first. Our session notes capture data after-the-fact. Real-time collection is Phase 4+ if ever. |
+| LMS / Training content | Enterprise feature (CentralReach). Small practices use Relias or BACB courses. No competitor at our tier builds this. |
+| Parent/caregiver portal | Phase 4+. Becomes valuable when billing is live (invoice payment). Not a switching factor for practices evaluating PM tools. |
+| E-prescribing | BCBAs cannot prescribe medication. Not applicable to ABA therapy. |
+
+---
+
+## Design Decisions Log
+
+Decisions made during platform architecture review (2026-03-27).
+
+| # | Decision | Status | Rationale |
+|---|----------|--------|-----------|
+| D1 | Consolidate client tabs from 8 → 7 (merge Contacts + Insurance into Overview) | **Decided** | Competitors have 3-5 sections. Contacts and Insurance are small data sets. |
+| D2 | Add Documents as a dedicated client tab | **Decided** | Every competitor has per-client document management. We have the schema. |
+| D3 | Tier scheduling features (MVP vs enhancements) | **Decided** | MVP = calendar + appointments + recurring + auth-aware + conflicts. Drive time, credential blocking, reminders = Phase 2+. |
+| D4 | Move Reports from Phase 3 to Phase 2 | **Decided** | Basic CSV exports (hours, sessions, auth utilization) use existing data. AlohaABA ships reports from day one. |
+| D5 | Consider moving Payers from sidebar into Settings | **Open** | Redundant: Payers is both a nav item and a Settings section. Removing from nav drops us to 7 items. Revisit when Billing group ships. |
+| D6 | Design the RBT experience | **Open** | See below. |
+
+---
+
+## Role-Based Experiences
+
+The nav and pages look different per role. This needs design work before we ship to real practices.
+
+### RBT Experience (needs design)
+
+RBTs are the highest-volume users — they log 20-30 hours of sessions per week and write notes for each one. Their experience must be fast and focused.
+
+**What an RBT needs:**
+- See their caseload (assigned clients only, not all clients)
+- See today's schedule (when scheduling exists)
+- Log sessions quickly (pre-filled provider, CPT, client from schedule)
+- Write session notes with goal data
+- Sign notes
+
+**What an RBT does NOT need:**
+- All clients in the practice (only their assigned caseload)
+- Authorization management (BCBA/admin responsibility)
+- Billing, claims, payers, reports
+- Provider management, team management, settings
+
+**Current state:** RBTs see Overview, Clients (all), Sessions (all), which is too much. The Overview dashboard should be caseload-focused for RBTs (my clients, my sessions today, my unsigned notes). The Clients list should filter to their caseload by default.
+
+**Competitor reference:** AlohaABA's "My Dashboard" concept — personal data scoped to the logged-in user, not org-wide.
+
+### BCBA Experience
+
+BCBAs are the clinical leads. They need everything RBTs see plus:
+- All clients (not just their caseload — they supervise across RBTs)
+- Authorization tracking (managing auth renewals)
+- Goal management (writing treatment plans)
+- Session note review (reviewing RBT notes — even though co-sign is removed, BCBAs still review notes for quality)
+- Provider oversight (seeing supervisee caseloads)
+
+### Admin/Owner Experience
+
+Full platform access. Billing, reports, team management, settings.
 
 ---
 
