@@ -20,7 +20,12 @@ import {
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,22 +63,23 @@ function isSupervisorTier(credentialType: string) {
   return ["bcba", "bcba_d", "bcaba"].includes(credentialType);
 }
 
-// ── Add Member Popover ───────────────────────────────────────────────────────
-// GitHub SelectPanel / Notion person picker pattern.
-// Lightweight popover anchored to the trigger button.
+// ── Add Member Modal ─────────────────────────────────────────────────────────
+// Focused add-only modal. Full provider roster with search, grouped by
+// credential, checkmarks on already-assigned. Stays open for multi-add.
 
-function AddMemberPopover({
+function AddMemberModal({
+  open,
+  onOpenChange,
   clientId,
   availableProviders,
   careTeam,
-  children,
 }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   clientId: string;
   availableProviders: AvailableProvider[];
   careTeam: CareTeamMember[];
-  children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const { execute: executeAdd, isPending: isAdding } = useAction(addToTeam, {
@@ -82,7 +88,7 @@ function AddMemberPopover({
 
   const onTeamIds = new Set(careTeam.map((m) => m.providerId));
 
-  // Combine available + on-team into one list for display (all org providers)
+  // Combine available + on-team into one list (full org roster)
   const allProviders = [
     ...availableProviders,
     ...careTeam.map((m) => ({
@@ -92,8 +98,6 @@ function AddMemberPopover({
       credentialType: m.credentialType,
     })),
   ];
-
-  // Dedupe by id (in case of overlap)
   const uniqueProviders = Array.from(
     new Map(allProviders.map((p) => [p.id, p])).values(),
   );
@@ -121,110 +125,180 @@ function AddMemberPopover({
     });
   }
 
-  function ProviderItem({ provider }: { provider: (typeof uniqueProviders)[number] }) {
-    const avatarColor = CREDENTIAL_AVATAR[provider.credentialType] ?? CREDENTIAL_AVATAR.other;
-    const isOnTeam = onTeamIds.has(provider.id);
-
-    return (
-      <button
-        type="button"
-        disabled={isAdding || isOnTeam}
-        onClick={() => handleAdd(provider)}
-        className="hover:bg-accent/50 flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors disabled:cursor-default disabled:hover:bg-transparent"
-      >
-        <div
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${avatarColor}`}
-        >
-          {getInitials(provider.firstName, provider.lastName)}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="text-xs font-semibold">
-            {provider.firstName} {provider.lastName}
-          </div>
-          <div className="text-muted-foreground text-[11px]">
-            {CREDENTIAL_LABELS[provider.credentialType as CredentialType] ??
-              provider.credentialType.toUpperCase()}
-          </div>
-        </div>
-        {isOnTeam ? (
-          <HugeiconsIcon
-            icon={CheckmarkCircle02Icon}
-            size={16}
-            className="shrink-0 text-emerald-500"
-          />
-        ) : (
-          <span className="text-primary shrink-0 text-[11px] font-medium">+ Add</span>
-        )}
-      </button>
-    );
-  }
-
   return (
-    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) setSearch(""); }}>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0" sideOffset={4}>
-        {/* Search */}
-        <div className="p-2">
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setSearch(""); }}>
+      <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="shrink-0 space-y-0 px-5 pt-5 pb-0">
+          <DialogTitle className="text-base font-semibold">Add Team Members</DialogTitle>
+          <p className="text-muted-foreground text-xs">
+            Select providers to add to the care team. Already-assigned providers show a checkmark.
+          </p>
+        </DialogHeader>
+
+        {/* Search — prominent, full width */}
+        <div className="shrink-0 px-5 pt-3 pb-2">
           <div className="relative">
             <HugeiconsIcon
               icon={Search01Icon}
-              size={14}
+              size={16}
               strokeWidth={1.5}
-              className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2"
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
             />
             <Input
-              placeholder="Search providers..."
+              placeholder="Search by name or credential..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-8 pl-8 text-xs"
+              className="h-10 rounded-lg pl-10 text-sm"
               autoFocus
             />
           </div>
         </div>
 
-        {/* Provider list */}
-        <div className="max-h-72 overflow-y-auto">
+        {/* Provider roster */}
+        <div className="flex-1 overflow-y-auto px-2 pb-2">
           {filtered.length > 0 ? (
-            <>
+            <div className="space-y-1">
               {supervisors.length > 0 && (
-                <>
-                  <div className="flex items-center gap-1.5 px-3 py-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-violet-500" />
-                    <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                <div>
+                  <div className="flex items-center gap-2 px-3 pt-2 pb-1">
+                    <div className="h-2 w-2 rounded-full bg-violet-500" />
+                    <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
                       BCBAs & Supervisors
                     </span>
-                  </div>
-                  {supervisors.map((p) => (
-                    <ProviderItem key={p.id} provider={p} />
-                  ))}
-                </>
-              )}
-              {technicians.length > 0 && (
-                <>
-                  <div className="flex items-center gap-1.5 px-3 py-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                      RBTs & Technicians
+                    <span className="text-muted-foreground/50 text-[11px]">
+                      ({supervisors.length})
                     </span>
                   </div>
-                  {technicians.map((p) => (
-                    <ProviderItem key={p.id} provider={p} />
-                  ))}
-                </>
+                  {supervisors.map((p) => {
+                    const avatarColor =
+                      CREDENTIAL_AVATAR[p.credentialType] ?? CREDENTIAL_AVATAR.other;
+                    const isOnTeam = onTeamIds.has(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        disabled={isAdding || isOnTeam}
+                        onClick={() => handleAdd(p)}
+                        className="hover:bg-accent/50 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors disabled:cursor-default disabled:hover:bg-transparent"
+                      >
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${avatarColor}`}
+                        >
+                          {getInitials(p.firstName, p.lastName)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium">
+                            {p.firstName} {p.lastName}
+                          </div>
+                          <div className="text-muted-foreground text-xs">
+                            {CREDENTIAL_LABELS[p.credentialType as CredentialType] ??
+                              p.credentialType.toUpperCase()}
+                          </div>
+                        </div>
+                        {isOnTeam ? (
+                          <HugeiconsIcon
+                            icon={CheckmarkCircle02Icon}
+                            size={18}
+                            className="shrink-0 text-emerald-500"
+                          />
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0 text-xs"
+                            tabIndex={-1}
+                            disabled={isAdding}
+                          >
+                            <HugeiconsIcon icon={Add01Icon} size={12} className="mr-1" />
+                            Add
+                          </Button>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-            </>
+              {technicians.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 px-3 pt-3 pb-1">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                      RBTs & Technicians
+                    </span>
+                    <span className="text-muted-foreground/50 text-[11px]">
+                      ({technicians.length})
+                    </span>
+                  </div>
+                  {technicians.map((p) => {
+                    const avatarColor =
+                      CREDENTIAL_AVATAR[p.credentialType] ?? CREDENTIAL_AVATAR.other;
+                    const isOnTeam = onTeamIds.has(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        disabled={isAdding || isOnTeam}
+                        onClick={() => handleAdd(p)}
+                        className="hover:bg-accent/50 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors disabled:cursor-default disabled:hover:bg-transparent"
+                      >
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${avatarColor}`}
+                        >
+                          {getInitials(p.firstName, p.lastName)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium">
+                            {p.firstName} {p.lastName}
+                          </div>
+                          <div className="text-muted-foreground text-xs">
+                            {CREDENTIAL_LABELS[p.credentialType as CredentialType] ??
+                              p.credentialType.toUpperCase()}
+                          </div>
+                        </div>
+                        {isOnTeam ? (
+                          <HugeiconsIcon
+                            icon={CheckmarkCircle02Icon}
+                            size={18}
+                            className="shrink-0 text-emerald-500"
+                          />
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0 text-xs"
+                            tabIndex={-1}
+                            disabled={isAdding}
+                          >
+                            <HugeiconsIcon icon={Add01Icon} size={12} className="mr-1" />
+                            Add
+                          </Button>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           ) : search ? (
-            <div className="text-muted-foreground px-3 py-6 text-center text-xs">
-              No providers match &ldquo;{search}&rdquo;
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-muted-foreground text-sm">
+                No providers match &ldquo;{search}&rdquo;
+              </p>
+              <p className="text-muted-foreground/60 mt-1 text-xs">
+                Try a different name or credential type
+              </p>
             </div>
           ) : (
-            <div className="text-muted-foreground px-3 py-6 text-center text-xs">
-              No providers available.
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-muted-foreground text-sm">No providers in this practice yet</p>
+              <p className="text-muted-foreground/60 mt-1 text-xs">
+                Add providers on the Providers page first
+              </p>
             </div>
           )}
         </div>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -243,6 +317,7 @@ export function ClientCareTeam({
   availableProviders: AvailableProvider[];
   canEdit: boolean;
 }) {
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<CareTeamMember | null>(null);
   const [showPast, setShowPast] = useState(false);
 
@@ -267,16 +342,15 @@ export function ClientCareTeam({
           : null}
       </div>
       {canEdit && (
-        <AddMemberPopover
-          clientId={clientId}
-          availableProviders={availableProviders}
-          careTeam={careTeam}
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs"
+          onClick={() => setAddModalOpen(true)}
         >
-          <Button variant="outline" size="sm" className="text-xs">
-            <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
-            Add Member
-          </Button>
-        </AddMemberPopover>
+          <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
+          Add Member
+        </Button>
       )}
     </div>
   );
@@ -305,16 +379,14 @@ export function ClientCareTeam({
             session coverage.
           </p>
           {canEdit && (
-            <AddMemberPopover
-              clientId={clientId}
-              availableProviders={availableProviders}
-              careTeam={careTeam}
+            <Button
+              size="sm"
+              className="mt-4 text-xs"
+              onClick={() => setAddModalOpen(true)}
             >
-              <Button size="sm" className="mt-4 text-xs">
-                <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
-                Add Team Members
-              </Button>
-            </AddMemberPopover>
+              <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
+              Add Team Members
+            </Button>
           )}
         </div>
       </div>
@@ -435,6 +507,17 @@ export function ClientCareTeam({
           </>
         )}
       </div>
+
+      {/* Add Member Modal */}
+      {canEdit && (
+        <AddMemberModal
+          open={addModalOpen}
+          onOpenChange={setAddModalOpen}
+          clientId={clientId}
+          availableProviders={availableProviders}
+          careTeam={careTeam}
+        />
+      )}
 
       {/* Remove confirmation */}
       <ConfirmDialog
