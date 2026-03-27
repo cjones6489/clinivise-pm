@@ -106,19 +106,84 @@ Catalyst (now part of Rethink Behavioral Health) takes a fundamentally different
 **Strengths**: Fastest note completion, most objective data, eliminates clone risk
 **Weaknesses**: Less flexibility for practices that want narrative-heavy notes, less payer-specific customization
 
-### 2.4 Raven Health (AI-First Newcomer)
+### 2.4 Raven Health (AI-Powered All-in-One)
 
-**Approach: AI-generated notes from minimal structured input**
+**Approach: AI-powered platform with data collection, billing, and note generation**
 
-- **AI note generation**: Providers enter key data points (goals, behaviors, observations), and AI generates a compliant narrative
-- **Minimal manual note writing**: Goal is "complete notes in 2 minutes"
-- **Compliance checking**: AI ensures generated notes include required elements per payer
-- **Less emphasis on template customization**: The AI adapts output based on context rather than using user-built templates
+Raven Health positions itself as a full ABA software platform with AI at the center. Key findings:
 
-**Strengths**: Fastest completion time, consistent compliance, modern UX
-**Weaknesses**: Less control over note content, newer platform with less market validation
+- **AI-powered note generation**: Core feature — AI generates session notes from collected data. The platform markets "AI capabilities" as a primary differentiator alongside data collection and billing.
+- **Data collection**: Mobile-friendly data collection during sessions (frequency, duration, trial-by-trial). Data feeds both graphing and AI note generation.
+- **Full platform**: Scheduling, data collection, session notes, billing, reporting — all-in-one, not just a notes tool.
+- **Target market**: Growing ABA practices. Marketing emphasizes ease of use and modern design vs. legacy platforms like CentralReach.
+- **Blog content strategy**: Heavy investment in educational content (8 key components of effective session notes, how to write notes for insurance, BCBA guides) — positions them as thought leaders.
+- **Pricing**: Per-learner/month model. Exact pricing requires demo, but third-party sources (GetApp, Capterra, SoftwareAdvice) indicate competitive with mid-market ABA tools.
+- **Template approach**: Less emphasis on user-built templates. The AI adapts output based on CPT code and session data. BCBAs review and edit AI-generated notes rather than designing template layouts.
 
-### 2.5 AlohaABA (PM-Focused)
+**Strengths**: Modern UX, AI-first approach, all-in-one platform, strong content marketing
+**Weaknesses**: Newer platform (less market validation), less customization for practices with rigid template requirements, pricing not transparent
+
+Sources:
+- [Raven Health: AI-Powered ABA Platform Features](https://ravenhealth.com/key-features-ai-capabilities/)
+- [Raven Health: ABA Billing Software Pricing](https://ravenhealth.com/pricing/)
+- [Raven Health: 8 Key Components of an Effective ABA Session Note Template](https://ravenhealth.com/blog/aba-note-template/)
+- [Raven Health: How to Write ABA Session Notes for Insurance](https://ravenhealth.com/blog/aba-session-notes-for-insurance/)
+- [GetApp: Raven Health 2026 Pricing, Features, Reviews](https://www.getapp.com/healthcare-pharmaceuticals-software/a/raven-health/)
+
+### 2.5 Hipp Health (AI-Native, Mobile-First)
+
+**Approach: AI-native platform with multi-modal note capture and payer-calibrated AI generation**
+
+Hipp Health is the most aggressive AI-native newcomer. Raised $6.2M (October 2025) specifically to automate behavioral health admin. Key findings:
+
+- **Multi-modal note capture**: Providers can **write, record, or photograph** session notes on the go. This is unique — most platforms only support typed input. Hipp accepts voice recordings, handwritten notes (via photo), and typed text, then uses AI to process all formats.
+- **LLM-powered notes calibrated to individual payer templates**: This is the standout feature. Hipp's AI doesn't just generate generic notes — it **calibrates output to each payer's specific documentation requirements**. A TRICARE note and a Medicaid note from the same session would be formatted differently.
+- **Compliance Agent**: AI-powered compliance scanning that checks clinical notes, authorizations, and verifications in real-time. Identifies risks and auto-generates remediation tasks. Treats addendum notes and attached documents as valid content. Uses whole-word matching to reduce false positives.
+- **Session Verification**: Dedicated page that consolidates verification workflow — date range, service line, clinic location, provider filters in one view.
+- **Data collection**: Mobile app for in-session data collection. Live-streaming and graphing from multiple sessions simultaneously.
+- **Auto-generated claims**: Notes flow directly into claims generation — the AI pipeline goes from session data to note to claim.
+- **Live session streaming**: Supervisors can observe sessions remotely in real-time.
+- **Smart scheduling**: AI-assisted scheduling with utilization rate tracking.
+- **Target market**: ABA practices of all sizes, but messaging emphasizes operational efficiency ("Your Practice on Autopilot").
+- **Founded by**: Veterans from behavioral health and tech. HIPAA-compliant by design, not as an afterthought.
+- **Pricing**: Not publicly listed. Requires demo.
+- **Reported results**: Practices report 90% reduction in claims outstanding.
+
+**Strengths**: Most innovative approach to note capture (voice, photo, text), payer-calibrated AI, compliance agent, modern mobile-first design, strong funding
+**Weaknesses**: Early-stage platform, unproven at scale, pricing opaque, heavy AI dependence may concern clinicians who want manual control
+
+**Key insight for Clinivise**: Hipp's payer-calibrated AI notes are the most compelling feature in the market. Rather than asking practices to build templates per payer, the AI automatically adapts. This aligns with the user's observation that funder requirements vary too much for one-size-fits-all templates.
+
+Sources:
+- [Hipp Health: Effortless Clinical Notes](https://www.hipp.health/product/aba-session-notes)
+- [Hipp Health: Compliance Agent](https://www.hipp.health/product/aba-compliance-agent)
+- [Hipp Health: Data Collection and Analytics](https://www.hipp.health/product/aba-data-collection-software)
+- [HIT Consultant: Hipp Health Secures $6.2M (Oct 2025)](https://hitconsultant.net/2025/10/06/hipp-health-secures-6-2m-for-ai-native-platform-to-automate-behavioral-health-admin/)
+- [Mission Viewpoint: Platform Card — Hipp Health](https://www.missionviewpoint.com/platform-card-hipp-health/)
+
+### 2.6 Passage Health (Content-First PM Platform)
+
+**Approach: Practice management with EHR integration emphasis and content marketing**
+
+Passage Health positions as an all-in-one ABA practice management platform. Notable findings:
+
+- **Blog/content strategy**: Extremely active content marketing — publishes comprehensive comparison articles ("Top 5 ABA Practice Management Software", "7 Best ABA Data Collection Software"). Positions themselves as the definitive buyer's guide.
+- **EHR integration emphasis**: Marketing emphasizes how EHR integration improves practice efficiency. This suggests their own EHR features may be developing, with current strength in PM + integration.
+- **Session notes guidance**: Published detailed guide on "How to Take Effective ABA Session Notes" with examples — suggests they understand the documentation problem but may not yet have a differentiated solution.
+- **Frontera AI (separate entity)**: Frontera Health (fronterahealth.com) is a separate company focused on **ABA assessment report automation** — "Write ABA Assessment Reports 75% Faster." Frontera focuses on initial assessments (97151), not session notes. Has an "Assessment Builder" tool. Frontera and Passage appear to be separate companies despite some marketing overlap.
+- **Target market**: Small to mid-size ABA practices. Content targets practice owners and BCBAs making software decisions.
+- **Pricing**: Not publicly available.
+
+**Strengths**: Strong content/SEO presence, practice management depth, integration focus
+**Weaknesses**: Session note features less differentiated than Raven/Hipp, may be more PM than clinical tool
+
+Sources:
+- [Passage Health: How to Take Effective ABA Session Notes](https://www.passagehealth.com/blog/aba-session-notes-examples)
+- [Passage Health: Top 5 ABA Practice Management Software](https://www.passagehealth.com/blog/aba-practice-management-software)
+- [Passage Health: How EHR Integration Improves ABA Practice Efficiency](https://www.passagehealth.com/blog/ehr-integration)
+- [Frontera Health: ABA Clinical Report Automation](https://fronterahealth.com/)
+
+### 2.7 AlohaABA (PM-Focused)
 
 **Approach: Simple, basic note fields**
 
@@ -127,12 +192,13 @@ Catalyst (now part of Rethink Behavioral Health) takes a fundamentally different
 - **No clinical documentation depth**: Practices using AlohaABA typically pair it with a clinical tool (Motivity, Catalyst) for session notes
 - **Strength is in billing workflow**, not documentation
 
-### 2.6 Other Notable Platforms
+### 2.8 Other Notable Platforms
 
 - **Hi Rasmus**: Emerging platform focused on modern UX and AI. Template customization details limited in public documentation.
 - **Artemis ABA**: Blog-heavy with templates and guides but limited platform customization features publicly documented.
 - **Theralytics**: Offers configurable note templates with payer-specific variants. Template builder less mature than CentralReach/Motivity.
 - **Praxis Notes**: AI-powered note writing specifically for ABA. Not a full EHR — bolt-on tool for note generation.
+- **Noteable**: All-in-one ABA and behavioral health PM software. Less AI emphasis, more traditional PM approach.
 
 ---
 
