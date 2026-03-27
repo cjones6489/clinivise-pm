@@ -20,6 +20,7 @@ export const clientGoals = pgTable(
     goalNumber: integer("goal_number").notNull(),
     title: text("title").notNull(),
     description: text("description"),
+    protocol: text("protocol"), // RBT instructions — how to run this program during a session (4/5 competitors have this)
     goalType: text("goal_type").notNull().default("skill_acquisition"),
     status: text("status").notNull().default("active"),
     baselineData: text("baseline_data"),

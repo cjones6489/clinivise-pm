@@ -13,6 +13,7 @@ export type GoalWithObjectives = {
   goalNumber: number;
   title: string;
   description: string | null;
+  protocol: string | null;
   goalType: string;
   status: string;
   baselineData: string | null;
@@ -76,6 +77,7 @@ export async function getClientGoals(
       goalNumber: clientGoals.goalNumber,
       title: clientGoals.title,
       description: clientGoals.description,
+      protocol: clientGoals.protocol,
       goalType: clientGoals.goalType,
       status: clientGoals.status,
       baselineData: clientGoals.baselineData,

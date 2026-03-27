@@ -33,6 +33,7 @@ export const createGoalSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
+  protocol: optionalText, // RBT instructions for how to run this program
   goalType: z.enum(GOAL_TYPES),
   baselineData: z
     .string()
@@ -123,6 +124,7 @@ export const updateGoalSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
+  protocol: optionalText,
   goalType: z.enum(GOAL_TYPES).optional(),
   status: z.enum(GOAL_STATUSES).optional(),
   baselineData: z

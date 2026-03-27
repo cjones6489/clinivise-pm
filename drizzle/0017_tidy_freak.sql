@@ -1,0 +1,1 @@
+ALTER TABLE "client_goals" ADD COLUMN "protocol" text;
