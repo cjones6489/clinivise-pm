@@ -8,10 +8,12 @@ import type {
   ClientInsuranceWithPayer,
   PayerOption,
 } from "@/server/queries/clients";
+import type { GoalWithObjectives } from "@/server/queries/goals";
 import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
 import { ClientOverview } from "./client-overview";
 import { ClientCareTeam } from "./client-care-team";
+import { ClientGoals } from "./client-goals";
 import { ClientForm } from "./client-form";
 import { ClientContactsCard } from "./client-contacts-card";
 import { ClientInsuranceCard } from "./client-insurance-card";
@@ -24,6 +26,7 @@ export function ClientDetail({
   contacts,
   careTeam,
   availableProviders,
+  goals,
   insurance,
   payerOptions,
   authorizations,
@@ -36,6 +39,7 @@ export function ClientDetail({
   contacts: ClientContact[];
   careTeam: CareTeamMember[];
   availableProviders: AvailableProvider[];
+  goals: GoalWithObjectives[];
   insurance: ClientInsuranceWithPayer[];
   payerOptions: PayerOption[];
   authorizations: AuthorizationListItem[];
@@ -49,6 +53,7 @@ export function ClientDetail({
       <TabsList>
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="care-team">Care Team</TabsTrigger>
+        <TabsTrigger value="goals">Goals</TabsTrigger>
         <TabsTrigger value="contacts">Contacts</TabsTrigger>
         <TabsTrigger value="insurance">Insurance</TabsTrigger>
         <TabsTrigger value="authorizations">Authorizations</TabsTrigger>
@@ -74,6 +79,10 @@ export function ClientDetail({
           availableProviders={availableProviders}
           canEdit={canEdit}
         />
+      </TabsContent>
+
+      <TabsContent value="goals" className="pt-4">
+        <ClientGoals goals={goals} canEdit={canEdit} />
       </TabsContent>
 
       <TabsContent value="contacts" className="pt-4">

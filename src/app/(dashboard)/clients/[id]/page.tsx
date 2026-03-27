@@ -10,6 +10,7 @@ import {
   getClientInsurance,
   getPayerOptions,
 } from "@/server/queries/clients";
+import { getClientGoals } from "@/server/queries/goals";
 import { getClientAuthorizations, getClientAuthUtilization } from "@/server/queries/authorizations";
 import { getClientSessions } from "@/server/queries/sessions";
 import { ExpiryBadge } from "@/components/shared/expiry-badge";
@@ -32,12 +33,13 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const canEdit = hasPermission(user.role, "clients.write");
   const canManagePayers = hasPermission(user.role, "payers.write");
 
-  const [client, contacts, careTeam, availableProviders, insurance, payerOptions, authorizations, sessions, authUtilization] =
+  const [client, contacts, careTeam, availableProviders, goals, insurance, payerOptions, authorizations, sessions, authUtilization] =
     await Promise.all([
       getClientById(user.organizationId, id),
       getClientContacts(user.organizationId, id),
       getCareTeam(user.organizationId, id),
       canEdit ? getAvailableProviders(user.organizationId, id) : Promise.resolve([]),
+      getClientGoals(user.organizationId, id),
       getClientInsurance(user.organizationId, id),
       canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
       getClientAuthorizations(user.organizationId, id),
@@ -125,6 +127,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         contacts={contacts}
         careTeam={careTeam}
         availableProviders={availableProviders}
+        goals={goals}
         insurance={insurance}
         payerOptions={payerOptions}
         authorizations={authorizations}
