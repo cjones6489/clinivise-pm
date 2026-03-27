@@ -370,17 +370,35 @@ export async function getUnsignedNoteCount(orgId: string): Promise<{
   };
 }
 
-/** Check if a session already has a note (for "Complete Note" button state) */
+/** Check if a session already has a note (for "Complete Note" button state and detail card) */
 export async function sessionHasNote(
   orgId: string,
   sessionId: string,
-): Promise<{ hasNote: boolean; noteId: string | null; noteStatus: string | null }> {
+): Promise<{
+  hasNote: boolean;
+  noteId: string | null;
+  noteStatus: string | null;
+  noteType: string | null;
+  signedByName: string | null;
+  signedAt: Date | null;
+  cosignedByName: string | null;
+  cosignedAt: Date | null;
+}> {
   const [row] = await db
     .select({
       id: sessionNotes.id,
       status: sessionNotes.status,
+      noteType: sessionNotes.noteType,
+      signedAt: sessionNotes.signedAt,
+      cosignedAt: sessionNotes.cosignedAt,
+      signerFirstName: signerAlias.firstName,
+      signerLastName: signerAlias.lastName,
+      cosignerFirstName: cosignerAlias.firstName,
+      cosignerLastName: cosignerAlias.lastName,
     })
     .from(sessionNotes)
+    .leftJoin(signerAlias, eq(sessionNotes.signedById, signerAlias.id))
+    .leftJoin(cosignerAlias, eq(sessionNotes.cosignedById, cosignerAlias.id))
     .where(
       and(
         eq(sessionNotes.organizationId, orgId),
@@ -389,10 +407,37 @@ export async function sessionHasNote(
     )
     .limit(1);
 
+  if (!row) {
+    return {
+      hasNote: false,
+      noteId: null,
+      noteStatus: null,
+      noteType: null,
+      signedByName: null,
+      signedAt: null,
+      cosignedByName: null,
+      cosignedAt: null,
+    };
+  }
+
+  const signedByName =
+    row.signerFirstName && row.signerLastName
+      ? `${row.signerLastName}, ${row.signerFirstName}`
+      : null;
+  const cosignedByName =
+    row.cosignerFirstName && row.cosignerLastName
+      ? `${row.cosignerLastName}, ${row.cosignerFirstName}`
+      : null;
+
   return {
-    hasNote: !!row,
-    noteId: row?.id ?? null,
-    noteStatus: row?.status ?? null,
+    hasNote: true,
+    noteId: row.id,
+    noteStatus: row.status,
+    noteType: row.noteType,
+    signedByName,
+    signedAt: row.signedAt,
+    cosignedByName,
+    cosignedAt: row.cosignedAt,
   };
 }
 
