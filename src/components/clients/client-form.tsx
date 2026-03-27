@@ -40,13 +40,7 @@ const GENDER_LABELS: Record<string, string> = {
   U: "Unknown",
 };
 
-export function ClientForm({
-  client,
-  disabled,
-}: {
-  client?: Client;
-  disabled?: boolean;
-}) {
+export function ClientForm({ client, disabled }: { client?: Client; disabled?: boolean }) {
   const router = useRouter();
   const isEdit = !!client;
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -313,11 +307,20 @@ export function ClientForm({
           </Field>
           <Field>
             <Label className="text-xs font-medium">Primary Language</Label>
-            <Input {...register("primaryLanguage")} placeholder="English" className="h-8 text-xs" disabled={disabled} />
+            <Input
+              {...register("primaryLanguage")}
+              placeholder="English"
+              className="h-8 text-xs"
+              disabled={disabled}
+            />
           </Field>
           <Field>
             <Label className="text-xs font-medium">Medicaid ID</Label>
-            <Input {...register("medicaidId")} className="h-8 text-xs tabular-nums" disabled={disabled} />
+            <Input
+              {...register("medicaidId")}
+              className="h-8 text-xs tabular-nums"
+              disabled={disabled}
+            />
           </Field>
         </div>
         <div className="flex items-center gap-2">
@@ -325,10 +328,12 @@ export function ClientForm({
             type="checkbox"
             {...register("interpreterNeeded")}
             id="interpreterNeeded"
-            className="h-4 w-4 rounded border-border"
+            className="border-border h-4 w-4 rounded"
             disabled={disabled}
           />
-          <Label htmlFor="interpreterNeeded" className="text-xs font-medium">Interpreter needed</Label>
+          <Label htmlFor="interpreterNeeded" className="text-xs font-medium">
+            Interpreter needed
+          </Label>
         </div>
       </div>
 
@@ -338,11 +343,21 @@ export function ClientForm({
         <div className="grid grid-cols-2 gap-4">
           <Field>
             <Label className="text-xs font-medium">Provider Name</Label>
-            <Input {...register("referringProviderName")} placeholder="Dr. Jane Smith" className="h-8 text-xs" disabled={disabled} />
+            <Input
+              {...register("referringProviderName")}
+              placeholder="Dr. Jane Smith"
+              className="h-8 text-xs"
+              disabled={disabled}
+            />
           </Field>
           <Field>
             <Label className="text-xs font-medium">NPI</Label>
-            <Input {...register("referringProviderNpi")} placeholder="10-digit NPI" className="h-8 text-xs tabular-nums" disabled={disabled} />
+            <Input
+              {...register("referringProviderNpi")}
+              placeholder="10-digit NPI"
+              className="h-8 text-xs tabular-nums"
+              disabled={disabled}
+            />
           </Field>
         </div>
       </div>

@@ -70,15 +70,24 @@ export function InviteMemberDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) reset();
+      }}
+    >
       <DialogTrigger asChild>
-        <Button size="sm" className="text-xs">Invite Member</Button>
+        <Button size="sm" className="text-xs">
+          Invite Member
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold">Invite Team Member</DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
-            Send an invitation to join your practice. They&apos;ll receive an email to set up their account.
+          <DialogDescription className="text-muted-foreground text-xs">
+            Send an invitation to join your practice. They&apos;ll receive an email to set up their
+            account.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">

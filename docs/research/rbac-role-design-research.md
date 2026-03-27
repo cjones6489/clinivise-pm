@@ -13,6 +13,7 @@ Role-based access control in ABA practice management must balance three competin
 **BACB Definition:** Paraprofessional certification (undergraduate-level) in behavior analysis. RBTs are direct-care providers who implement behavior-analytic services under the close supervision of a BCBA or BCaBA. The RBT credential is granted by the BACB after completing a 40-hour training, passing a competency assessment, and passing a written exam.
 
 **Scope of Practice:**
+
 - Implement behavior reduction and skill acquisition programs as designed by the supervising BCBA
 - Collect data on target behaviors during sessions
 - Complete session documentation (session notes, data sheets, billing records)
@@ -23,6 +24,7 @@ Role-based access control in ABA practice management must balance three competin
 - May NOT bill insurance directly — their services are billed under the supervising BCBA's NPI
 
 **Day-to-Day in Practice:**
+
 - Arrives at client location (home, clinic, school, community)
 - Reviews session plan/targets set by BCBA
 - Runs discrete trial training, natural environment teaching, or other protocols
@@ -32,6 +34,7 @@ Role-based access control in ABA practice management must balance three competin
 - Communicates session outcomes to supervisor
 
 **Data Access Needs:**
+
 - Their own assigned clients' treatment plans (read-only)
 - Session data collection interface for their sessions
 - Their own session history and notes
@@ -40,6 +43,7 @@ Role-based access control in ABA practice management must balance three competin
 - Behavior intervention plans for their assigned clients
 
 **Must Be Blocked From:**
+
 - Other providers' session notes and data (unless explicitly shared for coverage)
 - Client insurance/financial information (policy numbers, billing rates, claims)
 - Authorization details (approved units, utilization percentages, payer correspondence)
@@ -52,6 +56,7 @@ Role-based access control in ABA practice management must balance three competin
 - Audit logs
 
 **BACB Ethics Code References:**
+
 - RBT Ethics Code 2.0, Section 1.01: "RBTs practice within the boundaries defined by their credential, their education, and their competencies."
 - RBT Ethics Code 2.0, Section 1.07: "RBTs follow the direction of their supervisors, accurately implement behavior-technician services, and accurately complete all required documentation (e.g., client data, billing records)."
 - RBT Ethics Code 2.0, Section 2: "RBTs protect the confidentiality of clients... share information only with supervisors as required."
@@ -61,6 +66,7 @@ Role-based access control in ABA practice management must balance three competin
 **BACB Definition:** Undergraduate-level certification in behavior analysis. BCaBAs provide behavior-analytic services under the supervision of a BCBA. Unlike RBTs, BCaBAs may supervise RBTs and have broader clinical responsibilities, but they cannot practice independently.
 
 **Scope of Practice:**
+
 - All RBT duties plus:
 - May supervise RBTs (but must be supervised themselves by a BCBA)
 - May assist with assessments under BCBA direction
@@ -72,6 +78,7 @@ Role-based access control in ABA practice management must balance three competin
 - First 1,000 hours post-certification: must receive supervision for at least 5% of total service hours
 
 **Day-to-Day in Practice:**
+
 - Provides direct therapy services (like an RBT but with more autonomy)
 - Conducts portions of assessments as directed by supervising BCBA
 - Supervises and trains RBTs on protocol implementation
@@ -81,6 +88,7 @@ Role-based access control in ABA practice management must balance three competin
 - Tracks RBT supervision hours and compliance
 
 **Data Access Needs:**
+
 - All data an RBT needs, plus:
 - Assigned clients' full clinical records (assessment data, treatment plans, progress notes)
 - RBT session notes for supervisees they oversee
@@ -89,6 +97,7 @@ Role-based access control in ABA practice management must balance three competin
 - Scheduling data for their supervisees and assigned clients
 
 **Must Be Blocked From:**
+
 - Insurance/financial details (billing rates, claims, payments)
 - Practice-level financial data
 - Clients not in their caseload or their supervisees' caseloads
@@ -102,6 +111,7 @@ Role-based access control in ABA practice management must balance three competin
 **BACB Definition:** Graduate-level (master's degree minimum) certification in behavior analysis. BCBAs are independent practitioners who may practice without supervision. They are qualified healthcare professionals (QHPs) under insurance billing rules.
 
 **Scope of Practice:**
+
 - Full clinical authority within ABA practice
 - Conduct functional behavior assessments (FBAs) and all ABA assessments
 - Develop, implement, and modify treatment/behavior intervention plans
@@ -113,6 +123,7 @@ Role-based access control in ABA practice management must balance three competin
 - May bill CPT codes 97151, 97155, 97156, 97157, 97158 (QHP-only codes)
 
 **Day-to-Day in Practice:**
+
 - Reviews client data and progress across caseload
 - Conducts assessments for new clients
 - Develops and updates treatment plans
@@ -125,6 +136,7 @@ Role-based access control in ABA practice management must balance three competin
 - May handle some billing review or claim submission in small practices
 
 **Data Access Needs:**
+
 - All clinical data for their caseload (and supervisees' caseloads)
 - Authorization data (approved units, utilization, expiry dates) for caseload planning
 - Session data across their caseload for supervision and clinical review
@@ -135,6 +147,7 @@ Role-based access control in ABA practice management must balance three competin
 - Some billing visibility (what's been billed, claim status) — varies by practice
 
 **Must Be Blocked From (in practices with dedicated admin/billing staff):**
+
 - Practice-wide financial reports (revenue, collections, profit margins)
 - Other BCBAs' caseload data (unless cross-coverage is configured)
 - Staff compensation and HR data
@@ -157,6 +170,7 @@ Role-based access control in ABA practice management must balance three competin
 **Regulatory Context:** Billing staff are not BACB-credentialed roles. They are administrative staff who handle insurance verification, claim submission, payment posting, denial management, and financial reporting. In ABA practices, billing is notoriously complex due to authorization-based services, unit calculations, and payer-specific rules.
 
 **Day-to-Day in Practice:**
+
 - Verify insurance eligibility and benefits for new/existing clients
 - Submit authorization requests (administrative side — BCBA provides clinical justification)
 - Track authorization utilization to prevent over/under-billing
@@ -168,6 +182,7 @@ Role-based access control in ABA practice management must balance three competin
 - Generate financial reports for practice leadership
 
 **Data Access Needs:**
+
 - Client demographics and insurance information (full read/write)
 - Authorization data (approved units, dates, utilization — full read, limited write)
 - Session data (dates, CPT codes, units, provider — for claim creation; NOT clinical content)
@@ -179,6 +194,7 @@ Role-based access control in ABA practice management must balance three competin
 - Provider NPI and credential information (for claim rendering)
 
 **Must Be Blocked From:**
+
 - Clinical content of session notes (behavioral data, skill acquisition data, incident details)
 - Treatment plans and behavior intervention plans
 - Assessment results and clinical progress notes
@@ -196,6 +212,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 **Role Description:** Administrative staff who manage day-to-day operations of the practice. May or may not be clinically credentialed. In small ABA practices, this role often overlaps with billing, scheduling, and HR.
 
 **Day-to-Day in Practice:**
+
 - Manage staff onboarding, credential tracking, and offboarding
 - Configure practice settings (locations, services, payer contracts)
 - Handle scheduling for clinical staff and clients
@@ -207,6 +224,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - Configure system settings
 
 **Data Access Needs:**
+
 - All client data (demographics, insurance, status) — full CRUD
 - Provider/staff data — full CRUD
 - Authorization data — full CRUD
@@ -219,6 +237,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - Team management — invite, deactivate, change roles
 
 **Must Be Blocked From:**
+
 - Certain clinical content may be restricted if admin is not clinically credentialed
 - In practice, most small-practice admins have broad access
 - Cannot delete audit logs or modify historical billing records
@@ -228,6 +247,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 **Role Description:** The practice owner. Usually a BCBA who founded or leads the practice. Has full system access. In Clerk's model, this maps to the organization creator.
 
 **Data Access:**
+
 - Everything. Full CRUD on all features.
 - Only role that can manage organization settings, billing configuration, and subscription
 - Only role that can transfer ownership
@@ -235,6 +255,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - Full audit log access including export
 
 **Distinction from Admin:**
+
 - Owner can manage other admins (promote, demote, remove)
 - Owner can access subscription/plan information
 - Owner can configure SSO and security settings
@@ -249,6 +270,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 **Overview:** The dominant ABA practice management platform, used by large multi-site practices. Known for its comprehensive feature set and equally comprehensive complexity.
 
 **Permissions Model:**
+
 - Fully granular, module-by-module permission system
 - Permissions are organized by module: Contacts, Clinical, Billing, Claims, Scheduling, Timesheets, Reports, Learn (training), and Organization Account
 - Each module has multiple individual permission toggles (estimated 50+ total)
@@ -256,6 +278,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - No preset roles — every practice must configure permissions from scratch
 
 **Key Billing Module Permissions:**
+
 - Basic Billing Access (create timesheets)
 - Access billing tab and create invoices
 - Create and manage payments
@@ -264,19 +287,23 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - Access Service Codes and Fee Schedules
 
 **Key Clinical Module Permissions:**
+
 - Basic Clinical Access
 - Create/view/edit/score assessments (ABLLS-R, AFLS)
 - View and collect scores for assessments
 - View finalized reports
 
 **Key Scheduling Permissions:**
+
 - Separate from clinical and billing
 - Granular view/edit/manage toggles
 
 **Organization Account Restrictions:**
+
 - Only the main organization account can access: SSO settings, insurance verification settings, visit verification settings, organization claim settings, merchant settings, employee/client checklists, and agreed-rate toggling
 
 **Pain Points (from user reviews on Capterra/Software Advice):**
+
 - Steep learning curve; permissions setup is one of the most common onboarding complaints
 - "Too many settings to configure" is a recurring theme
 - Permission misconfiguration is a frequent support ticket category
@@ -291,6 +318,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 **Overview:** Cloud-based ABA practice management popular with small to mid-size practices. Positioned as simpler than CentralReach.
 
 **Permissions Model:**
+
 - Role-based with custom user roles
 - Accessed via Settings > Security > User Roles
 - Permissions assigned individually and/or by job title
@@ -300,12 +328,14 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - Staff can only view clients and complete sessions they're assigned to
 
 **Key Design Decisions:**
+
 - Simpler than CentralReach but still requires manual configuration
 - Binary access model (view/full) rather than granular CRUD
 - Client-level access scoping (staff see only assigned clients)
 - Reports locked behind admin by default
 
 **Pain Points:**
+
 - When a staff member is deleted and recreated with the same email, the system treats it as a new record (user role must be reassigned)
 - Limited documentation on exactly what each permission controls
 - No preset role templates
@@ -318,25 +348,27 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 
 **Permissions Model — Clinician Roles (mutually exclusive):**
 
-| Role | Own Clients | All Clients | Billing | Operations |
-|------|-------------|-------------|---------|------------|
-| **Entire Practice Access** | Full manage | Full manage | Yes | Selected tools |
-| **Full Client List Access** | Full manage | View only | No | No |
-| **Billing Access** | Full manage | No access | Own clients only | No |
-| **Basic Access** | Care + docs only | No access | No | No |
+| Role                        | Own Clients      | All Clients | Billing          | Operations     |
+| --------------------------- | ---------------- | ----------- | ---------------- | -------------- |
+| **Entire Practice Access**  | Full manage      | Full manage | Yes              | Selected tools |
+| **Full Client List Access** | Full manage      | View only   | No               | No             |
+| **Billing Access**          | Full manage      | No access   | Own clients only | No             |
+| **Basic Access**            | Care + docs only | No access   | No               | No             |
 
 **Additional Clinician Role:**
+
 - **Supervisor** — can be combined with any other clinician role. Allows reviewing supervisees' documentation and enabling supervisee billing.
 
 **Administrative Roles (stackable with clinician roles):**
 
-| Role | Scope | Key Capabilities |
-|------|-------|-------------------|
-| **Practice Manager** | All clients, all settings | Full operational access except plan/subscription info |
-| **Practice Biller** | All clients (limited view) | Billing documents, payments, reports, payroll |
-| **Practice Scheduler** | All clients (limited view) | Scheduling tasks only |
+| Role                   | Scope                      | Key Capabilities                                      |
+| ---------------------- | -------------------------- | ----------------------------------------------------- |
+| **Practice Manager**   | All clients, all settings  | Full operational access except plan/subscription info |
+| **Practice Biller**    | All clients (limited view) | Billing documents, payments, reports, payroll         |
+| **Practice Scheduler** | All clients (limited view) | Scheduling tasks only                                 |
 
 **Key Design Decisions:**
+
 - Clinician roles are mutually exclusive (pick one); admin roles stack on top
 - Supervisor is the only combinable clinician role
 - Client-level access granting/revoking is possible regardless of role
@@ -344,6 +376,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - Only Plus plan supports group practice features
 
 **Pain Points:**
+
 - Not ABA-specific (no authorization tracking, no CPT code awareness)
 - Can't create custom roles beyond the 6 presets
 - The "Billing Access" clinician role conflates clinical and billing in a way that doesn't map to ABA's clinical/billing separation
@@ -355,6 +388,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 **Overview:** ABA-specific practice management software, positioned as budget-friendly for smaller practices.
 
 **Permissions Model:**
+
 - Role-based access controls (RBAC) described but not fully documented publicly
 - Roles include: Clinician, Clinical Director, Administrative Team
 - Configurable permissions per role — "letting practices tailor rules, permissions, locations, and service types"
@@ -363,6 +397,7 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 - Automatic session timeouts for shared devices
 
 **Key Design Decisions:**
+
 - Emphasis on role-based defaults that match ABA practice hierarchies
 - Clinical Director has overview across staff utilization and compliance
 - Administrative team has operational tools without full clinical access
@@ -372,17 +407,17 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 
 ### 2.5 Comparative Summary
 
-| Feature | CentralReach | AlohaABA | SimplePractice | Theralytics |
-|---------|-------------|----------|----------------|-------------|
-| **Role count** | Custom only | Custom + presets | 7 preset | ~4 preset |
-| **Granularity** | 50+ toggles | View/Full per feature | Preset bundles | Configurable |
-| **Client scoping** | Network-based | Assignment-based | Role + manual | Role-based |
-| **Preset templates** | None | None | Yes (the roles ARE templates) | Yes |
-| **Admin/clinical split** | By permission | By permission | Explicit roles | Explicit roles |
-| **Stackable roles** | N/A (all custom) | N/A | Yes (admin on clinician) | Unknown |
-| **Setup complexity** | Very high | Medium | Very low | Low |
-| **ABA-specific** | Yes | Yes | No | Yes |
-| **User satisfaction** | Mixed (power vs complexity) | Good | Very good | Good |
+| Feature                  | CentralReach                | AlohaABA              | SimplePractice                | Theralytics    |
+| ------------------------ | --------------------------- | --------------------- | ----------------------------- | -------------- |
+| **Role count**           | Custom only                 | Custom + presets      | 7 preset                      | ~4 preset      |
+| **Granularity**          | 50+ toggles                 | View/Full per feature | Preset bundles                | Configurable   |
+| **Client scoping**       | Network-based               | Assignment-based      | Role + manual                 | Role-based     |
+| **Preset templates**     | None                        | None                  | Yes (the roles ARE templates) | Yes            |
+| **Admin/clinical split** | By permission               | By permission         | Explicit roles                | Explicit roles |
+| **Stackable roles**      | N/A (all custom)            | N/A                   | Yes (admin on clinician)      | Unknown        |
+| **Setup complexity**     | Very high                   | Medium                | Very low                      | Low            |
+| **ABA-specific**         | Yes                         | Yes                   | No                            | Yes            |
+| **User satisfaction**    | Mixed (power vs complexity) | Good                  | Very good                     | Good           |
 
 ---
 
@@ -393,12 +428,14 @@ Per HHS guidance, "a billing specialist does not need access to psychotherapy no
 The HIPAA Privacy Rule (45 CFR 164.502(b)) requires covered entities to "make reasonable efforts to limit use, disclosure of, and requests for protected health information to the minimum necessary to accomplish the intended purpose."
 
 **Practical Implementation for ABA:**
+
 - A billing specialist should see diagnosis codes, CPT codes, units, dates of service, and insurance information — NOT full session notes, behavioral data, or treatment plan content
 - An RBT should see their assigned clients' treatment targets and session plans — NOT insurance information, billing rates, or other clients' records
 - A BCBA should see full clinical data for their caseload — but not necessarily practice-wide financial data or other BCBAs' clinical notes
 - An admin/owner may need broad access but should still be restricted from clinical content if they are not clinically credentialed
 
 **HHS Guidance Specifics:**
+
 - "For internal uses, a covered entity must develop and implement policies and procedures that restrict access and uses of protected health information based on the specific roles of the members of their workforce"
 - "A billing office sending information to an insurer should not include the patient's full clinical record if a treatment summary and relevant diagnosis codes suffice"
 - Organizations must identify "classes of persons or job titles" that need access to PHI and define the categories of PHI each class needs
@@ -413,6 +450,7 @@ The HIPAA Security Rule (45 CFR 164.312(a)) requires:
 4. **Encryption and Decryption** (Addressable): Implement mechanism to encrypt/decrypt ePHI
 
 **Audit Controls** (45 CFR 164.312(b)):
+
 - Implement mechanisms that record and examine activity in information systems containing ePHI
 - Must track: who accessed records, when, what actions they performed, what data they viewed
 - Audit logs must be retained for minimum 6 years
@@ -438,6 +476,7 @@ Behavior analysts must be knowledgeable about and comply with all applicable req
 Supervisors ensure supervisees' performance is within the boundaries of their competence and their assigned responsibilities. Supervisors maintain documentation of supervision. Supervisors must be competent to provide supervision and maintain appropriate oversight volume.
 
 **Implications for RBAC:**
+
 - RBTs should not have access to information beyond what their supervisor has authorized them to see
 - BCaBAs must have enough access to fulfill supervisory duties over RBTs, but under BCBA oversight
 - Session documentation must be attributable to the specific provider who rendered the service
@@ -455,6 +494,7 @@ Insurance payers and government auditors check:
 6. **Supervision documentation**: For RBT-rendered services, is there documented BCBA supervision?
 
 **What payers specifically look for in audits:**
+
 - That billing staff cannot modify clinical documentation
 - That clinical documentation was signed by the rendering provider (not someone else)
 - That session times and dates are accurate and not retroactively altered without audit trail
@@ -464,6 +504,7 @@ Insurance payers and government auditors check:
 ### 3.5 State-Specific Considerations
 
 Many states have additional requirements:
+
 - Some states require BCBA access to all clinical records for supervisees at all times
 - Some Medicaid programs require specific supervision ratios that must be documented
 - Some states require electronic visit verification (EVV) with provider-specific authentication
@@ -476,6 +517,7 @@ Many states have additional requirements:
 ## 4. Permission Matrix
 
 This is the primary deliverable. Each cell indicates the access level:
+
 - **---** = No access (feature hidden from this role)
 - **R** = Read only
 - **RW** = Read + Write (create, edit)
@@ -486,113 +528,113 @@ This is the primary deliverable. Each cell indicates the access level:
 
 ### 4.1 Core Navigation & Pages
 
-| Feature / Page | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|----------------|-------|-------|------|-------|-----|---------------|
-| **Dashboard / Overview** | Full practice | Full practice | Own caseload | Own caseload | Own schedule | Billing metrics |
-| **Clients list** | RWD all | RWD all | RW caseload | R caseload | R assigned | R all (limited fields) |
-| **Client detail — Demographics** | RW | RW | RW caseload | R caseload | R assigned | R all |
-| **Client detail — Insurance** | RW | RW | R caseload | --- | --- | RW all |
-| **Client detail — Clinical notes** | RW | R (if credentialed) | RW caseload | RW caseload | R assigned (own notes RW) | --- |
-| **Client detail — Contacts/Family** | RW | RW | RW caseload | R caseload | R assigned | R all |
-| **Client detail — Documents** | RW | RW | RW caseload | R caseload | R assigned | R (billing docs only) |
+| Feature / Page                      | Owner         | Admin               | BCBA         | BCaBA        | RBT                       | Billing Staff          |
+| ----------------------------------- | ------------- | ------------------- | ------------ | ------------ | ------------------------- | ---------------------- |
+| **Dashboard / Overview**            | Full practice | Full practice       | Own caseload | Own caseload | Own schedule              | Billing metrics        |
+| **Clients list**                    | RWD all       | RWD all             | RW caseload  | R caseload   | R assigned                | R all (limited fields) |
+| **Client detail — Demographics**    | RW            | RW                  | RW caseload  | R caseload   | R assigned                | R all                  |
+| **Client detail — Insurance**       | RW            | RW                  | R caseload   | ---          | ---                       | RW all                 |
+| **Client detail — Clinical notes**  | RW            | R (if credentialed) | RW caseload  | RW caseload  | R assigned (own notes RW) | ---                    |
+| **Client detail — Contacts/Family** | RW            | RW                  | RW caseload  | R caseload   | R assigned                | R all                  |
+| **Client detail — Documents**       | RW            | RW                  | RW caseload  | R caseload   | R assigned                | R (billing docs only)  |
 
 ### 4.2 Authorizations
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Authorizations list** | RW all | RW all | RW caseload | R caseload | --- | RW all |
-| **Authorization detail** | RW | RW | RW caseload | R caseload | --- | RW (admin fields) |
-| **Create authorization** | Yes | Yes | Yes (own caseload) | No | No | Yes |
-| **Edit authorization** | Yes | Yes | Yes (own caseload) | No | No | Yes (dates, units, status) |
-| **Upload auth letter (AI parse)** | Yes | Yes | Yes | No | No | Yes |
-| **Auth utilization view** | Full practice | Full practice | Own caseload | Own caseload | --- | Full practice |
-| **Auth alerts/warnings** | All | All | Own caseload | Own caseload | --- | All |
+| Feature                           | Owner         | Admin         | BCBA               | BCaBA        | RBT | Billing Staff              |
+| --------------------------------- | ------------- | ------------- | ------------------ | ------------ | --- | -------------------------- |
+| **Authorizations list**           | RW all        | RW all        | RW caseload        | R caseload   | --- | RW all                     |
+| **Authorization detail**          | RW            | RW            | RW caseload        | R caseload   | --- | RW (admin fields)          |
+| **Create authorization**          | Yes           | Yes           | Yes (own caseload) | No           | No  | Yes                        |
+| **Edit authorization**            | Yes           | Yes           | Yes (own caseload) | No           | No  | Yes (dates, units, status) |
+| **Upload auth letter (AI parse)** | Yes           | Yes           | Yes                | No           | No  | Yes                        |
+| **Auth utilization view**         | Full practice | Full practice | Own caseload       | Own caseload | --- | Full practice              |
+| **Auth alerts/warnings**          | All           | All           | Own caseload       | Own caseload | --- | All                        |
 
 ### 4.3 Sessions
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Sessions list** | RW all | RW all | RW caseload | RW caseload | OWN RW | R all (billing fields) |
-| **Log new session** | Yes | Yes | Yes | Yes | Yes (own only) | No |
-| **Edit session** | All sessions | All sessions | Caseload sessions | Caseload sessions | Own sessions (before sign-off) | No |
-| **Cancel session** | All | All | Caseload | Caseload | Own (before sign-off) | No |
-| **Session clinical data** (targets, data, notes) | RW all | R (if credentialed) | RW caseload | RW caseload | OWN RW | --- |
-| **Session billing fields** (CPT, units, modifiers) | RW | RW | R caseload | R caseload | --- | R all |
-| **Session sign-off / lock** | Yes | Yes | Yes (caseload) | No | No | No |
-| **View session timer** | Yes | Yes | Yes | Yes | Yes (own) | No |
-| **Bulk session operations** | Yes | Yes | No | No | No | No |
+| Feature                                            | Owner        | Admin               | BCBA              | BCaBA             | RBT                            | Billing Staff          |
+| -------------------------------------------------- | ------------ | ------------------- | ----------------- | ----------------- | ------------------------------ | ---------------------- |
+| **Sessions list**                                  | RW all       | RW all              | RW caseload       | RW caseload       | OWN RW                         | R all (billing fields) |
+| **Log new session**                                | Yes          | Yes                 | Yes               | Yes               | Yes (own only)                 | No                     |
+| **Edit session**                                   | All sessions | All sessions        | Caseload sessions | Caseload sessions | Own sessions (before sign-off) | No                     |
+| **Cancel session**                                 | All          | All                 | Caseload          | Caseload          | Own (before sign-off)          | No                     |
+| **Session clinical data** (targets, data, notes)   | RW all       | R (if credentialed) | RW caseload       | RW caseload       | OWN RW                         | ---                    |
+| **Session billing fields** (CPT, units, modifiers) | RW           | RW                  | R caseload        | R caseload        | ---                            | R all                  |
+| **Session sign-off / lock**                        | Yes          | Yes                 | Yes (caseload)    | No                | No                             | No                     |
+| **View session timer**                             | Yes          | Yes                 | Yes               | Yes               | Yes (own)                      | No                     |
+| **Bulk session operations**                        | Yes          | Yes                 | No                | No                | No                             | No                     |
 
 ### 4.4 Providers / Staff
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Providers list** | RW all | RW all | R all | R limited | R (own profile) | R (NPI/credentials) |
-| **Provider detail — Profile** | RW | RW | R | R (own + supervisor) | R (own profile) | R (billing fields) |
-| **Provider detail — Credentials** | RW | RW | R | R (own) | R (own) | R |
-| **Provider detail — Caseload** | R all | R all | R own | R own | --- | --- |
-| **Create provider** | Yes | Yes | No | No | No | No |
-| **Edit provider** | Yes | Yes | No | No | Own profile only | No |
-| **Deactivate provider** | Yes | Yes | No | No | No | No |
+| Feature                           | Owner  | Admin  | BCBA  | BCaBA                | RBT              | Billing Staff       |
+| --------------------------------- | ------ | ------ | ----- | -------------------- | ---------------- | ------------------- |
+| **Providers list**                | RW all | RW all | R all | R limited            | R (own profile)  | R (NPI/credentials) |
+| **Provider detail — Profile**     | RW     | RW     | R     | R (own + supervisor) | R (own profile)  | R (billing fields)  |
+| **Provider detail — Credentials** | RW     | RW     | R     | R (own)              | R (own)          | R                   |
+| **Provider detail — Caseload**    | R all  | R all  | R own | R own                | ---              | ---                 |
+| **Create provider**               | Yes    | Yes    | No    | No                   | No               | No                  |
+| **Edit provider**                 | Yes    | Yes    | No    | No                   | Own profile only | No                  |
+| **Deactivate provider**           | Yes    | Yes    | No    | No                   | No               | No                  |
 
 ### 4.5 Payers
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Payers list** | RW | RW | R | --- | --- | RW |
-| **Payer detail** | RW | RW | R | --- | --- | RW |
-| **Create / edit payer** | Yes | Yes | No | No | No | Yes |
-| **Fee schedules / rates** | RW | RW | --- | --- | --- | RW |
-| **Contracted rates** | RW | RW | --- | --- | --- | RW |
+| Feature                   | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
+| ------------------------- | ----- | ----- | ---- | ----- | --- | ------------- |
+| **Payers list**           | RW    | RW    | R    | ---   | --- | RW            |
+| **Payer detail**          | RW    | RW    | R    | ---   | --- | RW            |
+| **Create / edit payer**   | Yes   | Yes   | No   | No    | No  | Yes           |
+| **Fee schedules / rates** | RW    | RW    | ---  | ---   | --- | RW            |
+| **Contracted rates**      | RW    | RW    | ---  | ---   | --- | RW            |
 
 ### 4.6 Billing (Phase 2)
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Claims list** | RW | RW | R caseload | --- | --- | RW all |
-| **Create / submit claim** | Yes | Yes | No | No | No | Yes |
-| **Edit claim** | Yes | Yes | No | No | No | Yes |
-| **Void claim** | Yes | Yes | No | No | No | Yes |
-| **Payments / ERAs** | RW | RW | --- | --- | --- | RW |
-| **Post payment** | Yes | Yes | No | No | No | Yes |
-| **Denial management** | RW | R | --- | --- | --- | RW |
-| **Billing reports** | Full | Full | --- | --- | --- | Full |
-| **Revenue dashboard** | Full | Full | --- | --- | --- | Full |
-| **Aging reports** | Full | Full | --- | --- | --- | Full |
+| Feature                   | Owner | Admin | BCBA       | BCaBA | RBT | Billing Staff |
+| ------------------------- | ----- | ----- | ---------- | ----- | --- | ------------- |
+| **Claims list**           | RW    | RW    | R caseload | ---   | --- | RW all        |
+| **Create / submit claim** | Yes   | Yes   | No         | No    | No  | Yes           |
+| **Edit claim**            | Yes   | Yes   | No         | No    | No  | Yes           |
+| **Void claim**            | Yes   | Yes   | No         | No    | No  | Yes           |
+| **Payments / ERAs**       | RW    | RW    | ---        | ---   | --- | RW            |
+| **Post payment**          | Yes   | Yes   | No         | No    | No  | Yes           |
+| **Denial management**     | RW    | R     | ---        | ---   | --- | RW            |
+| **Billing reports**       | Full  | Full  | ---        | ---   | --- | Full          |
+| **Revenue dashboard**     | Full  | Full  | ---        | ---   | --- | Full          |
+| **Aging reports**         | Full  | Full  | ---        | ---   | --- | Full          |
 
 ### 4.7 Settings & Administration
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Practice settings** | RW | RW | --- | --- | --- | --- |
-| **Team management** | ADMIN | ADMIN | --- | --- | --- | --- |
-| **Invite members** | Yes | Yes | No | No | No | No |
-| **Change member roles** | Yes | Yes (not owner) | No | No | No | No |
-| **Remove members** | Yes | Yes (not owner) | No | No | No | No |
-| **Audit logs** | R | R | --- | --- | --- | --- |
-| **Organization settings** | ADMIN | R | --- | --- | --- | --- |
-| **Subscription / plan** | ADMIN | --- | --- | --- | --- | --- |
-| **Security settings** | ADMIN | ADMIN | --- | --- | --- | --- |
+| Feature                   | Owner | Admin           | BCBA | BCaBA | RBT | Billing Staff |
+| ------------------------- | ----- | --------------- | ---- | ----- | --- | ------------- |
+| **Practice settings**     | RW    | RW              | ---  | ---   | --- | ---           |
+| **Team management**       | ADMIN | ADMIN           | ---  | ---   | --- | ---           |
+| **Invite members**        | Yes   | Yes             | No   | No    | No  | No            |
+| **Change member roles**   | Yes   | Yes (not owner) | No   | No    | No  | No            |
+| **Remove members**        | Yes   | Yes (not owner) | No   | No    | No  | No            |
+| **Audit logs**            | R     | R               | ---  | ---   | --- | ---           |
+| **Organization settings** | ADMIN | R               | ---  | ---   | --- | ---           |
+| **Subscription / plan**   | ADMIN | ---             | ---  | ---   | --- | ---           |
+| **Security settings**     | ADMIN | ADMIN           | ---  | ---   | --- | ---           |
 
 ### 4.8 Reports & Analytics
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Utilization reports** | Full practice | Full practice | Own caseload | Own caseload | --- | Full practice |
-| **Session summary reports** | Full | Full | Own caseload | Own caseload | Own sessions | --- |
-| **Financial reports** | Full | Full | --- | --- | --- | Full |
-| **Staff productivity** | Full | Full | Own supervisees | --- | --- | --- |
-| **Authorization expiry report** | Full | Full | Own caseload | Own caseload | --- | Full |
-| **Compliance / supervision report** | Full | Full | Own supervisees | --- | --- | --- |
-| **Export data** | Yes | Yes | Own caseload | No | No | Billing data only |
+| Feature                             | Owner         | Admin         | BCBA            | BCaBA        | RBT          | Billing Staff     |
+| ----------------------------------- | ------------- | ------------- | --------------- | ------------ | ------------ | ----------------- |
+| **Utilization reports**             | Full practice | Full practice | Own caseload    | Own caseload | ---          | Full practice     |
+| **Session summary reports**         | Full          | Full          | Own caseload    | Own caseload | Own sessions | ---               |
+| **Financial reports**               | Full          | Full          | ---             | ---          | ---          | Full              |
+| **Staff productivity**              | Full          | Full          | Own supervisees | ---          | ---          | ---               |
+| **Authorization expiry report**     | Full          | Full          | Own caseload    | Own caseload | ---          | Full              |
+| **Compliance / supervision report** | Full          | Full          | Own supervisees | ---          | ---          | ---               |
+| **Export data**                     | Yes           | Yes           | Own caseload    | No           | No           | Billing data only |
 
 ### 4.9 AI Features
 
-| Feature | Owner | Admin | BCBA | BCaBA | RBT | Billing Staff |
-|---------|-------|-------|------|-------|-----|---------------|
-| **Auth letter AI parsing** | Yes | Yes | Yes (caseload) | No | No | Yes |
-| **Session note AI assist** | Yes | Yes | Yes | Yes | Yes (own) | No |
-| **Claim scrubbing AI** (Phase 2) | Yes | Yes | No | No | No | Yes |
-| **Treatment plan AI suggestions** | Yes | R | Yes | R | No | No |
+| Feature                           | Owner | Admin | BCBA           | BCaBA | RBT       | Billing Staff |
+| --------------------------------- | ----- | ----- | -------------- | ----- | --------- | ------------- |
+| **Auth letter AI parsing**        | Yes   | Yes   | Yes (caseload) | No    | No        | Yes           |
+| **Session note AI assist**        | Yes   | Yes   | Yes            | Yes   | Yes (own) | No            |
+| **Claim scrubbing AI** (Phase 2)  | Yes   | Yes   | No             | No    | No        | Yes           |
+| **Treatment plan AI suggestions** | Yes   | R     | Yes            | R     | No        | No            |
 
 ---
 
@@ -603,6 +645,7 @@ This is the primary deliverable. Each cell indicates the access level:
 **Description:** Fixed set of 6 roles with hardcoded permission mappings. No customization.
 
 **What we have today:**
+
 ```typescript
 export const PERMISSIONS = {
   "clients.write": ["owner", "admin", "bcba"],
@@ -616,6 +659,7 @@ export const PERMISSIONS = {
 ```
 
 **Pros:**
+
 - Simplest to implement and maintain
 - No permission configuration UI needed
 - Impossible to misconfigure
@@ -624,6 +668,7 @@ export const PERMISSIONS = {
 - Matches SimplePractice's successful approach
 
 **Cons:**
+
 - No flexibility for practices with non-standard role needs
 - A BCBA who also does billing can't have billing access without being made admin
 - A billing staff member who also schedules can't see schedules without role change
@@ -636,6 +681,7 @@ export const PERMISSIONS = {
 **Description:** Ship the 6 preset roles with comprehensive default permissions (from the matrix above). Allow admins/owners to grant additional per-feature permissions to individual users.
 
 **Implementation Model:**
+
 ```
 User's effective permissions = Role defaults + Individual overrides
 ```
@@ -643,16 +689,19 @@ User's effective permissions = Role defaults + Individual overrides
 Overrides can only ADD permissions, never remove them. This prevents accidentally locking someone out of features they need for their role.
 
 **Example:**
+
 - "Dr. Smith is a BCBA who also handles billing. Her role is `bcba`, but she has override permissions: `billing.read`, `billing.write`, `claims.write`."
 - "Maria is a billing staff member who also manages scheduling. Her role is `billing_staff`, but she has override permissions: `scheduling.write`."
 
 **UI Pattern (Team page):**
+
 1. Select a member
 2. See their current role and its default permissions
 3. Toggle on additional permissions from a categorized list
 4. Changes take effect immediately with audit log entry
 
 **Pros:**
+
 - Covers 95%+ of use cases with preset roles alone
 - Overrides handle edge cases without full custom role builder complexity
 - Additive-only model prevents accidental lockouts
@@ -661,6 +710,7 @@ Overrides can only ADD permissions, never remove them. This prevents accidentall
 - Matches the SimplePractice model (preset roles + stackable admin capabilities)
 
 **Cons:**
+
 - Overrides could accumulate, becoming hard to track (mitigated by per-user override display)
 - Doesn't support "remove a default permission" (by design, but some practices may want this)
 - Still requires a small UI for managing overrides
@@ -672,17 +722,20 @@ Overrides can only ADD permissions, never remove them. This prevents accidentall
 **Description:** Allow admins to create entirely custom roles by selecting individual permissions from a comprehensive list. Similar to CentralReach's model.
 
 **Implementation:**
+
 - Define ~40-60 individual permissions
 - Allow creation of custom role "templates" that bundle permissions
 - Each role is a named collection of permissions
 - New users are assigned a role template, with optional per-user overrides
 
 **Pros:**
+
 - Maximum flexibility
 - Handles any organizational structure
 - Enterprise-friendly for large multi-site practices
 
 **Cons:**
+
 - Massive implementation cost (permission builder UI, role template management, migration tooling)
 - CentralReach's biggest pain point is this exact feature — users find it overwhelming
 - Increases HIPAA audit surface (auditors must review custom roles, not just preset definitions)
@@ -701,6 +754,7 @@ Overrides can only ADD permissions, never remove them. This prevents accidentall
 **Phase 1 (Now):** Expand the existing 6 preset roles with the full permission matrix from Section 4. No UI for overrides yet — just hardcoded defaults.
 
 **Phase 1 Polish / Phase 2:** Add per-user override toggles on the Team page. Start with the most-requested overrides:
+
 - `billing.read` — for BCBAs who need to see claim status
 - `billing.write` — for BCBAs who also submit claims
 - `authorizations.write` — for billing staff who manage auth renewals
@@ -716,67 +770,67 @@ Replace the current 7-permission map with a comprehensive set. Here is the recom
 ```typescript
 export const PERMISSIONS = {
   // ── Clients ────────────────────────────────────────────────
-  "clients.read":           ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"],
-  "clients.write":          ["owner", "admin", "bcba"],
-  "clients.delete":         ["owner", "admin"],
+  "clients.read": ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"],
+  "clients.write": ["owner", "admin", "bcba"],
+  "clients.delete": ["owner", "admin"],
   "clients.insurance.read": ["owner", "admin", "bcba", "billing_staff"],
-  "clients.insurance.write":["owner", "admin", "billing_staff"],
-  "clients.clinical.read":  ["owner", "admin", "bcba", "bcaba", "rbt"],
+  "clients.insurance.write": ["owner", "admin", "billing_staff"],
+  "clients.clinical.read": ["owner", "admin", "bcba", "bcaba", "rbt"],
   "clients.clinical.write": ["owner", "admin", "bcba", "bcaba"],
 
   // ── Sessions ───────────────────────────────────────────────
-  "sessions.read":          ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"],
-  "sessions.write":         ["owner", "admin", "bcba", "bcaba", "rbt"],
+  "sessions.read": ["owner", "admin", "bcba", "bcaba", "rbt", "billing_staff"],
+  "sessions.write": ["owner", "admin", "bcba", "bcaba", "rbt"],
   "sessions.clinical.read": ["owner", "admin", "bcba", "bcaba", "rbt"],
-  "sessions.clinical.write":["owner", "admin", "bcba", "bcaba", "rbt"],
-  "sessions.billing.read":  ["owner", "admin", "bcba", "billing_staff"],
+  "sessions.clinical.write": ["owner", "admin", "bcba", "bcaba", "rbt"],
+  "sessions.billing.read": ["owner", "admin", "bcba", "billing_staff"],
   "sessions.billing.write": ["owner", "admin", "billing_staff"],
-  "sessions.signoff":       ["owner", "admin", "bcba"],
-  "sessions.bulk":          ["owner", "admin"],
+  "sessions.signoff": ["owner", "admin", "bcba"],
+  "sessions.bulk": ["owner", "admin"],
 
   // ── Authorizations ─────────────────────────────────────────
-  "authorizations.read":    ["owner", "admin", "bcba", "bcaba", "billing_staff"],
-  "authorizations.write":   ["owner", "admin", "bcba", "billing_staff"],
-  "authorizations.upload":  ["owner", "admin", "bcba", "billing_staff"],
+  "authorizations.read": ["owner", "admin", "bcba", "bcaba", "billing_staff"],
+  "authorizations.write": ["owner", "admin", "bcba", "billing_staff"],
+  "authorizations.upload": ["owner", "admin", "bcba", "billing_staff"],
 
   // ── Providers ──────────────────────────────────────────────
-  "providers.read":         ["owner", "admin", "bcba", "bcaba", "billing_staff"],
-  "providers.write":        ["owner", "admin"],
-  "providers.credentials":  ["owner", "admin", "billing_staff"],
+  "providers.read": ["owner", "admin", "bcba", "bcaba", "billing_staff"],
+  "providers.write": ["owner", "admin"],
+  "providers.credentials": ["owner", "admin", "billing_staff"],
 
   // ── Payers ─────────────────────────────────────────────────
-  "payers.read":            ["owner", "admin", "bcba", "billing_staff"],
-  "payers.write":           ["owner", "admin", "billing_staff"],
-  "payers.rates":           ["owner", "admin", "billing_staff"],
+  "payers.read": ["owner", "admin", "bcba", "billing_staff"],
+  "payers.write": ["owner", "admin", "billing_staff"],
+  "payers.rates": ["owner", "admin", "billing_staff"],
 
   // ── Billing (Phase 2) ─────────────────────────────────────
-  "billing.read":           ["owner", "admin", "billing_staff"],
-  "billing.write":          ["owner", "admin", "billing_staff"],
-  "billing.claims.write":   ["owner", "admin", "billing_staff"],
+  "billing.read": ["owner", "admin", "billing_staff"],
+  "billing.write": ["owner", "admin", "billing_staff"],
+  "billing.claims.write": ["owner", "admin", "billing_staff"],
   "billing.payments.write": ["owner", "admin", "billing_staff"],
-  "billing.reports":        ["owner", "admin", "billing_staff"],
+  "billing.reports": ["owner", "admin", "billing_staff"],
 
   // ── Reports ────────────────────────────────────────────────
-  "reports.clinical":       ["owner", "admin", "bcba", "bcaba"],
-  "reports.financial":      ["owner", "admin", "billing_staff"],
-  "reports.utilization":    ["owner", "admin", "bcba", "bcaba", "billing_staff"],
-  "reports.export":         ["owner", "admin"],
+  "reports.clinical": ["owner", "admin", "bcba", "bcaba"],
+  "reports.financial": ["owner", "admin", "billing_staff"],
+  "reports.utilization": ["owner", "admin", "bcba", "bcaba", "billing_staff"],
+  "reports.export": ["owner", "admin"],
 
   // ── Settings & Admin ───────────────────────────────────────
-  "settings.read":          ["owner", "admin"],
-  "settings.write":         ["owner", "admin"],
-  "team.read":              ["owner", "admin"],
-  "team.write":             ["owner", "admin"],
-  "team.invite":            ["owner", "admin"],
-  "team.roles":             ["owner", "admin"],
-  "audit.read":             ["owner", "admin"],
-  "organization.write":     ["owner"],
-  "subscription.manage":    ["owner"],
+  "settings.read": ["owner", "admin"],
+  "settings.write": ["owner", "admin"],
+  "team.read": ["owner", "admin"],
+  "team.write": ["owner", "admin"],
+  "team.invite": ["owner", "admin"],
+  "team.roles": ["owner", "admin"],
+  "audit.read": ["owner", "admin"],
+  "organization.write": ["owner"],
+  "subscription.manage": ["owner"],
 
   // ── AI Features ────────────────────────────────────────────
-  "ai.auth_parse":          ["owner", "admin", "bcba", "billing_staff"],
-  "ai.session_assist":      ["owner", "admin", "bcba", "bcaba", "rbt"],
-  "ai.claim_scrub":         ["owner", "admin", "billing_staff"],
+  "ai.auth_parse": ["owner", "admin", "bcba", "billing_staff"],
+  "ai.session_assist": ["owner", "admin", "bcba", "bcaba", "rbt"],
+  "ai.claim_scrub": ["owner", "admin", "billing_staff"],
 } as const;
 ```
 
@@ -784,16 +838,17 @@ export const PERMISSIONS = {
 
 The permission map above controls **feature-level** access (can you see the Sessions page?). **Data-level** access determines **which** sessions you see:
 
-| Role | Data Scope |
-|------|-----------|
-| Owner | All practice data |
-| Admin | All practice data |
-| BCBA | Own caseload: assigned clients + supervisees' assigned clients |
-| BCaBA | Own caseload: assigned clients + supervisees' assigned clients (under BCBA) |
-| RBT | Own assignments only: sessions they are the rendering provider for |
-| Billing Staff | All clients (billing/insurance fields only) |
+| Role          | Data Scope                                                                  |
+| ------------- | --------------------------------------------------------------------------- |
+| Owner         | All practice data                                                           |
+| Admin         | All practice data                                                           |
+| BCBA          | Own caseload: assigned clients + supervisees' assigned clients              |
+| BCaBA         | Own caseload: assigned clients + supervisees' assigned clients (under BCBA) |
+| RBT           | Own assignments only: sessions they are the rendering provider for          |
+| Billing Staff | All clients (billing/insurance fields only)                                 |
 
 **Implementation:** Add a `getCaseloadFilter(userId, role)` query helper that returns the appropriate WHERE clause:
+
 - For owner/admin: `WHERE organization_id = ?`
 - For bcba: `WHERE client_id IN (SELECT client_id FROM provider_clients WHERE provider_id = ? OR provider_id IN (SELECT id FROM providers WHERE supervisor_id = ?))`
 - For rbt: `WHERE rendering_provider_id = ?`
@@ -804,12 +859,14 @@ The permission map above controls **feature-level** access (can you see the Sess
 **Why Hybrid?** Clerk handles authentication and organization membership. But Clerk's custom permissions model (limited to 10 custom roles, permissions tied to "features" in the Clerk dashboard) doesn't map well to ABA's nuanced data-level scoping. Our approach:
 
 **Clerk's responsibilities:**
+
 - Authentication (sign in, sign out, MFA)
 - Organization membership (who belongs to which practice)
 - Basic role storage (synced to our DB via webhook)
 - Session management and token issuance
 
 **Our DB's responsibilities:**
+
 - Role assignment (stored in `users.role`)
 - Permission evaluation (our `PERMISSIONS` map + override table)
 - Caseload scoping (provider-client assignments)
@@ -818,6 +875,7 @@ The permission map above controls **feature-level** access (can you see the Sess
 - Audit logging of access decisions
 
 **Sync model:**
+
 1. Clerk manages org membership (invite, accept, remove)
 2. Clerk webhook fires on membership change
 3. Our webhook handler creates/updates/deactivates user record in our `users` table
@@ -826,6 +884,7 @@ The permission map above controls **feature-level** access (can you see the Sess
 6. This avoids the "System Permissions aren't included in session claims" limitation
 
 **New DB table for overrides (Phase 2):**
+
 ```sql
 CREATE TABLE permission_overrides (
   id TEXT PRIMARY KEY,
@@ -840,11 +899,12 @@ CREATE TABLE permission_overrides (
 ```
 
 **Permission check function (updated):**
+
 ```typescript
 export async function hasPermission(
   userId: string,
   orgId: string,
-  permission: Permission
+  permission: Permission,
 ): Promise<boolean> {
   // 1. Check role-based default
   const user = await getUserWithRole(userId, orgId);
@@ -864,6 +924,7 @@ export async function hasPermission(
 The Team page should follow SimplePractice's model with Clinivise's design system:
 
 **Page Layout:**
+
 ```
 [Page Header: "Team" + "Invite Member" button]
 
@@ -894,6 +955,7 @@ The Team page should follow SimplePractice's model with Clinivise's design syste
 ```
 
 **Member Detail / Edit Sheet (slide-over):**
+
 ```
 [Member Header]
   Name: Dr. Sarah Kim
@@ -930,6 +992,7 @@ The Team page should follow SimplePractice's model with Clinivise's design syste
 ### 6.6 What to Build Now vs. Defer
 
 **Build Now (Phase 1):**
+
 1. Expand `PERMISSIONS` map from 7 to ~35 permissions (as specified in Section 6.2)
 2. Add caseload scoping to queries (BCBAs see caseload, RBTs see assigned)
 3. Update sidebar nav to reflect new permissions
@@ -940,6 +1003,7 @@ The Team page should follow SimplePractice's model with Clinivise's design syste
 8. Add permission descriptions to role display (so users understand what each role can do)
 
 **Defer to Phase 2:**
+
 1. Per-user permission overrides (DB table + UI toggles)
 2. Billing-specific permissions (no billing features yet)
 3. Report-specific permissions (reports page not yet built)
@@ -948,6 +1012,7 @@ The Team page should follow SimplePractice's model with Clinivise's design syste
 6. Permission audit reporting (who has what permissions, when changed)
 
 **Defer to Phase 3+:**
+
 1. Client-level access grants (specific user can see specific client, regardless of role)
 2. Time-based permissions (temporary access for coverage)
 3. Supervisor chain access (BCBA can see all supervisees' supervisees)
@@ -979,6 +1044,7 @@ Moving beyond static role assignments to context-aware access:
 ### 7.3 Attribute-Based Access Control (ABAC)
 
 Beyond RBAC, the industry is moving toward ABAC where access decisions consider multiple attributes:
+
 - User attributes (role, credential, location, department)
 - Resource attributes (client status, document type, sensitivity level)
 - Environmental attributes (time of day, IP address, device type)
@@ -1015,6 +1081,7 @@ A frontier pattern specific to healthcare: tie system permissions to real-time c
 **Risk:** A user's role is changed (e.g., RBT promoted to BCaBA) but they retain cached permissions from the old role, or session tokens still carry old role claims.
 
 **Mitigation:**
+
 - Store role in our DB, not Clerk session claims
 - Check role on every request (our `requireAuth()` already does this — it queries the DB)
 - When role changes, the next page load gets the new role
@@ -1033,11 +1100,13 @@ A frontier pattern specific to healthcare: tie system permissions to real-time c
 **Risk:** When a BCBA supervises BCaBAs who supervise RBTs, the BCBA needs access to the full chain of client data. If the caseload scoping only looks one level deep, the BCBA can't see their BCaBA's RBTs' session data.
 
 **Mitigation:** Caseload scoping must traverse the supervision chain:
+
 1. BCBA's directly assigned clients
-2. + Clients assigned to BCaBAs supervised by this BCBA
-3. + Clients assigned to RBTs supervised by this BCBA or their BCaBAs
+2. - Clients assigned to BCaBAs supervised by this BCBA
+3. - Clients assigned to RBTs supervised by this BCBA or their BCaBAs
 
 **SQL pattern:**
+
 ```sql
 WHERE client_id IN (
   -- Direct assignments
@@ -1064,12 +1133,14 @@ WHERE client_id IN (
 **Risk:** When a BCBA leaves the practice, all their clients need to be reassigned. During the transition, session notes and treatment plans must remain accessible to the new BCBA.
 
 **Mitigation:**
+
 1. **Before departure:** Admin reassigns all clients to new BCBA(s) using a bulk reassignment tool
 2. **During transition:** Old BCBA's access is set to read-only for a configurable transition period (e.g., 30 days) to allow handover
 3. **After departure:** Old BCBA's account is deactivated (soft delete — they can't log in, but their historical data attributions remain intact for audit purposes)
 4. **Data integrity:** The old BCBA's name remains on historical session notes and treatment plans (they rendered/signed those services). The new BCBA is linked as the current supervising BCBA.
 
 **Recommended workflow:**
+
 ```
 Admin opens departing BCBA's profile
 → "Transfer Caseload" action
@@ -1086,6 +1157,7 @@ Admin opens departing BCBA's profile
 **Risk:** An RBT's certification expires (BACB requires annual renewal). They should not be able to log sessions under an expired credential, as this would create billing compliance issues.
 
 **Mitigation:**
+
 - Track credential expiration dates on provider records
 - System warning at 60/30/14/7 days before expiry
 - On expiry: automatically restrict session logging (soft block with admin override)
@@ -1097,6 +1169,7 @@ Admin opens departing BCBA's profile
 **Risk:** Payers or compliance auditors may need temporary read-only access to specific client records during an audit.
 
 **Mitigation:**
+
 - Do NOT create system accounts for external auditors
 - Instead, export audit-ready reports and documentation bundles
 - If real-time access is needed, create a time-limited read-only account with specific client scope
@@ -1108,6 +1181,7 @@ Admin opens departing BCBA's profile
 **Risk:** In some cases, a client needs to be restricted from certain staff members (e.g., conflict of interest, request by family, legal restriction).
 
 **Mitigation (deferred):**
+
 - Client-level access block list: specific users cannot see this client, regardless of role
 - Implementation: add a `client_access_blocks` table
 - Override caseload scoping to exclude blocked users
@@ -1118,6 +1192,7 @@ Admin opens departing BCBA's profile
 **Risk:** A user's role is changed while they have an active session timer running. If they lose `sessions.write`, can they still save their in-progress session?
 
 **Mitigation:**
+
 - Permission checks happen at save time, not during data entry
 - Grace period: if a session was started before the role change, allow saving within 24 hours
 - Alternative: check permission at session start and don't re-check mid-session (simpler, slightly less secure)
@@ -1128,6 +1203,7 @@ Admin opens departing BCBA's profile
 ## 9. Sources
 
 ### BACB & Regulatory
+
 - [BACB Ethics Code for Behavior Analysts (2022)](https://www.bacb.com/wp-content/uploads/2022/01/Ethics-Code-for-Behavior-Analysts-240830-a.pdf)
 - [RBT Ethics Code 2.0](https://www.bacb.com/wp-content/uploads/2022/01/RBT-Ethics-Code-240830-a.pdf)
 - [BACB Ethics Information](https://www.bacb.com/ethics-information/ethics-codes/)
@@ -1138,6 +1214,7 @@ Admin opens departing BCBA's profile
 - [BACB BCBA Certification](https://www.bacb.com/bcba/)
 
 ### HIPAA & Healthcare Compliance
+
 - [HHS Summary of HIPAA Privacy Rule](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
 - [HHS Summary of HIPAA Security Rule](https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html)
 - [HHS Minimum Necessary FAQ](https://www.hhs.gov/hipaa/for-professionals/faq/minimum-necessary/index.html)
@@ -1152,6 +1229,7 @@ Admin opens departing BCBA's profile
 - [Konfirmity — HIPAA Role-Based Access Control Best Practices 2026](https://www.konfirmity.com/blog/hipaa-role-based-access-control-for-hipaa)
 
 ### Competitor Platforms
+
 - [CentralReach — Permissions Explained](https://help.centralreach.com/permissions-explained/)
 - [CentralReach — Billing Module Permissions](https://help.centralreach.com/billing-module-permissions/)
 - [CentralReach — Claims Module Permissions](https://help.centralreach.com/claims-module-permissions/)
@@ -1169,6 +1247,7 @@ Admin opens departing BCBA's profile
 - [Theralytics — Scheduling Software](https://www.theralytics.net/aba-therapy-scheduling-software)
 
 ### ABA Practice Operations
+
 - [CentralReach — ABA Therapy Certification Explained](https://centralreach.com/blog/aba-therapy-certification-explained-rbt-bcaba-bcba-bcba-d/)
 - [ABA Master's Programs — BCBA-D](https://abamastersprograms.org/licensure/bcba-d/)
 - [FlashGenius — BCBA vs BCBA-D](https://flashgenius.net/blog-article/bcba-vs-bcba-d-requirements-exam-cost-and-roi)
@@ -1183,6 +1262,7 @@ Admin opens departing BCBA's profile
 - [MBWRCM — BCBA Billing Guide for RBT Supervision](https://www.mbwrcm.com/the-revenue-cycle-blog/bcba-billing-rbt-supervision-guide)
 
 ### RBAC Design Patterns
+
 - [EnterpriseReady — Role-Based Access Control Guide](https://www.enterpriseready.io/features/role-based-access-control/)
 - [Perpetual — How to Design Effective SaaS Roles and Permissions](https://www.perpetualny.com/blog/how-to-design-effective-saas-roles-and-permissions)
 - [UX Design / Licia — Designing Permissions for a SaaS App](https://uxdesign.cc/design-permissions-for-a-saas-app-db6c1825f20e)
@@ -1195,6 +1275,7 @@ Admin opens departing BCBA's profile
 - [Censinet — RBAC Best Practices for Clinical Applications](https://www.censinet.com/perspectives/rbac-best-practices-securing-clinical-applications)
 
 ### Clerk / Technical Implementation
+
 - [Clerk — Roles and Permissions](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions)
 - [Clerk — Check Roles and Permissions](https://clerk.com/docs/guides/organizations/control-access/check-access)
 - [Clerk — Organizations Overview](https://clerk.com/docs/guides/organizations/overview)
@@ -1205,6 +1286,7 @@ Admin opens departing BCBA's profile
 - [Clerk — Implement RBAC in Next.js 15](https://clerk.com/blog/nextjs-role-based-access-control)
 
 ### Healthcare Access Control Patterns
+
 - [Censinet — Break-Glass Access Pros and Cons](https://censinet.com/perspectives/break-glass-access-pros-and-cons-for-healthcare)
 - [Yale HIPAA — Break Glass Procedure](https://hipaa.yale.edu/security/break-glass-procedure-granting-emergency-access-critical-ephi-systems)
 - [AMA — Break-the-Glass EHR Functionality](https://www.ama-assn.org/practice-management/digital/break-glass-ehr-functionality)

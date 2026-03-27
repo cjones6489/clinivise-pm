@@ -45,6 +45,7 @@ globs:
 ## Production Hardening Checklist (for later)
 
 When moving to real patient data, add:
+
 - `Cache-Control: no-store` on all PHI endpoints
 - Security headers (HSTS, X-Frame-Options, CSP, etc.)
 - Rate limiting on all API routes via Upstash

@@ -68,24 +68,24 @@ Modern fintech dashboards (Ramp, Mercury, Stripe) use card-based layouts where e
 
 ### 2A. Insurance Card OCR APIs — Market Overview
 
-| Provider | Accuracy | HIPAA | Pricing | Fields Extracted | Notes |
-|----------|----------|-------|---------|-----------------|-------|
-| **Veryfi** | 97%+ | Yes (SOC 2 Type II, HIPAA, CCPA, GDPR) | Per document, tiered by volume | Member ID, group #, plan details, provider networks | Multi-modal LLM API (AnyDocs). Best for startups — good docs, reasonable pricing |
-| **Mindee** | 90-95% | Yes | Free tier: 250/mo, then $0.10-$0.01/doc | Member ID, group #, barcodes, issue dates, plan codes | Both sides in single request. Good free tier for dev |
-| **Microsoft Azure Doc Intelligence** | High (unspecified) | Yes (Azure BAA) | Pay-per-use via Azure | Full structured extraction | Enterprise-grade but complex setup. Already in Azure ecosystem |
-| **Orbit Healthcare** | High | Yes | Custom pricing | Subscriber ID, Group ID, Payer Name, Payer ID | Trained on 4,000+ payers, 20,000+ plan types. Also validates with payers in <5 seconds |
-| **Klippa** | High | Yes | Custom pricing | Full card data | Strong on multi-format support |
+| Provider                             | Accuracy           | HIPAA                                  | Pricing                                 | Fields Extracted                                      | Notes                                                                                  |
+| ------------------------------------ | ------------------ | -------------------------------------- | --------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Veryfi**                           | 97%+               | Yes (SOC 2 Type II, HIPAA, CCPA, GDPR) | Per document, tiered by volume          | Member ID, group #, plan details, provider networks   | Multi-modal LLM API (AnyDocs). Best for startups — good docs, reasonable pricing       |
+| **Mindee**                           | 90-95%             | Yes                                    | Free tier: 250/mo, then $0.10-$0.01/doc | Member ID, group #, barcodes, issue dates, plan codes | Both sides in single request. Good free tier for dev                                   |
+| **Microsoft Azure Doc Intelligence** | High (unspecified) | Yes (Azure BAA)                        | Pay-per-use via Azure                   | Full structured extraction                            | Enterprise-grade but complex setup. Already in Azure ecosystem                         |
+| **Orbit Healthcare**                 | High               | Yes                                    | Custom pricing                          | Subscriber ID, Group ID, Payer Name, Payer ID         | Trained on 4,000+ payers, 20,000+ plan types. Also validates with payers in <5 seconds |
+| **Klippa**                           | High               | Yes                                    | Custom pricing                          | Full card data                                        | Strong on multi-format support                                                         |
 
 **Recommendation for Clinivise**: Start with **Mindee** for development (free tier, good accuracy, simple API). Evaluate **Veryfi** for production (better accuracy, HIPAA compliance is more mature, cleaner documentation). Both can be swapped easily — the extraction output is the same structured JSON.
 
 ### 2B. Payer Database & Directory APIs
 
-| Service | Coverage | Features | Relevance |
-|---------|----------|----------|-----------|
-| **Stedi Payer Network** | 3,400+ US payers | Searchable payer directory, payer ID lookup, eligibility checks | Already in Clinivise tech stack. Use Stedi's payer list as the source of truth for payer search/autocomplete |
-| **NPPES NPI Registry** | All US providers | Free API, lookup by NPI, name, location | Already needed for provider management |
-| **pVerify** | Largest payer list in industry | EDI + non-EDI payers, real-time eligibility | Alternative to Stedi for eligibility |
-| **Approved Admissions** | 1,300+ payers | Single endpoint, batch eligibility, MBI lookup, coverage discovery | Good for batch verification workflows |
+| Service                 | Coverage                       | Features                                                           | Relevance                                                                                                    |
+| ----------------------- | ------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| **Stedi Payer Network** | 3,400+ US payers               | Searchable payer directory, payer ID lookup, eligibility checks    | Already in Clinivise tech stack. Use Stedi's payer list as the source of truth for payer search/autocomplete |
+| **NPPES NPI Registry**  | All US providers               | Free API, lookup by NPI, name, location                            | Already needed for provider management                                                                       |
+| **pVerify**             | Largest payer list in industry | EDI + non-EDI payers, real-time eligibility                        | Alternative to Stedi for eligibility                                                                         |
+| **Approved Admissions** | 1,300+ payers                  | Single endpoint, batch eligibility, MBI lookup, coverage discovery | Good for batch verification workflows                                                                        |
 
 **Recommendation for Clinivise**: Use **Stedi's payer list API** to power a payer search/autocomplete in the insurance form. This aligns with the existing tech stack decision and means payer data flows naturally into Phase 2 claims submission.
 
@@ -101,6 +101,7 @@ The most advanced systems combine multiple AI steps:
 6. **Store**: Card images stored as documents, extraction results stored alongside insurance record
 
 **Maturity Assessment**:
+
 - Steps 1-2: Production-ready today (Veryfi/Mindee APIs are mature)
 - Step 3: Semi-automated (fuzzy matching against Stedi payer list — ~85% accuracy, staff confirms)
 - Step 4: Production-ready (standard form pre-fill from API response)
@@ -108,6 +109,7 @@ The most advanced systems combine multiple AI steps:
 - Step 6: Production-ready (Vercel Blob + DB)
 
 **Build order for Clinivise**:
+
 - Sprint 2C: Steps 1 (image upload), 4 (manual form), 6 (storage) — manual entry with card image attachment
 - Later sprint: Steps 2-3 (OCR extraction + payer matching) — AI pre-fill behind a feature flag
 - Phase 2: Step 5 (eligibility verification via Stedi)
@@ -132,6 +134,7 @@ Primary/Secondary/Tertiary insurance shown with clear visual hierarchy: numbered
 
 **Subscriber relationship handling (critical for ABA)**
 ABA patients are almost always minors. The subscriber (policy holder) is typically a parent/guardian. The form must handle:
+
 - `relationshipToSubscriber`: self, spouse, child, other
 - When "child" is selected: show subscriber name, DOB, gender fields
 - Pre-fill subscriber info from client contacts (if a parent/guardian contact exists)
@@ -161,18 +164,21 @@ Services like Approved Admissions offer "Insurance Coverage Discovery" — given
 ### Persona-Specific Design
 
 **Intake Coordinator (tablet, standing, at front desk)**
+
 - Large touch targets (44px minimum), chunky form elements
 - Camera capture button prominently placed — "Scan Insurance Card" is the primary action
 - Quick-add flow: photo -> minimal required fields (payer, member ID) -> save as unverified
 - Pre-fill subscriber from client's contacts (auto-detect parent/guardian)
 
 **Billing Staff (desktop, sitting, processing 20+ clients/day)**
+
 - Keyboard-navigable form (Tab through fields, Enter to save)
 - Batch verification workflow — see all unverified insurance across clients
 - Side-by-side view: card image on left, form fields on right
 - Quick-verify button that validates and marks as verified in one action
 
 **BCBA (desktop or tablet, reviewing client info)**
+
 - Read-only insurance summary on client detail page
 - See active coverage at a glance — payer name, member ID, status badge
 - Link to authorizations tied to each insurance policy
@@ -214,12 +220,12 @@ The Insurance tab within the client detail page should use a **card-based layout
 
 ### Status Badge System
 
-| Status | Color | Badge Variant | Meaning |
-|--------|-------|---------------|---------|
-| Active + Verified | Emerald | `default` with emerald | Coverage confirmed, ready to bill |
-| Active + Unverified | Amber | `outline` with amber | Entered but not yet verified by staff |
-| Expired | Red | `outline` with red | Past termination date |
-| Pending Verification | Blue | `secondary` | Eligibility check in progress (Phase 2) |
+| Status               | Color   | Badge Variant          | Meaning                                 |
+| -------------------- | ------- | ---------------------- | --------------------------------------- |
+| Active + Verified    | Emerald | `default` with emerald | Coverage confirmed, ready to bill       |
+| Active + Unverified  | Amber   | `outline` with amber   | Entered but not yet verified by staff   |
+| Expired              | Red     | `outline` with red     | Past termination date                   |
+| Pending Verification | Blue    | `secondary`            | Eligibility check in progress (Phase 2) |
 
 ### Form Design
 
@@ -229,6 +235,7 @@ The add/edit insurance form should be a **dialog/sheet** (consistent with the co
 **Conditional fields**: Subscriber info (shown when relationship != "self")
 **Optional fields**: Group number, effective date, termination date, card images
 **Smart defaults**:
+
 - Priority auto-increments (first policy = 1, second = 2)
 - Relationship defaults to "child" (since ABA patients are almost always minors)
 - Pre-fill subscriber name from client contacts if a legal guardian exists
@@ -239,44 +246,46 @@ The add/edit insurance form should be a **dialog/sheet** (consistent with the co
 
 ### Build Now (Sprint 2C)
 
-| Feature | Effort | Impact | Notes |
-|---------|--------|--------|-------|
-| Card-based insurance display (read) | S | High | Replace placeholder with policy cards |
-| Add/edit insurance dialog form | M | High | Payer select + member ID + subscriber fields |
-| Insurance CRUD server actions | M | High | Create, update, delete, reorder priority |
-| Payer searchable select (from payers table) | S | High | Combobox backed by existing payers table |
-| Subscriber auto-fill from contacts | S | Medium | If legal guardian contact exists, pre-fill subscriber fields |
-| Insurance status badges | S | Medium | Active/expired based on dates, verified/unverified status |
-| Card image upload (file input) | S | Medium | Simple file upload attached to insurance record via documents table |
-| Priority management (set as primary) | S | Medium | Button to swap priority, not drag-and-drop |
-| Verification status field | S | Medium | Add `verification_status` column to `client_insurance` |
+| Feature                                     | Effort | Impact | Notes                                                               |
+| ------------------------------------------- | ------ | ------ | ------------------------------------------------------------------- |
+| Card-based insurance display (read)         | S      | High   | Replace placeholder with policy cards                               |
+| Add/edit insurance dialog form              | M      | High   | Payer select + member ID + subscriber fields                        |
+| Insurance CRUD server actions               | M      | High   | Create, update, delete, reorder priority                            |
+| Payer searchable select (from payers table) | S      | High   | Combobox backed by existing payers table                            |
+| Subscriber auto-fill from contacts          | S      | Medium | If legal guardian contact exists, pre-fill subscriber fields        |
+| Insurance status badges                     | S      | Medium | Active/expired based on dates, verified/unverified status           |
+| Card image upload (file input)              | S      | Medium | Simple file upload attached to insurance record via documents table |
+| Priority management (set as primary)        | S      | Medium | Button to swap priority, not drag-and-drop                          |
+| Verification status field                   | S      | Medium | Add `verification_status` column to `client_insurance`              |
 
 ### Build Soon (Sprint 2C+ or Sprint 4)
 
-| Feature | Effort | Impact | Notes |
-|---------|--------|--------|-------|
-| Payer management page (settings) | M | High | CRUD for practice's payer list |
-| Card image viewer (side-by-side with form) | S | Medium | Show uploaded card images in a lightbox |
-| Browser camera capture | S | Medium | `<input capture="environment">` for tablet intake |
-| Batch verification queue | M | Medium | Dashboard widget showing all unverified insurance |
+| Feature                                    | Effort | Impact | Notes                                             |
+| ------------------------------------------ | ------ | ------ | ------------------------------------------------- |
+| Payer management page (settings)           | M      | High   | CRUD for practice's payer list                    |
+| Card image viewer (side-by-side with form) | S      | Medium | Show uploaded card images in a lightbox           |
+| Browser camera capture                     | S      | Medium | `<input capture="environment">` for tablet intake |
+| Batch verification queue                   | M      | Medium | Dashboard widget showing all unverified insurance |
 
 ### Build Later (Phase 2)
 
-| Feature | Effort | Impact | Notes |
-|---------|--------|--------|-------|
-| OCR card extraction (Mindee/Veryfi) | M | High | API integration + confidence-based pre-fill UI |
-| Real-time eligibility check (Stedi 270/271) | L | Very High | Core billing prerequisite |
-| Stedi payer directory integration | M | High | Replace local payer table with Stedi payer search |
-| Coverage timeline visualization | M | Low | Visual date ranges for overlapping coverage |
-| Automated insurance discovery | L | Medium | Third-party API, PHI handling complexity |
-| Predictive coverage alerts | L | Low | Requires historical data |
+| Feature                                     | Effort | Impact    | Notes                                             |
+| ------------------------------------------- | ------ | --------- | ------------------------------------------------- |
+| OCR card extraction (Mindee/Veryfi)         | M      | High      | API integration + confidence-based pre-fill UI    |
+| Real-time eligibility check (Stedi 270/271) | L      | Very High | Core billing prerequisite                         |
+| Stedi payer directory integration           | M      | High      | Replace local payer table with Stedi payer search |
+| Coverage timeline visualization             | M      | Low       | Visual date ranges for overlapping coverage       |
+| Automated insurance discovery               | L      | Medium    | Third-party API, PHI handling complexity          |
+| Predictive coverage alerts                  | L      | Low       | Requires historical data                          |
 
 ---
 
 ## 6. Visual Design Patterns Worth Stealing
 
 ### Insurance Card as UI Element
+
 Represent each insurance policy as a visual "card" that loosely resembles a physical insurance card. This creates immediate recognition and reduces cognitive load. The card should show:
+
 - Payer logo/name prominently at top (like the insurer branding on a physical card)
 - Priority badge in top-right corner (numbered circle: 1, 2, 3)
 - Key identifiers in a consistent grid: Member ID, Group #
@@ -285,25 +294,31 @@ Represent each insurance policy as a visual "card" that loosely resembles a phys
 - Status badges (active/expired, verified/unverified) using the Clinivise status color system (emerald/amber/red/blue)
 
 ### Status Color System (from design-system.md)
+
 - **Emerald**: Active + Verified (ready to bill)
 - **Amber**: Unverified or expiring soon (needs attention)
 - **Red**: Expired or failed verification (cannot bill)
 - **Blue**: Pending (eligibility check in progress)
 
 ### Empty State
+
 When no insurance is on file:
+
 - Shield/insurance icon in muted background
 - "No insurance on file" message
 - "Add Insurance" CTA button
 - Secondary text: "Upload an insurance card or enter policy details manually"
 
 ### Card Image Thumbnail
+
 Show a small thumbnail of the uploaded insurance card image on the policy card. Clicking opens a lightbox/modal with the full-size image. This lets billing staff quickly reference the physical card while verifying data.
 
 ### Priority Indicator
+
 Use a small numbered circle badge (1, 2, 3) in the top-left or top-right of each insurance card. Primary = filled circle with "1", secondary = outlined circle with "2". This is more immediately scannable than text labels like "Primary" / "Secondary".
 
 ### Coordination of Benefits Visual
+
 When multiple policies exist, show a subtle connecting line or shared border between cards to indicate they work together. A small "COB" indicator on the secondary policy helps billing staff understand the billing sequence.
 
 ---

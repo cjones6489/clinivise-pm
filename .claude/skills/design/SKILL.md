@@ -13,6 +13,7 @@ Read `.claude/skills/design/references/design-system.md` before generating any U
 ## Input
 
 The user provides one of:
+
 - A component or page to build (e.g., "build the client list page")
 - A UI to improve (e.g., "this form feels cluttered")
 - A design direction (e.g., "design the authorization tracking card")
@@ -40,32 +41,37 @@ CentralReach users report: confusing navigation, inconsistent save behavior, tin
 
 Design for these personas in priority order:
 
-| Role | Primary workflow | Device | Design priority |
-|------|-----------------|--------|----------------|
-| **RBT** | Log sessions, view schedule | Tablet (field) | Touch targets, speed, minimal input |
-| **BCBA** | Review data, manage auths, supervise | Laptop/desktop | Data density, overview, auth tracking |
-| **Billing Staff** | Claims, ERA, denials | Desktop (dual monitor) | Tables, bulk actions, status visibility |
-| **Admin/Owner** | Dashboard, settings, team | Desktop | High-level metrics, configuration |
+| Role              | Primary workflow                     | Device                 | Design priority                         |
+| ----------------- | ------------------------------------ | ---------------------- | --------------------------------------- |
+| **RBT**           | Log sessions, view schedule          | Tablet (field)         | Touch targets, speed, minimal input     |
+| **BCBA**          | Review data, manage auths, supervise | Laptop/desktop         | Data density, overview, auth tracking   |
+| **Billing Staff** | Claims, ERA, denials                 | Desktop (dual monitor) | Tables, bulk actions, status visibility |
+| **Admin/Owner**   | Dashboard, settings, team            | Desktop                | High-level metrics, configuration       |
 
 ## Design Process
 
 When building a component or page:
 
 ### Step 1: Understand the workflow
+
 Before writing code, answer:
+
 - Who uses this? (which persona)
 - How often? (daily, weekly, rarely)
 - What's the happy path? (most common flow)
 - What are the edge states? (empty, loading, error, max data)
 
 ### Step 2: Compose from the design system
+
 - Use ONLY shadcn/ui Mira components — never build custom primitives
 - Use ONLY semantic color tokens from `globals.css` — never hardcode colors
 - Follow the spacing/typography scale in the design reference
 - Check: does this component already exist in `src/components/ui/`?
 
 ### Step 3: Build with hierarchy
+
 Every screen needs three levels of visual hierarchy:
+
 1. **Primary** — The main content/action (bold heading, primary button, key metric)
 2. **Secondary** — Supporting context (muted text, secondary data, navigation)
 3. **Tertiary** — Metadata and chrome (timestamps, IDs, borders, dividers)
@@ -73,7 +79,9 @@ Every screen needs three levels of visual hierarchy:
 Use font weight, size, and color to create this hierarchy — not decoration.
 
 ### Step 4: Handle all states
+
 Every component must handle:
+
 - **Loading** — Skeleton matching the content shape (never a centered spinner)
 - **Empty** — Helpful message + CTA ("No sessions logged this week. Log a session →")
 - **Error** — Inline error with retry action (never just "Something went wrong")
@@ -81,7 +89,9 @@ Every component must handle:
 - **Overflow** — What happens with 1000 rows? Long names? Narrow viewports?
 
 ### Step 5: Verify visually
+
 After generating UI code, if the user has browser/screenshot capabilities:
+
 - Take a screenshot and review for alignment, spacing, and hierarchy issues
 - Check at 1440px (desktop), 1024px (laptop), and 768px (tablet) widths
 - Verify empty and loading states look intentional, not broken
@@ -89,6 +99,7 @@ After generating UI code, if the user has browser/screenshot capabilities:
 ## Component Patterns
 
 ### Data Tables (most common component)
+
 ```
 - Use @tanstack/react-table with shadcn Table
 - Compact rows: py-2 px-3 text-xs
@@ -102,6 +113,7 @@ After generating UI code, if the user has browser/screenshot capabilities:
 ```
 
 ### Forms (second most common)
+
 ```
 - Use React Hook Form + Zod v4 + shadcn Field component
 - Single column for simple forms, two columns for dense forms
@@ -114,6 +126,7 @@ After generating UI code, if the user has browser/screenshot capabilities:
 ```
 
 ### Cards / Metric Displays
+
 ```
 - Use shadcn Card with data-size="sm" for dashboard metrics
 - Number prominence: large font-semibold for the value, text-xs text-muted-foreground for the label
@@ -125,6 +138,7 @@ After generating UI code, if the user has browser/screenshot capabilities:
 ```
 
 ### Navigation
+
 ```
 - Sidebar: shadcn Sidebar component, collapsed by default on tablet
 - Role-based visibility: RBTs see sessions + schedule, BCBAs see everything, billing staff see billing section
@@ -137,18 +151,18 @@ After generating UI code, if the user has browser/screenshot capabilities:
 
 ONLY use semantic tokens. Never hardcode colors.
 
-| Purpose | Token | Example |
-|---------|-------|---------|
-| Page background | `bg-background` | Main content area |
-| Cards/surfaces | `bg-card` | Cards, popovers, modals |
+| Purpose            | Token                       | Example                         |
+| ------------------ | --------------------------- | ------------------------------- |
+| Page background    | `bg-background`             | Main content area               |
+| Cards/surfaces     | `bg-card`                   | Cards, popovers, modals         |
 | Subtle backgrounds | `bg-muted` or `bg-muted/50` | Table headers, section dividers |
-| Primary text | `text-foreground` | Headings, body text |
-| Secondary text | `text-muted-foreground` | Labels, metadata, timestamps |
-| Interactive | `text-primary` | Links, active nav items |
-| Success/positive | `text-emerald-600` | Utilization OK, claim paid |
-| Warning | `text-amber-600` | Auth expiring, high utilization |
-| Error/destructive | `text-destructive` | Over-utilized, denied, errors |
-| Borders | `border-border` | Cards, inputs, dividers |
+| Primary text       | `text-foreground`           | Headings, body text             |
+| Secondary text     | `text-muted-foreground`     | Labels, metadata, timestamps    |
+| Interactive        | `text-primary`              | Links, active nav items         |
+| Success/positive   | `text-emerald-600`          | Utilization OK, claim paid      |
+| Warning            | `text-amber-600`            | Auth expiring, high utilization |
+| Error/destructive  | `text-destructive`          | Over-utilized, denied, errors   |
+| Borders            | `border-border`             | Cards, inputs, dividers         |
 
 ## Anti-Patterns (NEVER do these)
 
@@ -166,6 +180,7 @@ ONLY use semantic tokens. Never hardcode colors.
 ## Output
 
 When invoked, produce:
+
 1. Component code using the patterns above
 2. All required states (loading, empty, error)
 3. Brief rationale for key design decisions

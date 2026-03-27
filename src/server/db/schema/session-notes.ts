@@ -76,9 +76,7 @@ export const sessionNotes = pgTable(
     }),
     cosignedAt: timestamp("cosigned_at", { withTimezone: true }),
 
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -156,9 +154,7 @@ export const sessionNoteGoals = pgTable(
     progressStatus: text("progress_status").notNull().default("not_assessed"), // met | partially_met | not_met | regression | maintenance | not_assessed
     notes: text("notes"),
     sortOrder: integer("sort_order").default(0).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
@@ -194,15 +190,11 @@ export const sessionNoteBehaviors = pgTable(
     intensity: text("intensity"), // mild | moderate | severe
     notes: text("notes"),
     sortOrder: integer("sort_order").default(0).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull()
       .$onUpdate(() => new Date()),
   },
-  (table) => [
-    index("session_note_behaviors_note_idx").on(table.sessionNoteId),
-  ],
+  (table) => [index("session_note_behaviors_note_idx").on(table.sessionNoteId)],
 );

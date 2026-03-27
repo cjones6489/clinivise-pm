@@ -40,7 +40,11 @@ export function SessionActions({
       {canCancel && (
         <ConfirmDialog
           trigger={
-            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive text-xs">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-destructive hover:text-destructive text-xs"
+            >
               <HugeiconsIcon icon={Delete01Icon} size={14} className="mr-1.5" />
               Cancel Session
             </Button>

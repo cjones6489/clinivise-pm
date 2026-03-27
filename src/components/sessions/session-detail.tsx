@@ -23,11 +23,7 @@ function KV({ label, children }: { label: string; children: React.ReactNode }) {
   );
 }
 
-export function SessionDetailView({
-  session,
-}: {
-  session: SessionDetailType;
-}) {
+export function SessionDetailView({ session }: { session: SessionDetailType }) {
   const cptMeta = ABA_CPT_CODES[session.cptCode as CptCode];
 
   return (

@@ -39,10 +39,7 @@ export async function POST(req: NextRequest) {
       const { id, name } = evt.data;
 
       if (name && id) {
-        await db
-          .update(organizations)
-          .set({ name })
-          .where(eq(organizations.clerkOrgId, id));
+        await db.update(organizations).set({ name }).where(eq(organizations.clerkOrgId, id));
       }
     }
 
@@ -114,12 +111,7 @@ export async function POST(req: NextRequest) {
         await db
           .update(users)
           .set({ status: "deactivated", isActive: false })
-          .where(
-            and(
-              eq(users.clerkUserId, clerkUserId),
-              eq(users.organizationId, org.id),
-            ),
-          );
+          .where(and(eq(users.clerkUserId, clerkUserId), eq(users.organizationId, org.id)));
       }
     }
 
@@ -139,10 +131,7 @@ export async function POST(req: NextRequest) {
         if (primaryEmail) updates.email = primaryEmail.email_address.toLowerCase();
 
         if (Object.keys(updates).length > 0) {
-          await db
-            .update(users)
-            .set(updates)
-            .where(eq(users.clerkUserId, id));
+          await db.update(users).set(updates).where(eq(users.clerkUserId, id));
         }
       }
     }
@@ -162,10 +151,10 @@ export async function POST(req: NextRequest) {
     console.error("Clerk webhook error:", err);
     // Verification errors → 400 (don't retry). Processing errors → 500 (retry).
     const isVerificationError =
-      err instanceof Error && (err.message.includes("verification") || err.message.includes("signature"));
-    return new Response(
-      isVerificationError ? "Webhook verification failed" : "Internal error",
-      { status: isVerificationError ? 400 : 500 },
-    );
+      err instanceof Error &&
+      (err.message.includes("verification") || err.message.includes("signature"));
+    return new Response(isVerificationError ? "Webhook verification failed" : "Internal error", {
+      status: isVerificationError ? 400 : 500,
+    });
   }
 }

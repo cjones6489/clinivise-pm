@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  getUtilizationLevel,
-  LEVEL_COLORS,
-} from "./utilization-bar";
+import { getUtilizationLevel, LEVEL_COLORS } from "./utilization-bar";
 import { unitsToHours } from "@/lib/constants";
 
 describe("getUtilizationLevel", () => {

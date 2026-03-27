@@ -20,7 +20,10 @@ export async function getProviders(orgId: string): Promise<Provider[]> {
 }
 
 /** Find the provider record linked to a user (for session form pre-fill). */
-export async function getProviderByUserId(orgId: string, userId: string): Promise<{ id: string } | null> {
+export async function getProviderByUserId(
+  orgId: string,
+  userId: string,
+): Promise<{ id: string } | null> {
   const [provider] = await db
     .select({ id: providers.id })
     .from(providers)
@@ -106,9 +109,7 @@ export async function getProviderMetrics(
       )::int`,
     })
     .from(sessions)
-    .where(
-      and(eq(sessions.organizationId, orgId), eq(sessions.providerId, providerId)),
-    );
+    .where(and(eq(sessions.organizationId, orgId), eq(sessions.providerId, providerId)));
 
   return {
     activeClients: result?.activeClients ?? 0,
@@ -297,12 +298,7 @@ export async function getProviderSupervisees(
       isActive: providers.isActive,
     })
     .from(providers)
-    .where(
-      and(
-        scopedWhere(orgId),
-        eq(providers.supervisorId, supervisorId),
-      ),
-    )
+    .where(and(scopedWhere(orgId), eq(providers.supervisorId, supervisorId)))
     .orderBy(providers.lastName, providers.firstName);
 }
 

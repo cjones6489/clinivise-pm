@@ -16,18 +16,18 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 
 ## Risk Rating Framework
 
-| Severity | Definition |
-|----------|-----------|
+| Severity     | Definition                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------- |
 | **Critical** | Could cause regulatory action, False Claims Act liability, HIPAA breach, or patient harm |
-| **High** | Could cause financial loss, audit failure, customer churn, or reputational damage |
-| **Medium** | Could cause user frustration, feature abandonment, or increased support burden |
-| **Low** | Minor inconvenience, cosmetic issue, or edge case with easy workaround |
+| **High**     | Could cause financial loss, audit failure, customer churn, or reputational damage        |
+| **Medium**   | Could cause user frustration, feature abandonment, or increased support burden           |
+| **Low**      | Minor inconvenience, cosmetic issue, or edge case with easy workaround                   |
 
-| Likelihood | Definition |
-|------------|-----------|
-| **High** | Will happen in normal operation without mitigation |
-| **Medium** | Plausible under realistic conditions |
-| **Low** | Requires unusual circumstances or adversarial behavior |
+| Likelihood | Definition                                             |
+| ---------- | ------------------------------------------------------ |
+| **High**   | Will happen in normal operation without mitigation     |
+| **Medium** | Plausible under realistic conditions                   |
+| **Low**    | Requires unusual circumstances or adversarial behavior |
 
 ---
 
@@ -41,9 +41,10 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 
 **Real case**: Pieces Technologies marketed AI summaries as "highly accurate" with a "critical hallucination rate of <0.001%" -- the Texas AG found these metrics were themselves deceptive. The settlement was the first of its kind for healthcare AI.
 
-**Why this is non-obvious**: LLMs are trained to be helpful, not to say "I don't know." When processing a scanned authorization letter, the model will almost always return *something* for every field, even when the document is ambiguous, truncated, or uses a format the model hasn't seen. A 97% OCR accuracy rate means 3 errors per 100 fields -- at 50 fields per authorization document, that is 1-2 errors per document on average.
+**Why this is non-obvious**: LLMs are trained to be helpful, not to say "I don't know." When processing a scanned authorization letter, the model will almost always return _something_ for every field, even when the document is ambiguous, truncated, or uses a format the model hasn't seen. A 97% OCR accuracy rate means 3 errors per 100 fields -- at 50 fields per authorization document, that is 1-2 errors per document on average.
 
 **Mitigation for Clinivise**:
+
 - Task 100 (`auth-ai-review.tsx`) already plans editable fields + confidence scores -- this is the critical control
 - NEVER auto-save AI-extracted data to the database. Always require explicit human confirmation per field
 - Display confidence scores per field, with visual distinction (green/amber/red) so reviewers know where to focus
@@ -60,6 +61,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: The ABA Coding Coalition documents that practices routinely bill 97153 for every direct session even when the BCBA is making real-time clinical decisions (should be 97155). AI trained on historical billing data would perpetuate this error.
 
 **Mitigation**:
+
 - Constrain CPT code suggestions to the `ABA_CPT_CODES` constant array in `src/lib/constants.ts` -- never let the LLM suggest codes outside this set
 - Cross-validate suggested codes against provider credential type (RBTs cannot bill 97151/97155/97156)
 - Include payer-specific code rules in validation (some payers don't cover certain codes)
@@ -74,6 +76,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: OIG found improper billing related to time units resulted in over $200 million in overpayments in a single year. Therapists consistently billed full units for sessions lasting only 7 minutes beyond the prior unit.
 
 **Mitigation**:
+
 - Unit calculations are deterministic -- NEVER delegate them to the LLM. Use `calculateUnits()` in `src/lib/utils.ts`
 - The AI should only extract raw time values; the application computes units
 - Store the calculation method per payer (CMS vs. AMA) as noted in the architecture decisions
@@ -86,6 +89,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Critical | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Cross-validate extracted dates against basic sanity checks (start < end, not in the distant past/future, duration within typical auth windows of 3-12 months)
 - Cross-validate approved units against typical ranges for the CPT code and authorization period
 - Flag outlier values visually in the review UI
@@ -105,6 +109,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Why Clinivise is especially at risk**: The business model monetizes 2-4% of collected revenue. If AI-assisted billing systematically inflates collections (even unintentionally), Clinivise directly profits from the inflation. This creates a conflict-of-interest argument in any FCA investigation.
 
 **Mitigation**:
+
 - AI should suggest, never submit. Every claim requires human attestation
 - Log every AI suggestion alongside the final billed values (creates an audit trail showing human review occurred)
 - Never market AI features with specific accuracy percentages unless independently validated (Pieces Technologies lesson)
@@ -120,6 +125,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: Illinois signed a law (effective August 1, 2025) prohibiting AI systems in therapy from making independent therapeutic decisions, directly interacting with clients, or generating treatment plans without licensed professional review.
 
 **Mitigation**:
+
 - Any session note generation feature must require explicit BCBA review and attestation
 - Include clear disclaimers that AI is a drafting tool, not a clinical tool
 - Log the timestamp and user ID of who reviewed/approved each AI-generated note
@@ -132,6 +138,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: High | **Likelihood**: High | **Blocker**: No, but requires per-state configuration
 
 **Mitigation**:
+
 - Track state regulations via a policy reference (Manatt Health AI Policy Tracker is a good starting point)
 - Build AI feature flags that can be enabled/disabled per organization based on state
 - Include configurable disclosure language that can be customized per state
@@ -147,6 +154,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: The FDA's January 2026 revised CDS guidance expanded the scope of software that falls outside active regulation -- specifically, tools where clinicians can independently review recommendations are generally exempt. But AI that makes autonomous clinical decisions falls firmly within FDA scope.
 
 **Mitigation**:
+
 - Keep Phase 1 AI features purely administrative (document extraction, not clinical recommendations)
 - Never position AI outputs as clinical guidance or treatment recommendations
 - If adding session note generation: frame it as a "drafting assistant," never as a clinical decision tool
@@ -165,6 +173,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: Production LLM systems degrade silently. Model providers update APIs without warning, and organizations that celebrate initial success watch performance quietly erode over 90 days until the system becomes more burden than benefit.
 
 **Mitigation**:
+
 - Pin model versions in the AI wrapper (`src/lib/ai.ts`) -- never use "latest" or unversioned endpoints
 - Build a "golden evaluation set" of 50-100 auth letters with known correct extractions
 - Run automated regression tests against the golden set weekly (or after any model version change)
@@ -179,6 +188,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Medium | **Likelihood**: High | **Blocker**: No
 
 **Mitigation**:
+
 - Start with the most common payers in ABA (BCBS, UHC, Aetna, Cigna, Medicaid state plans) and build format-specific prompts
 - Include a "confidence" indicator at the document level (not just field level) -- if overall confidence is low, tell the user "This document format is unfamiliar -- please verify all fields carefully"
 - Allow users to report extraction errors, which feeds back into prompt improvement
@@ -191,6 +201,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: High | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Validate page count before processing and warn users about multi-patient batch documents
 - Process documents page-by-page with explicit context chaining if documents exceed the model's optimal window
 - Display which page each extracted field came from so reviewers can verify
@@ -205,6 +216,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: Therapists report that AI-generated notes "create false narratives." AI systems fabricate logical sequences or hallucinate clinical details. Hallucinations have been categorized into five types: patient information errors, history errors, symptom/diagnosis/procedure errors, medication errors, and follow-up errors.
 
 **Mitigation (if/when session notes are added)**:
+
 - Never generate notes from scratch -- always require structured input (session time, CPT code, target behaviors, data) and generate prose from that structure
 - Use constrained generation: the note template should define sections, and the AI fills only within those sections using the provided data
 - Flag any AI-generated clinical observations as "AI-drafted -- requires BCBA review"
@@ -224,6 +236,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: The January 2025 HHS HIPAA Security Rule update (first major update in 20 years) removed the distinction between "required" and "addressable" safeguards, making encryption and risk management mandatory rather than optional.
 
 **Mitigation**:
+
 - Phase 1 (prototyping): Use test data only. No real patient documents through any LLM API
 - Production: Use AWS Bedrock exclusively for PHI workloads (covered under AWS BAA, free via AWS Artifact)
 - The `src/lib/ai.ts` wrapper is the right pattern -- one-file swap from prototype API to Bedrock
@@ -238,6 +251,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Critical | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Create synthetic auth letters for all development and testing -- never use real patient documents
 - Add `.gitignore` rules for common document extensions in test directories
 - Document the requirement in `CLAUDE.md` security rules (already partially addressed)
@@ -250,6 +264,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: High | **Likelihood**: Low (requires adversarial intent) | **Blocker**: No
 
 **Mitigation**:
+
 - Validate all extracted values against business rules before presenting to users (units within range, dates valid, codes in allowed set)
 - Use structured output formats (JSON schema) to constrain LLM responses
 - Sanitize document text before sending to LLM (strip invisible characters, control characters)
@@ -263,6 +278,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Critical | **Likelihood**: Low (with Bedrock) | **Blocker**: No
 
 **Mitigation**:
+
 - AWS Bedrock explicitly does not use customer data for training and does not share it with model providers
 - Document the data flow in a formal HIPAA risk assessment
 - For prototyping: ensure no real PHI reaches any non-BAA-covered API
@@ -279,6 +295,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Medium | **Likelihood**: High | **Blocker**: No
 
 **Mitigation**:
+
 - Version-control all prompts with the same rigor as code
 - Run the golden evaluation set against prompt changes before deployment
 - Treat prompt changes as code changes requiring review
@@ -293,6 +310,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: Research demonstrates measurable performance degradation as context length increases, with accuracy dropping for information in the middle of long contexts ("lost in the middle" phenomenon).
 
 **Mitigation**:
+
 - Set maximum document size limits (file size and page count) with user-facing messages
 - For large documents, extract text per-page and process in chunks
 - Place the extraction schema/instructions at both the beginning and end of the prompt
@@ -305,6 +323,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Medium | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Test extraction against Spanish-language auth letters (common in TX, FL, CA)
 - Specify the expected output language in the extraction prompt
 - Flag documents that appear to be in a language other than English for human review
@@ -324,6 +343,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Why this is non-obvious for Clinivise**: If the auth letter parser is 95% accurate, staff will quickly learn to click "Confirm All" without checking. The 5% errors will flow through undetected and compound over time. This is the most likely path to a billing audit finding.
 
 **Mitigation**:
+
 - NEVER include a "Confirm All" button in the auth review UI (`auth-ai-review.tsx`)
 - Require field-by-field confirmation, or at minimum, require the user to scroll through all fields
 - Randomly highlight 2-3 fields per document as "Please verify this field" even when confidence is high
@@ -340,6 +360,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: Only 16% of clinicians currently use AI tools for clinical decisions (2025 survey). Clinician frustration with not being involved in AI adoption decisions leads to resistance and disengagement.
 
 **Mitigation**:
+
 - Set expectations clearly in the UI: "AI-assisted extraction -- please review all fields"
 - Make the manual entry workflow equally polished (AI extraction is an accelerator, not a requirement)
 - Track which payer formats have low extraction accuracy and prioritize improvements
@@ -352,6 +373,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Medium | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Design AI features as optional accelerators, never mandatory steps
 - Keep the AI UI inline with the existing workflow (upload button on the authorization form, not a separate "AI" section)
 - Provide in-context tooltips explaining what the AI did and how to correct it
@@ -369,6 +391,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: One telemedicine client's monthly AI spend reached $48K before optimization. Healthcare organizations routinely pay 3x public API rates for HIPAA-compliant access.
 
 **Mitigation**:
+
 - Implement per-organization rate limits (already planned with Upstash Redis)
 - Set daily/monthly token budgets per organization with alerts at 80% usage
 - Track cost per AI-processed document and display it internally
@@ -383,6 +406,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Medium | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Rate limit AI features per organization (e.g., 20 auth letter parses per month on free tier)
 - Restrict AI features to authorization-letter-shaped documents (validate document type before processing)
 - Monitor usage patterns for anomalies (single org uploading 100+ documents per day)
@@ -397,9 +421,10 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: BCBS research attributes $2.3B in excess claims spending to AI-enabled coding practices. The research specifically examined whether diagnosis coding increases were matched by corresponding treatment increases -- they were not.
 
 **Mitigation**:
+
 - Never build AI features that suggest higher-paying codes without explicit clinical justification
 - Monitor aggregate coding patterns across the platform (are practices using Clinivise billing higher than industry averages?)
-- Consider having AI suggest the *conservative* code when ambiguous, not the higher-paying one
+- Consider having AI suggest the _conservative_ code when ambiguous, not the higher-paying one
 - Document the design philosophy: AI assists accuracy, never optimizes revenue
 - If adding denial prediction or claim optimization features, ensure they optimize for accuracy/compliance, not for maximum reimbursement
 
@@ -410,6 +435,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Medium | **Likelihood**: High | **Blocker**: No
 
 **Mitigation**:
+
 - Budget AI feature maintenance as a recurring cost, not a one-time development cost
 - Track time spent on AI-related support tickets and prompt adjustments
 - Automate regression testing to reduce ongoing maintenance burden
@@ -425,6 +451,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Medium | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Include an ABA terminology glossary in the system prompt for extraction
 - Validate extracted clinical terms against a known ABA vocabulary list
 - Test extraction specifically against ABA-specific auth letter language
@@ -436,6 +463,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: High | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Cross-validate provider credential type against CPT code eligibility (already planned in Task 79)
 - The provider credential is stored in the database, not extracted by AI -- use the database as the source of truth
 - Flag any AI suggestion that conflicts with the provider's credential level
@@ -447,6 +475,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Critical | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - NEVER let AI determine which calculation method to use. Store the method per payer in the database
 - Unit calculations are deterministic math -- keep them in `calculateUnits()`, not in AI prompts
 - Display the calculation method alongside the unit total so the user can verify
@@ -458,6 +487,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: High | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Authorization utilization logic is application code (atomic SQL increments, FIFO ordering), not AI
 - AI only extracts authorization details from documents; the application manages utilization tracking
 - The architecture already specifies FIFO with manual override -- maintain this separation
@@ -469,6 +499,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: High | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Build a payer rules engine as structured data, not AI prompts
 - AI features should validate against the payer rules engine, not generate payer-specific rules
 - Allow admin users to configure payer-specific rules (modifiers, unit caps, service combinations)
@@ -483,6 +514,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: Research documents that insurance payers have misused MUEs in processing ABA claims, denying claims that exceed MUE thresholds even when they do not exceed the preauthorization.
 
 **Mitigation**:
+
 - Build MUE checking into the session/claims validation layer
 - Alert users when a session's units approach or exceed MUE thresholds
 - Document that pre-authorized services exceeding MUE thresholds are payable (per ABA Coding Coalition guidance)
@@ -500,6 +532,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Real case**: Healthcare billing is becoming an "AI vs AI contest" with both hospitals and insurers deploying AI. BCBS's Blue Health Intelligence specifically analyzes billing patterns across thousands of providers to detect AI-driven coding shifts.
 
 **Mitigation**:
+
 - Design AI features for accuracy, not optimization
 - Monitor claim denial rates per payer -- if denials increase after AI feature adoption, investigate
 - Avoid patterns that look adversarial to payer AI (sudden coding pattern changes across all patients)
@@ -511,6 +544,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: Critical | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Log explicit "user reviewed and confirmed field X" events, not just "data saved"
 - Include the AI's original suggestion, the user's final value, and whether it was modified
 - The audit logging service (Task 101) should treat AI-generated data as a distinct action type
@@ -523,6 +557,7 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 **Severity**: High | **Likelihood**: Medium | **Blocker**: No
 
 **Mitigation**:
+
 - Advise customers to expect potential audit attention when changing billing practices
 - Ensure all AI-assisted billing is backed by proper documentation
 - Build documentation completeness checks: before a session is marked "ready to bill," verify that all required documentation elements are present
@@ -531,43 +566,43 @@ For Clinivise, the risk posture is manageable with disciplined engineering, but 
 
 ## Risk Summary Matrix
 
-| # | Risk | Severity | Likelihood | Phase | Manageable? |
-|---|------|----------|------------|-------|-------------|
-| 1.1 | Auth letter field hallucination | Critical | High | 1 | Yes -- human review UI |
-| 1.2 | CPT code hallucination | Critical | Medium | 2 | Yes -- constrained code lists |
-| 1.3 | Unit calculation misapplication | Critical | Medium | 1 | Yes -- deterministic code, not AI |
-| 1.4 | Auth amount/date hallucination | Critical | Medium | 1 | Yes -- sanity checks + review |
-| 2.1 | False Claims Act liability | Critical | Medium | 2 | Yes -- human attestation required |
-| 2.2 | BCBA professional liability | Critical | Medium | 2+ | Yes -- review workflow |
-| 2.3 | State regulatory fragmentation | High | High | All | Yes -- feature flags per state |
-| 2.4 | SaMD classification risk | High | Low | 2+ | Yes -- stay administrative |
-| 3.1 | Silent accuracy degradation | High | High | 1 | Yes -- regression testing |
-| 3.2 | Document format variance | Medium | High | 1 | Yes -- payer-specific prompts |
-| 3.3 | Multi-page document handling | High | Medium | 1 | Yes -- chunked processing |
-| 3.4 | False narrative in therapy notes | Critical | Medium | 2+ | Yes -- structured input required |
-| 4.1 | PHI exposure via LLM API | Critical | High | 1 | Yes -- BAA required, Bedrock |
-| 4.2 | PHI in prompt engineering artifacts | Critical | Medium | 1 | Yes -- synthetic data only |
-| 4.3 | Prompt injection via documents | High | Low | 1 | Yes -- output validation |
-| 4.4 | Data retention by AI providers | Critical | Low | 1 | Yes -- Bedrock guarantees |
-| 5.1 | Prompt sensitivity | Medium | High | 1 | Yes -- version control + eval |
-| 5.2 | Context window overflow | Medium | Medium | 1 | Yes -- size limits + chunking |
-| 5.3 | Multilingual documents | Medium | Medium | 1 | Yes -- language detection |
-| 6.1 | Automation complacency | Critical | High | 1 | Yes -- UX design (no "Confirm All") |
-| 6.2 | Feature abandonment | Medium | Medium | 1 | Yes -- graceful fallback to manual |
-| 6.3 | Training burden | Medium | Medium | 1 | Yes -- inline, optional features |
-| 7.1 | LLM API cost overruns | High | Medium | 1 | Yes -- rate limits + budgets |
-| 7.2 | Free tier AI abuse | Medium | Medium | 1 | Yes -- rate limits + validation |
-| 7.3 | Revenue model conflict of interest | Critical | Low | 2 | Yes -- conservative coding default |
-| 7.4 | Soft cost underestimation | Medium | High | All | Yes -- budget as recurring |
-| 8.1 | ABA terminology misinterpretation | Medium | Medium | 1 | Yes -- glossary in prompts |
-| 8.2 | Supervision miscategorization | High | Medium | 2 | Yes -- DB as source of truth |
-| 8.3 | CMS vs AMA rule confusion | Critical | Medium | 1 | Yes -- deterministic, per-payer |
-| 8.4 | Authorization overlap mishandling | High | Medium | 1 | Yes -- application logic, not AI |
-| 8.5 | Payer-specific rule ignorance | High | Medium | 2 | Yes -- structured rules engine |
-| 8.6 | MUE violations | High | Medium | 2 | Yes -- validation layer |
-| 9.1 | AI-vs-AI billing arms race | High | Medium | 2 | Yes -- design for accuracy |
-| 9.2 | Audit trail completeness | Critical | Medium | 1 | Yes -- explicit review logging |
-| 9.3 | Insurance company audit trigger | High | Medium | 2 | Yes -- documentation checks |
+| #   | Risk                                | Severity | Likelihood | Phase | Manageable?                         |
+| --- | ----------------------------------- | -------- | ---------- | ----- | ----------------------------------- |
+| 1.1 | Auth letter field hallucination     | Critical | High       | 1     | Yes -- human review UI              |
+| 1.2 | CPT code hallucination              | Critical | Medium     | 2     | Yes -- constrained code lists       |
+| 1.3 | Unit calculation misapplication     | Critical | Medium     | 1     | Yes -- deterministic code, not AI   |
+| 1.4 | Auth amount/date hallucination      | Critical | Medium     | 1     | Yes -- sanity checks + review       |
+| 2.1 | False Claims Act liability          | Critical | Medium     | 2     | Yes -- human attestation required   |
+| 2.2 | BCBA professional liability         | Critical | Medium     | 2+    | Yes -- review workflow              |
+| 2.3 | State regulatory fragmentation      | High     | High       | All   | Yes -- feature flags per state      |
+| 2.4 | SaMD classification risk            | High     | Low        | 2+    | Yes -- stay administrative          |
+| 3.1 | Silent accuracy degradation         | High     | High       | 1     | Yes -- regression testing           |
+| 3.2 | Document format variance            | Medium   | High       | 1     | Yes -- payer-specific prompts       |
+| 3.3 | Multi-page document handling        | High     | Medium     | 1     | Yes -- chunked processing           |
+| 3.4 | False narrative in therapy notes    | Critical | Medium     | 2+    | Yes -- structured input required    |
+| 4.1 | PHI exposure via LLM API            | Critical | High       | 1     | Yes -- BAA required, Bedrock        |
+| 4.2 | PHI in prompt engineering artifacts | Critical | Medium     | 1     | Yes -- synthetic data only          |
+| 4.3 | Prompt injection via documents      | High     | Low        | 1     | Yes -- output validation            |
+| 4.4 | Data retention by AI providers      | Critical | Low        | 1     | Yes -- Bedrock guarantees           |
+| 5.1 | Prompt sensitivity                  | Medium   | High       | 1     | Yes -- version control + eval       |
+| 5.2 | Context window overflow             | Medium   | Medium     | 1     | Yes -- size limits + chunking       |
+| 5.3 | Multilingual documents              | Medium   | Medium     | 1     | Yes -- language detection           |
+| 6.1 | Automation complacency              | Critical | High       | 1     | Yes -- UX design (no "Confirm All") |
+| 6.2 | Feature abandonment                 | Medium   | Medium     | 1     | Yes -- graceful fallback to manual  |
+| 6.3 | Training burden                     | Medium   | Medium     | 1     | Yes -- inline, optional features    |
+| 7.1 | LLM API cost overruns               | High     | Medium     | 1     | Yes -- rate limits + budgets        |
+| 7.2 | Free tier AI abuse                  | Medium   | Medium     | 1     | Yes -- rate limits + validation     |
+| 7.3 | Revenue model conflict of interest  | Critical | Low        | 2     | Yes -- conservative coding default  |
+| 7.4 | Soft cost underestimation           | Medium   | High       | All   | Yes -- budget as recurring          |
+| 8.1 | ABA terminology misinterpretation   | Medium   | Medium     | 1     | Yes -- glossary in prompts          |
+| 8.2 | Supervision miscategorization       | High     | Medium     | 2     | Yes -- DB as source of truth        |
+| 8.3 | CMS vs AMA rule confusion           | Critical | Medium     | 1     | Yes -- deterministic, per-payer     |
+| 8.4 | Authorization overlap mishandling   | High     | Medium     | 1     | Yes -- application logic, not AI    |
+| 8.5 | Payer-specific rule ignorance       | High     | Medium     | 2     | Yes -- structured rules engine      |
+| 8.6 | MUE violations                      | High     | Medium     | 2     | Yes -- validation layer             |
+| 9.1 | AI-vs-AI billing arms race          | High     | Medium     | 2     | Yes -- design for accuracy          |
+| 9.2 | Audit trail completeness            | Critical | Medium     | 1     | Yes -- explicit review logging      |
+| 9.3 | Insurance company audit trigger     | High     | Medium     | 2     | Yes -- documentation checks         |
 
 ---
 

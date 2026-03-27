@@ -90,42 +90,147 @@ const CP_BCBA_IDS = Array.from({ length: 10 }, (_, i) => `cp_seed_bcba_${i + 1}`
 const CP_RBT_IDS = Array.from({ length: 10 }, (_, i) => `cp_seed_rbt_${i + 1}`);
 
 // Sessions (60)
-const SESSION_IDS = Array.from({ length: 60 }, (_, i) => `session_seed_${String(i + 1).padStart(2, "0")}`);
+const SESSION_IDS = Array.from(
+  { length: 60 },
+  (_, i) => `session_seed_${String(i + 1).padStart(2, "0")}`,
+);
 
 // ---------------------------------------------------------------------------
 // Seed data
 // ---------------------------------------------------------------------------
 
 const clientData = [
-  { first: "Ethan", last: "Miller", dob: "2018-03-15", gender: "M" as const, guardian: { first: "Rebecca", last: "Miller", rel: "mother" as const }, city: "Austin", state: "TX" },
-  { first: "Sophia", last: "Garcia", dob: "2019-07-22", gender: "F" as const, guardian: { first: "Maria", last: "Garcia", rel: "mother" as const }, city: "Austin", state: "TX" },
-  { first: "Liam", last: "Johnson", dob: "2017-11-03", gender: "M" as const, guardian: { first: "Tanya", last: "Johnson", rel: "mother" as const }, city: "Round Rock", state: "TX" },
-  { first: "Olivia", last: "Thompson", dob: "2020-01-18", gender: "F" as const, guardian: { first: "Marcus", last: "Thompson", rel: "father" as const }, city: "Cedar Park", state: "TX" },
-  { first: "Noah", last: "Williams", dob: "2018-09-05", gender: "M" as const, guardian: { first: "Jordan", last: "Williams", rel: "mother" as const }, city: "Austin", state: "TX" },
-  { first: "Emma", last: "Rodriguez", dob: "2019-04-12", gender: "F" as const, guardian: { first: "Carlos", last: "Rodriguez", rel: "father" as const }, city: "Pflugerville", state: "TX" },
-  { first: "Aiden", last: "Chen", dob: "2016-12-28", gender: "M" as const, guardian: { first: "Lisa", last: "Chen", rel: "mother" as const }, city: "Austin", state: "TX" },
-  { first: "Isabella", last: "Patel", dob: "2020-06-09", gender: "F" as const, guardian: { first: "Priya", last: "Patel", rel: "mother" as const }, city: "Georgetown", state: "TX" },
-  { first: "Mason", last: "Kim", dob: "2017-08-14", gender: "M" as const, guardian: { first: "Soo-Jin", last: "Kim", rel: "mother" as const }, city: "Austin", state: "TX" },
-  { first: "Ava", last: "Davis", dob: "2019-02-27", gender: "F" as const, guardian: { first: "Michael", last: "Davis", rel: "father" as const }, city: "Leander", state: "TX" },
+  {
+    first: "Ethan",
+    last: "Miller",
+    dob: "2018-03-15",
+    gender: "M" as const,
+    guardian: { first: "Rebecca", last: "Miller", rel: "mother" as const },
+    city: "Austin",
+    state: "TX",
+  },
+  {
+    first: "Sophia",
+    last: "Garcia",
+    dob: "2019-07-22",
+    gender: "F" as const,
+    guardian: { first: "Maria", last: "Garcia", rel: "mother" as const },
+    city: "Austin",
+    state: "TX",
+  },
+  {
+    first: "Liam",
+    last: "Johnson",
+    dob: "2017-11-03",
+    gender: "M" as const,
+    guardian: { first: "Tanya", last: "Johnson", rel: "mother" as const },
+    city: "Round Rock",
+    state: "TX",
+  },
+  {
+    first: "Olivia",
+    last: "Thompson",
+    dob: "2020-01-18",
+    gender: "F" as const,
+    guardian: { first: "Marcus", last: "Thompson", rel: "father" as const },
+    city: "Cedar Park",
+    state: "TX",
+  },
+  {
+    first: "Noah",
+    last: "Williams",
+    dob: "2018-09-05",
+    gender: "M" as const,
+    guardian: { first: "Jordan", last: "Williams", rel: "mother" as const },
+    city: "Austin",
+    state: "TX",
+  },
+  {
+    first: "Emma",
+    last: "Rodriguez",
+    dob: "2019-04-12",
+    gender: "F" as const,
+    guardian: { first: "Carlos", last: "Rodriguez", rel: "father" as const },
+    city: "Pflugerville",
+    state: "TX",
+  },
+  {
+    first: "Aiden",
+    last: "Chen",
+    dob: "2016-12-28",
+    gender: "M" as const,
+    guardian: { first: "Lisa", last: "Chen", rel: "mother" as const },
+    city: "Austin",
+    state: "TX",
+  },
+  {
+    first: "Isabella",
+    last: "Patel",
+    dob: "2020-06-09",
+    gender: "F" as const,
+    guardian: { first: "Priya", last: "Patel", rel: "mother" as const },
+    city: "Georgetown",
+    state: "TX",
+  },
+  {
+    first: "Mason",
+    last: "Kim",
+    dob: "2017-08-14",
+    gender: "M" as const,
+    guardian: { first: "Soo-Jin", last: "Kim", rel: "mother" as const },
+    city: "Austin",
+    state: "TX",
+  },
+  {
+    first: "Ava",
+    last: "Davis",
+    dob: "2019-02-27",
+    gender: "F" as const,
+    guardian: { first: "Michael", last: "Davis", rel: "father" as const },
+    city: "Leander",
+    state: "TX",
+  },
 ];
 
 // Assign each client a payer rotation and a provider (RBT1 or RBT2), BCBA supervises all
-const payerRotation = [PAYER_BCBS, PAYER_AETNA, PAYER_UHC, PAYER_MEDICAID, PAYER_BCBS, PAYER_AETNA, PAYER_UHC, PAYER_MEDICAID, PAYER_BCBS, PAYER_AETNA];
-const rbtRotation = [PROV_RBT1, PROV_RBT2, PROV_RBT1, PROV_RBT2, PROV_RBT1, PROV_RBT2, PROV_RBT1, PROV_RBT2, PROV_RBT1, PROV_RBT2];
+const payerRotation = [
+  PAYER_BCBS,
+  PAYER_AETNA,
+  PAYER_UHC,
+  PAYER_MEDICAID,
+  PAYER_BCBS,
+  PAYER_AETNA,
+  PAYER_UHC,
+  PAYER_MEDICAID,
+  PAYER_BCBS,
+  PAYER_AETNA,
+];
+const rbtRotation = [
+  PROV_RBT1,
+  PROV_RBT2,
+  PROV_RBT1,
+  PROV_RBT2,
+  PROV_RBT1,
+  PROV_RBT2,
+  PROV_RBT1,
+  PROV_RBT2,
+  PROV_RBT1,
+  PROV_RBT2,
+];
 
 // Auth states: 0-3 active, 4-5 expiring (within 14 days), 6-7 expired, 8 exhausted, 9 pending
 type AuthProfile = { status: string; startOffset: number; endOffset: number; usedPct: number };
 const authProfiles: AuthProfile[] = [
-  { status: "approved", startOffset: -120, endOffset: 60, usedPct: 0.55 },   // active, healthy
-  { status: "approved", startOffset: -90, endOffset: 90, usedPct: 0.40 },    // active, healthy
-  { status: "approved", startOffset: -150, endOffset: 30, usedPct: 0.70 },   // active, moderate
-  { status: "approved", startOffset: -60, endOffset: 120, usedPct: 0.25 },   // active, early
-  { status: "approved", startOffset: -170, endOffset: 10, usedPct: 0.85 },   // expiring soon, high util
-  { status: "approved", startOffset: -175, endOffset: 5, usedPct: 0.92 },    // expiring very soon, critical
-  { status: "approved", startOffset: -210, endOffset: -10, usedPct: 0.78 },  // expired 10 days ago
-  { status: "expired",  startOffset: -240, endOffset: -30, usedPct: 0.65 },  // expired 30 days ago
-  { status: "approved", startOffset: -180, endOffset: 0, usedPct: 1.0 },     // exhausted (100% used)
-  { status: "pending",  startOffset: 5, endOffset: 185, usedPct: 0 },        // pending future auth
+  { status: "approved", startOffset: -120, endOffset: 60, usedPct: 0.55 }, // active, healthy
+  { status: "approved", startOffset: -90, endOffset: 90, usedPct: 0.4 }, // active, healthy
+  { status: "approved", startOffset: -150, endOffset: 30, usedPct: 0.7 }, // active, moderate
+  { status: "approved", startOffset: -60, endOffset: 120, usedPct: 0.25 }, // active, early
+  { status: "approved", startOffset: -170, endOffset: 10, usedPct: 0.85 }, // expiring soon, high util
+  { status: "approved", startOffset: -175, endOffset: 5, usedPct: 0.92 }, // expiring very soon, critical
+  { status: "approved", startOffset: -210, endOffset: -10, usedPct: 0.78 }, // expired 10 days ago
+  { status: "expired", startOffset: -240, endOffset: -30, usedPct: 0.65 }, // expired 30 days ago
+  { status: "approved", startOffset: -180, endOffset: 0, usedPct: 1.0 }, // exhausted (100% used)
+  { status: "pending", startOffset: 5, endOffset: 185, usedPct: 0 }, // pending future auth
 ];
 
 // ---------------------------------------------------------------------------
@@ -160,10 +265,42 @@ async function seed() {
   await db
     .insert(schema.users)
     .values([
-      { id: USER_OWNER, clerkUserId: "clerk_seed_owner", organizationId: ORG_ID, email: "sarah.chen@brightfuturesaba.com", firstName: "Sarah", lastName: "Chen", role: "owner" },
-      { id: USER_BCBA, clerkUserId: "clerk_seed_bcba", organizationId: ORG_ID, email: "marcus.wright@brightfuturesaba.com", firstName: "Marcus", lastName: "Wright", role: "bcba" },
-      { id: USER_RBT1, clerkUserId: "clerk_seed_rbt1", organizationId: ORG_ID, email: "david.park@brightfuturesaba.com", firstName: "David", lastName: "Park", role: "rbt" },
-      { id: USER_RBT2, clerkUserId: "clerk_seed_rbt2", organizationId: ORG_ID, email: "jessica.torres@brightfuturesaba.com", firstName: "Jessica", lastName: "Torres", role: "rbt" },
+      {
+        id: USER_OWNER,
+        clerkUserId: "clerk_seed_owner",
+        organizationId: ORG_ID,
+        email: "sarah.chen@brightfuturesaba.com",
+        firstName: "Sarah",
+        lastName: "Chen",
+        role: "owner",
+      },
+      {
+        id: USER_BCBA,
+        clerkUserId: "clerk_seed_bcba",
+        organizationId: ORG_ID,
+        email: "marcus.wright@brightfuturesaba.com",
+        firstName: "Marcus",
+        lastName: "Wright",
+        role: "bcba",
+      },
+      {
+        id: USER_RBT1,
+        clerkUserId: "clerk_seed_rbt1",
+        organizationId: ORG_ID,
+        email: "david.park@brightfuturesaba.com",
+        firstName: "David",
+        lastName: "Park",
+        role: "rbt",
+      },
+      {
+        id: USER_RBT2,
+        clerkUserId: "clerk_seed_rbt2",
+        organizationId: ORG_ID,
+        email: "jessica.torres@brightfuturesaba.com",
+        firstName: "Jessica",
+        lastName: "Torres",
+        role: "rbt",
+      },
     ])
     .onConflictDoNothing();
 
@@ -172,10 +309,55 @@ async function seed() {
   await db
     .insert(schema.providers)
     .values([
-      { id: PROV_BCBA, organizationId: ORG_ID, userId: USER_OWNER, firstName: "Sarah", lastName: "Chen", credentialType: "bcba_d", npi: "1111111112", credentialNumber: "BCBA-D-12345", credentialExpiry: relDate(365), modifierCode: "HP" },
-      { id: PROV_BCBA_D, organizationId: ORG_ID, userId: USER_BCBA, firstName: "Marcus", lastName: "Wright", credentialType: "bcba", npi: "2222222223", credentialNumber: "BCBA-67890", credentialExpiry: relDate(200), supervisorId: PROV_BCBA, modifierCode: "HO" },
-      { id: PROV_RBT1, organizationId: ORG_ID, userId: USER_RBT1, firstName: "David", lastName: "Park", credentialType: "rbt", credentialNumber: "RBT-11111", credentialExpiry: relDate(180), supervisorId: PROV_BCBA, modifierCode: "HM" },
-      { id: PROV_RBT2, organizationId: ORG_ID, userId: USER_RBT2, firstName: "Jessica", lastName: "Torres", credentialType: "rbt", credentialNumber: "RBT-22222", credentialExpiry: relDate(90), supervisorId: PROV_BCBA_D, modifierCode: "HM" },
+      {
+        id: PROV_BCBA,
+        organizationId: ORG_ID,
+        userId: USER_OWNER,
+        firstName: "Sarah",
+        lastName: "Chen",
+        credentialType: "bcba_d",
+        npi: "1111111112",
+        credentialNumber: "BCBA-D-12345",
+        credentialExpiry: relDate(365),
+        modifierCode: "HP",
+      },
+      {
+        id: PROV_BCBA_D,
+        organizationId: ORG_ID,
+        userId: USER_BCBA,
+        firstName: "Marcus",
+        lastName: "Wright",
+        credentialType: "bcba",
+        npi: "2222222223",
+        credentialNumber: "BCBA-67890",
+        credentialExpiry: relDate(200),
+        supervisorId: PROV_BCBA,
+        modifierCode: "HO",
+      },
+      {
+        id: PROV_RBT1,
+        organizationId: ORG_ID,
+        userId: USER_RBT1,
+        firstName: "David",
+        lastName: "Park",
+        credentialType: "rbt",
+        credentialNumber: "RBT-11111",
+        credentialExpiry: relDate(180),
+        supervisorId: PROV_BCBA,
+        modifierCode: "HM",
+      },
+      {
+        id: PROV_RBT2,
+        organizationId: ORG_ID,
+        userId: USER_RBT2,
+        firstName: "Jessica",
+        lastName: "Torres",
+        credentialType: "rbt",
+        credentialNumber: "RBT-22222",
+        credentialExpiry: relDate(90),
+        supervisorId: PROV_BCBA_D,
+        modifierCode: "HM",
+      },
     ])
     .onConflictDoNothing();
 
@@ -184,10 +366,42 @@ async function seed() {
   await db
     .insert(schema.payers)
     .values([
-      { id: PAYER_BCBS, organizationId: ORG_ID, name: "Blue Cross Blue Shield of Texas", payerType: "commercial", timelyFilingDays: 90, unitCalcMethod: "ama", phone: "(800) 555-2583" },
-      { id: PAYER_AETNA, organizationId: ORG_ID, name: "Aetna", payerType: "commercial", timelyFilingDays: 90, unitCalcMethod: "ama", phone: "(800) 555-1234" },
-      { id: PAYER_UHC, organizationId: ORG_ID, name: "UnitedHealthcare", payerType: "commercial", timelyFilingDays: 120, unitCalcMethod: "ama", phone: "(800) 555-5678" },
-      { id: PAYER_MEDICAID, organizationId: ORG_ID, name: "Texas Medicaid (HHSC)", payerType: "medicaid", timelyFilingDays: 365, unitCalcMethod: "cms", phone: "(800) 555-9012" },
+      {
+        id: PAYER_BCBS,
+        organizationId: ORG_ID,
+        name: "Blue Cross Blue Shield of Texas",
+        payerType: "commercial",
+        timelyFilingDays: 90,
+        unitCalcMethod: "ama",
+        phone: "(800) 555-2583",
+      },
+      {
+        id: PAYER_AETNA,
+        organizationId: ORG_ID,
+        name: "Aetna",
+        payerType: "commercial",
+        timelyFilingDays: 90,
+        unitCalcMethod: "ama",
+        phone: "(800) 555-1234",
+      },
+      {
+        id: PAYER_UHC,
+        organizationId: ORG_ID,
+        name: "UnitedHealthcare",
+        payerType: "commercial",
+        timelyFilingDays: 120,
+        unitCalcMethod: "ama",
+        phone: "(800) 555-5678",
+      },
+      {
+        id: PAYER_MEDICAID,
+        organizationId: ORG_ID,
+        name: "Texas Medicaid (HHSC)",
+        payerType: "medicaid",
+        timelyFilingDays: 365,
+        unitCalcMethod: "cms",
+        phone: "(800) 555-9012",
+      },
     ])
     .onConflictDoNothing();
 
@@ -210,7 +424,9 @@ async function seed() {
     diagnosisDescription: "Autism Spectrum Disorder",
     intakeDate: relDate(-180 + i * 10),
     status: i === 8 ? "on_hold" : "active",
-    referralSource: ["pediatrician", "school", "self_referral", "insurance", "other_provider"][i % 5],
+    referralSource: ["pediatrician", "school", "self_referral", "insurance", "other_provider"][
+      i % 5
+    ],
     holdReason: i === 8 ? "Family vacation — returning next month" : null,
   }));
   await db.insert(schema.clients).values(clientValues).onConflictDoNothing();
@@ -471,9 +687,9 @@ async function seed() {
       providerId: rbtRotation[clientIdx]!,
       supervisorId: PROV_BCBA,
       authorizationId: AUTH_IDS[clientIdx]!,
-      authorizationServiceId: svcValues.find(
-        (sv) => sv.authorizationId === AUTH_IDS[clientIdx] && sv.cptCode === "97153",
-      )?.id ?? null,
+      authorizationServiceId:
+        svcValues.find((sv) => sv.authorizationId === AUTH_IDS[clientIdx] && sv.cptCode === "97153")
+          ?.id ?? null,
       sessionDate: date,
       startTime: makeTimestamp(date, "09:00"),
       endTime: makeTimestamp(date, "12:00"),
@@ -497,16 +713,46 @@ async function seed() {
   // ---------------------------------------------------------------------------
 
   const counts = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(schema.organizations).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.users).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.providers).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.payers).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.clients).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.clientContacts).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.clientInsurance).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.authorizations).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.authorizationServices).then((r) => r[0]?.count),
-    db.select({ count: sql<number>`count(*)` }).from(schema.sessions).then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.organizations)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.users)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.providers)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.payers)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.clients)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.clientContacts)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.clientInsurance)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.authorizations)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.authorizationServices)
+      .then((r) => r[0]?.count),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.sessions)
+      .then((r) => r[0]?.count),
   ]);
 
   console.log("\nSeed complete! Database counts:");

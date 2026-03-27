@@ -196,42 +196,42 @@ Key fixes applied across all audit rounds:
 
 > Foundation: list, create, detail, service lines. Follows Providers (2A) and Clients (2B) patterns.
 
-| #   | Task | Files | Status |
-| --- | ---- | ----- | ------ |
-| 76  | Schema migration: add `previousAuthorizationId` (self-ref FK), `ratePerUnit` (numeric 10,2) on auth_services | `drizzle/0004_sprint_2d_auth_enhancements.sql` | `[x]` |
-| 77  | Authorization constants (status labels, status variants, CPT code options for select) | `src/lib/constants.ts` | `[x]` |
-| 78  | Authorization Zod validators (create, update, service line create/update) | `src/lib/validators/authorizations.ts` | `[x]` |
-| 79  | Authorization read queries (list with client+payer JOIN, detail with service lines, client-scoped list) | `src/server/queries/authorizations.ts` | `[x]` |
-| 80  | Authorization server actions (create with service lines, update, archive/soft-delete) | `src/server/actions/authorizations.ts` | `[x]` |
-| 81  | Authorization service line server actions (add, update, remove) | `src/server/actions/authorization-services.ts` | `[x]` |
-| 82  | Authorization list page (DataTable, status filter, client search, payer filter) | `src/app/(dashboard)/authorizations/page.tsx` | `[x]` |
-| 83  | Authorization table + columns (status badge, client name, payer, date range, service line count) | `src/components/authorizations/auth-table.tsx`, `auth-columns.tsx` | `[x]` |
-| 84  | Authorization create page + form (client selector → auto-populate payer/insurance, date range, diagnosis, service lines inline) | `src/app/(dashboard)/authorizations/new/page.tsx`, `src/components/authorizations/auth-form.tsx` | `[x]` |
-| 85  | Authorization service line manager component (add/edit/remove CPT lines with approved units, rate per unit) | `src/components/authorizations/auth-service-lines.tsx` | `[x]` |
-| 86  | Authorization detail page (header card + service lines table + placeholder tabs for sessions/documents/history) | `src/app/(dashboard)/authorizations/[id]/page.tsx`, `src/components/authorizations/auth-detail.tsx` | `[x]` |
-| 87  | Authorization status badge component (reusable, follows CLIENT_STATUS_VARIANT pattern) | `src/components/authorizations/auth-status-badge.tsx` | `[x]` |
-| 88  | Client detail: wire Authorizations tab (filtered auth list for this client) | `src/components/clients/client-detail.tsx` | `[x]` |
-| 89  | Unit tests: authorization validators, service line validators | `src/lib/validators/authorizations.test.ts` | `[x]` |
+| #   | Task                                                                                                                            | Files                                                                                               | Status |
+| --- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------ |
+| 76  | Schema migration: add `previousAuthorizationId` (self-ref FK), `ratePerUnit` (numeric 10,2) on auth_services                    | `drizzle/0004_sprint_2d_auth_enhancements.sql`                                                      | `[x]`  |
+| 77  | Authorization constants (status labels, status variants, CPT code options for select)                                           | `src/lib/constants.ts`                                                                              | `[x]`  |
+| 78  | Authorization Zod validators (create, update, service line create/update)                                                       | `src/lib/validators/authorizations.ts`                                                              | `[x]`  |
+| 79  | Authorization read queries (list with client+payer JOIN, detail with service lines, client-scoped list)                         | `src/server/queries/authorizations.ts`                                                              | `[x]`  |
+| 80  | Authorization server actions (create with service lines, update, archive/soft-delete)                                           | `src/server/actions/authorizations.ts`                                                              | `[x]`  |
+| 81  | Authorization service line server actions (add, update, remove)                                                                 | `src/server/actions/authorization-services.ts`                                                      | `[x]`  |
+| 82  | Authorization list page (DataTable, status filter, client search, payer filter)                                                 | `src/app/(dashboard)/authorizations/page.tsx`                                                       | `[x]`  |
+| 83  | Authorization table + columns (status badge, client name, payer, date range, service line count)                                | `src/components/authorizations/auth-table.tsx`, `auth-columns.tsx`                                  | `[x]`  |
+| 84  | Authorization create page + form (client selector → auto-populate payer/insurance, date range, diagnosis, service lines inline) | `src/app/(dashboard)/authorizations/new/page.tsx`, `src/components/authorizations/auth-form.tsx`    | `[x]`  |
+| 85  | Authorization service line manager component (add/edit/remove CPT lines with approved units, rate per unit)                     | `src/components/authorizations/auth-service-lines.tsx`                                              | `[x]`  |
+| 86  | Authorization detail page (header card + service lines table + placeholder tabs for sessions/documents/history)                 | `src/app/(dashboard)/authorizations/[id]/page.tsx`, `src/components/authorizations/auth-detail.tsx` | `[x]`  |
+| 87  | Authorization status badge component (reusable, follows CLIENT_STATUS_VARIANT pattern)                                          | `src/components/authorizations/auth-status-badge.tsx`                                               | `[x]`  |
+| 88  | Client detail: wire Authorizations tab (filtered auth list for this client)                                                     | `src/components/clients/client-detail.tsx`                                                          | `[x]`  |
+| 89  | Unit tests: authorization validators, service line validators                                                                   | `src/lib/validators/authorizations.test.ts`                                                         | `[x]`  |
 
 ### 2D-2 — Authorization Intelligence (completed — Phase 1B)
 
 > Utilization tracking and expiry alerts. Built as Phase 1B (4 sub-sprints, 10 commits, 24+ audit findings fixed).
 
-| #   | Task | Files | Status |
-| --- | ---- | ----- | ------ |
-| 90  | Utilization bar component (role="meter", a11y, over-utilization, compact mode, hours display) | `src/components/shared/utilization-bar.tsx` | `[x]` |
-| 91  | Add inline utilization mini-bars to auth list table columns | `src/components/authorizations/authorization-columns.tsx` | `[x]` |
-| 92  | Auth detail: per-service-line utilization bars on detail page | `src/components/authorizations/authorization-detail.tsx` | `[x]` |
-| 93  | Auth detail: rich header card (status, dates, payer, client, diagnosis, days remaining, overall utilization bar) | `src/app/(dashboard)/authorizations/[id]/page.tsx` | `[x]` |
-| 94  | Expiry badge column on auth list + sort by days-until-expiry | `src/components/authorizations/authorization-columns.tsx` | `[x]` |
-| 95  | Expiry alert banner on auth detail page (warning/critical severity, shared getExpiryLevel) | `src/app/(dashboard)/authorizations/[id]/page.tsx` | `[x]` |
-| 96  | Client detail: auth expiry badge in header + per-CPT utilization bars + under-utilization detection | `src/app/(dashboard)/clients/[id]/page.tsx`, `src/components/clients/client-overview.tsx` | `[x]` |
-| +   | Auth list: metric cards (active, expiring 30d, expired, avg utilization) + 5 filter tabs + server-side filters | `src/app/(dashboard)/authorizations/page.tsx`, `src/server/queries/authorizations.ts` | `[x]` |
-| +   | Shared ExpiryBadge component (color-coded days, "Today", future auth "Starts {date}", full date mode) | `src/components/shared/expiry-badge.tsx` | `[x]` |
-| +   | Shared MetricCard component (extracted from dashboard, accent prop, reused on sessions + auth list pages) | `src/components/shared/metric-card.tsx` | `[x]` |
-| +   | Client detail: action buttons row (Log Session, Add Authorization) + Weekly Avg metric card | `src/app/(dashboard)/clients/[id]/page.tsx`, `src/components/clients/client-overview.tsx` | `[x]` |
-| +   | New query: getClientAuthUtilization (per-CPT breakdown, daysTotal/Elapsed, startDate filter) | `src/server/queries/authorizations.ts` | `[x]` |
-| +   | Tests: 24 new (16 utilization-bar + 8 expiry-badge) | `src/components/shared/*.test.tsx` | `[x]` |
+| #   | Task                                                                                                             | Files                                                                                     | Status |
+| --- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------ |
+| 90  | Utilization bar component (role="meter", a11y, over-utilization, compact mode, hours display)                    | `src/components/shared/utilization-bar.tsx`                                               | `[x]`  |
+| 91  | Add inline utilization mini-bars to auth list table columns                                                      | `src/components/authorizations/authorization-columns.tsx`                                 | `[x]`  |
+| 92  | Auth detail: per-service-line utilization bars on detail page                                                    | `src/components/authorizations/authorization-detail.tsx`                                  | `[x]`  |
+| 93  | Auth detail: rich header card (status, dates, payer, client, diagnosis, days remaining, overall utilization bar) | `src/app/(dashboard)/authorizations/[id]/page.tsx`                                        | `[x]`  |
+| 94  | Expiry badge column on auth list + sort by days-until-expiry                                                     | `src/components/authorizations/authorization-columns.tsx`                                 | `[x]`  |
+| 95  | Expiry alert banner on auth detail page (warning/critical severity, shared getExpiryLevel)                       | `src/app/(dashboard)/authorizations/[id]/page.tsx`                                        | `[x]`  |
+| 96  | Client detail: auth expiry badge in header + per-CPT utilization bars + under-utilization detection              | `src/app/(dashboard)/clients/[id]/page.tsx`, `src/components/clients/client-overview.tsx` | `[x]`  |
+| +   | Auth list: metric cards (active, expiring 30d, expired, avg utilization) + 5 filter tabs + server-side filters   | `src/app/(dashboard)/authorizations/page.tsx`, `src/server/queries/authorizations.ts`     | `[x]`  |
+| +   | Shared ExpiryBadge component (color-coded days, "Today", future auth "Starts {date}", full date mode)            | `src/components/shared/expiry-badge.tsx`                                                  | `[x]`  |
+| +   | Shared MetricCard component (extracted from dashboard, accent prop, reused on sessions + auth list pages)        | `src/components/shared/metric-card.tsx`                                                   | `[x]`  |
+| +   | Client detail: action buttons row (Log Session, Add Authorization) + Weekly Avg metric card                      | `src/app/(dashboard)/clients/[id]/page.tsx`, `src/components/clients/client-overview.tsx` | `[x]`  |
+| +   | New query: getClientAuthUtilization (per-CPT breakdown, daysTotal/Elapsed, startDate filter)                     | `src/server/queries/authorizations.ts`                                                    | `[x]`  |
+| +   | Tests: 24 new (16 utilization-bar + 8 expiry-badge)                                                              | `src/components/shared/*.test.tsx`                                                        | `[x]`  |
 
 ---
 
@@ -241,47 +241,47 @@ Key fixes applied across all audit rounds:
 
 > Built across Phase 0 (stabilize) and Phase 1A (3 sub-sprints, 4 commits, 10 audit findings fixed).
 
-| #   | Task | Files | Status |
-| --- | ---- | ----- | ------ |
-| S1  | Session Zod validators (create, update, cancel, with date/time/unit refinements + timesRequiredWhenCompleted) | `src/lib/validators/sessions.ts` | `[x]` |
-| S2  | Session read queries (list with client+provider+auth JOINs, detail, client sessions, auth sessions, paginated, server-side filters) | `src/server/queries/sessions.ts` | `[x]` |
-| S3  | Session server actions (create with FOR UPDATE + FIFO inside tx, update with ordered locking, cancel with optimistic locking) | `src/server/actions/sessions.ts` | `[x]` |
-| S4  | Session log form (provider, client, CPT, units, POS, date/time, auth check card with green/amber/red/gray states) | `src/components/sessions/session-form.tsx` | `[x]` |
-| S5  | Auto-calculate units card (blue info card: Duration, Units, Modifier — real-time as user types) | Built into session form | `[x]` |
-| S6  | Auto-populate modifier codes from provider credential type | Built into session form | `[x]` |
-| S7  | Auth check card with utilization impact (replaces dropdown, "Change" link for manual override) | Built into session form | `[x]` |
-| S8  | CPT-credential blocking (RBT/BCaBA hard-blocked from QHP-only codes 97151/97155-97158) | `src/server/actions/sessions.ts`, `src/lib/constants.ts` | `[x]` |
-| S9  | Session list page with metric cards (hours/week, sessions 7d, flagged, unbilled) + filter tabs (All/This Week/Flagged) | `src/app/(dashboard)/sessions/page.tsx` | `[x]` |
-| S10 | Session table + columns + detail sheet (row click opens side panel, stopPropagation on actions) | `src/components/sessions/session-table.tsx`, `session-columns.tsx`, `session-detail-sheet.tsx` | `[x]` |
-| S11 | New session page (pre-select via query params) | `src/app/(dashboard)/sessions/new/page.tsx` | `[x]` |
-| S12 | Client detail: Sessions tab wired | `src/components/clients/client-sessions-card.tsx` | `[x]` |
-| S13 | Auth detail: Sessions tab wired | `src/components/authorizations/auth-sessions-card.tsx` | `[x]` |
-| S14 | Unit tests: 42 session validator tests, 82 session helper tests, 30 utility tests | `src/lib/validators/sessions.test.ts`, `session-helpers.test.ts`, `utils.test.ts` | `[x]` |
-| +   | Session list metrics query (FILTER WHERE aggregation) | `src/server/queries/sessions.ts` | `[x]` |
-| +   | Status-conditional fields (time/auth hidden for cancelled/no_show, clear values on status change) | `src/components/sessions/session-form.tsx` | `[x]` |
-| +   | Shared MetricCard + DataTable onRowClick prop | `src/components/shared/metric-card.tsx`, `data-table.tsx` | `[x]` |
+| #   | Task                                                                                                                                | Files                                                                                          | Status |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------ |
+| S1  | Session Zod validators (create, update, cancel, with date/time/unit refinements + timesRequiredWhenCompleted)                       | `src/lib/validators/sessions.ts`                                                               | `[x]`  |
+| S2  | Session read queries (list with client+provider+auth JOINs, detail, client sessions, auth sessions, paginated, server-side filters) | `src/server/queries/sessions.ts`                                                               | `[x]`  |
+| S3  | Session server actions (create with FOR UPDATE + FIFO inside tx, update with ordered locking, cancel with optimistic locking)       | `src/server/actions/sessions.ts`                                                               | `[x]`  |
+| S4  | Session log form (provider, client, CPT, units, POS, date/time, auth check card with green/amber/red/gray states)                   | `src/components/sessions/session-form.tsx`                                                     | `[x]`  |
+| S5  | Auto-calculate units card (blue info card: Duration, Units, Modifier — real-time as user types)                                     | Built into session form                                                                        | `[x]`  |
+| S6  | Auto-populate modifier codes from provider credential type                                                                          | Built into session form                                                                        | `[x]`  |
+| S7  | Auth check card with utilization impact (replaces dropdown, "Change" link for manual override)                                      | Built into session form                                                                        | `[x]`  |
+| S8  | CPT-credential blocking (RBT/BCaBA hard-blocked from QHP-only codes 97151/97155-97158)                                              | `src/server/actions/sessions.ts`, `src/lib/constants.ts`                                       | `[x]`  |
+| S9  | Session list page with metric cards (hours/week, sessions 7d, flagged, unbilled) + filter tabs (All/This Week/Flagged)              | `src/app/(dashboard)/sessions/page.tsx`                                                        | `[x]`  |
+| S10 | Session table + columns + detail sheet (row click opens side panel, stopPropagation on actions)                                     | `src/components/sessions/session-table.tsx`, `session-columns.tsx`, `session-detail-sheet.tsx` | `[x]`  |
+| S11 | New session page (pre-select via query params)                                                                                      | `src/app/(dashboard)/sessions/new/page.tsx`                                                    | `[x]`  |
+| S12 | Client detail: Sessions tab wired                                                                                                   | `src/components/clients/client-sessions-card.tsx`                                              | `[x]`  |
+| S13 | Auth detail: Sessions tab wired                                                                                                     | `src/components/authorizations/auth-sessions-card.tsx`                                         | `[x]`  |
+| S14 | Unit tests: 42 session validator tests, 82 session helper tests, 30 utility tests                                                   | `src/lib/validators/sessions.test.ts`, `session-helpers.test.ts`, `utils.test.ts`              | `[x]`  |
+| +   | Session list metrics query (FILTER WHERE aggregation)                                                                               | `src/server/queries/sessions.ts`                                                               | `[x]`  |
+| +   | Status-conditional fields (time/auth hidden for cancelled/no_show, clear values on status change)                                   | `src/components/sessions/session-form.tsx`                                                     | `[x]`  |
+| +   | Shared MetricCard + DataTable onRowClick prop                                                                                       | `src/components/shared/metric-card.tsx`, `data-table.tsx`                                      | `[x]`  |
 
 ### 3B — Dashboard + Auth Intelligence (completed — Phase 1C)
 
 > Built as Phase 1C (3 sub-sprints, 6 commits, 10+ audit findings fixed). Replaced 462-line client-side dashboard with async server components + Suspense + SQL aggregation.
 
-| #   | Task | Files | Status |
-| --- | ---- | ----- | ------ |
-| 97  | Schema migration: add `ratePerUnit` (numeric 10,2, nullable) to `authorization_services` | `drizzle/` | `[—]` deferred to Phase 2 |
-| 98  | Dashboard overview page (3 Suspense boundaries, ErrorBoundary per section, lightweight hasClients check) | `src/app/(dashboard)/overview/page.tsx` | `[x]` |
-| 99  | Metrics cards (active clients, avg utilization, hours this week, action items — SQL FILTER aggregation) | `src/components/dashboard/dashboard-metrics.tsx` | `[x]` |
-| 100 | Priority alerts card (aggregated by type+severity, max 5 visible groups, "everything is fine" state, AHRQ anti-fatigue) | `src/components/dashboard/dashboard-alerts.tsx` | `[x]` |
-| 101 | Client overview table (urgency-scored, needs-attention/on-track split, UtilizationBar compact + ExpiryBadge, clickable rows) | `src/components/dashboard/dashboard-clients.tsx` | `[x]` |
-| 102 | Dashboard read queries (getDashboardMetrics, getDashboardAlerts, getClientOverviewForDashboard — Promise.all parallel) | `src/server/queries/dashboard.ts` | `[x]` |
-| 103 | Getting Started card (extracted to standalone component) | `src/components/dashboard/getting-started-card.tsx` | `[x]` |
-| 104 | Predictive burndown on auth detail ("At current pace, exhausts on [date]") | `src/components/authorizations/auth-detail.tsx` | `[—]` Phase 1-Polish |
-| 105 | Under-utilization pacing alert (<50% used with >50% period elapsed) | `src/components/clients/client-overview.tsx` | `[x]` built in Phase 1B-3 |
-| 106 | Revenue-at-risk calculation ((approved - used) × ratePerUnit for auths expiring within 30d) | `src/server/queries/dashboard.ts` | `[—]` Phase 2 (needs fee schedule) |
-| 107 | Auth health composite score (utilization pacing + expiry proximity + gap risk) | `src/server/queries/authorization-alerts.ts` | `[—]` Phase 2+ (needs validation) |
-| +   | SectionErrorBoundary shared component (class component, componentDidCatch logging) | `src/components/shared/section-error-boundary.tsx` | `[x]` |
-| +   | Skeleton loaders (metrics, alerts, clients — content-shaped placeholders) | `src/components/dashboard/*.tsx` | `[x]` |
-| +   | Deleted 462-line monolithic dashboard-view.tsx (replaced by 3 async server components) | — | `[x]` |
-| +   | hasClients lightweight query (SELECT 1 LIMIT 1, doesn't block Suspense streaming) | `src/server/queries/clients.ts` | `[x]` |
+| #   | Task                                                                                                                         | Files                                               | Status                             |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------- |
+| 97  | Schema migration: add `ratePerUnit` (numeric 10,2, nullable) to `authorization_services`                                     | `drizzle/`                                          | `[—]` deferred to Phase 2          |
+| 98  | Dashboard overview page (3 Suspense boundaries, ErrorBoundary per section, lightweight hasClients check)                     | `src/app/(dashboard)/overview/page.tsx`             | `[x]`                              |
+| 99  | Metrics cards (active clients, avg utilization, hours this week, action items — SQL FILTER aggregation)                      | `src/components/dashboard/dashboard-metrics.tsx`    | `[x]`                              |
+| 100 | Priority alerts card (aggregated by type+severity, max 5 visible groups, "everything is fine" state, AHRQ anti-fatigue)      | `src/components/dashboard/dashboard-alerts.tsx`     | `[x]`                              |
+| 101 | Client overview table (urgency-scored, needs-attention/on-track split, UtilizationBar compact + ExpiryBadge, clickable rows) | `src/components/dashboard/dashboard-clients.tsx`    | `[x]`                              |
+| 102 | Dashboard read queries (getDashboardMetrics, getDashboardAlerts, getClientOverviewForDashboard — Promise.all parallel)       | `src/server/queries/dashboard.ts`                   | `[x]`                              |
+| 103 | Getting Started card (extracted to standalone component)                                                                     | `src/components/dashboard/getting-started-card.tsx` | `[x]`                              |
+| 104 | Predictive burndown on auth detail ("At current pace, exhausts on [date]")                                                   | `src/components/authorizations/auth-detail.tsx`     | `[—]` Phase 1-Polish               |
+| 105 | Under-utilization pacing alert (<50% used with >50% period elapsed)                                                          | `src/components/clients/client-overview.tsx`        | `[x]` built in Phase 1B-3          |
+| 106 | Revenue-at-risk calculation ((approved - used) × ratePerUnit for auths expiring within 30d)                                  | `src/server/queries/dashboard.ts`                   | `[—]` Phase 2 (needs fee schedule) |
+| 107 | Auth health composite score (utilization pacing + expiry proximity + gap risk)                                               | `src/server/queries/authorization-alerts.ts`        | `[—]` Phase 2+ (needs validation)  |
+| +   | SectionErrorBoundary shared component (class component, componentDidCatch logging)                                           | `src/components/shared/section-error-boundary.tsx`  | `[x]`                              |
+| +   | Skeleton loaders (metrics, alerts, clients — content-shaped placeholders)                                                    | `src/components/dashboard/*.tsx`                    | `[x]`                              |
+| +   | Deleted 462-line monolithic dashboard-view.tsx (replaced by 3 async server components)                                       | —                                                   | `[x]`                              |
+| +   | hasClients lightweight query (SELECT 1 LIMIT 1, doesn't block Suspense streaming)                                            | `src/server/queries/clients.ts`                     | `[x]`                              |
 
 ---
 
@@ -410,6 +410,7 @@ Key fixes applied across all audit rounds:
 Comprehensive verification of unit calculations, modifier codes, and payer-specific rules. All findings verified against CMS manuals, ABA Coding Coalition, Optum/UHC FAQs, and state Medicaid provider manuals.
 
 **Unit Calculations (verified correct):**
+
 - `calculateUnitsFromMinutes` formula verified against CMS Medicare Benefit Policy Manual Ch. 15 §220.3
 - AMA per-code method (current default) is correct for commercial payers
 - Three methods needed for Phase 2: `ama` (commercial), `cms` (Medicaid aggregate), `full_unit` (strict Medicaid like Arkansas — `floor(minutes/15)`, no rounding)
@@ -418,6 +419,7 @@ Comprehensive verification of unit calculations, modifier codes, and payer-speci
 - January 2027: ABA Coding Coalition announced 6 new CPT codes + revisions to existing codes. Monitor in late 2026.
 
 **Modifier Codes (verified correct):**
+
 - `CREDENTIAL_MODIFIERS` mapping (RBT→HM, BCaBA→HN, BCBA→HO, BCBA-D→HP) confirmed by Optum ABA Modifier FAQ
 - Auto-application of telehealth modifier 95 for POS 02/10 is correct
 - Priority ordering and CMS 1500 4-modifier limit are correct
@@ -425,26 +427,26 @@ Comprehensive verification of unit calculations, modifier codes, and payer-speci
 
 **Phase 2 Billing Gaps (not blocking Phase 1):**
 
-| Gap | Impact | Details |
-|-----|--------|---------|
-| Payer-specific modifier overrides | High | Some state Medicaid programs use different modifiers: Nevada=UD, New Mexico=U1-U4, Minnesota=UB, Georgia=U6/U7. Need `payer_modifier_rules` table or JSONB override on payers |
-| CMS aggregate unit calc method | High | Medicaid payers need date-level cross-code aggregation with remainder distribution. Current code hardcodes `unitCalcMethod: "ama"` |
-| `full_unit` calculation method | Medium | Arkansas Medicaid and some strict programs require `floor(minutes/15)` with no rounding up |
-| `supervisingProviderId` on claims | Medium | CMS-1500 Box 17/17b needs supervising BCBA NPI when RBT is rendering provider. `sessions.supervisorId` exists but `claims` table lacks dedicated field |
-| Rendering vs supervising NPI rules | High | Some payers want RBT NPI as rendering, others want BCBA NPI. Needs payer-level configuration |
-| Modifier mutual exclusivity | Medium | No validation prevents 59 + XE on same line (mutually exclusive). Add during claim generation |
-| Credential expiry warning | Medium | Expired RBT certification + HM modifier = denial. Track `credentialExpiry` and warn/block |
-| `maxUnitsPerDay` server enforcement | Medium | Value exists in constants/schema but not enforced during session creation |
+| Gap                                 | Impact | Details                                                                                                                                                                       |
+| ----------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Payer-specific modifier overrides   | High   | Some state Medicaid programs use different modifiers: Nevada=UD, New Mexico=U1-U4, Minnesota=UB, Georgia=U6/U7. Need `payer_modifier_rules` table or JSONB override on payers |
+| CMS aggregate unit calc method      | High   | Medicaid payers need date-level cross-code aggregation with remainder distribution. Current code hardcodes `unitCalcMethod: "ama"`                                            |
+| `full_unit` calculation method      | Medium | Arkansas Medicaid and some strict programs require `floor(minutes/15)` with no rounding up                                                                                    |
+| `supervisingProviderId` on claims   | Medium | CMS-1500 Box 17/17b needs supervising BCBA NPI when RBT is rendering provider. `sessions.supervisorId` exists but `claims` table lacks dedicated field                        |
+| Rendering vs supervising NPI rules  | High   | Some payers want RBT NPI as rendering, others want BCBA NPI. Needs payer-level configuration                                                                                  |
+| Modifier mutual exclusivity         | Medium | No validation prevents 59 + XE on same line (mutually exclusive). Add during claim generation                                                                                 |
+| Credential expiry warning           | Medium | Expired RBT certification + HM modifier = denial. Track `credentialExpiry` and warn/block                                                                                     |
+| `maxUnitsPerDay` server enforcement | Medium | Value exists in constants/schema but not enforced during session creation                                                                                                     |
 
 **Recommended payer defaults for Phase 2:**
 
-| Payer Type | Unit Calc | Modifier Source |
-|-----------|-----------|-----------------|
-| Commercial (BCBS, Aetna, Cigna, UHC) | `ama` | Standard HM/HN/HO/HP |
-| Medicaid (most states) | `cms` | Standard, but check state manual |
-| Medicare | `cms` | Standard |
-| TRICARE | `ama` | Rule of Eights (per-code) |
-| Strict Medicaid (AR, etc.) | `full_unit` | State-specific |
+| Payer Type                           | Unit Calc   | Modifier Source                  |
+| ------------------------------------ | ----------- | -------------------------------- |
+| Commercial (BCBS, Aetna, Cigna, UHC) | `ama`       | Standard HM/HN/HO/HP             |
+| Medicaid (most states)               | `cms`       | Standard, but check state manual |
+| Medicare                             | `cms`       | Standard                         |
+| TRICARE                              | `ama`       | Rule of Eights (per-code)        |
+| Strict Medicaid (AR, etc.)           | `full_unit` | State-specific                   |
 
 ### Session Validation Rules (from 2026-03-26 research)
 
@@ -454,38 +456,38 @@ Multi-agent research across CMS documentation, ABA Coding Coalition, Optum/UHC p
 
 **Hard Blocks (prevent session save — truly universal, no exceptions):**
 
-| Rule | Why Universal |
-|------|-------------|
-| Same provider, overlapping 1:1 sessions (different clients) | Fraud indicator — physically impossible. "Impossible day" pattern is primary OIG audit target |
-| RBT billing QHP-only CPT codes (97151, 97155-97158) | Embedded in CPT code definitions by the AMA. No state/payer exception exists. BACB scope of practice prohibits it |
+| Rule                                                        | Why Universal                                                                                                     |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Same provider, overlapping 1:1 sessions (different clients) | Fraud indicator — physically impossible. "Impossible day" pattern is primary OIG audit target                     |
+| RBT billing QHP-only CPT codes (97151, 97155-97158)         | Embedded in CPT code definitions by the AMA. No state/payer exception exists. BACB scope of practice prohibits it |
 
 **Warnings (show alert at session creation, allow save, flag for billing review):**
 
-| Rule | Classification | Why Not a Block |
-|------|---------------|-----------------|
-| Session date outside auth date range | Universal Warning | Retroactive authorizations exist (0-90 days depending on payer). Practice may attach auth later |
-| Max units/day (MUE) exceeded | Universal Warning | All ABA CPT codes have MAI=3 (appealable, not absolute). Pre-authorized amounts override MUEs. MUE values vary by payer |
-| Missing supervisor for RBT sessions | Universal Warning | Depends on billing model (3 models exist — see below). Supervisor can be assigned before claim generation |
-| Expired provider credentials | Universal Warning | BACB has 30-day renewal grace period. Practice may be mid-renewal process |
-| BCaBA billing QHP codes | Payer-Specific | BCaBAs ARE considered QHPs by some payers/states (e.g., Virginia DMAS, some BCBS). Configurable, not blockable |
-| Concurrent BCBA + RBT same client (97155 + 97153) | Allowed | CPT 97155 description explicitly includes "simultaneous direction of technician" |
-| Group codes (97154, 97157, 97158) overlapping | Allowed | Group codes by definition serve 2-8 clients simultaneously |
+| Rule                                              | Classification    | Why Not a Block                                                                                                         |
+| ------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Session date outside auth date range              | Universal Warning | Retroactive authorizations exist (0-90 days depending on payer). Practice may attach auth later                         |
+| Max units/day (MUE) exceeded                      | Universal Warning | All ABA CPT codes have MAI=3 (appealable, not absolute). Pre-authorized amounts override MUEs. MUE values vary by payer |
+| Missing supervisor for RBT sessions               | Universal Warning | Depends on billing model (3 models exist — see below). Supervisor can be assigned before claim generation               |
+| Expired provider credentials                      | Universal Warning | BACB has 30-day renewal grace period. Practice may be mid-renewal process                                               |
+| BCaBA billing QHP codes                           | Payer-Specific    | BCaBAs ARE considered QHPs by some payers/states (e.g., Virginia DMAS, some BCBS). Configurable, not blockable          |
+| Concurrent BCBA + RBT same client (97155 + 97153) | Allowed           | CPT 97155 description explicitly includes "simultaneous direction of technician"                                        |
+| Group codes (97154, 97157, 97158) overlapping     | Allowed           | Group codes by definition serve 2-8 clients simultaneously                                                              |
 
 **Hard Blocks at Claim Generation (Phase 2 — prevent claim submission, not session logging):**
 
-| Rule | Why Block at Claim |
-|------|-------------------|
-| Session date outside auth date range (no retro-auth flag) | Claim will be auto-denied |
-| Missing supervisor for RBT session (when payer requires it) | Claim will be denied — payer-specific |
-| Expired credentials on date of service | Recoupment risk if discovered in audit |
+| Rule                                                        | Why Block at Claim                     |
+| ----------------------------------------------------------- | -------------------------------------- |
+| Session date outside auth date range (no retro-auth flag)   | Claim will be auto-denied              |
+| Missing supervisor for RBT session (when payer requires it) | Claim will be denied — payer-specific  |
+| Expired credentials on date of service                      | Recoupment risk if discovered in audit |
 
 **Three RBT Billing Models (payer-specific — affects supervisor requirements):**
 
-| Model | Rendering Provider (Box 24J) | Supervisor (Box 17) | Used By |
-|-------|------------------------------|---------------------|---------|
-| A (most common) | BCBA's NPI | Empty — BCBA IS the renderer | Most commercial (Aetna, Cigna, many BCBS) |
-| B | RBT's NPI | BCBA with DQ qualifier | TRICARE, some Medicaid, some BCBS |
-| C | RBT's NPI (group billing) | Payer-dependent | Larger practices, some Medicaid |
+| Model           | Rendering Provider (Box 24J) | Supervisor (Box 17)          | Used By                                   |
+| --------------- | ---------------------------- | ---------------------------- | ----------------------------------------- |
+| A (most common) | BCBA's NPI                   | Empty — BCBA IS the renderer | Most commercial (Aetna, Cigna, many BCBS) |
+| B               | RBT's NPI                    | BCBA with DQ qualifier       | TRICARE, some Medicaid, some BCBS         |
+| C               | RBT's NPI (group billing)    | Payer-dependent              | Larger practices, some Medicaid           |
 
 **Key insight:** Under Model A (most small practices), the RBT is invisible on the claim. There is no "supervisor" field because the BCBA IS the rendering provider. The supervision relationship is documented in clinical records, not on the claim form. Optum/UHC explicitly states their supervisory services reimbursement policy does NOT apply to ABA services.
 
@@ -494,6 +496,7 @@ Multi-agent research across CMS documentation, ABA Coding Coalition, Optum/UHC p
 **Correction needed in codebase:** `QHP_ONLY_CPT_CODES` currently hard-blocks BCaBAs. This should be a configurable warning — BCaBAs are QHPs in some jurisdictions. Safe default: warn for BCaBAs, block for RBTs.
 
 **Implementation plan (2-tier validation engine):**
+
 1. **Session creation:** Run all checks, show warnings inline, only hard-block the 2 universal rules
 2. **Billing readiness indicator:** Per-session status — green (clean), amber (warnings), red (will be blocked at claim generation)
 3. **Claim generation (Phase 2):** Hard-block on all payer-specific rules. Payer configuration drives which warnings become blocks.
@@ -503,12 +506,14 @@ Multi-agent research across CMS documentation, ABA Coding Coalition, Optum/UHC p
 Multi-agent competitive research across CentralReach, AlohaABA, Raven Health, Motivity, Healthie, SimplePractice, plus BACB supervision requirements and ABA practitioner forums.
 
 **Real-world care team structure per client:**
+
 - 1+ supervising BCBAs (one primary, others for coverage/transition/supervision)
 - 0-1 BCaBAs (uncommon, assists BCBA)
 - 1-4 RBTs (frontline therapy, high turnover: 77-103% annually)
 - Optional: Clinical Director (BCBA-D, oversees BCBAs)
 
 **Critical design principles:**
+
 - **Care team = convenience, not access control.** The team is "who usually works with this client" — it drives smart defaults and caseload views, but never blocks service delivery.
 - **Sessions record who actually showed up.** Any active provider in the org can log for any client, whether or not they're on the team. Float RBTs, coverage BCBAs, one-time assessments — all valid without team assignment.
 - **Multiple BCBAs per client are valid.** Primary BCBA owns the treatment plan/auth, but coverage BCBAs, transitioning BCBAs, and clinical directors may also be on the team.
@@ -517,17 +522,18 @@ Multi-agent competitive research across CentralReach, AlohaABA, Raven Health, Mo
 
 **Competitor landscape (opportunity):**
 
-| Platform | Model | Weakness |
-|----------|-------|----------|
-| CentralReach | Manual "Connections" per client-employee pair | Setup friction, no role distinction |
-| AlohaABA | Implicit through scheduling/permissions | No visible team anywhere |
-| Raven Health | Scheduling-driven, no formal team | Same — emergent, not explicit |
-| Motivity | Explicit "Learner Team" with permission scoping | Best in ABA, but no time-bounding |
-| Healthie | Primary provider + Care Team members + bulk assignment | Best UX, but no roles |
+| Platform     | Model                                                  | Weakness                            |
+| ------------ | ------------------------------------------------------ | ----------------------------------- |
+| CentralReach | Manual "Connections" per client-employee pair          | Setup friction, no role distinction |
+| AlohaABA     | Implicit through scheduling/permissions                | No visible team anywhere            |
+| Raven Health | Scheduling-driven, no formal team                      | Same — emergent, not explicit       |
+| Motivity     | Explicit "Learner Team" with permission scoping        | Best in ABA, but no time-bounding   |
+| Healthie     | Primary provider + Care Team members + bulk assignment | Best UX, but no roles               |
 
 **No ABA platform does care teams well. This is a differentiator.**
 
 **Phase 1 (current — adequate):**
+
 - `clients.assignedBcbaId` covers the primary BCBA relationship
 - 15 locations in codebase assume single BCBA (schema, queries, actions, validators, UI)
 - Sessions already allow any org provider via `sessions.providerId`
@@ -559,6 +565,7 @@ Migration: Seed from existing `assignedBcbaId`. Keep `assignedBcbaId` as denorma
 **Phase 2 UI:** Care Team card on client detail (avatar list with roles), team management in client edit, provider dropdown on session form suggests team members first.
 
 **Phase 3 features:**
+
 - BACB supervision ratio tracking (5% of monthly RBT direct hours supervised by BCBA)
 - ReBAC data scoping — "If on Team" permission model (Motivity pattern)
 - Optional "restrict sessions to team" setting per practice
@@ -567,6 +574,7 @@ Migration: Seed from existing `assignedBcbaId`. Keep `assignedBcbaId` as denorma
 - Historical team assignment records for compliance audits
 
 **BACB supervision requirements (for Phase 3 tracking):**
+
 - RBTs: minimum 5% of monthly direct-service hours supervised by BCBA/BCaBA
 - Cannot be averaged across months — must be met every calendar month
 - At least 2 face-to-face supervision contacts per month
@@ -581,6 +589,7 @@ Multi-agent research across CentralReach, Motivity, ABA Matrix, Brellium, Raven 
 **Key insight: Session notes are NOT submitted with claims — they're kept on file and produced during audits. But inadequate notes lead to retroactive denial and recoupment ($56M Indiana, $94M Wisconsin Medicaid improper payments). CentralReach admits 80% of session notes fail at least one payer requirement.**
 
 **Dependency chain:**
+
 ```
 Treatment Plan / BIP → Goals → Session Notes → Progress Reports → Claims
 ```
@@ -588,6 +597,7 @@ Treatment Plan / BIP → Goals → Session Notes → Progress Reports → Claims
 **Design principle: Don't build a treatment plan authoring tool. Build a goals registry that session notes reference. Full plans live wherever the BCBA writes them. Clinivise is a PM tool, not a data collection tool — trial-by-trial data stays in Catalyst/Motivity.**
 
 **ABA goal hierarchy (industry standard):**
+
 ```
 Domain (Communication, Social, Behavior Reduction, ...)
   └─ Goal/Program ("Client will functionally request preferred items")
@@ -648,6 +658,7 @@ client_goal_objectives:
 ```
 
 **Constants:**
+
 ```typescript
 GOAL_DOMAINS = ["communication", "social_skills", "adaptive_behavior", "behavior_reduction",
                 "academic", "play_leisure", "self_care", "motor", "vocational", "other"]
@@ -657,6 +668,7 @@ GOAL_DOMAIN_LABELS = { communication: "Communication", social_skills: "Social Sk
 ```
 
 **UI: Goals tab on client detail page**
+
 - Card-based list grouped by domain (not a table — goals are too rich for table rows)
 - Each goal card: number, title, status badge, mastery criteria, baseline, dates
 - Objectives nested inline under each goal (collapsible)
@@ -667,19 +679,19 @@ GOAL_DOMAIN_LABELS = { communication: "Communication", social_skills: "Social Sk
 
 **Implementation tasks:**
 
-| # | Task | Files | Status |
-|---|------|-------|--------|
-| CD-1.1 | Create `client_goals` + `client_goal_objectives` + `client_goal_targets` schema | `src/server/db/schema/client-goals.ts` | `[x]` |
-| CD-1.2 | Add goal constants (domains, types, statuses, labels, behavior functions, assessment sources) | `src/lib/constants.ts` | `[x]` |
-| CD-1.3 | Create Zod validators for goal/objective/target CRUD | `src/lib/validators/goals.ts` | `[x]` |
-| CD-1.4 | Generate + run migrations | `drizzle/` | `[x]` |
-| CD-1.5 | Goal read queries (list by client, grouped by domain) | `src/server/queries/goals.ts` | `[x]` |
-| CD-1.6 | Goal server actions (create, update, change status, add objective) | `src/server/actions/goals.ts` | `[x]` |
-| CD-1.7 | Goals tab component (card list grouped by domain) | `src/components/clients/client-goals.tsx` | `[x]` |
-| CD-1.8 | Add Goal dialog + Add Objective dialog | `src/components/clients/client-goals.tsx` | `[x]` |
-| CD-1.9 | Wire Goals tab into client detail page | `src/components/clients/client-detail.tsx` | `[x]` |
-| CD-1.10 | Update UI for new goal fields (behavior reduction, targets, expanded statuses) | Multiple | `[ ]` |
-| CD-1.11 | Unit tests: goal validators, status transitions | `src/lib/validators/goals.test.ts` | `[ ]` |
+| #       | Task                                                                                          | Files                                      | Status |
+| ------- | --------------------------------------------------------------------------------------------- | ------------------------------------------ | ------ |
+| CD-1.1  | Create `client_goals` + `client_goal_objectives` + `client_goal_targets` schema               | `src/server/db/schema/client-goals.ts`     | `[x]`  |
+| CD-1.2  | Add goal constants (domains, types, statuses, labels, behavior functions, assessment sources) | `src/lib/constants.ts`                     | `[x]`  |
+| CD-1.3  | Create Zod validators for goal/objective/target CRUD                                          | `src/lib/validators/goals.ts`              | `[x]`  |
+| CD-1.4  | Generate + run migrations                                                                     | `drizzle/`                                 | `[x]`  |
+| CD-1.5  | Goal read queries (list by client, grouped by domain)                                         | `src/server/queries/goals.ts`              | `[x]`  |
+| CD-1.6  | Goal server actions (create, update, change status, add objective)                            | `src/server/actions/goals.ts`              | `[x]`  |
+| CD-1.7  | Goals tab component (card list grouped by domain)                                             | `src/components/clients/client-goals.tsx`  | `[x]`  |
+| CD-1.8  | Add Goal dialog + Add Objective dialog                                                        | `src/components/clients/client-goals.tsx`  | `[x]`  |
+| CD-1.9  | Wire Goals tab into client detail page                                                        | `src/components/clients/client-detail.tsx` | `[x]`  |
+| CD-1.10 | Update UI for new goal fields (behavior reduction, targets, expanded statuses)                | Multiple                                   | `[ ]`  |
+| CD-1.11 | Unit tests: goal validators, status transitions                                               | `src/lib/validators/goals.test.ts`         | `[ ]`  |
 
 ---
 
@@ -736,14 +748,15 @@ session_notes:
 
 **CPT-specific templates:**
 
-| CPT | Who Writes | Required Fields | Template Focus |
-|-----|-----------|-----------------|---------------|
-| 97153 (RBT therapy) | RBT | goals_addressed, interventions_used, narrative | Goals data, trial scores, prompt levels, progress |
-| 97155 (BCBA modification) | BCBA | goals_addressed, protocol_modifications, data_analysis | What data prompted change, what was modified, rationale |
-| 97156 (caregiver training) | BCBA | caregiver_*, training_topics, caregiver_competency | Caregiver name, BST components, competency |
-| 97151 (assessment) | BCBA | assessment_tools, assessment_domains, narrative | Instruments used, domains assessed, findings |
+| CPT                        | Who Writes | Required Fields                                        | Template Focus                                          |
+| -------------------------- | ---------- | ------------------------------------------------------ | ------------------------------------------------------- |
+| 97153 (RBT therapy)        | RBT        | goals_addressed, interventions_used, narrative         | Goals data, trial scores, prompt levels, progress       |
+| 97155 (BCBA modification)  | BCBA       | goals_addressed, protocol_modifications, data_analysis | What data prompted change, what was modified, rationale |
+| 97156 (caregiver training) | BCBA       | caregiver\_\*, training_topics, caregiver_competency   | Caregiver name, BST components, competency              |
+| 97151 (assessment)         | BCBA       | assessment_tools, assessment_domains, narrative        | Instruments used, domains assessed, findings            |
 
 **Signature workflow (Motivity model):**
+
 ```
 draft → signed (author signs, note locks)
       → pending_review (auto if BCBA review required for this CPT/payer)
@@ -753,6 +766,7 @@ draft → signed (author signs, note locks)
 ```
 
 **Permission model:**
+
 - RBT: create/edit own notes in draft, view own approved notes
 - BCBA: create own, view/edit supervised RBT notes, approve/reject, co-sign
 - Admin/Billing: view all approved notes (read-only), flag for review
@@ -761,19 +775,19 @@ draft → signed (author signs, note locks)
 
 **Implementation tasks:**
 
-| # | Task | Files | Status |
-|---|------|-------|--------|
-| CD-2.1 | Create `session_notes` + `session_note_goals` + `session_note_behaviors` schema | `src/server/db/schema/session-notes.ts` | `[x]` |
-| CD-2.2 | Create note validators (per-CPT required fields) | `src/lib/validators/session-notes.ts` | `[x]` |
-| CD-2.3 | Generate + run migrations (verified against CASP/TRICARE/Optum) | `drizzle/` | `[x]` |
-| CD-2.4 | Note read queries (by session, BCBA review queue) | `src/server/queries/session-notes.ts` | `[ ]` |
-| CD-2.5 | Note server actions (create, update, sign, approve/reject) | `src/server/actions/session-notes.ts` | `[ ]` |
-| CD-2.6 | "Complete Note" button on session detail page | `src/app/(dashboard)/sessions/[id]/page.tsx` | `[ ]` |
-| CD-2.7 | Session note form (CPT-aware template, goals multi-select) | `src/components/sessions/session-note-form.tsx` | `[ ]` |
-| CD-2.8 | BCBA review queue page (unsigned notes pending co-signature) | `src/app/(dashboard)/notes/page.tsx` | `[ ]` |
-| CD-2.9 | Dashboard: "Unsigned notes" alert count | `src/server/queries/dashboard.ts` | `[ ]` |
-| CD-2.10 | Note status badges + signature display on session detail | `src/components/sessions/session-detail.tsx` | `[ ]` |
-| CD-2.11 | "Billing readiness" indicator per session (green/amber/red) | `src/components/sessions/` | `[ ]` |
+| #       | Task                                                                            | Files                                           | Status |
+| ------- | ------------------------------------------------------------------------------- | ----------------------------------------------- | ------ |
+| CD-2.1  | Create `session_notes` + `session_note_goals` + `session_note_behaviors` schema | `src/server/db/schema/session-notes.ts`         | `[x]`  |
+| CD-2.2  | Create note validators (per-CPT required fields)                                | `src/lib/validators/session-notes.ts`           | `[x]`  |
+| CD-2.3  | Generate + run migrations (verified against CASP/TRICARE/Optum)                 | `drizzle/`                                      | `[x]`  |
+| CD-2.4  | Note read queries (by session, BCBA review queue)                               | `src/server/queries/session-notes.ts`           | `[ ]`  |
+| CD-2.5  | Note server actions (create, update, sign, approve/reject)                      | `src/server/actions/session-notes.ts`           | `[ ]`  |
+| CD-2.6  | "Complete Note" button on session detail page                                   | `src/app/(dashboard)/sessions/[id]/page.tsx`    | `[ ]`  |
+| CD-2.7  | Session note form (CPT-aware template, goals multi-select)                      | `src/components/sessions/session-note-form.tsx` | `[ ]`  |
+| CD-2.8  | BCBA review queue page (unsigned notes pending co-signature)                    | `src/app/(dashboard)/notes/page.tsx`            | `[ ]`  |
+| CD-2.9  | Dashboard: "Unsigned notes" alert count                                         | `src/server/queries/dashboard.ts`               | `[ ]`  |
+| CD-2.10 | Note status badges + signature display on session detail                        | `src/components/sessions/session-detail.tsx`    | `[ ]`  |
+| CD-2.11 | "Billing readiness" indicator per session (green/amber/red)                     | `src/components/sessions/`                      | `[ ]`  |
 
 **Current state:** Sessions have a `notes` text field for quick free-text entry. This stays as the "30-second log" quick note. The full structured session note is completed later via the "Complete Note" action on the session detail page.
 
@@ -783,16 +797,16 @@ draft → signed (author signs, note locks)
 
 28 fields added across 6 tables based on CMS-1500, payer audit, and competitor verification. Schema is applied but **UI forms/displays are not yet updated**.
 
-| # | Task | Files | Status |
-|---|------|-------|--------|
-| SA-1 | Client form: add primaryLanguage, interpreterNeeded, secondaryDiagnosisCodes, referringProvider, medicaidId | `client-form.tsx`, `client-overview.tsx` | `[ ]` |
-| SA-2 | Provider form: add email, phone, stateLicenseNumber/Expiry, taxonomyCode (+ fix missing modifierCode) | `provider-form.tsx`, `provider-detail.tsx` | `[ ]` |
-| SA-3 | Authorization form: add authType, requestingProviderId, denialReason, appealDeadline | `authorization-form.tsx`, `authorization-detail.tsx` | `[ ]` |
-| SA-4 | Session form: add cancellationReason, cancelledBy (when cancelling), serviceAddress (when POS is home/community) | `session-form.tsx`, `session-detail.tsx` | `[ ]` |
-| SA-5 | Payer form: add electronicPayerId, portalUrl, authDepartmentEmail | `payer-form.tsx` | `[ ]` |
-| SA-6 | Org settings: add billing entity section (billingName, billingNpi, billingTaxId, billingAddress) | `practice-info-form.tsx` | `[ ]` |
-| SA-7 | Goal editing UI: add behavior reduction fields, target CRUD, expanded status lifecycle | `client-goals.tsx` | `[ ]` |
-| SA-8 | Update validators for new client/provider/auth fields in forms | `validators/*.ts` | `[ ]` |
+| #    | Task                                                                                                             | Files                                                | Status |
+| ---- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------ |
+| SA-1 | Client form: add primaryLanguage, interpreterNeeded, secondaryDiagnosisCodes, referringProvider, medicaidId      | `client-form.tsx`, `client-overview.tsx`             | `[ ]`  |
+| SA-2 | Provider form: add email, phone, stateLicenseNumber/Expiry, taxonomyCode (+ fix missing modifierCode)            | `provider-form.tsx`, `provider-detail.tsx`           | `[ ]`  |
+| SA-3 | Authorization form: add authType, requestingProviderId, denialReason, appealDeadline                             | `authorization-form.tsx`, `authorization-detail.tsx` | `[ ]`  |
+| SA-4 | Session form: add cancellationReason, cancelledBy (when cancelling), serviceAddress (when POS is home/community) | `session-form.tsx`, `session-detail.tsx`             | `[ ]`  |
+| SA-5 | Payer form: add electronicPayerId, portalUrl, authDepartmentEmail                                                | `payer-form.tsx`                                     | `[ ]`  |
+| SA-6 | Org settings: add billing entity section (billingName, billingNpi, billingTaxId, billingAddress)                 | `practice-info-form.tsx`                             | `[ ]`  |
+| SA-7 | Goal editing UI: add behavior reduction fields, target CRUD, expanded status lifecycle                           | `client-goals.tsx`                                   | `[ ]`  |
+| SA-8 | Update validators for new client/provider/auth fields in forms                                                   | `validators/*.ts`                                    | `[ ]`  |
 
 ---
 
@@ -833,6 +847,7 @@ draft → signed (author signs, note locks)
 The market has bifurcated: PM-only tools (AlohaABA) force double-entry with clinical tools (Motivity). All-in-one tools (CentralReach) are powerful but have terrible UX. The opportunity: **be the all-in-one that doesn't suck.**
 
 Research findings:
+
 - ABA practitioners' #1 complaint is using too many software tools
 - AlohaABA + Motivity goals do NOT sync — BCBAs manually reference goals by name
 - CentralReach users complain about complexity but don't switch because consolidation is valuable
@@ -887,38 +902,38 @@ Verified against CentralReach, AlohaABA, Motivity, Theralytics, Raven Health, Ca
 
 #### Table Stakes (must build — every competitor has these)
 
-| Feature | Status | Priority | Notes |
-|---------|--------|----------|-------|
-| **Scheduling / Calendar** | Not started | **P0 — next after session notes** | Auth-aware scheduling (block over-scheduling), recurring templates, conflict detection, drag-and-drop. The #1 gap — without it, practices need a second tool. |
-| **Basic Reports (exportable)** | Minimal (dashboard only) | P1 | Auth utilization, session summaries, staff hours, cancellation rates. CSV/PDF export. Enables payroll workflows without building payroll module. |
-| **Document Management UI** | Schema exists, no UI | P1 | Per-client document library: upload, categorize (consent, assessment, treatment plan, auth letter), retrieve. Payer audits request docs within 5-10 business days. |
-| **Claims / Billing (RCM)** | Schema stubs (Phase 2 via Stedi) | P1 | Session-to-claim conversion, claims scrubbing, clearinghouse submission (837P), ERA/835 processing, denial management. Monetization engine (2-4% of collections). |
-| **E-Signatures (full UI)** | Schema + workflow exists | P1 | Provider sign, supervisor co-sign, bulk signing for BCBA review queue, timestamped audit trail. |
-| **Eligibility Verification** | Schema stub | P2 | Real-time 270/271 checks, batch verification for weekly schedule, coverage lapse alerts. Reduces claim denials 25-30%. |
+| Feature                        | Status                           | Priority                          | Notes                                                                                                                                                              |
+| ------------------------------ | -------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Scheduling / Calendar**      | Not started                      | **P0 — next after session notes** | Auth-aware scheduling (block over-scheduling), recurring templates, conflict detection, drag-and-drop. The #1 gap — without it, practices need a second tool.      |
+| **Basic Reports (exportable)** | Minimal (dashboard only)         | P1                                | Auth utilization, session summaries, staff hours, cancellation rates. CSV/PDF export. Enables payroll workflows without building payroll module.                   |
+| **Document Management UI**     | Schema exists, no UI             | P1                                | Per-client document library: upload, categorize (consent, assessment, treatment plan, auth letter), retrieve. Payer audits request docs within 5-10 business days. |
+| **Claims / Billing (RCM)**     | Schema stubs (Phase 2 via Stedi) | P1                                | Session-to-claim conversion, claims scrubbing, clearinghouse submission (837P), ERA/835 processing, denial management. Monetization engine (2-4% of collections).  |
+| **E-Signatures (full UI)**     | Schema + workflow exists         | P1                                | Provider sign, supervisor co-sign, bulk signing for BCBA review queue, timestamped audit trail.                                                                    |
+| **Eligibility Verification**   | Schema stub                      | P2                                | Real-time 270/271 checks, batch verification for weekly schedule, coverage lapse alerts. Reduces claim denials 25-30%.                                             |
 
 #### Differentiators (some competitors have, would set us apart)
 
-| Feature | Status | Priority | Notes |
-|---------|--------|----------|-------|
-| **Progress Graphing** | Not started | P1 | We already capture per-goal session data. Auto-generate line graphs from that data. BCBAs need this for treatment decisions + insurance submissions. Low effort / high value. |
-| **AI Treatment Plan / Progress Report Generation** | Not started | P2 | Strongest AI-native play. Goals data + session data → compliant documents. Saves BCBAs 3-5 hours per client per quarter. |
-| **Supervision Tracking** | Not started | P2 | BACB 5% monthly requirement. Track supervision hours per RBT, ensure 2+ contacts/month, exportable logs. Few competitors do well. |
-| **Intake Pipeline** | Not started | P2 | Referral → eligibility → assessment → onboarded. Simple status + checklist. Practices lose clients during this funnel. |
-| **Cancellation Analytics** | Not started | P2 | Cancellations = #1 revenue leak. Report on existing session status data by client, provider, reason code. |
-| **Enhanced Credentialing** | Basic (expiry dates) | P3 | Multi-credential tracking per provider, CAQH status, payer panel enrollment, background check tracking, credential-based scheduling blocks. |
-| **Goal Template Library** | Not started | P3 | Org-level reusable goal templates (with objectives + targets). Motivity has 30,000+ community templates. |
-| **Assessment-Linked Goal Generation** | Not started | P3 | After VB-MAPP/ABLLS-R assessment, auto-suggest goals for unmastered milestones. CentralReach does this. |
+| Feature                                            | Status               | Priority | Notes                                                                                                                                                                         |
+| -------------------------------------------------- | -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Progress Graphing**                              | Not started          | P1       | We already capture per-goal session data. Auto-generate line graphs from that data. BCBAs need this for treatment decisions + insurance submissions. Low effort / high value. |
+| **AI Treatment Plan / Progress Report Generation** | Not started          | P2       | Strongest AI-native play. Goals data + session data → compliant documents. Saves BCBAs 3-5 hours per client per quarter.                                                      |
+| **Supervision Tracking**                           | Not started          | P2       | BACB 5% monthly requirement. Track supervision hours per RBT, ensure 2+ contacts/month, exportable logs. Few competitors do well.                                             |
+| **Intake Pipeline**                                | Not started          | P2       | Referral → eligibility → assessment → onboarded. Simple status + checklist. Practices lose clients during this funnel.                                                        |
+| **Cancellation Analytics**                         | Not started          | P2       | Cancellations = #1 revenue leak. Report on existing session status data by client, provider, reason code.                                                                     |
+| **Enhanced Credentialing**                         | Basic (expiry dates) | P3       | Multi-credential tracking per provider, CAQH status, payer panel enrollment, background check tracking, credential-based scheduling blocks.                                   |
+| **Goal Template Library**                          | Not started          | P3       | Org-level reusable goal templates (with objectives + targets). Motivity has 30,000+ community templates.                                                                      |
+| **Assessment-Linked Goal Generation**              | Not started          | P3       | After VB-MAPP/ABLLS-R assessment, auto-suggest goals for unmastered milestones. CentralReach does this.                                                                       |
 
 #### Nice-to-Have (low priority for Phase 1-2)
 
-| Feature | Notes |
-|---------|-------|
-| Telehealth | Integrate (Zoom/Doxy.me link from calendar), don't build |
-| Payroll integration | CSV hours export to QuickBooks/Gusto sufficient |
-| Parent/caregiver portal | Phase 3. Becomes important when billing is live |
-| Appointment reminders (SMS/email) | Build with scheduling. Use Twilio/Resend |
+| Feature                             | Notes                                                     |
+| ----------------------------------- | --------------------------------------------------------- |
+| Telehealth                          | Integrate (Zoom/Doxy.me link from calendar), don't build  |
+| Payroll integration                 | CSV hours export to QuickBooks/Gusto sufficient           |
+| Parent/caregiver portal             | Phase 3. Becomes important when billing is live           |
+| Appointment reminders (SMS/email)   | Build with scheduling. Use Twilio/Resend                  |
 | EVV (Electronic Visit Verification) | Only mandated for ABA in CO and FL. Monitor for expansion |
-| Mobile data collection | Phase 3+. Lightweight tap-to-record on existing goals |
+| Mobile data collection              | Phase 3+. Lightweight tap-to-record on existing goals     |
 
 #### Not Applicable for Small Practices (1-50 staff)
 

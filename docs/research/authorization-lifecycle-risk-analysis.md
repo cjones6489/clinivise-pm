@@ -10,12 +10,12 @@ Risk and failure mode analysis for ABA authorization management. Covers revenue 
 
 OIG audits have exposed massive improper payment volumes in ABA Medicaid programs:
 
-| State | Improper Payments | Additional Potentially Improper | Sample Period | Source |
-|-------|------------------:|-------------------------------:|---------------|--------|
-| Colorado | $77.8M | $207M | — | [STAT News](https://www.statnews.com/2026/03/02/hhs-medicaid-audit-finds-autism-therapy-overpayment-colorado/) |
-| Indiana | $56M | — | 2019–2020 | [HHS OIG](https://oig.hhs.gov/reports/all/2024/indiana-made-at-least-56-million-in-improper-fee-for-service-medicaid-payments-for-applied-behavior-analysis-provided-to-children-diagnosed-with-autism/) |
-| Maine | $45.6M | — | — | [Benesch/JDSupra](https://www.jdsupra.com/legalnews/oig-finds-significant-improper-medicaid-7138475/) |
-| Wisconsin | $18.5M | $94.3M | 2021–2022 | [Benesch/JDSupra](https://www.jdsupra.com/legalnews/oig-finds-significant-improper-medicaid-7138475/) |
+| State     | Improper Payments | Additional Potentially Improper | Sample Period | Source                                                                                                                                                                                                   |
+| --------- | ----------------: | ------------------------------: | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Colorado  |            $77.8M |                           $207M | —             | [STAT News](https://www.statnews.com/2026/03/02/hhs-medicaid-audit-finds-autism-therapy-overpayment-colorado/)                                                                                           |
+| Indiana   |              $56M |                               — | 2019–2020     | [HHS OIG](https://oig.hhs.gov/reports/all/2024/indiana-made-at-least-56-million-in-improper-fee-for-service-medicaid-payments-for-applied-behavior-analysis-provided-to-children-diagnosed-with-autism/) |
+| Maine     |            $45.6M |                               — | —             | [Benesch/JDSupra](https://www.jdsupra.com/legalnews/oig-finds-significant-improper-medicaid-7138475/)                                                                                                    |
+| Wisconsin |            $18.5M |                          $94.3M | 2021–2022     | [Benesch/JDSupra](https://www.jdsupra.com/legalnews/oig-finds-significant-improper-medicaid-7138475/)                                                                                                    |
 
 In Indiana, **100% of sampled claims** contained one or more improper or potentially improper claim lines. In Wisconsin, **all 100 sampled enrollee-months** contained problems. These are not edge cases — they are systemic.
 
@@ -29,16 +29,17 @@ In Indiana, **100% of sampled claims** contained one or more improper or potenti
 
 ### 1.3 Most Common Authorization-Related Denial Reasons
 
-| Denial Code | Meaning | Root Cause |
-|-------------|---------|------------|
-| CO 197 | Pre-certification/authorization absent | Auth not requested before service or auth expired |
-| CO 15 | Invalid authorization number | Auth number mismatch, wrong auth on claim |
-| — | Units exceed authorized | Billed more units than auth allows |
-| — | Service outside authorized date range | Session date falls outside auth effective period |
-| — | Provider not listed on authorization | Rendering provider not credentialed on the auth |
-| — | CPT code mismatch | Billed code differs from authorized code |
+| Denial Code | Meaning                                | Root Cause                                        |
+| ----------- | -------------------------------------- | ------------------------------------------------- |
+| CO 197      | Pre-certification/authorization absent | Auth not requested before service or auth expired |
+| CO 15       | Invalid authorization number           | Auth number mismatch, wrong auth on claim         |
+| —           | Units exceed authorized                | Billed more units than auth allows                |
+| —           | Service outside authorized date range  | Session date falls outside auth effective period  |
+| —           | Provider not listed on authorization   | Rendering provider not credentialed on the auth   |
+| —           | CPT code mismatch                      | Billed code differs from authorized code          |
 
 **Risk: Authorization-related revenue leakage**
+
 - Severity: **Critical**
 - Likelihood: **High**
 - Mitigation: Real-time unit tracking with hard stops at 100%, automated renewal alerts starting 30 days before expiration, claim-level auth validation before submission, and auth-scheduling integration that blocks booking when units are exhausted.
@@ -145,19 +146,20 @@ Per OIG findings and payer guidelines, surviving an audit requires:
 6. **Clear connection** between services billed and treatment plan goals
 
 **Risk: Audit failure due to documentation gaps**
+
 - Severity: **Critical**
 - Likelihood: **High** (OIG found 100% of sampled claims had deficiencies in multiple states)
 - Mitigation: Session logging form that requires all audit-critical fields before submission. Auto-populate authorization details, provider info, and diagnosis from the client record. Enforce start/stop time entry. Generate compliance reports showing documentation completeness rates. Flag sessions missing required fields.
 
 ### 3.3 Fraudulent Patterns the System Should Detect
 
-| Pattern | Description | Detection Method |
-|---------|-------------|------------------|
-| Impossible days | >8 hours of direct service per provider per day | Daily unit sum per provider |
-| Phantom sessions | Sessions logged when provider was off-site | GPS/location check (Phase 2), schedule cross-reference |
-| Upcoding | Billing 97155 (BCBA) when 97153 (RBT) was delivered | Provider credential check against billed CPT code |
-| Unbundling | Splitting a single service into multiple codes | NCCI edit validation |
-| Over-utilization | Consistently billing at or above authorized units | Utilization trend analysis per client |
+| Pattern          | Description                                         | Detection Method                                       |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------------ |
+| Impossible days  | >8 hours of direct service per provider per day     | Daily unit sum per provider                            |
+| Phantom sessions | Sessions logged when provider was off-site          | GPS/location check (Phase 2), schedule cross-reference |
+| Upcoding         | Billing 97155 (BCBA) when 97153 (RBT) was delivered | Provider credential check against billed CPT code      |
+| Unbundling       | Splitting a single service into multiple codes      | NCCI edit validation                                   |
+| Over-utilization | Consistently billing at or above authorized units   | Utilization trend analysis per client                  |
 
 - Severity: **Critical**
 - Likelihood: **Low** (for intentional fraud in small practices), **Medium** (for unintentional patterns)
@@ -252,6 +254,7 @@ Per OIG findings and payer guidelines, surviving an audit requires:
 ### 5.3 Payer-Specific Authorization Rules
 
 Different payers have different:
+
 - Auth duration periods (3 months, 6 months, 1 year)
 - Unit calculation methods (CMS 8-minute rule for Medicare/Medicaid vs. AMA per-code for commercial)
 - Re-authorization timelines and documentation requirements
@@ -287,7 +290,7 @@ Different payers have different:
   - Auth has remaining units >= billed units
   - Auth payer matches the claim payer
   - Auth status is `approved` (not `pending`, `expired`, `denied`)
-  Block claim submission if any validation fails. Generate a "claims hold" report for claims that can't be submitted.
+    Block claim submission if any validation fails. Generate a "claims hold" report for claims that can't be submitted.
 
 ### 6.3 Payer Retroactively Revokes an Authorization
 
@@ -329,30 +332,30 @@ Different payers have different:
 
 ## Summary Risk Matrix
 
-| # | Risk | Severity | Likelihood | Category |
-|---|------|----------|------------|----------|
-| 1 | Revenue loss from auth-related denials | Critical | High | Revenue |
-| 2 | Concurrent session race condition (lost updates) | Critical | Medium | Data Integrity |
-| 3 | Authorization gap — services without active auth | Critical | High | Edge Case |
-| 4 | Billing beyond authorized units | Critical | Medium | Compliance |
-| 5 | Failed transaction leaves partial state (session without unit update) | Critical | Low | Data Integrity |
-| 6 | Payer retroactive auth revocation / recoupment | Critical | Low | Integration |
-| 7 | OIG audit failure due to documentation gaps | Critical | High | Compliance |
-| 8 | Unit count drift from reality over time | Critical | Medium | Data Integrity |
-| 9 | Session on authorization expiry date | High | Medium | Edge Case |
-| 10 | Retroactive authorization backfill | High | Medium | Edge Case |
-| 11 | Split sessions across multiple auth service lines | High | High | Edge Case |
-| 12 | Overlapping authorizations for same service | High | Medium | Edge Case |
-| 13 | Session edit/delete after units decremented | High | High | Data Integrity |
-| 14 | Negative or impossible unit values | High | Low | Data Integrity |
-| 15 | Dual insurance with separate authorizations | High | Medium | Multi-Payer |
-| 16 | Scheduling session when auth about to expire | High | High | Integration |
-| 17 | Claim submission with wrong/expired auth number | High | Medium | Integration |
-| 18 | Auth data entry errors | High | High | Integration |
-| 19 | Auth renewal timing mismatch (payer delay) | High | High | Integration |
-| 20 | Payer-specific authorization rules | Medium | High | Multi-Payer |
-| 21 | COB impact on auth tracking | Medium | Medium | Multi-Payer |
-| 22 | System downtime during session logging | Medium | Low | Integration |
+| #   | Risk                                                                  | Severity | Likelihood | Category       |
+| --- | --------------------------------------------------------------------- | -------- | ---------- | -------------- |
+| 1   | Revenue loss from auth-related denials                                | Critical | High       | Revenue        |
+| 2   | Concurrent session race condition (lost updates)                      | Critical | Medium     | Data Integrity |
+| 3   | Authorization gap — services without active auth                      | Critical | High       | Edge Case      |
+| 4   | Billing beyond authorized units                                       | Critical | Medium     | Compliance     |
+| 5   | Failed transaction leaves partial state (session without unit update) | Critical | Low        | Data Integrity |
+| 6   | Payer retroactive auth revocation / recoupment                        | Critical | Low        | Integration    |
+| 7   | OIG audit failure due to documentation gaps                           | Critical | High       | Compliance     |
+| 8   | Unit count drift from reality over time                               | Critical | Medium     | Data Integrity |
+| 9   | Session on authorization expiry date                                  | High     | Medium     | Edge Case      |
+| 10  | Retroactive authorization backfill                                    | High     | Medium     | Edge Case      |
+| 11  | Split sessions across multiple auth service lines                     | High     | High       | Edge Case      |
+| 12  | Overlapping authorizations for same service                           | High     | Medium     | Edge Case      |
+| 13  | Session edit/delete after units decremented                           | High     | High       | Data Integrity |
+| 14  | Negative or impossible unit values                                    | High     | Low        | Data Integrity |
+| 15  | Dual insurance with separate authorizations                           | High     | Medium     | Multi-Payer    |
+| 16  | Scheduling session when auth about to expire                          | High     | High       | Integration    |
+| 17  | Claim submission with wrong/expired auth number                       | High     | Medium     | Integration    |
+| 18  | Auth data entry errors                                                | High     | High       | Integration    |
+| 19  | Auth renewal timing mismatch (payer delay)                            | High     | High       | Integration    |
+| 20  | Payer-specific authorization rules                                    | Medium   | High       | Multi-Payer    |
+| 21  | COB impact on auth tracking                                           | Medium   | Medium     | Multi-Payer    |
+| 22  | System downtime during session logging                                | Medium   | Low        | Integration    |
 
 ---
 

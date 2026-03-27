@@ -22,12 +22,14 @@
 ### 1A. Stripe Credits — Quota/Limit Tracking Done Right (production-proven)
 
 **What they do:**
+
 - Stripe's billing credits feature maintains a ledger system that tracks every credit-related action — granting, consuming, and invoicing. The Credit Balance Summary shows a running balance after all ledger transactions.
 - Credits are tied to concrete business value rather than abstract units (e.g., "1 credit = 1,000 API calls"). This reduces confusion.
 - Threshold-based webhooks trigger automated notifications when customers approach depletion. The system pre-calculates overages and consolidates into unified invoices.
 - The UI surfaces usage inline at the point of billing, not in a separate analytics page.
 
 **What to steal for Clinivise:**
+
 - **Ledger-style utilization tracking**: Show authorization utilization as a running ledger — each session logged is a "debit" against approved units. Display "12 of 40 units used" inline, not buried in a detail page.
 - **Concrete unit labeling**: ABA units are already concrete (15-min increments), but label them clearly: "12 units used (3.0 hours) of 40 approved (10.0 hours)" — dual format for BCBAs who think in hours and billing staff who think in units.
 - **Threshold webhooks as alerts**: Map Stripe's approach to authorization thresholds — 80% (warning), 95% (critical), 100%+ (over-utilized). Trigger inline alerts, not just emails.
@@ -41,12 +43,14 @@
 ### 1B. Linear — Data-Dense Progress Tracking Without Clutter (production-proven)
 
 **What they do:**
+
 - Linear preserves rich information density without feeling overwhelming. Not every element carries equal visual weight — parts central to the user's task stay in focus while navigation elements recede.
 - Sidebar, tabs, headers, and panels are tuned to reduce visual noise. Compact tabs with rounded corners, `text-xs` sizing, overflow handling via popover.
 - Progress tracking is integrated into project views with colored progress bars showing initiative completion. The bars use segmented fills with distinct colors per status (done, in-progress, blocked).
 - Right-side metadata panel keeps context visible while main content scrolls.
 
 **What to steal for Clinivise:**
+
 - **Segmented utilization bars**: Instead of a single progress bar, use a segmented bar per authorization service line. Each CPT code gets its own segment showing used/approved. The overall authorization bar aggregates all service lines.
 - **Visual weight hierarchy**: Authorization status (active, expiring, expired) gets maximum visual weight. Utilization percentages get secondary weight. Metadata (auth number, payer, dates) recedes.
 - **Compact tab overflow**: Authorization detail page will have tabs (Overview, Services, Sessions, Documents, Timeline). Apply Linear's overflow-to-popover pattern for tablet viewports.
@@ -60,12 +64,14 @@
 ### 1C. Mercury — Financial Tracking Visualization (production-proven)
 
 **What they do:**
+
 - Mercury's dashboard highlights insights rather than raw data. Budget tracking uses progress bars to convey proximity to goals.
 - Color is used sparingly — red for alerts, green for positives. Top-left placement for highest-priority metrics (users scan left-to-right, top-to-bottom).
 - Expense categorization and cash flow trends use clean bar and line charts. The design avoids clutter by grouping related metrics.
 - Interactive elements surface on hover, keeping the default view clean.
 
 **What to steal for Clinivise:**
+
 - **Burndown visualization**: Apply Mercury's budget-to-spend ratio as a visual model for authorization burndown. Show a projection line: "At current pace, units exhaust on [date]" with a simple area chart.
 - **Left-to-right scanning**: Place utilization percentage and status on the left of authorization cards. Place metadata (dates, auth number) on the right. Most important data is seen first.
 - **Sparse color**: Only use color for semantic meaning — emerald for healthy utilization (<80%), amber for warning (80-95%), red for critical (>95%), blue for informational.
@@ -88,14 +94,14 @@ The best approach is often a combination — cards for the authorization overvie
 
 **Decision for Clinivise:**
 
-| View | Pattern | Rationale |
-|------|---------|-----------|
-| Authorization list page | Data table | Sortable, filterable, 10-100+ authorizations per practice. Users need to compare expiry dates, utilization across clients. |
-| Authorization detail: header | Card-style summary | One authorization, rich metadata. Card with utilization bar, status badge, key dates, client name. |
-| Authorization detail: services | Compact table | 1-8 service lines per auth. Need column comparison (approved vs. used vs. remaining per CPT). |
-| Dashboard: expiring auths widget | Card list (max 5) | Scannable at a glance. Card per expiring auth with countdown badge. |
-| Dashboard: utilization alerts | Stacked alert banners | Severity-sorted. Inline with dashboard flow. |
-| Session form: auth picker | Cards in a sheet | Touch-friendly. Show utilization inline so RBTs see remaining units before selecting. |
+| View                             | Pattern               | Rationale                                                                                                                  |
+| -------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Authorization list page          | Data table            | Sortable, filterable, 10-100+ authorizations per practice. Users need to compare expiry dates, utilization across clients. |
+| Authorization detail: header     | Card-style summary    | One authorization, rich metadata. Card with utilization bar, status badge, key dates, client name.                         |
+| Authorization detail: services   | Compact table         | 1-8 service lines per auth. Need column comparison (approved vs. used vs. remaining per CPT).                              |
+| Dashboard: expiring auths widget | Card list (max 5)     | Scannable at a glance. Card per expiring auth with countdown badge.                                                        |
+| Dashboard: utilization alerts    | Stacked alert banners | Severity-sorted. Inline with dashboard flow.                                                                               |
+| Session form: auth picker        | Cards in a sheet      | Touch-friendly. Show utilization inline so RBTs see remaining units before selecting.                                      |
 
 **Implement:** Phase 1 (Sprint 2D) — this defines the component architecture.
 
@@ -127,6 +133,7 @@ Authorization utilization bars should be multi-segment when showing the breakdow
 ```
 
 For individual service lines, use a single-segment bar with color coding:
+
 - Emerald fill: 0-79%
 - Amber fill: 80-94%
 - Red fill: 95-100%
@@ -149,6 +156,7 @@ Activity timelines help users reconstruct sequences, audit processes, and follow
 **Application to Clinivise authorization detail page:**
 
 **Tab structure (5 tabs):**
+
 1. **Overview** — Authorization summary card, all service line utilization bars, projected exhaustion, key dates
 2. **Services** — Service line table (CPT, approved, used, remaining, rate). Add/edit/remove service lines.
 3. **Sessions** — Filtered session table for this authorization only. Inline status (billed, pending, void).
@@ -156,6 +164,7 @@ Activity timelines help users reconstruct sequences, audit processes, and follow
 5. **Timeline** — Audit log filtered to this authorization. Created, modified, units consumed, expiry alerts, re-auth events.
 
 **Header (always visible above tabs):**
+
 - Client name (linked)
 - Authorization number + payer name
 - Status badge (pending, active, expiring, expired, denied)
@@ -172,20 +181,24 @@ Activity timelines help users reconstruct sequences, audit processes, and follow
 ### 1G. CentralReach and AlohaABA — Competitive Gaps to Exploit
 
 **CentralReach:**
+
 - Has automated authorization tracking that monitors balances, tracks utilization by therapist and practice, and sends alerts.
 - BUT: layout elements are too small, causing click errors. Configuration is tedious. Mobile/desktop experiences are inconsistent. Frequent outages.
 - No predictive pacing. No inline point-of-action alerts. No AI letter parsing.
 
 **AlohaABA:**
+
 - Tracks authorizations and alerts staff to missing pre-authorizations before claim submission.
 - Text fields and authorization configurations are customizable per practice workflow.
 - BUT: no burndown/projection, no AI features, basic visualization.
 
 **Motivity/RethinkBH:**
+
 - RethinkBH automates insurance authorization tracking and renewal monitoring, with analysis by progress, renewal requirements, therapist, and practice.
 - Mobile app rebuilt with real-time data syncing for field use.
 
 **Competitive opportunity for Clinivise:**
+
 1. **Inline utilization at point of action** — show remaining units when logging a session, not just on a separate dashboard
 2. **Predictive burndown** — "At current pace, units exhaust 2 weeks before auth expires" (nobody does this)
 3. **AI letter parsing** — upload PDF, get structured auth data (nobody in ABA does this)
@@ -208,16 +221,16 @@ Healthcare-specific research (PMC, AHRQ) shows that alert fatigue is a severe pr
 
 **Application to Clinivise:**
 
-| Alert Type | Severity | Trigger | Display Pattern | Frequency |
-|-----------|----------|---------|-----------------|-----------|
-| Over-utilized (>100%) | Critical (red) | Session logged that exceeds approved units | Inline banner on auth detail + session form block/warn + dashboard alert | On every occurrence |
-| Near-exhaustion (95-100%) | Critical (red) | Utilization crosses 95% threshold | Inline banner on auth detail + dashboard alert | Once per crossing |
-| High utilization (80-94%) | Warning (amber) | Utilization crosses 80% threshold | Subtle badge on auth list + dashboard widget | Once per crossing |
-| Expiring soon (7 days) | Critical (red) | Calendar countdown | Dashboard alert + auth list badge | Daily |
-| Expiring soon (14 days) | Warning (amber) | Calendar countdown | Dashboard widget | Daily |
-| Expiring soon (30 days) | Info (blue) | Calendar countdown | Dashboard widget only | Weekly |
-| Under-utilized (<50% used, >50% period elapsed) | Warning (amber) | Pacing calculation | Dashboard widget + auth detail callout | Weekly |
-| Projected early exhaustion | Warning (amber) | Burn rate exceeds sustainable pace | Auth detail callout | On recalculation |
+| Alert Type                                      | Severity        | Trigger                                    | Display Pattern                                                          | Frequency           |
+| ----------------------------------------------- | --------------- | ------------------------------------------ | ------------------------------------------------------------------------ | ------------------- |
+| Over-utilized (>100%)                           | Critical (red)  | Session logged that exceeds approved units | Inline banner on auth detail + session form block/warn + dashboard alert | On every occurrence |
+| Near-exhaustion (95-100%)                       | Critical (red)  | Utilization crosses 95% threshold          | Inline banner on auth detail + dashboard alert                           | Once per crossing   |
+| High utilization (80-94%)                       | Warning (amber) | Utilization crosses 80% threshold          | Subtle badge on auth list + dashboard widget                             | Once per crossing   |
+| Expiring soon (7 days)                          | Critical (red)  | Calendar countdown                         | Dashboard alert + auth list badge                                        | Daily               |
+| Expiring soon (14 days)                         | Warning (amber) | Calendar countdown                         | Dashboard widget                                                         | Daily               |
+| Expiring soon (30 days)                         | Info (blue)     | Calendar countdown                         | Dashboard widget only                                                    | Weekly              |
+| Under-utilized (<50% used, >50% period elapsed) | Warning (amber) | Pacing calculation                         | Dashboard widget + auth detail callout                                   | Weekly              |
+| Projected early exhaustion                      | Warning (amber) | Burn rate exceeds sustainable pace         | Auth detail callout                                                      | On recalculation    |
 
 **Implement:** Phase 1 — 80%/95%/100% utilization (Sprint 2D), expiry alerts (Sprint 2D), under-utilization + projection (Sprint 3B dashboard).
 
@@ -227,14 +240,14 @@ Healthcare-specific research (PMC, AHRQ) shows that alert fatigue is a severe pr
 
 **Research findings (Carbon Design System, Smashing Magazine, PatternFly):**
 
-| Pattern | When to Use | Persistence | Interruptiveness |
-|---------|-------------|-------------|------------------|
-| **Inline banner** | Alert relates to specific page content. User needs to see it in context. | Persistent until dismissed or resolved. | Low — user discovers it while working. |
-| **Toast** | Immediate feedback after user action (e.g., "Session saved"). Low-priority confirmations. | Auto-dismiss (3-5 seconds). | Medium — appears but doesn't block. |
-| **Page-level banner** | System-wide or page-wide status. Authorization expired globally. | Persistent. | Low-medium — visible but not blocking. |
-| **Blocking dialog** | Destructive or irreversible action. "This session exceeds authorized units — proceed anyway?" | Until user acts. | High — blocks workflow. |
-| **Dashboard widget** | Aggregated alerts. "3 authorizations expiring this week." | Persistent on dashboard. | None — user chooses to look. |
-| **Badge/pill on nav** | Unread alert count. "Authorizations (3)" in sidebar. | Until alerts are resolved. | Very low — peripheral awareness. |
+| Pattern               | When to Use                                                                                   | Persistence                             | Interruptiveness                       |
+| --------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------- | -------------------------------------- |
+| **Inline banner**     | Alert relates to specific page content. User needs to see it in context.                      | Persistent until dismissed or resolved. | Low — user discovers it while working. |
+| **Toast**             | Immediate feedback after user action (e.g., "Session saved"). Low-priority confirmations.     | Auto-dismiss (3-5 seconds).             | Medium — appears but doesn't block.    |
+| **Page-level banner** | System-wide or page-wide status. Authorization expired globally.                              | Persistent.                             | Low-medium — visible but not blocking. |
+| **Blocking dialog**   | Destructive or irreversible action. "This session exceeds authorized units — proceed anyway?" | Until user acts.                        | High — blocks workflow.                |
+| **Dashboard widget**  | Aggregated alerts. "3 authorizations expiring this week."                                     | Persistent on dashboard.                | None — user chooses to look.           |
+| **Badge/pill on nav** | Unread alert count. "Authorizations (3)" in sidebar.                                          | Until alerts are resolved.              | Very low — peripheral awareness.       |
 
 **Decision for Clinivise:**
 
@@ -291,6 +304,7 @@ No ABA competitor offers AI-powered authorization letter parsing. CentralReach, 
 Modern approaches use multimodal vision-language models (Claude, GPT-4 Vision, Gemini) rather than traditional OCR. These models understand document layout, context, and meaning — not just character recognition.
 
 Key architecture patterns from HealthEdge, LandingAI, and LlamaIndex:
+
 - **Multi-pass extraction**: Layout-aware models break down the document visually, then vision-language models interpret each region in context.
 - **Confidence scoring**: Each extracted field includes a confidence score. Low-confidence fields route to human review. High-confidence fields auto-populate.
 - **Structured output**: LLMs output structured JSON directly — "Read this document and give me the data as JSON with specific fields."
@@ -307,6 +321,7 @@ Key architecture patterns from HealthEdge, LandingAI, and LlamaIndex:
 7. Store original document in `documents` table via Vercel Blob
 
 **What makes this frontier:**
+
 - Vision model reads the PDF directly — no OCR preprocessing needed
 - Handles varied letter formats across payers (each payer has a different template)
 - Extracts implicit information (e.g., "approved for 6 months" → calculates end date from start date)
@@ -321,23 +336,27 @@ Key architecture patterns from HealthEdge, LandingAI, and LlamaIndex:
 ### 3B. AI Prior Authorization Industry — What Cohere, Waystar, and Infinx Are Doing
 
 **Cohere Health:**
+
 - Automates decisioning for up to 90% of care needs. 50% faster reviews, 30% more accurate decisions.
 - **Cohere Align** personalizes the PA process by analyzing providers' historical behavior. Pre-approved providers get ~80% of submissions streamlined, cutting submission time by 55%.
 - **Early Trend Signal Intelligence** predicts medical utilization trends up to 3 months before claims data is available, using prior authorization data.
 - AI extracts structured and unstructured information from clinical notes, imaging reports, and medical documentation.
 
 **Waystar:**
+
 - **Auth Accelerate** reduces submission times by 70%, boosts auto-approval rates to 85%, and cuts average payer approval wait from 4+ days to under 1 day.
 - End-to-end authorization automation from submission through approval.
 
 **Infinx:**
+
 - Authorization determination agent automatically determines if prior auth is required with >98% accuracy by cross-referencing payer guidelines and CPT codes.
 - Acquired Glidian (prior auth automation leader), processing 700,000+ patient access transactions monthly.
 - Revenue Cycle Agent Platform integrates generative AI, automation, and human expertise.
 
 **What this means for Clinivise:**
+
 - These are payer-side and enterprise solutions. Clinivise operates on the provider side for small practices.
-- The *concepts* are transferable: predictive utilization, structured extraction, payer-specific logic.
+- The _concepts_ are transferable: predictive utilization, structured extraction, payer-specific logic.
 - Clinivise won't build a Cohere competitor, but can implement the provider-facing aspects:
   - AI letter parsing (extraction, not decisioning)
   - Predictive utilization pacing (deterministic, not ML)
@@ -374,11 +393,13 @@ elif projected_exhaustion_date > auth_end_date:
 ```
 
 **Display as:**
+
 - **Burndown text**: "At current pace, units exhaust on May 15 — 23 days before auth expires on June 7"
 - **Burndown visual**: Simple area chart with projected line vs. authorization end date
 - **Pacing recommendation**: "To use all units before expiry, schedule {N} units/week (currently averaging {M} units/week)"
 
 **Edge cases to handle:**
+
 - No sessions logged yet (burn rate = 0): show "No sessions recorded — projection unavailable"
 - Authorization just started (<7 days): show "Collecting data — projection available after first week"
 - Erratic scheduling (high variance): show range ("exhausts between May 10–May 25")
@@ -391,17 +412,17 @@ elif projected_exhaustion_date > auth_end_date:
 
 ### 3D. AI Features — Build Now vs. Defer
 
-| Feature | Phase | Effort | Rationale |
-|---------|-------|--------|-----------|
-| Authorization letter parsing (PDF → structured data) | Phase 1 (Sprint 4B) | L | Capstone AI feature. No competitor has it. Validates AI-native thesis. |
-| Deterministic utilization projection | Phase 1 (Sprint 2D) | S | Pure math. High value. Zero AI cost. |
-| Pacing recommendations (text) | Phase 1 (Sprint 3B) | S | Simple calculation. Display in dashboard widget. |
-| Burndown area chart | Phase 1.5 | M | Requires charting component. Nice-to-have. |
-| AI-suggested re-auth timing | Phase 2 | M | Needs historical pattern data from multiple auth cycles. |
-| Payer-specific auth requirement lookup | Phase 2 | M | Needs payer requirement database (Stedi or manual). |
-| Auto-generate re-auth request letter | Phase 2 | M | LLM generates letter from template + client data. |
-| Predictive denial risk scoring | Phase 2+ | L | Needs claims outcome data. Not available until billing is live. |
-| Real-time eligibility-aware auth tracking | Phase 2 | M | Stedi 270/271 integration. |
+| Feature                                              | Phase               | Effort | Rationale                                                              |
+| ---------------------------------------------------- | ------------------- | ------ | ---------------------------------------------------------------------- |
+| Authorization letter parsing (PDF → structured data) | Phase 1 (Sprint 4B) | L      | Capstone AI feature. No competitor has it. Validates AI-native thesis. |
+| Deterministic utilization projection                 | Phase 1 (Sprint 2D) | S      | Pure math. High value. Zero AI cost.                                   |
+| Pacing recommendations (text)                        | Phase 1 (Sprint 3B) | S      | Simple calculation. Display in dashboard widget.                       |
+| Burndown area chart                                  | Phase 1.5           | M      | Requires charting component. Nice-to-have.                             |
+| AI-suggested re-auth timing                          | Phase 2             | M      | Needs historical pattern data from multiple auth cycles.               |
+| Payer-specific auth requirement lookup               | Phase 2             | M      | Needs payer requirement database (Stedi or manual).                    |
+| Auto-generate re-auth request letter                 | Phase 2             | M      | LLM generates letter from template + client data.                      |
+| Predictive denial risk scoring                       | Phase 2+            | L      | Needs claims outcome data. Not available until billing is live.        |
+| Real-time eligibility-aware auth tracking            | Phase 2             | M      | Stedi 270/271 integration.                                             |
 
 ---
 
@@ -410,6 +431,7 @@ elif projected_exhaustion_date > auth_end_date:
 ### 4A. RBTs in the Field — The Primary Tablet Use Case
 
 **Context:** RBTs (Registered Behavior Technicians) log sessions on tablets in homes, schools, and clinics. They need to:
+
 1. Select the correct client
 2. See which authorization applies (and remaining units)
 3. Log the session (start/end time, CPT code, notes)
@@ -445,6 +467,7 @@ RethinkBH rebuilt their mobile app with real-time data syncing, optimized for ta
 **Research findings (Smashing Magazine, UX Matters):**
 
 For responsive data tables on tablet:
+
 - **Priority-based column hiding**: Assign numerical priority to columns. Lower values = higher priority = hidden last. Rightmost columns removed first by default.
 - **Card transformation**: On narrow viewports, table rows transform into cards. Each card shows the most critical fields with expandable detail.
 - **Fixed primary column**: Keep the identifying column (client name or auth number) fixed during horizontal scroll.
@@ -452,16 +475,16 @@ For responsive data tables on tablet:
 
 **Authorization table column priorities:**
 
-| Column | Priority | Mobile Behavior |
-|--------|----------|----------------|
-| Client name | 1 (always visible) | Bold, primary identifier |
-| Status badge | 1 (always visible) | Colored pill |
-| Utilization bar | 2 (tablet+) | Compact bar with percentage |
-| Expiry date | 2 (tablet+) | Countdown badge if <30 days |
-| Payer | 3 (desktop) | Hidden on mobile, shown in expanded card |
-| Auth number | 3 (desktop) | Hidden on mobile, shown in expanded card |
-| CPT codes | 4 (desktop only) | Hidden on mobile, shown in expanded card |
-| Date range | 4 (desktop only) | Hidden on mobile, shown in expanded card |
+| Column          | Priority           | Mobile Behavior                          |
+| --------------- | ------------------ | ---------------------------------------- |
+| Client name     | 1 (always visible) | Bold, primary identifier                 |
+| Status badge    | 1 (always visible) | Colored pill                             |
+| Utilization bar | 2 (tablet+)        | Compact bar with percentage              |
+| Expiry date     | 2 (tablet+)        | Countdown badge if <30 days              |
+| Payer           | 3 (desktop)        | Hidden on mobile, shown in expanded card |
+| Auth number     | 3 (desktop)        | Hidden on mobile, shown in expanded card |
+| CPT codes       | 4 (desktop only)   | Hidden on mobile, shown in expanded card |
+| Date range      | 4 (desktop only)   | Hidden on mobile, shown in expanded card |
 
 **Implement:** Phase 1 (Sprint 2D) — use the existing DataTable component with column visibility config per breakpoint.
 
@@ -477,24 +500,24 @@ Status indicators relay severity through shape, color, and text labels. Badges a
 
 **Authorization status indicators for Clinivise:**
 
-| Status | Badge Color | Icon | Text |
-|--------|-------------|------|------|
-| Pending | Blue/info | Clock | "Pending" |
-| Active | Emerald/success | Check circle | "Active" |
-| Expiring (30 days) | Amber/warning | Alert triangle | "Expires in {N}d" |
-| Expiring (7 days) | Red/error | Alert triangle | "Expires in {N}d" |
-| Expired | Red/error (muted) | X circle | "Expired" |
-| Denied | Red/error | X circle | "Denied" |
-| On Hold | Gray/muted | Pause circle | "On Hold" |
+| Status             | Badge Color       | Icon           | Text              |
+| ------------------ | ----------------- | -------------- | ----------------- |
+| Pending            | Blue/info         | Clock          | "Pending"         |
+| Active             | Emerald/success   | Check circle   | "Active"          |
+| Expiring (30 days) | Amber/warning     | Alert triangle | "Expires in {N}d" |
+| Expiring (7 days)  | Red/error         | Alert triangle | "Expires in {N}d" |
+| Expired            | Red/error (muted) | X circle       | "Expired"         |
+| Denied             | Red/error         | X circle       | "Denied"          |
+| On Hold            | Gray/muted        | Pause circle   | "On Hold"         |
 
 **Utilization indicators (compact, for table cells and card corners):**
 
-| Utilization | Color | Display |
-|-------------|-------|---------|
-| 0-79% | Emerald | "32%" with emerald dot |
-| 80-94% | Amber | "87%" with amber dot |
-| 95-100% | Red | "97%" with red dot |
-| >100% | Red (pulsing) | "112%" with red dot + "OVER" badge |
+| Utilization | Color         | Display                            |
+| ----------- | ------------- | ---------------------------------- |
+| 0-79%       | Emerald       | "32%" with emerald dot             |
+| 80-94%      | Amber         | "87%" with amber dot               |
+| 95-100%     | Red           | "97%" with red dot                 |
+| >100%       | Red (pulsing) | "112%" with red dot + "OVER" badge |
 
 **Implement:** Phase 1 (Sprint 2D) — status badges are a shared component, utilization indicators built into auth-utilization component.
 
@@ -548,11 +571,13 @@ Intake → Request Auth → Payer Review → Approved/Denied
 Kanban boards visualize records as cards progressing through stages. Drag-and-drop between columns updates status. Work-in-progress limits constrain column capacity. Suited for workflows with clear stages and manageable item counts.
 
 **Pros for ABA authorization tracking:**
+
 - Visual overview of all authorizations by status (Pending → Active → Expiring → Expired)
 - Drag to move between statuses (e.g., mark as denied)
 - Quick identification of bottlenecks (too many in "Pending" column)
 
 **Cons for ABA authorization tracking:**
+
 - Authorization status changes are mostly automated (Active → Expiring is calendar-driven, not drag-drop)
 - The primary user need is utilization tracking within Active status, not status transitions
 - Small practices may only have 10-30 active authorizations — Kanban adds visual overhead without proportional benefit
@@ -579,6 +604,7 @@ Best-in-class systems identify expiring authorizations well in advance (30-45 da
 5. **Expired**: Status changes to "Expired." If a new auth exists, show transition: "Replaced by AUTH-2024-002."
 
 **Data model (already in schema):**
+
 - `authorizations` table can link to previous via a self-referencing FK or metadata
 - `authorization_services` on the new auth start fresh (used_units = 0)
 - Timeline/audit log shows the chain: AUTH-001 → AUTH-002 → AUTH-003
@@ -594,12 +620,14 @@ Best-in-class systems identify expiring authorizations well in advance (30-45 da
 Based on all research, here is the recommended component architecture for authorization tracking:
 
 **Authorization List Page** (`/authorizations`)
+
 - `AuthorizationTable` — Data table with column priority hiding, search, filters (status, client, payer, expiry range)
 - `AuthorizationFilters` — Filter presets: "Active," "Expiring Soon," "Over-Utilized," "All"
 - `AuthorizationStatusBadge` — Reusable status pill component
 - `UtilizationIndicator` — Compact percentage + color dot for table cells
 
 **Authorization Detail Page** (`/authorizations/[id]`)
+
 - `AuthorizationHeader` — Card-style summary: client, payer, auth #, status badge, date range, countdown, overall utilization bar, actions
 - `AuthorizationTabs` — 5 tabs: Overview, Services, Sessions, Documents, Timeline
 - `AuthorizationOverview` — All service line utilization bars, projected exhaustion, pacing recommendation, alerts
@@ -613,59 +641,64 @@ Based on all research, here is the recommended component architecture for author
 - `ExpiryAlert` — Inline banner with countdown and CTA
 
 **Authorization Form** (`/authorizations/new`, `/authorizations/[id]/edit`)
+
 - `AuthorizationForm` — Create/edit form with service line management
 - `ServiceLineForm` — Sub-form for adding CPT codes + approved units
 
 **Dashboard Widgets** (on `/overview`)
+
 - `ExpiringAuthsWidget` — Card list of authorizations expiring within 30 days
 - `UtilizationAlertsWidget` — Severity-sorted alert list (over-utilized, under-utilized, expiring)
 
 **Session Form Integration**
+
 - `AuthorizationPicker` — Card-based picker shown when logging a session. Displays available auths for selected client with utilization bars.
 
 **Shared**
+
 - `AuthorizationStatusBadge` — Reused across list, detail, dashboard, session form
 - `UtilizationIndicator` — Compact version for tables and inline display
 
 ### 6B. Implementation Priority
 
-| Priority | Component | Sprint | Rationale |
-|----------|-----------|--------|-----------|
-| 1 | Authorization list page + table | 2D | Entry point for all auth management |
-| 2 | Authorization form (create/edit) | 2D | Core CRUD |
-| 3 | Authorization detail page + tabs | 2D | Primary information surface |
-| 4 | UtilizationBar + UtilizationIndicator | 2D | Core value proposition — utilization visibility |
-| 5 | AuthorizationStatusBadge | 2D | Reused everywhere |
-| 6 | ExpiryAlert (inline) | 2D | Prevents missed re-auths |
-| 7 | ServiceLineForm | 2D | Needed for auth creation |
-| 8 | BurndownProjection (text) | 2D | Deterministic, high value, low effort |
-| 9 | AuthorizationPicker (for session form) | 3A | Touch-friendly auth selection during session logging |
-| 10 | ExpiringAuthsWidget (dashboard) | 3B | Aggregated expiry visibility |
-| 11 | UtilizationAlertsWidget (dashboard) | 3B | Aggregated utilization alerts |
-| 12 | AuthorizationTimeline | 3B | Audit trail |
-| 13 | AuthorizationDocuments + AI parse trigger | 4B | AI letter parsing integration point |
-| 14 | UtilizationSummaryBar (multi-segment) | 3B | Nice-to-have visual enhancement |
-| 15 | Burndown area chart | Phase 1.5 | Requires charting component setup |
-| 16 | Kanban view toggle | Deferred | Low priority, table + filters sufficient |
+| Priority | Component                                 | Sprint    | Rationale                                            |
+| -------- | ----------------------------------------- | --------- | ---------------------------------------------------- |
+| 1        | Authorization list page + table           | 2D        | Entry point for all auth management                  |
+| 2        | Authorization form (create/edit)          | 2D        | Core CRUD                                            |
+| 3        | Authorization detail page + tabs          | 2D        | Primary information surface                          |
+| 4        | UtilizationBar + UtilizationIndicator     | 2D        | Core value proposition — utilization visibility      |
+| 5        | AuthorizationStatusBadge                  | 2D        | Reused everywhere                                    |
+| 6        | ExpiryAlert (inline)                      | 2D        | Prevents missed re-auths                             |
+| 7        | ServiceLineForm                           | 2D        | Needed for auth creation                             |
+| 8        | BurndownProjection (text)                 | 2D        | Deterministic, high value, low effort                |
+| 9        | AuthorizationPicker (for session form)    | 3A        | Touch-friendly auth selection during session logging |
+| 10       | ExpiringAuthsWidget (dashboard)           | 3B        | Aggregated expiry visibility                         |
+| 11       | UtilizationAlertsWidget (dashboard)       | 3B        | Aggregated utilization alerts                        |
+| 12       | AuthorizationTimeline                     | 3B        | Audit trail                                          |
+| 13       | AuthorizationDocuments + AI parse trigger | 4B        | AI letter parsing integration point                  |
+| 14       | UtilizationSummaryBar (multi-segment)     | 3B        | Nice-to-have visual enhancement                      |
+| 15       | Burndown area chart                       | Phase 1.5 | Requires charting component setup                    |
+| 16       | Kanban view toggle                        | Deferred  | Low priority, table + filters sufficient             |
 
 ### 6C. Key Design Decisions Summary
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| List layout | Data table (not cards, not kanban) | Sortable, filterable, scales to 100+ auths. Cards for detail page only. |
-| Detail layout | Header card + 5 tabs | Matches client detail pattern (consistency). Tabs proven for 4-6 section detail pages. |
-| Utilization display | Segmented bar + percentage text + color coding | Visual + numeric + semantic color for triple-redundancy. Accessible. |
-| Alert placement | Inline banners (detail) + dashboard widgets (aggregate) + blocking dialog (session form) | Context-appropriate. Prevents alert fatigue. |
-| Mobile/tablet strategy | Column priority hiding + card transformation on narrow viewports | Progressive disclosure. Works with existing DataTable component. |
-| Authorization picker | Card-based in sheet (not dropdown) | Touch-friendly for RBTs. Shows utilization inline. |
-| Re-authorization | Pre-filled form linked to previous auth | Reduces data entry. Maintains authorization chain for auditing. |
-| Status indicators | Color + icon + text (triple encoding) | WCAG accessible. Clear at any size. |
+| Decision               | Choice                                                                                   | Rationale                                                                              |
+| ---------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| List layout            | Data table (not cards, not kanban)                                                       | Sortable, filterable, scales to 100+ auths. Cards for detail page only.                |
+| Detail layout          | Header card + 5 tabs                                                                     | Matches client detail pattern (consistency). Tabs proven for 4-6 section detail pages. |
+| Utilization display    | Segmented bar + percentage text + color coding                                           | Visual + numeric + semantic color for triple-redundancy. Accessible.                   |
+| Alert placement        | Inline banners (detail) + dashboard widgets (aggregate) + blocking dialog (session form) | Context-appropriate. Prevents alert fatigue.                                           |
+| Mobile/tablet strategy | Column priority hiding + card transformation on narrow viewports                         | Progressive disclosure. Works with existing DataTable component.                       |
+| Authorization picker   | Card-based in sheet (not dropdown)                                                       | Touch-friendly for RBTs. Shows utilization inline.                                     |
+| Re-authorization       | Pre-filled form linked to previous auth                                                  | Reduces data entry. Maintains authorization chain for auditing.                        |
+| Status indicators      | Color + icon + text (triple encoding)                                                    | WCAG accessible. Clear at any size.                                                    |
 
 ---
 
 ## Sources
 
 ### Quota/Limit Tracking & Dashboard Design
+
 - [Stripe Billing Credits](https://stripe.com/blog/introducing-credits-for-usage-based-billing)
 - [Stripe Credits Documentation](https://docs.stripe.com/billing/subscriptions/usage-based/billing-credits)
 - [Mercury Banking](https://mercury.com)
@@ -678,12 +711,14 @@ Based on all research, here is the recommended component architecture for author
 - [Data Tables: Four Major User Tasks (NN/g)](https://www.nngroup.com/articles/data-tables/)
 
 ### Progress Bar & Visualization
+
 - [VA.gov Segmented Progress Bar](https://design.va.gov/components/form/progress-bar-segmented)
 - [Stacks Progress Bars (Stack Overflow)](https://stackoverflow.design/product/components/progress-bars/)
 - [Multi-Segment Progress Bar (Siteimprove)](https://fancy.siteimprove.com/lab/components/data%20visualization/multi%20segment%20progress%20bar/)
 - [Progress Bar Types and Design Tips (Domo)](https://www.domo.com/learn/charts/progress-bars)
 
 ### Alerting & Notification Patterns
+
 - [Carbon Design System Notification Pattern](https://carbondesignsystem.com/patterns/notification-pattern/)
 - [Design Guidelines for Better Notifications UX (Smashing Magazine)](https://www.smashingmagazine.com/2025/07/design-guidelines-better-notifications-ux/)
 - [PatternFly Alert Design Guidelines](https://www.patternfly.org/components/alert/design-guidelines/)
@@ -692,6 +727,7 @@ Based on all research, here is the recommended component architecture for author
 - [Indicators, Validations, and Notifications (NN/g)](https://www.nngroup.com/articles/indicators-validations-notifications/)
 
 ### Alert Fatigue in Healthcare
+
 - [Alert Fatigue Primer (AHRQ PSNet)](https://psnet.ahrq.gov/primer/alert-fatigue)
 - [Fighting Alert Fatigue (Cleveland Clinic)](https://consultqd.clevelandclinic.org/fighting-alert-fatigue-to-improve-patient-safety-and-standardization-of-care)
 - [Passive Clinical Decision Support (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10830237/)
@@ -699,6 +735,7 @@ Based on all research, here is the recommended component architecture for author
 - [Fix Alert Fatigue: Focus on 3 Things (Synapse Medicine)](https://www.synapse-medicine.com/blog/blogpost/fix-alert-fatigue-healthcare)
 
 ### AI Prior Authorization
+
 - [Cohere Health Platform](https://www.coherehealth.com/)
 - [Cohere Early Trend Signal Intelligence](https://www.coherehealth.com/news/cohere-health-launches-early-trend-signal-intelligence)
 - [Cohere Utilization Management Suite](https://www.coherehealth.com/utilization-management-suite)
@@ -709,6 +746,7 @@ Based on all research, here is the recommended component architecture for author
 - [Prior Authorization Software Comparison 2025](https://www.sprypt.com/blog/prior-authorization-software-electronic-solutions)
 
 ### AI Document Extraction
+
 - [LLMs vs OCR for Document Extraction (Vellum)](https://www.vellum.ai/blog/document-data-extraction-llms-vs-ocrs)
 - [LandingAI Agentic Document Extraction](https://landing.ai/ade)
 - [LandingAI Healthcare Solutions](https://landing.ai/solutions/healthcare)
@@ -716,6 +754,7 @@ Based on all research, here is the recommended component architecture for author
 - [HealthEdge AI OCR for Prior Authorization](https://healthedge.com/resources/blog/transforming-healthcare-document-processing-how-healthedge-s-ai-platform-revolutionized-prior-authorization-with-intelligent-ocr)
 
 ### ABA Authorization Management
+
 - [Effective Authorization Management (S-Cubed)](https://scubed.io/blog/strengthening-aba-practices-with-effective-authorization-management-strategies)
 - [CentralReach Proactive Authorization](https://centralreach.com/blog/enhance-aba-practices-with-proactive-authorization-management/)
 - [ABA Authorization Management (ABA Matrix)](https://www.abamatrix.com/aba-authorization-management/)
@@ -723,28 +762,33 @@ Based on all research, here is the recommended component architecture for author
 - [Key ABA Metrics (Raven Health)](https://ravenhealth.com/blog/aba-practice-metrics-to-track/)
 
 ### Mobile & Tablet Healthcare UX
+
 - [Mobile Devices in Healthcare (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC4029126/)
 - [Healthcare Mobile App UX Tips (MedMatch)](https://medmatchnetwork.com/10-ux-tips-for-healthcare-mobile-apps/)
 - [RethinkBH Practice Management](https://www.rethinkbehavioralhealth.com/our-solutions/practice-management/)
 - [Best RBT Data Collection Apps 2026](https://rbtpracticeexam.net/best-rbt-data-collection-apps/)
 
 ### Responsive Tables
+
 - [Responsive Tables Part 1 (Smashing Magazine)](https://www.smashingmagazine.com/2022/12/accessible-front-end-patterns-responsive-tables-part1/)
 - [Designing Mobile Tables (UX Matters)](https://www.uxmatters.com/mt/archives/2020/07/designing-mobile-tables.php)
 - [DataTables Column Priority](https://datatables.net/extensions/responsive/priority)
 
 ### Status Indicators & Badges
+
 - [Carbon Status Indicator Pattern](https://carbondesignsystem.com/patterns/status-indicator-pattern/)
 - [Badges vs Pills vs Chips vs Tags (Smart Interface Design)](https://smart-interface-design-patterns.com/articles/badges-chips-tags-pills/)
 - [Workday Canvas Pill Component](https://canvas.workday.com/components/indicators/pill)
 
 ### Workflow & Authorization Lifecycle
+
 - [Prior Authorization Tracking Guide (EZ MED)](https://ezmedpro.com/prior-authorization-tracking-best-practices-guide/)
 - [Prior Authorization Process Flow Chart (careviso)](https://www.careviso.com/news-events/prior-authorization-process-flow-chart)
 - [AI Flags Expiring Authorizations (Droidal)](https://medium.com/@droidalai/how-ai-automatically-flags-expiring-authorizations-to-prevent-missed-renewals-dfc6688c2a64)
 - [Prior Authorization Automation Guide 2026 (Innovaccer)](https://innovaccer.com/blogs/the-definitive-guide-to-streamlining-prior-authorization-workflows-for-providers)
 
 ### Detail Page & Timeline Patterns
+
 - [Timeline Pattern (UX Patterns)](https://uxpatterns.dev/patterns/data-display/timeline)
 - [Tabs UX Best Practices (Eleken)](https://www.eleken.co/blog-posts/tabs-ux)
 - [Activity Feed Examples (Nicelydone)](https://nicelydone.club/pages/activity-feeds)

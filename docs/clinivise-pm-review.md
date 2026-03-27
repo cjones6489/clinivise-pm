@@ -29,13 +29,15 @@ export const updateSessionSchema = z.object({
 // In the action, add a WHERE clause
 const [updated] = await tx
   .update(sessions)
-  .set({ /* ... */ })
+  .set({
+    /* ... */
+  })
   .where(
     and(
       eq(sessions.id, id),
       eq(sessions.organizationId, ctx.organizationId),
-      eq(sessions.updatedAt, new Date(parsedInput.updatedAt)) // Version check
-    )
+      eq(sessions.updatedAt, new Date(parsedInput.updatedAt)), // Version check
+    ),
   )
   .returning();
 
@@ -64,7 +66,7 @@ export function computeActualMinutes(
   sessionDate: string,
   startTime?: string,
   endTime?: string,
-  timezone?: string // Pass org timezone
+  timezone?: string, // Pass org timezone
 ): { startTimestamp: Date | null; endTimestamp: Date | null; actualMinutes: number | null } {
   if (!startTime || !endTime) {
     return { startTimestamp: null, endTimestamp: null, actualMinutes: null };
@@ -194,11 +196,7 @@ const ENTITY_PATHS: Record<string, (id?: string, meta?: Record<string, string>) 
     ...(meta?.authorizationId ? [`/authorizations/${meta.authorizationId}`] : []),
     "/overview",
   ],
-  client: (id) => [
-    "/clients",
-    ...(id ? [`/clients/${id}`] : []),
-    "/overview",
-  ],
+  client: (id) => ["/clients", ...(id ? [`/clients/${id}`] : []), "/overview"],
   authorization: (id, meta) => [
     "/authorizations",
     ...(id ? [`/authorizations/${id}`] : []),
@@ -210,7 +208,7 @@ const ENTITY_PATHS: Record<string, (id?: string, meta?: Record<string, string>) 
 export function revalidateEntity(
   entityType: string,
   entityId?: string,
-  meta?: Record<string, string>
+  meta?: Record<string, string>,
 ) {
   const pathFn = ENTITY_PATHS[entityType];
   if (!pathFn) return;
@@ -247,16 +245,8 @@ type SoftDeletable = { deletedAt: any; organizationId: any };
  * Returns a WHERE clause that scopes to the org and excludes soft-deleted rows.
  * Use for any table that has organizationId + deletedAt.
  */
-export function tenantScope<T extends SoftDeletable>(
-  table: T,
-  orgId: string,
-  ...extra: SQL[]
-) {
-  return and(
-    eq(table.organizationId, orgId),
-    isNull(table.deletedAt),
-    ...extra
-  );
+export function tenantScope<T extends SoftDeletable>(table: T, orgId: string, ...extra: SQL[]) {
+  return and(eq(table.organizationId, orgId), isNull(table.deletedAt), ...extra);
 }
 
 /**
@@ -297,7 +287,7 @@ export class AppError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly statusCode: number = 400
+    public readonly statusCode: number = 400,
   ) {
     super(message);
     this.name = "AppError";
@@ -324,11 +314,7 @@ export class ConflictError extends AppError {
 
 export class StaleDataError extends AppError {
   constructor() {
-    super(
-      "Record was modified by another user. Please refresh and try again.",
-      "STALE_DATA",
-      409
-    );
+    super("Record was modified by another user. Please refresh and try again.", "STALE_DATA", 409);
   }
 }
 ```

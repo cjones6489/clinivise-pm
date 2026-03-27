@@ -10,6 +10,7 @@ globs: src/components/**, src/app/**
 ## Workflow-First Design (MANDATORY)
 
 Before building any page component, answer these questions (not optional):
+
 1. **Who** is on this page and what are they trying to do?
 2. **What's the hero moment** — the ONE visually dominant element?
 3. **What actions** belong on this page? Add contextual action buttons.
@@ -17,6 +18,7 @@ Before building any page component, answer these questions (not optional):
 5. **Does the wireframe** (`docs/design/clinivise-wireframes.jsx`) show a layout for this page? Match it.
 
 Never build a page that's just a form or a bare table. Every page needs:
+
 - A rich header with contextual metadata (not just a title)
 - Section cards with title bars (not naked headings)
 - Key-value pairs for detail display (not disabled form inputs)

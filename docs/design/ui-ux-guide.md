@@ -3,6 +3,7 @@
 > **Purpose**: Comprehensive guide for designing every page in Clinivise. Based on competitive research across 11+ ABA/PM/EHR platforms. Use this as the reference when designing in v0.dev or implementing pages.
 >
 > **Research sources**: See `docs/research/` for the full competitive analysis:
+>
 > - `dashboard-design-research.md` — 11 platforms analyzed
 > - `client-detail-page-patterns.md` — 7 platforms analyzed
 > - `session-auth-form-patterns-research.md` — 7+ platforms analyzed
@@ -27,6 +28,7 @@
 **Role-adaptive layouts — same structure, different data:**
 
 #### BCBA / Default View
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  HEADER: "Dashboard" + Today's Date + [+ Log Session] [+ Add Client]
@@ -68,6 +70,7 @@
 ```
 
 #### RBT View (simplified)
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  HEADER: "My Day" + Today's Date + [+ Log Session]              │
@@ -94,6 +97,7 @@
 ```
 
 #### Admin/Owner View
+
 ```
 Same structure as BCBA but with financial metrics:
 - Revenue This Month, Outstanding Claims, Collection Rate, Staff Utilization
@@ -101,6 +105,7 @@ Same structure as BCBA but with financial metrics:
 ```
 
 **Key design decisions:**
+
 - Metric cards: large number (24px+), uppercase label (11px), subtitle with context
 - Action items card: colored left border (red=critical, amber=warning), each row has an action button
 - Auth table: progress bar inline, color-coded by utilization threshold
@@ -111,6 +116,7 @@ Same structure as BCBA but with financial metrics:
 ### 2. Client Detail (`/clients/[id]`)
 
 **Header banner (sticky, always visible):**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ ← Back to Clients                                               │
@@ -126,6 +132,7 @@ Same structure as BCBA but with financial metrics:
 ```
 
 **Overview tab layout:**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  ROW 1: 4 Clickable Metric Cards                               │
@@ -168,6 +175,7 @@ Same structure as BCBA but with financial metrics:
 ```
 
 **Key differentiators from competitors:**
+
 - Guardian info in the sticky header (ABA clients are children — most competitors bury this)
 - Clickable metric cards that navigate to detail tabs (from Jane App pattern)
 - Auth utilization progress bars with color thresholds on the Overview tab (CentralReach buries this in billing)
@@ -175,6 +183,7 @@ Same structure as BCBA but with financial metrics:
 - Recent sessions feed on overview (SimplePractice-inspired)
 
 **Care Team tab layout (Phase 2):**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  CARE TEAM                              2 BCBAs · 3 RBTs       │
@@ -213,6 +222,7 @@ Same structure as BCBA but with financial metrics:
 ```
 
 **Key UX decisions (from research — Linear, GitHub, Healthie convergent pattern):**
+
 - **No drag-and-drop** — combobox-search-and-add is faster (3 clicks vs 5+), works on tablets, accessible
 - **Popover not modal** — keep existing team visible while adding
 - **Auto-role from credential** — reduces clicks; override available
@@ -277,6 +287,7 @@ Same structure as BCBA but with financial metrics:
 ```
 
 **Key UX patterns from research:**
+
 - **Quick Log** at the top — repeat previous sessions with one tap (no competitor has this)
 - **Two-column** layout for field pairs (client+provider, date+start+end, CPT+POS)
 - **Auto-calculated card** with blue/info background — real-time feedback as user types
@@ -314,6 +325,7 @@ Same structure as BCBA but with financial metrics:
 ```
 
 **Key patterns:**
+
 - Rich table rows: name (bold) + DOB + diagnosis on second line (muted)
 - Guardian column (ABA-specific — most EHRs don't have this in the list)
 - Auth utilization mini-bar inline in the table
@@ -416,17 +428,18 @@ Clinical tab:
 
 ### Color Palette (from research)
 
-| Role | Token | Value | Usage |
-|---|---|---|---|
-| Primary | `--primary` | Teal-blue (oklch ~0.55 0.15 250) | Buttons, links, active nav, focus rings |
-| Background | `--background` | Light cool gray | Page background (cards float above) |
-| Card | `--card` | Pure/near white | Cards, dialogs, table containers |
-| Success | emerald-500/600 | Green | Utilization OK, active status |
-| Warning | amber-500/600 | Amber/gold | Expiring auth, high utilization |
-| Destructive | red-500/600 | Red | Expired, over-utilized, denied |
-| Info | blue-500/600 | Blue | Auto-calculated values, info cards |
+| Role        | Token           | Value                            | Usage                                   |
+| ----------- | --------------- | -------------------------------- | --------------------------------------- |
+| Primary     | `--primary`     | Teal-blue (oklch ~0.55 0.15 250) | Buttons, links, active nav, focus rings |
+| Background  | `--background`  | Light cool gray                  | Page background (cards float above)     |
+| Card        | `--card`        | Pure/near white                  | Cards, dialogs, table containers        |
+| Success     | emerald-500/600 | Green                            | Utilization OK, active status           |
+| Warning     | amber-500/600   | Amber/gold                       | Expiring auth, high utilization         |
+| Destructive | red-500/600     | Red                              | Expired, over-utilized, denied          |
+| Info        | blue-500/600    | Blue                             | Auto-calculated values, info cards      |
 
 ### Typography
+
 - Page titles: `text-xl font-bold tracking-tight`
 - Section card headers: `text-xs font-semibold uppercase tracking-wider`
 - Metric values: `text-2xl font-bold tabular-nums`
@@ -435,12 +448,14 @@ Clinical tab:
 - Table headers: `text-[11px] font-semibold uppercase tracking-wide`
 
 ### Elevation
+
 - Background (recessed): `bg-background`
 - Cards (floating): `bg-card shadow-sm rounded-xl border`
 - Cards on hover: `hover:shadow-md hover:-translate-y-0.5 transition-all`
 - Elevated (modals/popovers): `shadow-lg`
 
 ### Micro-interactions
+
 - Button press: `active:scale-[0.97] transition-transform`
 - Card hover lift: `hover:-translate-y-0.5 hover:shadow-md transition-all duration-200`
 - Content entrance: `fade-in` animation (0.3s ease-out, translateY 4px→0)
@@ -451,6 +466,7 @@ Clinical tab:
 ## v0.dev Prompt Templates
 
 ### Dashboard Prompt
+
 ```
 Design a practice management dashboard for "Clinivise" — an ABA therapy PM tool. Use Next.js, shadcn/ui, Tailwind CSS. The primary users are BCBAs and RBTs (85% women).
 
@@ -466,6 +482,7 @@ Style: clean light background, white cards with subtle shadows, teal primary col
 ```
 
 ### Client Detail Prompt
+
 ```
 Design a client detail page for an ABA therapy PM tool. Use shadcn/ui, Tailwind.
 
@@ -483,6 +500,7 @@ Style: teal primary, white cards with shadow-sm, section cards have subtle muted
 ```
 
 ### Session Log Form Prompt
+
 ```
 Design a session logging form for an ABA therapy PM tool. This is the MOST used page — speed matters.
 
@@ -500,5 +518,5 @@ Style: clean, fast, minimal visual noise. Pre-filled fields should look differen
 
 ---
 
-*Last updated: 2026-03-21*
-*Based on competitive research across CentralReach, AlohaABA, Theralytics, Raven Health, Motivity, SimplePractice, Jane App, Healthie, and 3+ other platforms.*
+_Last updated: 2026-03-21_
+_Based on competitive research across CentralReach, AlohaABA, Theralytics, Raven Health, Motivity, SimplePractice, Jane App, Healthie, and 3+ other platforms._

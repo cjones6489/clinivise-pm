@@ -29,6 +29,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** A family contacts the practice (self-referral, physician referral, or school referral) with a child who has an ASD diagnosis.
 
 **What happens:**
+
 1. **Intake coordinator** collects: child's name, DOB, diagnosis, insurance info, referral source
 2. **Insurance verification (VOB/QOB):** Staff contacts the payer (phone, portal, or eligibility API) to confirm:
    - ABA therapy is a covered benefit under the plan
@@ -58,6 +59,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Insurance verification confirms ABA is covered and prior auth is required.
 
 **What happens:**
+
 1. Practice submits a **prior authorization request for assessment only** (CPT 97151 - Behavior Identification Assessment)
 2. Submission includes:
    - Client demographics and insurance details
@@ -68,6 +70,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 3. Payer reviews and approves (or requests additional information)
 
 **Submission methods vary by payer:**
+
 - Online payer portals (Availity, payer-specific portals) -- preferred by most payers
 - Fax (still common for smaller regional payers)
 - Phone (live reviews for some payers)
@@ -86,6 +89,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Assessment authorization is approved (or not required).
 
 **What happens:**
+
 1. **BCBA conducts the assessment** using standardized tools:
    - VB-MAPP (Verbal Behavior Milestones Assessment and Placement Program)
    - ABLLS-R (Assessment of Basic Language and Learning Skills)
@@ -111,6 +115,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Assessment is completed.
 
 **What happens:**
+
 1. **BCBA develops an individualized treatment plan** based on assessment results
 2. Treatment plan must include:
    - **Target behaviors** with clear definitions, baseline levels, and measurable criteria
@@ -136,6 +141,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Treatment plan is complete. This is the second authorization request (the first was for assessment).
 
 **What happens:**
+
 1. **Practice submits treatment authorization request** including:
    - Completed treatment plan
    - Assessment report with standardized tool scores
@@ -162,6 +168,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Timeline:** 2-6 weeks from submission to approval, depending on payer and completeness of submission. Incomplete submissions are the #1 cause of delays.
 
 **Common submission errors that cause delays:**
+
 - Missing or expired diagnosis
 - Treatment plan goals not measurable
 - Hours not clinically justified
@@ -178,6 +185,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Payer approves (fully or partially) the treatment authorization.
 
 **What happens:**
+
 1. Practice receives authorization details:
    - **Authorization number** (critical -- must appear on every claim)
    - **Effective dates** (start and end)
@@ -197,6 +205,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
    - Scheduling can now begin within the authorized parameters
 
 **Key business rules:**
+
 - Sessions cannot be scheduled before the auth start date
 - Sessions cannot be scheduled after the auth end date
 - Sessions cannot exceed approved units per CPT code
@@ -212,6 +221,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Authorization is active and sessions are being delivered.
 
 **What happens:**
+
 1. **RBTs deliver direct treatment** (97153) according to the schedule
 2. **BCBAs provide supervision** (97155) and protocol modification
 3. **Parent/caregiver training** (97156/97157) is delivered
@@ -249,6 +259,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** 60-90 days before current authorization expires (or 75% of units consumed, whichever comes first).
 
 **What happens:**
+
 1. **BCBA re-administers standardized assessments** (VB-MAPP, ABLLS, etc.)
 2. **BCBA prepares progress report** including:
    - Client demographics and diagnosis
@@ -281,6 +292,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Progress report and updated treatment plan are complete.
 
 **What happens:**
+
 1. **Submission timing is critical:**
    - Submit 30-60 days before current auth expires (payer-dependent)
    - Humana Military allows submissions up to 60 days in advance
@@ -316,6 +328,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Current authorization expires before re-authorization is approved.
 
 **What happens (the worst-case scenario):**
+
 1. **Services delivered after expiration are typically not reimbursed** until renewed
 2. **Practice must decide:** Continue services at financial risk, or pause services
 3. **If services pause:**
@@ -330,6 +343,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
    - Practice may use "provisional codes" and flag claims as pending retro approval
 
 **Gap management protocol:**
+
 1. Immediately notify the family and the payer, documenting all communication
 2. Log every administrative action to create a clear audit trail for appeals
 3. Prepare tailored care plans for the gap period (RBT guidance, parent strategies)
@@ -346,6 +360,7 @@ The ABA authorization lifecycle is a continuous, repeating cycle with 10 distinc
 **Trigger:** Clinical circumstances change during an active authorization period.
 
 **Types of modifications:**
+
 1. **Unit increase:** More hours needed (e.g., behavioral crisis, new target behaviors)
    - Requires clinical justification and updated treatment plan
    - Some payers allow mid-auth modification requests via portal
@@ -395,66 +410,66 @@ Authorization is not a standalone feature -- it is the **central nervous system*
 
 ### 2.1 Authorization --> Scheduling
 
-| Connection Point | How It Works | What Goes Wrong Without It |
-|-----------------|-------------|---------------------------|
-| **Available units** | Scheduler checks remaining auth units before booking | Sessions booked without auth = unbillable work |
-| **Date range** | Sessions can only be scheduled within auth effective dates | Sessions outside auth dates = denied claims |
-| **Provider matching** | Only providers listed on the auth can be scheduled | Wrong provider = denied claim |
-| **Location restrictions** | Auth may specify home, clinic, school, or telehealth | Wrong location = denied claim |
-| **CPT code limits** | Each code has its own unit allocation | Scheduling 97155 when only 97153 is authorized = denied |
-| **Pacing** | Weekly session count should match auth utilization targets | Over-scheduling one week, under-scheduling another = poor pacing |
-| **Cancellation impact** | Every cancellation reduces utilization rate | Untracked cancellations lead to under-utilization penalties |
+| Connection Point          | How It Works                                               | What Goes Wrong Without It                                       |
+| ------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Available units**       | Scheduler checks remaining auth units before booking       | Sessions booked without auth = unbillable work                   |
+| **Date range**            | Sessions can only be scheduled within auth effective dates | Sessions outside auth dates = denied claims                      |
+| **Provider matching**     | Only providers listed on the auth can be scheduled         | Wrong provider = denied claim                                    |
+| **Location restrictions** | Auth may specify home, clinic, school, or telehealth       | Wrong location = denied claim                                    |
+| **CPT code limits**       | Each code has its own unit allocation                      | Scheduling 97155 when only 97153 is authorized = denied          |
+| **Pacing**                | Weekly session count should match auth utilization targets | Over-scheduling one week, under-scheduling another = poor pacing |
+| **Cancellation impact**   | Every cancellation reduces utilization rate                | Untracked cancellations lead to under-utilization penalties      |
 
 **Real workflow:** When scheduling, the system should show: "Client has 480 units of 97153 remaining (of 960 authorized). At current pace of 80 units/month, authorization will exhaust on [date]. Next re-auth due [date]."
 
 ### 2.2 Authorization --> Session Logging
 
-| Connection Point | How It Works | What Goes Wrong Without It |
-|-----------------|-------------|---------------------------|
-| **Unit deduction** | Each logged session decrements auth balance | Manual tracking leads to over/under counts |
-| **Real-time visibility** | RBTs need to know remaining units when logging | RBTs log sessions against exhausted auths = write-offs |
-| **Time validation** | Session start/end must fall within auth dates | Post-expiration sessions rejected at billing |
-| **Code validation** | Session CPT code must match authorized code | Wrong code billed = denial |
-| **Provider validation** | Rendering provider must be on the auth | Non-credentialed provider = denial |
-| **8-minute rule** | Units calculated per CMS rules from actual minutes | Wrong unit calculation = underbilling or audit risk |
+| Connection Point         | How It Works                                       | What Goes Wrong Without It                             |
+| ------------------------ | -------------------------------------------------- | ------------------------------------------------------ |
+| **Unit deduction**       | Each logged session decrements auth balance        | Manual tracking leads to over/under counts             |
+| **Real-time visibility** | RBTs need to know remaining units when logging     | RBTs log sessions against exhausted auths = write-offs |
+| **Time validation**      | Session start/end must fall within auth dates      | Post-expiration sessions rejected at billing           |
+| **Code validation**      | Session CPT code must match authorized code        | Wrong code billed = denial                             |
+| **Provider validation**  | Rendering provider must be on the auth             | Non-credentialed provider = denial                     |
+| **8-minute rule**        | Units calculated per CMS rules from actual minutes | Wrong unit calculation = underbilling or audit risk    |
 
 **Real workflow:** When an RBT starts a session, they should see: "This session will use 8 units of 97153. After this session, 472 units remain (49% utilized, on pace for 95% by auth end)."
 
 ### 2.3 Authorization --> Billing/Claims
 
-| Connection Point | How It Works | What Goes Wrong Without It |
-|-----------------|-------------|---------------------------|
-| **Auth number on claims** | Every claim must include the authorization number | Missing auth number = CO 197 denial |
-| **Date range validation** | Claim dates must fall within auth effective dates | Out-of-range dates = denial |
-| **Unit validation** | Billed units cannot exceed authorized units | Over-billed units = denial + audit risk |
-| **CPT code matching** | Billed code must match authorized code exactly | Code mismatch = denial |
-| **Provider matching** | Rendering provider on claim must be on the auth | Provider mismatch = CO 15 denial |
-| **Claim scrubbing** | Pre-submission validation catches auth issues | Unvalidated claims = 20-30% denial rate |
+| Connection Point          | How It Works                                      | What Goes Wrong Without It              |
+| ------------------------- | ------------------------------------------------- | --------------------------------------- |
+| **Auth number on claims** | Every claim must include the authorization number | Missing auth number = CO 197 denial     |
+| **Date range validation** | Claim dates must fall within auth effective dates | Out-of-range dates = denial             |
+| **Unit validation**       | Billed units cannot exceed authorized units       | Over-billed units = denial + audit risk |
+| **CPT code matching**     | Billed code must match authorized code exactly    | Code mismatch = denial                  |
+| **Provider matching**     | Rendering provider on claim must be on the auth   | Provider mismatch = CO 15 denial        |
+| **Claim scrubbing**       | Pre-submission validation catches auth issues     | Unvalidated claims = 20-30% denial rate |
 
 **Real workflow:** At claim generation, the system should auto-populate: auth number, validate date range, confirm units do not exceed remaining auth balance, verify provider credentials, and flag any discrepancies before submission.
 
 ### 2.4 Authorization --> Client Management
 
-| Connection Point | How It Works |
-|-----------------|-------------|
-| **Client status** | Auth status drives client status (Active, Pending Auth, Auth Expired, Discharged) |
-| **Intake workflow** | New client cannot begin services until auth is approved |
-| **Insurance changes** | New insurance = new auth process from scratch |
-| **Client dashboard** | Auth utilization is a primary KPI on the client profile |
-| **Family communication** | Auth status changes trigger family notifications |
+| Connection Point         | How It Works                                                                      |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| **Client status**        | Auth status drives client status (Active, Pending Auth, Auth Expired, Discharged) |
+| **Intake workflow**      | New client cannot begin services until auth is approved                           |
+| **Insurance changes**    | New insurance = new auth process from scratch                                     |
+| **Client dashboard**     | Auth utilization is a primary KPI on the client profile                           |
+| **Family communication** | Auth status changes trigger family notifications                                  |
 
 ### 2.5 Authorization --> Reporting
 
-| Report | What It Shows | Who Needs It |
-|--------|-------------|-------------|
-| **Auth utilization by client** | Used vs. approved units, pacing, projected exhaustion | BCBA, Admin |
-| **Expiring authorizations** | Auths expiring in 30/60/90 days | Admin, Billing |
-| **Under-utilized authorizations** | Clients below target utilization | BCBA, Practice Owner |
-| **Over-utilized authorizations** | Clients approaching or exceeding limits | Billing, Admin |
-| **Auth gap report** | Clients with lapsed or pending auths | Admin, Practice Owner |
-| **Denial analysis** | Auth-related denials by reason code | Billing, Practice Owner |
-| **Revenue at risk** | Dollar value of sessions at risk due to auth issues | Practice Owner |
-| **Payer performance** | Auth turnaround times, approval rates by payer | Practice Owner |
+| Report                            | What It Shows                                         | Who Needs It            |
+| --------------------------------- | ----------------------------------------------------- | ----------------------- |
+| **Auth utilization by client**    | Used vs. approved units, pacing, projected exhaustion | BCBA, Admin             |
+| **Expiring authorizations**       | Auths expiring in 30/60/90 days                       | Admin, Billing          |
+| **Under-utilized authorizations** | Clients below target utilization                      | BCBA, Practice Owner    |
+| **Over-utilized authorizations**  | Clients approaching or exceeding limits               | Billing, Admin          |
+| **Auth gap report**               | Clients with lapsed or pending auths                  | Admin, Practice Owner   |
+| **Denial analysis**               | Auth-related denials by reason code                   | Billing, Practice Owner |
+| **Revenue at risk**               | Dollar value of sessions at risk due to auth issues   | Practice Owner          |
+| **Payer performance**             | Auth turnaround times, approval rates by payer        | Practice Owner          |
 
 ---
 
@@ -462,16 +477,16 @@ Authorization is not a standalone feature -- it is the **central nervous system*
 
 ### 3.1 Where Practices Lose Money
 
-| Pain Point | Revenue Impact | Frequency |
-|-----------|---------------|-----------|
-| **Expired authorizations** | Sessions delivered post-expiration are write-offs | Most common -- "sneakiest revenue killer" |
-| **Over-utilized authorizations** | Sessions beyond approved units are unrecoverable | High in practices without real-time tracking |
-| **Under-utilized authorizations** | Lost revenue opportunity + future auth reductions | Pervasive -- compounds over time |
-| **Authorization gaps** | Pause in services = lost billable hours | Common during re-auth transitions |
-| **Denied claims (auth-related)** | Rework cost + delayed payment + possible write-off | 20-30% of claims in poorly managed practices |
-| **Reduced re-authorizations** | Payers cut hours based on under-utilization | Systemic -- affects practices for years |
-| **Billing without auth number** | CO 197 denial, cannot be resubmitted easily | Preventable but common with manual processes |
-| **Wrong provider on claim** | Denial if rendering provider not on auth | Common with staff turnover |
+| Pain Point                        | Revenue Impact                                     | Frequency                                    |
+| --------------------------------- | -------------------------------------------------- | -------------------------------------------- |
+| **Expired authorizations**        | Sessions delivered post-expiration are write-offs  | Most common -- "sneakiest revenue killer"    |
+| **Over-utilized authorizations**  | Sessions beyond approved units are unrecoverable   | High in practices without real-time tracking |
+| **Under-utilized authorizations** | Lost revenue opportunity + future auth reductions  | Pervasive -- compounds over time             |
+| **Authorization gaps**            | Pause in services = lost billable hours            | Common during re-auth transitions            |
+| **Denied claims (auth-related)**  | Rework cost + delayed payment + possible write-off | 20-30% of claims in poorly managed practices |
+| **Reduced re-authorizations**     | Payers cut hours based on under-utilization        | Systemic -- affects practices for years      |
+| **Billing without auth number**   | CO 197 denial, cannot be resubmitted easily        | Preventable but common with manual processes |
+| **Wrong provider on claim**       | Denial if rendering provider not on auth           | Common with staff turnover                   |
 
 ### 3.2 The Under-Utilization Death Spiral
 
@@ -489,15 +504,15 @@ This is the most insidious auth-related revenue problem in ABA:
 
 ### 3.3 BCBA Administrative Burden
 
-| Task | Time Per Instance | Frequency | Annual Burden (15 clients) |
-|------|------------------|-----------|---------------------------|
-| Initial auth request | 30-60 min | Once per client | 7.5-15 hours |
-| Treatment plan development | 4-8 hours | Every 6 months | 120-240 hours |
-| Progress report for re-auth | 20-30 min per form + 2-4 hours for report | Every 6 months | 60-120 hours |
-| Re-auth submission | 30-60 min | Every 6 months | 15-30 hours |
-| Auth modification requests | 15-30 min | As needed (2-3/year) | 5-10 hours |
-| Appeals for denials/reductions | 1-3 hours | As needed | 5-15 hours |
-| **Total admin burden** | | | **~210-430 hours/year** |
+| Task                           | Time Per Instance                         | Frequency            | Annual Burden (15 clients) |
+| ------------------------------ | ----------------------------------------- | -------------------- | -------------------------- |
+| Initial auth request           | 30-60 min                                 | Once per client      | 7.5-15 hours               |
+| Treatment plan development     | 4-8 hours                                 | Every 6 months       | 120-240 hours              |
+| Progress report for re-auth    | 20-30 min per form + 2-4 hours for report | Every 6 months       | 60-120 hours               |
+| Re-auth submission             | 30-60 min                                 | Every 6 months       | 15-30 hours                |
+| Auth modification requests     | 15-30 min                                 | As needed (2-3/year) | 5-10 hours                 |
+| Appeals for denials/reductions | 1-3 hours                                 | As needed            | 5-15 hours                 |
+| **Total admin burden**         |                                           |                      | **~210-430 hours/year**    |
 
 BCBAs billing at $80-120/hour for clinical services are spending 25-50% of their potential billable time on authorization paperwork. At $100/hour, the opportunity cost is $21,000-$43,000 per BCBA per year.
 
@@ -512,14 +527,14 @@ BCBAs billing at $80-120/hour for clinical services are spending 25-50% of their
 
 ### 3.5 Authorization-Specific Denial Codes
 
-| Denial Code | Meaning | Root Cause | Prevention |
-|-------------|---------|------------|------------|
-| CO 197 | Pre-certification/authorization absent | Auth not requested or expired | Real-time auth expiration tracking |
-| CO 15 | Invalid authorization number | Auth number wrong on claim | Auto-populate from auth record |
-| N/A | Units exceed authorized | Billed more than approved | Real-time unit balance tracking |
-| N/A | Service outside authorized date range | Session date outside auth period | Schedule validation against auth dates |
-| N/A | Provider not listed on authorization | Wrong rendering provider | Provider-auth matching in scheduling |
-| N/A | CPT code mismatch | Wrong code billed | Code validation at session logging |
+| Denial Code | Meaning                                | Root Cause                       | Prevention                             |
+| ----------- | -------------------------------------- | -------------------------------- | -------------------------------------- |
+| CO 197      | Pre-certification/authorization absent | Auth not requested or expired    | Real-time auth expiration tracking     |
+| CO 15       | Invalid authorization number           | Auth number wrong on claim       | Auto-populate from auth record         |
+| N/A         | Units exceed authorized                | Billed more than approved        | Real-time unit balance tracking        |
+| N/A         | Service outside authorized date range  | Session date outside auth period | Schedule validation against auth dates |
+| N/A         | Provider not listed on authorization   | Wrong rendering provider         | Provider-auth matching in scheduling   |
+| N/A         | CPT code mismatch                      | Wrong code billed                | Code validation at session logging     |
 
 ---
 
@@ -530,11 +545,13 @@ BCBAs billing at $80-120/hour for clinical services are spending 25-50% of their
 Nearly all payers use a **two-stage authorization** process, but the specifics differ significantly:
 
 **Stage 1: Assessment Authorization**
+
 - Purpose: Authorize the BCBA to conduct the initial evaluation (97151)
 - Typical units: 8-32 units (2-8 hours)
 - Some payers/states exempt assessment from prior auth entirely
 
 **Stage 2: Treatment Authorization**
+
 - Purpose: Authorize ongoing ABA treatment based on the assessment and treatment plan
 - Typical duration: 3-6 months
 - Typical units: Varies enormously by payer, diagnosis severity, and age
@@ -543,17 +560,18 @@ Nearly all payers use a **two-stage authorization** process, but the specifics d
 
 #### Medicaid (State-by-State Variation)
 
-| Aspect | Typical Medicaid | Notes |
-|--------|-----------------|-------|
-| Auth period | 90-180 days | Some states require quarterly re-auth for intensive cases |
-| Report frequency | Every 90 days (some states) to 6 months | Medicaid EPSDT follows state timelines |
-| Assessment auth | Often exempt from prior auth | Varies by state |
-| Treatment auth max | 180 days in many states (e.g., Louisiana) | State-specific caps |
-| Unit limits | State-dependent, often generous | EPSDT mandate requires medically necessary coverage |
+| Aspect              | Typical Medicaid                               | Notes                                                                |
+| ------------------- | ---------------------------------------------- | -------------------------------------------------------------------- |
+| Auth period         | 90-180 days                                    | Some states require quarterly re-auth for intensive cases            |
+| Report frequency    | Every 90 days (some states) to 6 months        | Medicaid EPSDT follows state timelines                               |
+| Assessment auth     | Often exempt from prior auth                   | Varies by state                                                      |
+| Treatment auth max  | 180 days in many states (e.g., Louisiana)      | State-specific caps                                                  |
+| Unit limits         | State-dependent, often generous                | EPSDT mandate requires medically necessary coverage                  |
 | Unique requirements | State-specific forms, per-code unit breakdowns | Virginia now requires exact units per CPT code (no bundled requests) |
-| Audit risk | **Very high** -- OIG focus area | 100% of sampled claims in Indiana contained errors |
+| Audit risk          | **Very high** -- OIG focus area                | 100% of sampled claims in Indiana contained errors                   |
 
 **Key state differences:**
+
 - **Virginia:** Service auth requests must specify exact units per CPT code. Assessment codes (97151, 97152, 0362T) do NOT require service authorization.
 - **Louisiana:** Two-stage auth required. Treatment auths cannot exceed 180 days.
 - **Texas:** Requires co-morbid details in auth requests.
@@ -562,44 +580,44 @@ Nearly all payers use a **two-stage authorization** process, but the specifics d
 
 #### Blue Cross Blue Shield (Varies by State)
 
-| Aspect | BCBS Typical | Notes |
-|--------|-------------|-------|
-| Auth period | 6 months | Plan-specific variation |
-| Submission deadline | 2-4 weeks before expiration (Horizon BCBS) | Strict deadline enforcement |
-| Report requirements | Thorough documentation including graphs for most goals | Horizon BCBS specifically requires visual data |
-| Clinical criteria | Published Supplemental Clinical Criteria documents | Updated regularly (Jan 2026 version available) |
-| Special requirements | Clinical Service Request Form (BCBS TX uses a specific 5-page form) | Payer-specific forms |
+| Aspect               | BCBS Typical                                                        | Notes                                          |
+| -------------------- | ------------------------------------------------------------------- | ---------------------------------------------- |
+| Auth period          | 6 months                                                            | Plan-specific variation                        |
+| Submission deadline  | 2-4 weeks before expiration (Horizon BCBS)                          | Strict deadline enforcement                    |
+| Report requirements  | Thorough documentation including graphs for most goals              | Horizon BCBS specifically requires visual data |
+| Clinical criteria    | Published Supplemental Clinical Criteria documents                  | Updated regularly (Jan 2026 version available) |
+| Special requirements | Clinical Service Request Form (BCBS TX uses a specific 5-page form) | Payer-specific forms                           |
 
 #### Aetna
 
-| Aspect | Aetna | Notes |
-|--------|-------|-------|
-| Auth period | 6-12 months | Longer periods than most |
-| Re-auth requirements | Clear signs of progress, real-life improvements, justification for continued sessions | Emphasizes functional outcomes |
-| Assessment tool requirement | Validated reassessment every 6-12 months | Must demonstrate response to intervention |
-| Documentation standard | Medical necessity guide published (publicly available PDF) | Specific form requirements |
-| Submission method | Outpatient Behavioral Health ABA Treatment Request form | Precertification process |
+| Aspect                      | Aetna                                                                                 | Notes                                     |
+| --------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Auth period                 | 6-12 months                                                                           | Longer periods than most                  |
+| Re-auth requirements        | Clear signs of progress, real-life improvements, justification for continued sessions | Emphasizes functional outcomes            |
+| Assessment tool requirement | Validated reassessment every 6-12 months                                              | Must demonstrate response to intervention |
+| Documentation standard      | Medical necessity guide published (publicly available PDF)                            | Specific form requirements                |
+| Submission method           | Outpatient Behavioral Health ABA Treatment Request form                               | Precertification process                  |
 
 #### UnitedHealthcare / Optum
 
-| Aspect | UHC/Optum | Notes |
-|--------|-----------|-------|
-| Auth management | Via Optum behavioral health | Separate portal from medical |
-| Data requirements | Solid metrics required -- percentage-based skill gains, quantified behavior drops | Rejects vague descriptions |
-| Supervision cap | Many plans cap 97155 at 20% of 97153 units | Critical to track |
-| Re-auth standards | Published reimbursement policies with specific frequency and unit rules | Different from other BCBS-type payers |
+| Aspect            | UHC/Optum                                                                         | Notes                                 |
+| ----------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
+| Auth management   | Via Optum behavioral health                                                       | Separate portal from medical          |
+| Data requirements | Solid metrics required -- percentage-based skill gains, quantified behavior drops | Rejects vague descriptions            |
+| Supervision cap   | Many plans cap 97155 at 20% of 97153 units                                        | Critical to track                     |
+| Re-auth standards | Published reimbursement policies with specific frequency and unit rules           | Different from other BCBS-type payers |
 
 #### TRICARE / Humana Military
 
-| Aspect | TRICARE | Notes |
-|--------|---------|-------|
-| Initial requirements | Referral from PCM/ASD-diagnosing provider, DSM-5 diagnosis | Military-specific referral pathway |
-| Assessment auth | Authorized upon receipt of all necessary documents | Relatively streamlined |
-| Treatment auth | 6-month periods | Standard |
-| Re-auth deadline | Submit up to 60 days in advance | Less than 30 days = risk of non-reimbursement |
-| Required tools | PSI (short form), SIPA, PDDBI (parent and teacher form) | Specific assessment tools required |
-| Supervision requirement | Authorized ABA supervisor or ACSP must request re-auth | Specific provider requirement |
-| Parent training | Minimum 6 sessions per 6-month period | Tracked separately |
+| Aspect                  | TRICARE                                                    | Notes                                         |
+| ----------------------- | ---------------------------------------------------------- | --------------------------------------------- |
+| Initial requirements    | Referral from PCM/ASD-diagnosing provider, DSM-5 diagnosis | Military-specific referral pathway            |
+| Assessment auth         | Authorized upon receipt of all necessary documents         | Relatively streamlined                        |
+| Treatment auth          | 6-month periods                                            | Standard                                      |
+| Re-auth deadline        | Submit up to 60 days in advance                            | Less than 30 days = risk of non-reimbursement |
+| Required tools          | PSI (short form), SIPA, PDDBI (parent and teacher form)    | Specific assessment tools required            |
+| Supervision requirement | Authorized ABA supervisor or ACSP must request re-auth     | Specific provider requirement                 |
+| Parent training         | Minimum 6 sessions per 6-month period                      | Tracked separately                            |
 
 ### 4.3 Coordination of Benefits (Dual Coverage)
 
@@ -631,14 +649,14 @@ When a practice is out-of-network with a payer:
 
 Based on research across industry sources, the top reasons ABA practices evaluate new software:
 
-| Priority | Reason | Authorization Connection |
-|---------|--------|------------------------|
-| 1 | **Billing/revenue cycle issues** | Auth errors are #1 cause of preventable denials |
-| 2 | **Operational fragmentation** | Auth data living in spreadsheets, separate from scheduling and billing |
-| 3 | **Authorization management failures** | Missed renewals, expired auths, unbillable sessions |
-| 4 | **Cost of current platform** | CentralReach add-on pricing; enterprise pricing for small practices |
-| 5 | **Poor user experience** | Complex UIs that require extensive training |
-| 6 | **Data collection limitations** | Clinical data not connected to auth/billing data |
+| Priority | Reason                                | Authorization Connection                                               |
+| -------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| 1        | **Billing/revenue cycle issues**      | Auth errors are #1 cause of preventable denials                        |
+| 2        | **Operational fragmentation**         | Auth data living in spreadsheets, separate from scheduling and billing |
+| 3        | **Authorization management failures** | Missed renewals, expired auths, unbillable sessions                    |
+| 4        | **Cost of current platform**          | CentralReach add-on pricing; enterprise pricing for small practices    |
+| 5        | **Poor user experience**              | Complex UIs that require extensive training                            |
+| 6        | **Data collection limitations**       | Clinical data not connected to auth/billing data                       |
 
 **Key finding:** Authorization management is not just a feature -- it is the **root cause** of billing problems, scheduling errors, and revenue leakage. Practices that fix authorization management fix a cascade of downstream problems.
 
@@ -653,13 +671,13 @@ From user reviews and industry analysis:
 
 ### 5.3 Competitor Weaknesses in Authorization
 
-| Competitor | Authorization Weakness | Clinivise Opportunity |
-|-----------|----------------------|----------------------|
-| **CentralReach** | Auth lives in Billing module, not client profile. Expensive add-ons. Complex UI. | Auth as first-class entity on client profile. Inclusive pricing. |
-| **AlohaABA** | Clean UI but authorization tracking is basic. Limited automation. | Deep auth intelligence with AI automation. |
-| **Rethink/RethinkBH** | Good tracking but multi-disciplinary focus dilutes ABA-specific depth. | ABA-specific auth rules engine. |
-| **Theralytics** | Basic auth tracking. No AI features. | AI-powered auth lifecycle management. |
-| **Spreadsheet users** | Manual tracking, error-prone, no integration with scheduling/billing. | Integrated platform that replaces spreadsheets entirely. |
+| Competitor            | Authorization Weakness                                                           | Clinivise Opportunity                                            |
+| --------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **CentralReach**      | Auth lives in Billing module, not client profile. Expensive add-ons. Complex UI. | Auth as first-class entity on client profile. Inclusive pricing. |
+| **AlohaABA**          | Clean UI but authorization tracking is basic. Limited automation.                | Deep auth intelligence with AI automation.                       |
+| **Rethink/RethinkBH** | Good tracking but multi-disciplinary focus dilutes ABA-specific depth.           | ABA-specific auth rules engine.                                  |
+| **Theralytics**       | Basic auth tracking. No AI features.                                             | AI-powered auth lifecycle management.                            |
+| **Spreadsheet users** | Manual tracking, error-prone, no integration with scheduling/billing.            | Integrated platform that replaces spreadsheets entirely.         |
 
 ### 5.4 The Free PM + Authorization Hook
 
@@ -671,6 +689,7 @@ Clinivise's business model (free PM, monetized via billing %) creates a unique a
 4. **Lock-in:** Auth intelligence improves over time (AI learns payer patterns, auto-generates reports, predicts outcomes)
 
 Authorization is the ideal adoption wedge because:
+
 - It is the highest-pain function in ABA practice management
 - It connects to every other function (scheduling, billing, client management, reporting)
 - It accumulates institutional knowledge over time (payer patterns, utilization history)
@@ -778,28 +797,28 @@ reauthorization_task:
 
 ### 7.1 Role-Based Responsibilities
 
-| Phase | Intake Coordinator | BCBA | Billing Specialist | Practice Owner/Admin |
-|-------|-------------------|------|-------------------|---------------------|
-| Referral/Verification | **Primary:** Collect docs, verify insurance | Review referral | Confirm benefits | Monitor pipeline |
-| Assessment Auth | Submit request | Review if needed | Track submission | -- |
-| Assessment | Schedule BCBA | **Primary:** Conduct assessment | -- | -- |
-| Treatment Plan | -- | **Primary:** Write treatment plan | -- | Review if needed |
-| Treatment Auth | Submit documents | **Primary:** Clinical content, LMN | Track submission, follow up | -- |
-| Auth Approval/Setup | Enter auth details into system | Verify accuracy | Map to billing rules | -- |
-| Active Treatment | Schedule sessions within auth | Supervise, log 97155 | Monitor utilization | Review dashboards |
-| Re-Auth Prep | Schedule re-assessment | **Primary:** Re-assess, write report | Track timeline | Review utilization |
-| Re-Auth Submission | Submit package | Review before submission | **Primary:** Track and follow up | Monitor gaps |
-| Gap Management | Notify families | Develop gap care plans | Hold/flag claims | Decision: continue or pause |
-| Modifications | Submit modification requests | Clinical justification | Track status | Approve financial decisions |
+| Phase                 | Intake Coordinator                          | BCBA                                 | Billing Specialist               | Practice Owner/Admin        |
+| --------------------- | ------------------------------------------- | ------------------------------------ | -------------------------------- | --------------------------- |
+| Referral/Verification | **Primary:** Collect docs, verify insurance | Review referral                      | Confirm benefits                 | Monitor pipeline            |
+| Assessment Auth       | Submit request                              | Review if needed                     | Track submission                 | --                          |
+| Assessment            | Schedule BCBA                               | **Primary:** Conduct assessment      | --                               | --                          |
+| Treatment Plan        | --                                          | **Primary:** Write treatment plan    | --                               | Review if needed            |
+| Treatment Auth        | Submit documents                            | **Primary:** Clinical content, LMN   | Track submission, follow up      | --                          |
+| Auth Approval/Setup   | Enter auth details into system              | Verify accuracy                      | Map to billing rules             | --                          |
+| Active Treatment      | Schedule sessions within auth               | Supervise, log 97155                 | Monitor utilization              | Review dashboards           |
+| Re-Auth Prep          | Schedule re-assessment                      | **Primary:** Re-assess, write report | Track timeline                   | Review utilization          |
+| Re-Auth Submission    | Submit package                              | Review before submission             | **Primary:** Track and follow up | Monitor gaps                |
+| Gap Management        | Notify families                             | Develop gap care plans               | Hold/flag claims                 | Decision: continue or pause |
+| Modifications         | Submit modification requests                | Clinical justification               | Track status                     | Approve financial decisions |
 
 ### 7.2 Permission Requirements in Clinivise
 
-| Role | Auth Permissions |
-|------|-----------------|
-| **Admin** | Full CRUD on all auths. Override auth limits. View all reports. |
-| **BCBA** | View/edit auths for assigned clients. Cannot override limits. Create re-auth tasks. |
-| **RBT** | View-only auth status for assigned clients (remaining units, expiration date). Cannot edit. |
-| **Billing** | View/edit auth numbers, dates, units. Track submissions. Cannot modify clinical content. |
+| Role        | Auth Permissions                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| **Admin**   | Full CRUD on all auths. Override auth limits. View all reports.                             |
+| **BCBA**    | View/edit auths for assigned clients. Cannot override limits. Create re-auth tasks.         |
+| **RBT**     | View-only auth status for assigned clients (remaining units, expiration date). Cannot edit. |
+| **Billing** | View/edit auth numbers, dates, units. Track submissions. Cannot modify clinical content.    |
 
 ---
 
@@ -847,20 +866,21 @@ Differentiation features:
 
 ### 8.4 Key Metrics to Track
 
-| Metric | Target | Why It Matters |
-|--------|--------|---------------|
-| Auth utilization rate | 85-100% | Revenue maximization, prevents future reductions |
-| Auth gap days | 0 | Every gap day = lost revenue |
-| Re-auth submission lead time | 60+ days | Prevents gaps |
-| Auth-related denial rate | <5% | Industry average is 20-30% without proper management |
-| BCBA admin time saved | 50%+ reduction | Direct ROI measurement for practices |
-| Time to first session | <21 days from referral | Competitive advantage for client acquisition |
+| Metric                       | Target                 | Why It Matters                                       |
+| ---------------------------- | ---------------------- | ---------------------------------------------------- |
+| Auth utilization rate        | 85-100%                | Revenue maximization, prevents future reductions     |
+| Auth gap days                | 0                      | Every gap day = lost revenue                         |
+| Re-auth submission lead time | 60+ days               | Prevents gaps                                        |
+| Auth-related denial rate     | <5%                    | Industry average is 20-30% without proper management |
+| BCBA admin time saved        | 50%+ reduction         | Direct ROI measurement for practices                 |
+| Time to first session        | <21 days from referral | Competitive advantage for client acquisition         |
 
 ---
 
 ## Sources
 
 ### Authorization Lifecycle & Process
+
 - [ABA Authorization Process - Humana Military](https://www.humanamilitary.com/content/humana-military-com/us/en/provider/managedcare/acoe/authorizationprocess.html)
 - [3 Phases of Insurance Authorization - Cultivate BHE](https://cultivatebhe.com/3-phases-of-the-insurance-authorization-process/)
 - [ABA Authorization Management - Motivity](https://www.motivity.net/blog/aba-authorization-management)
@@ -869,6 +889,7 @@ Differentiation features:
 - [Strengthening ABA Practices - S Cubed](https://scubed.io/blog/strengthening-aba-practices-with-effective-authorization-management-strategies)
 
 ### Assessment & CPT Codes
+
 - [CPT Code 97151 Guide - Brellium](https://brellium.com/resources/articles/how-to-cpt-code-97151-for-aba-therapy)
 - [CPT Code 97151 Guide 2026 - MedCloudMD](https://www.medcloudmd.com/post/cpt-code-97151-guide-2026)
 - [CPT Code 97153 Guide 2026 - MedCloudMD](https://www.medcloudmd.com/post/cpt-code-97153-aba-billing-2026)
@@ -877,18 +898,21 @@ Differentiation features:
 - [Billing Codes - ABA Coding Coalition](https://abacodes.org/codes/)
 
 ### Re-Authorization & Progress Reports
+
 - [ABA Progress Reports for Reauthorization - Praxis Notes](https://www.praxisnotes.com/resources/guide-aba-progress-reports-reauthorization)
 - [ABA Billing Playbook 2025-2026 - Cube Therapy Billing](https://www.cubetherapybilling.com/aba-billing-playbook)
 - [ABA Prior Authorization Checklist - MBW RCM](https://www.mbwrcm.com/the-revenue-cycle-blog/aba-prior-authorization-checklist)
 - [BCBA Initial Authorization Checklist - Praxis Notes](https://www.praxisnotes.com/resources/bcba-prior-authorization-checklist)
 
 ### Authorization Gaps & Management
+
 - [BCBA Authorization Gap Guide - Praxis Notes](https://www.praxisnotes.com/resources/bcba-authorization-gap-guide)
 - [ABA Authorization Management - ABA Matrix](https://www.abamatrix.com/aba-authorization-management/)
 - [Prior Authorization Delays - AnnexMed](https://annexmed.com/aba-prior-authorization-delays-revenue-stability)
 - [Enhance ABA Practices - CentralReach](https://centralreach.com/blog/enhance-aba-practices-with-proactive-authorization-management/)
 
 ### Payer-Specific Requirements
+
 - [BCBS ABA Supplemental Clinical Criteria (Jan 2026)](https://www.bcbsm.com/amslibs/content/dam/public/important-information/documents/bh-aba-supplemental-clinical-criteria-jan-2026.pdf)
 - [Aetna ABA Medical Necessity Guide](https://www.aetna.com/content/dam/aetna/pdfs/health-care-professionals/applied-behavioral-analysis.pdf)
 - [Aetna Outpatient BH ABA Treatment Request](https://www.aetna.com/document-library/pharmacy-insurance/healthcare-professional/documents/outpatient-behavioral-health-BH-ABA-assessment-precert.pdf)
@@ -897,6 +921,7 @@ Differentiation features:
 - [Carelon ABA Treatment Report Guidelines](https://www.carelonbehavioralhealth.com/content/dam/digital/carelon/cbh-assets/documents/global/clinical/aba-treatment-report-guidelines.pdf)
 
 ### Billing, Denials & Revenue
+
 - [Prior Authorization Management for ABA - Cube Therapy Billing](https://www.cubetherapybilling.com/what-is-a-priorauthorization)
 - [Common Billing Errors - ABA Building Blocks](https://ababuildingblocks.com/common-billing-errors-and-how-to-avoid-them/)
 - [ABA Billing Documentation Guide - TherapyPM](https://therapypms.com/aba-billing-documentation-clean-aba-claims/)
@@ -905,12 +930,14 @@ Differentiation features:
 - [Mitigate Risks of Over-Utilized Authorization - CentralReach](https://centralreach.com/blog/mitigating-risks-associated-with-over-utilized-authorizations-in-aba-practices/)
 
 ### Scheduling & Utilization
+
 - [Improving Scheduling & Authorizations - Your Missing Piece](https://yourmissingpiece.com/resources/optimizing-authorizations-and-scheduling/)
 - [Scheduling Strategies for ABA - Motivity](https://www.motivity.net/blog/scheduling-strategies-for-aba-practices)
 - [Streamlining ABA Therapy Scheduling - S Cubed](https://scubed.io/blog/aba-therapy-scheduling-billing-software-authorizations)
 - [Scheduling Tips to Maximize Utilization - ABA Building Blocks](https://ababuildingblocks.com/scheduling-tips-to-maximize-utilization/)
 
 ### Software & Adoption
+
 - [Best ABA Practice Management Software 2026 - Passage Health](https://www.passagehealth.com/blog/best-aba-practice-management-software)
 - [ABA Practice Management Guide - Motivity](https://www.motivity.net/blog/best-aba-practice-management-software)
 - [Ultimate 2026 Guide - AlohaABA](https://alohaaba.com/blogs/the-ultimate-guide-to-aba-practice-management-software-streamline-your-therapy-business)
@@ -918,29 +945,34 @@ Differentiation features:
 - [CentralReach Reviews - Capterra](https://www.capterra.com/p/140743/CentralReach/reviews/)
 
 ### AI & Automation
+
 - [AI Strengthens ABA Treatment Plans - Neuromnia](https://www.neuromnia.com/blog-posts/ai-enhanced-aba-treatment-plans-medical-necessity.html)
 - [AI Next-Gen Prior Authorization - McKinsey](https://www.mckinsey.com/industries/healthcare/our-insights/ai-ushers-in-next-gen-prior-authorization-in-healthcare)
 - [Transforming Prior Authorizations with AI - Availity](https://www.availity.com/blog/transforming-prior-authorizations-with-ai-powered-automation/)
 - [ABA Insurance Authorization Forms Guide - Instafill](https://resources.instafill.ai/docs/aba/aba-insurance-authorization-forms-guide)
 
 ### Coordination of Benefits & Dual Coverage
+
 - [How to Bill Secondary Insurance for ABA - BellMedEx](https://bellmedex.com/how-to-bill-secondary-insurance-for-aba-services/)
 - [Coordination of Benefits in ABA - Wayfinder RCM](https://www.wayfinderrcm.com/blog/how-coordination-of-benefits-impacts-billing-for-aba-services)
 - [Coordination of Benefits in ABA - Operant Billing](https://operantbilling.com/coordination-of-benefits-in-aba-therapy-what-is-it-why-its-important/)
 - [Single Case Agreement 101 - Your Missing Piece](https://yourmissingpiece.com/resources/single-case-agreement-101/)
 
 ### KPIs & Metrics
+
 - [4 Key Metrics Every ABA Practice - Raven Health](https://ravenhealth.com/blog/aba-practice-metrics-to-track/)
 - [Top KPIs in ABA Practice Management - Motivity](https://www.motivity.net/blog/aba-practice-management-kpi)
 - [ABA Denial Management - Passage Health](https://www.passagehealth.com/blog/aba-denial-management)
 
 ### Compliance & Audits
+
 - [ABA Documentation Audits - Revenue Cycle Blog](https://revenuecycleblog.com/documentation/aba-documentation-audit-billing-compliance-guide)
 - [Heightened Scrutiny of Medicaid ABA - Benesch Law](https://www.beneschlaw.com/insight/heightened-scrutiny-of-medicaid-funded-aba-services-key-takeaways-for-providers/)
 - [Insurance Denials and Appeals - ABA Therapy](https://www.intellistarsaba.com/blog/how-to-appeal-an-aba-therapy-insurance-denial)
 - [Authorization and Appeals Playbook - Autism Law Summit](https://autismlawsummit.com/media/0rhkfsj5/2022-10-12-autismlawsummit-theplaybook.pdf)
 
 ### Intake & Onboarding
+
 - [ABA Intake Process - Passage Health](https://www.passagehealth.com/blog/aba-intake-process)
 - [ABA Therapy Process: Referral to First Session - TotalCare ABA](https://www.totalcareaba.com/autism/aba-therapy-process-referral-to-first-session)
 - [ABA Intake Management - TherapyLake](https://blog.therapylake.com/aba-intake-management-solutions/)

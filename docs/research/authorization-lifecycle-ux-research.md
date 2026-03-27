@@ -5,6 +5,7 @@
 > Researched: 2026-03-21
 >
 > Companion documents:
+>
 > - [`authorization-tracking-ux-research.md`](authorization-tracking-ux-research.md) — Component-level patterns, alerting, AI features, mobile UX
 > - [`authorization-tracking-competitive-research.md`](authorization-tracking-competitive-research.md) — Competitor deep dives, user complaints, differentiation opportunities
 
@@ -29,22 +30,24 @@
 
 The biggest UX mistake in ABA practice management software (CentralReach, AlohaABA, Motivity) is treating authorization as a module — a page you navigate to, a tab you click, a report you run. This forces clinicians to context-switch away from their work to check authorization status.
 
-The best SaaS tools take a different approach: quota/limit/budget data surfaces *where you are*, not *where it lives*.
+The best SaaS tools take a different approach: quota/limit/budget data surfaces _where you are_, not _where it lives_.
 
 ### 1A. Stripe: Usage Limits as Ambient Context
 
 **How they do it:**
+
 - Stripe's billing credits maintain a running ledger visible at multiple touchpoints — the dashboard summary, the customer detail page, and the invoice preview all show the same credit balance, adapted to each context.
-- Usage-based billing shows real-time consumption on the Meters page, and threshold-based webhooks trigger when customers approach depletion. But the key UX insight is that the *customer portal* itself shows usage data — the customer never needs to ask "how much have I used?"
+- Usage-based billing shows real-time consumption on the Meters page, and threshold-based webhooks trigger when customers approach depletion. But the key UX insight is that the _customer portal_ itself shows usage data — the customer never needs to ask "how much have I used?"
 - Stripe doesn't hide usage on a "Usage" page. It surfaces it on invoices ("usage this period: X"), on the dashboard ("approaching threshold"), and on the customer detail page ("credit balance: Y").
 
 **Pattern for Clinivise:**
 Authorization utilization should appear:
+
 - On the client profile (not hidden in a tab — visible in the header area)
 - On the session logging form (remaining units for the selected auth)
 - On the scheduling calendar (constraint warnings when creating appointments)
 - On the dashboard (aggregated health across all clients)
-- On the authorization detail page (full breakdown — this is the *only* place you go for depth)
+- On the authorization detail page (full breakdown — this is the _only_ place you go for depth)
 
 The authorization detail page is the drill-down destination, not the primary surface.
 
@@ -55,11 +58,13 @@ The authorization detail page is the drill-down destination, not the primary sur
 ### 1B. Linear: Capacity Data Embedded in Every View
 
 **How they do it:**
+
 - Linear's cycle capacity dial appears on the cycles view, showing whether the team is likely to complete all issues. Capacity is calculated from the velocity of the previous three completed cycles.
-- The sidebar (Cmd/Ctrl+I) on *any* cycle view shows distribution of work across the team — total issue count, percentage completion per assignee, scope changes since cycle start.
+- The sidebar (Cmd/Ctrl+I) on _any_ cycle view shows distribution of work across the team — total issue count, percentage completion per assignee, scope changes since cycle start.
 - **Insights are attached to every view across the app** — whatever list of issues you are currently seeing, the insights panel illustrates that specific slice. There is no separate "analytics" page that shows different data.
 
 **Pattern for Clinivise:**
+
 - The authorization "capacity" (remaining units) should be visible wherever authorization-related data appears — not just on the auth detail page.
 - When viewing a client's sessions, show the auth utilization for the relevant period in a sidebar or header.
 - When viewing the scheduling calendar, show remaining units for the selected client/date range.
@@ -72,6 +77,7 @@ The authorization detail page is the drill-down destination, not the primary sur
 ### 1C. Notion: Same Data, Many Views, Global Filters
 
 **How they do it:**
+
 - Notion's linked databases let you show the same source data across multiple locations. Each linked view has its own filters, sorts, and layout — but changes to the underlying data reflect everywhere.
 - The new Dashboard view (March 2026) acts as a container for multiple sub-views with global filters. Pick a project, and every chart/table/board filters to show only that project's data.
 - A master "Tasks" database can appear as: a Kanban board on a team page, a calendar on a planning page, a filtered list on a personal dashboard, and a chart on an executive summary — all from the same data source.
@@ -79,15 +85,15 @@ The authorization detail page is the drill-down destination, not the primary sur
 **Pattern for Clinivise:**
 Authorization data is a single source of truth (the `authorizations` + `authorization_services` tables), but it should appear in multiple contexts:
 
-| Context | View | Filter | Detail Level |
-|---------|------|--------|-------------|
-| Dashboard overview | Aggregated alerts widget | Org-wide, severity-sorted | Alert only (count + CTA) |
-| Client detail page | Auth summary cards | This client's active auths | Utilization bars per service line |
-| Session logging form | Auth picker cards | This client, today's date in range | Remaining units + status badge |
-| Scheduling calendar | Inline constraint indicators | This client, selected date | "12 units remaining" or "Auth expires before session" |
-| Authorization list page | Full data table | Filterable by status, client, payer, date | All columns, sortable |
-| Authorization detail page | Tabbed detail view | Single authorization | Everything: services, sessions, docs, timeline |
-| Sidebar nav | Badge count | Unresolved alerts | Number only |
+| Context                   | View                         | Filter                                    | Detail Level                                          |
+| ------------------------- | ---------------------------- | ----------------------------------------- | ----------------------------------------------------- |
+| Dashboard overview        | Aggregated alerts widget     | Org-wide, severity-sorted                 | Alert only (count + CTA)                              |
+| Client detail page        | Auth summary cards           | This client's active auths                | Utilization bars per service line                     |
+| Session logging form      | Auth picker cards            | This client, today's date in range        | Remaining units + status badge                        |
+| Scheduling calendar       | Inline constraint indicators | This client, selected date                | "12 units remaining" or "Auth expires before session" |
+| Authorization list page   | Full data table              | Filterable by status, client, payer, date | All columns, sortable                                 |
+| Authorization detail page | Tabbed detail view           | Single authorization                      | Everything: services, sessions, docs, timeline        |
+| Sidebar nav               | Badge count                  | Unresolved alerts                         | Number only                                           |
 
 **Sources:** [Notion Linked Databases](https://www.notion.com/help/guides/using-linked-databases), [Notion Dashboard Views (March 2026)](https://www.notion.com/releases/2026-03-10), [Notion Views, Filters, Sorts](https://www.notion.com/help/views-filters-and-sorts)
 
@@ -96,12 +102,14 @@ Authorization data is a single source of truth (the `authorizations` + `authoriz
 ### 1D. Mercury: Budget Constraints Surfaced at Point of Action
 
 **How they do it:**
+
 - Mercury shows card spending limits, category locks, and budget tracking at the point of transaction — not just on a settings page. When a card has a category lock, transactions outside those categories are automatically declined with an explanatory message.
 - Expense management consolidates employee expenses, cards, bills, and incoming transactions in one place for cross-referencing. The dashboard highlights insights (not raw data), using progress bars for budget proximity.
 
 **Pattern for Clinivise:**
 Authorization constraints should be enforced and communicated at the point of action:
-- **Scheduling**: When booking a session that would exceed remaining units or fall outside the auth date range, show an inline warning *before* the user submits — not after a failed claim.
+
+- **Scheduling**: When booking a session that would exceed remaining units or fall outside the auth date range, show an inline warning _before_ the user submits — not after a failed claim.
 - **Session logging**: If logging a session that exceeds remaining units, show a blocking dialog (configurable: warn vs. hard block).
 - **Claims generation (Phase 2)**: Auto-populate auth number on claims. Validate auth validity before submission.
 
@@ -115,6 +123,7 @@ The constraint is the message. Every "you can't do this" moment is also "here's 
 
 **How they do it:**
 IBM's Carbon Design System defines a rigorous taxonomy for status indicators:
+
 - **Icon indicators** ("contextual" indicators) are linked to specific UI elements and placed near those elements.
 - **Severity levels** (high/medium/low attention) determine visual treatment — high-severity prompts immediate action, low-severity allows passive response.
 - **Color palette with semantic meaning**: red = danger/error, orange = serious warning, yellow = regular warning, green = success, blue = informational, gray = draft/not started, purple = outlier/undefined.
@@ -123,6 +132,7 @@ IBM's Carbon Design System defines a rigorous taxonomy for status indicators:
 
 **Pattern for Clinivise:**
 Authorization status indicators should follow the Carbon pattern:
+
 - Use **contextual placement** — the status indicator appears next to the element it describes (next to a client name, next to a date field, next to a unit count).
 - Use **severity-driven styling** — critical alerts (expiring in 7 days, over-utilized) get high-attention treatment (red, icon, text). Informational status (active, healthy utilization) gets low-attention treatment (green dot, small text).
 - Use **conditional display** — don't show a "healthy" badge on every authorization. Only show indicators when they communicate something the user needs to know. Absence of an indicator = everything is fine.
@@ -144,6 +154,7 @@ Hypertext provides a natural implementation: higher-level pages show simplified 
 Based on research across Stripe, Linear, Notion, Carbon, and healthcare PM tools, authorization data in Clinivise should follow a four-tier disclosure model:
 
 **Tier 1: Ambient Indicator (peripheral awareness)**
+
 - **Where**: Sidebar nav badge, dashboard alert count, client list status dot
 - **What**: A number or color that says "something needs attention" without specifying what
 - **Example**: Red badge "3" on the Authorizations nav item. Amber dot next to a client name in the client list.
@@ -151,6 +162,7 @@ Based on research across Stripe, Linear, Notion, Carbon, and healthcare PM tools
 - **Design**: Badge pill (shadcn Badge), dot indicator (4px circle with color), or count chip
 
 **Tier 2: Contextual Summary (working context)**
+
 - **Where**: Session form auth picker, scheduling calendar inline, client detail header
 - **What**: The minimum information needed to make a decision in the current workflow
 - **Example on session form**: Card showing "Blue Cross | 97153 | 12 of 40 units remaining" with an emerald/amber/red border
@@ -160,6 +172,7 @@ Based on research across Stripe, Linear, Notion, Carbon, and healthcare PM tools
 - **Design**: Compact card, inline text with badge, tooltip
 
 **Tier 3: Focused Detail (management context)**
+
 - **Where**: Authorization list page, dashboard widgets
 - **What**: Enough detail to triage and prioritize across multiple authorizations
 - **Example on auth list**: Table row with client name, status badge, utilization percentage + bar, expiry date, payer
@@ -168,6 +181,7 @@ Based on research across Stripe, Linear, Notion, Carbon, and healthcare PM tools
 - **Design**: Data table with column priority hiding, alert widgets with card lists
 
 **Tier 4: Full Detail (deep dive context)**
+
 - **Where**: Authorization detail page (tabbed)
 - **What**: Everything — service lines, session history, documents, timeline, burndown projection, re-auth actions
 - **Example**: Full detail page with header card (status, dates, utilization bar, actions) + tabs (Overview, Services, Sessions, Documents, Timeline)
@@ -178,12 +192,12 @@ Based on research across Stripe, Linear, Notion, Carbon, and healthcare PM tools
 
 Progressive disclosure should also be role-aware. Different roles need different default detail levels:
 
-| Role | Primary Auth Interactions | Default Disclosure Tier | What They Don't Need |
-|------|--------------------------|------------------------|---------------------|
-| **RBT** | Session logging (select auth, see remaining units) | Tier 2 (contextual summary) | Auth numbers, payer details, billing rates, financial projections |
-| **BCBA** | Client oversight (utilization trends, expiry warnings, re-auth decisions) | Tier 3 (focused detail) | Individual session-level billing details |
-| **Billing Staff** | Auth management (create, edit, monitor utilization, claims validation) | Tier 4 (full detail) | Clinical session notes |
-| **Admin/Owner** | Practice-wide oversight (aggregated health, revenue at risk) | Tier 1 + Tier 3 (ambient + dashboard) | Individual service line details |
+| Role              | Primary Auth Interactions                                                 | Default Disclosure Tier               | What They Don't Need                                              |
+| ----------------- | ------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------- |
+| **RBT**           | Session logging (select auth, see remaining units)                        | Tier 2 (contextual summary)           | Auth numbers, payer details, billing rates, financial projections |
+| **BCBA**          | Client oversight (utilization trends, expiry warnings, re-auth decisions) | Tier 3 (focused detail)               | Individual session-level billing details                          |
+| **Billing Staff** | Auth management (create, edit, monitor utilization, claims validation)    | Tier 4 (full detail)                  | Clinical session notes                                            |
+| **Admin/Owner**   | Practice-wide oversight (aggregated health, revenue at risk)              | Tier 1 + Tier 3 (ambient + dashboard) | Individual service line details                                   |
 
 **Sources:** [NN/g Progressive Disclosure](https://www.nngroup.com/articles/progressive-disclosure/), [Progressive Disclosure in SaaS (Lollypop)](https://lollypop.design/blog/2025/may/progressive-disclosure/), [Userpilot Progressive Disclosure Examples](https://userpilot.com/blog/progressive-disclosure-examples/)
 
@@ -197,18 +211,20 @@ Progressive disclosure should also be role-aware. Different roles need different
 Passage Health's scheduler automatically checks insurance authorizations and prevents booking beyond approved hours. ABA Matrix monitors remaining authorized units in real time with calendar integration, alerting when authorizations approach expiration. CentralReach's algorithm-powered scheduler considers authorized service hours alongside drive time and technician availability.
 
 **What the best tools do:**
+
 - **Pre-validation**: Before a booking is confirmed, check: (a) is there an active auth for this client on this date? (b) does the auth cover the selected CPT code? (c) are there enough remaining units? (d) does the auth expire before the session date?
 - **Inline warnings** (not post-hoc errors): Hub Planner's warning system displays pop-ups when overbooking is about to occur during the scheduling process. The warning analyzes current workload and compares it against new bookings being assigned.
 - **Two modes**: "Display warning" (allow override with reason) vs. "Disabled" (prevent the booking entirely). The mode should be configurable per practice.
 
 **Clinivise implementation:**
 When creating/editing an appointment:
+
 1. **No active auth**: Yellow banner — "No active authorization found for [Client] on [Date]. Session may not be billable." CTA: "Create Authorization"
 2. **Auth expires before session**: Amber banner — "Authorization expires [Date], before this session on [Date]." CTA: "View Authorization"
 3. **Insufficient units**: Red banner — "Only 3 units remaining on this authorization. This session requires 4 units." CTA: "View Authorization" or "Schedule Anyway" (with override reason, logged to audit trail)
 4. **All clear**: Green check (subtle, not a banner) — "Authorization verified: 12 units remaining"
 
-The "all clear" state should be the *quietest* — absence of warnings is the positive signal. This prevents "banner blindness" from always showing green success messages.
+The "all clear" state should be the _quietest_ — absence of warnings is the positive signal. This prevents "banner blindness" from always showing green success messages.
 
 **Sources:** [Passage Health ABA Scheduling](https://www.passagehealth.com/blog/aba-scheduler-software), [ABA Matrix Authorization Management](https://www.abamatrix.com/aba-authorization-management/), [Hub Planner Overbooking Prevention](https://hubplanner.com/preventing-resource-over-booking-with-a-new-built-in-warning-system/)
 
@@ -225,7 +241,7 @@ TherapyLake displays units in real time — used, reserved, and remaining — br
 
 2. **Show remaining units prominently**: Not in a tooltip, not in a secondary panel — directly on the session form. "97153 | Blue Cross | 12 of 40 units remaining" with a utilization bar.
 
-3. **Warn before exceeding**: If the session would consume the last units or exceed remaining units, show a clear warning *before* the user submits:
+3. **Warn before exceeding**: If the session would consume the last units or exceed remaining units, show a clear warning _before_ the user submits:
    - "This session (4 units) will use the last remaining units on this authorization."
    - "This session (4 units) exceeds the 3 remaining units on this authorization. [Log Anyway] [Choose Different Auth]"
 
@@ -233,6 +249,7 @@ TherapyLake displays units in real time — used, reserved, and remaining — br
 
 **Clinivise implementation:**
 The `AuthorizationPicker` component (already specced in companion research) should be a card-based sheet — not a dropdown. Each card shows:
+
 - Payer name + auth number (small text)
 - Date range with visual remaining-time indicator
 - Utilization bar per relevant CPT code
@@ -250,7 +267,7 @@ The `AuthorizationPicker` component (already specced in companion research) shou
 CentralReach buries authorization data in the Billing module — clinicians must navigate away from the client context to check auth status. Healthie's client profile uses collapsible sections that let team members hide what they don't need, but this can lead to authorization status being collapsed and invisible.
 
 **What the best tools do differently:**
-Authorization status should be one of the first things visible on a client profile — not hidden in a tab, not collapsed by default. It is *contextual to the client* and *critical to every interaction with that client*.
+Authorization status should be one of the first things visible on a client profile — not hidden in a tab, not collapsed by default. It is _contextual to the client_ and _critical to every interaction with that client_.
 
 **Clinivise implementation:**
 On the client detail page, authorization data should appear in two places:
@@ -280,6 +297,7 @@ Healthcare RCM dashboards provide real-time visibility into authorization compli
 **What to show on the Clinivise dashboard:**
 
 **Widget 1: Authorization Alerts** (severity-sorted, max 5 visible)
+
 - Over-utilized authorizations (>100%) — red
 - Near-exhaustion (>95%) — red
 - Expiring within 7 days — red
@@ -289,12 +307,14 @@ Healthcare RCM dashboards provide real-time visibility into authorization compli
 - Each alert: client name, payer, specific issue, CTA ("View Auth", "Re-authorize", "Adjust Schedule")
 
 **Widget 2: Revenue at Risk** (aggregated financial impact)
+
 - "Revenue at risk" is a concept borrowed from financial dashboards: the dollar value of services that may not be billable due to authorization issues.
 - Calculate: (scheduled but not-yet-billed sessions) x (per-unit rate) for authorizations that are expiring, over-utilized, or have no remaining units
 - Display as a single metric with sparkline trend: "$2,340 at risk from 3 authorizations"
 - This is powerful because it translates clinical data into financial impact — admins and owners respond to dollar amounts more urgently than unit counts
 
 **Widget 3: Utilization Overview** (practice-wide)
+
 - Distribution chart: how many authorizations are in each utilization band (0-50%, 50-80%, 80-95%, 95%+)
 - Or simplified: "12 on track | 3 under-utilizing | 2 over-utilizing | 1 expiring"
 
@@ -308,6 +328,7 @@ Healthcare RCM dashboards provide real-time visibility into authorization compli
 Passage Health's billing software automatically populates billing records with correct CPT codes, units, and dates from scheduled sessions. AlohaABA alerts staff to missing pre-authorizations before claim submission.
 
 **Clinivise implementation (Phase 2):**
+
 - Auto-populate auth number on claims from the linked session's authorization
 - Pre-submission validation checklist:
   - Is the authorization active on the date of service?
@@ -340,32 +361,34 @@ Higher education institutions use a Composite Financial Index with four componen
 
 **Component signals and weights:**
 
-| Signal | Weight | Calculation | Rationale |
-|--------|--------|-------------|-----------|
-| **Utilization pacing** | 35% | Compare actual burn rate vs. ideal burn rate (approved_units / auth_period_days). Score 100 if on pace, degrade as deviation increases. | Most important — directly impacts revenue |
-| **Expiry proximity** | 25% | Score 100 if >60 days remaining. Degrade linearly: 60d=100, 30d=75, 14d=50, 7d=25, 0d=0. | Expiring auths need re-auth action |
-| **Coverage gap risk** | 20% | Score 100 if next auth exists or current auth has >30 days remaining. Score 0 if auth expires in <14 days with no successor. | Gap = no billable sessions |
-| **Service line balance** | 20% | Score 100 if all service lines are within 20% of proportional utilization. Degrade as imbalance increases (e.g., 97153 at 90% while 97155 at 20%). | Imbalanced utilization leads to partial auth waste |
+| Signal                   | Weight | Calculation                                                                                                                                        | Rationale                                          |
+| ------------------------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Utilization pacing**   | 35%    | Compare actual burn rate vs. ideal burn rate (approved_units / auth_period_days). Score 100 if on pace, degrade as deviation increases.            | Most important — directly impacts revenue          |
+| **Expiry proximity**     | 25%    | Score 100 if >60 days remaining. Degrade linearly: 60d=100, 30d=75, 14d=50, 7d=25, 0d=0.                                                           | Expiring auths need re-auth action                 |
+| **Coverage gap risk**    | 20%    | Score 100 if next auth exists or current auth has >30 days remaining. Score 0 if auth expires in <14 days with no successor.                       | Gap = no billable sessions                         |
+| **Service line balance** | 20%    | Score 100 if all service lines are within 20% of proportional utilization. Degrade as imbalance increases (e.g., 97153 at 90% while 97155 at 20%). | Imbalanced utilization leads to partial auth waste |
 
 **Score bands:**
 
-| Score | RAG | Label | Dashboard Display |
-|-------|-----|-------|-------------------|
-| 80-100 | Green | Healthy | Emerald dot. No action needed. |
-| 60-79 | Yellow | Needs Attention | Amber dot. "Review utilization" or "Re-auth approaching." |
-| 40-59 | Orange | At Risk | Amber dot (stronger). "Action needed within 2 weeks." |
-| 0-39 | Red | Critical | Red dot. "Immediate action required." |
+| Score  | RAG    | Label           | Dashboard Display                                         |
+| ------ | ------ | --------------- | --------------------------------------------------------- |
+| 80-100 | Green  | Healthy         | Emerald dot. No action needed.                            |
+| 60-79  | Yellow | Needs Attention | Amber dot. "Review utilization" or "Re-auth approaching." |
+| 40-59  | Orange | At Risk         | Amber dot (stronger). "Action needed within 2 weeks."     |
+| 0-39   | Red    | Critical        | Red dot. "Immediate action required."                     |
 
 **Where to display:**
+
 - **Client list page**: Small colored dot next to each client name (Tier 1 ambient)
 - **Client detail header**: Score + label (e.g., "Auth Health: 72 — Needs Attention") (Tier 2 contextual)
 - **Dashboard**: Aggregated distribution — "18 healthy | 4 need attention | 2 at risk | 1 critical" (Tier 3 focused)
 - **Authorization detail page**: Full breakdown of score components with individual signal scores (Tier 4 full detail)
 
 **Implementation considerations:**
+
 - Calculate on read (not stored) — derived from `authorization_services.used_units`, `authorizations.start_date/end_date`, and scheduled sessions
 - Cache with short TTL (5 min) via React Query stale time for dashboard aggregation
-- The score is a *communication tool*, not a clinical metric. It helps prioritize attention.
+- The score is a _communication tool_, not a clinical metric. It helps prioritize attention.
 - Make the formula transparent — clicking the score shows the breakdown (progressive disclosure)
 
 **Phase:** Start with simplified RAG (green/amber/red based on utilization + expiry only) in Sprint 2D. Add the weighted composite score in Sprint 3B dashboard work.
@@ -385,6 +408,7 @@ Current ABA tools treat re-auth as "create a new authorization." They don't guid
 ### 5B. Inspiration: Project Management Recurring Workflows
 
 **Manifestly Checklists / CheckFlow:**
+
 - Recurring workflows with scheduled runs (daily, weekly, quarterly)
 - Step-by-step checklists with data collection fields, file uploads, and signature collection
 - Deadline-driven: reminders for overdue items, late task highlighting on summary pages
@@ -392,11 +416,13 @@ Current ABA tools treat re-auth as "create a new authorization." They don't guid
 - Progress tracking: summary page shows assignments, late checklists, and late tasks
 
 **Asana Recurring Tasks:**
+
 - Tasks can repeat on a schedule (daily, weekly, monthly)
 - Task templates provide pre-built structures for common processes
 - Due dates auto-calculate relative to the trigger date
 
 **UnitedHealthcare TrackIt:**
+
 - Self-service tool for tracking prior authorizations, referrals, and pending claims
 - Highlights recent decisions and items needing action in near real time
 - Status tracking from submission through resolution
@@ -461,6 +487,7 @@ Progress: 3 of 6 steps complete
 ### 6A. The Need: Visualizing Authorization Periods Over Time
 
 A client's authorization history is a series of date ranges — some contiguous, some with gaps, some overlapping (different CPT code groups). Visualizing this history helps BCBAs and billing staff:
+
 - Identify coverage gaps (dates with no active authorization)
 - Verify continuity of care documentation
 - Plan re-authorizations with historical context
@@ -471,6 +498,7 @@ A client's authorization history is a series of date ranges — some contiguous,
 **The most appropriate visualization for authorization periods is a horizontal range bar chart** — similar to a Gantt chart but simpler. Each row represents an authorization, and bars span the authorization's date range.
 
 **Why this works for auth history:**
+
 - Gantt charts excel at showing "how tasks or phases overlap and the order in which they need to occur"
 - Authorization periods are inherently time-bounded ranges — a horizontal bar is the natural representation
 - Gaps between bars are immediately visible as white space
@@ -494,6 +522,7 @@ Auth 2                                ██████████████
 ```
 
 **Color coding:**
+
 - Emerald fill: active, healthy utilization
 - Amber fill: active, high utilization or nearing expiry
 - Red fill: active, over-utilized or expiring imminently
@@ -521,7 +550,7 @@ For implementation in Clinivise's React/Next.js stack:
 
 ### 6D. Stripe-Inspired Activity Feed Pattern
 
-For the authorization *activity* timeline (audit log), use a vertical activity feed rather than a horizontal range chart. Stripe's subscription management shows event history as a chronological feed:
+For the authorization _activity_ timeline (audit log), use a vertical activity feed rather than a horizontal range chart. Stripe's subscription management shows event history as a chronological feed:
 
 ```
 Authorization Activity — AUTH-2026-001
@@ -556,6 +585,7 @@ Jan 15, 2026  Authorization created
 **The reality:** RBTs log sessions on tablets in homes, schools, and clinics. They have a child in front of them. They need to start a timer, take data, and log the session. Authorization is a background concern — they need to know "am I okay to provide this service?" not "what is the auth number and payer ID?"
 
 **Research findings:**
+
 - TallyFlex designed ABA data collection for "one-finger" operation — tap to count, timers for duration. The interface replaces paper data sheets and clipboards.
 - CR Mobile guides RBTs through sessions with voice-to-text and offline-first design.
 - RethinkBH's mobile app provides full data access with real-time syncing, supporting both online and offline collection.
@@ -580,6 +610,7 @@ That is: CPT code name, utilization bar, remaining units in large text, status w
 BCBAs may review authorization status on a tablet between sessions or during supervision. They need more than RBTs but less than the full desktop detail view.
 
 **BCBA tablet needs:**
+
 - Client list with auth health indicators (colored dot per client)
 - Quick drill-down to utilization summary per client
 - Expiry warnings with action buttons (re-authorize, adjust schedule)
@@ -591,6 +622,7 @@ On tablet viewports (768px-1024px), the authorization list table should use prio
 ### 7C. Offline Considerations (Phase 2)
 
 For field sessions without reliable connectivity:
+
 - Cache last-known authorization state locally (remaining units, expiry date, status)
 - Display "Last synced: [time]" indicator
 - Allow session logging offline — sync and validate authorization on reconnect
@@ -607,6 +639,7 @@ For field sessions without reliable connectivity:
 The research across all seven areas points to a single architectural principle: **authorization data is infrastructure that the entire application reads from, not a feature that lives in one place.**
 
 This means:
+
 1. Authorization queries should be composable — `getClientAuthorizationSummary(clientId)` returns the compact summary usable by the client detail page, the session form, and the scheduling calendar.
 2. Authorization alerts should be computed once and cached — not recalculated on every page load.
 3. The `AuthorizationStatusBadge`, `UtilizationBar`, and `UtilizationIndicator` components should be shared primitives used across 6+ pages.
@@ -635,43 +668,44 @@ This means:
 
 ### 8C. Component Reuse Map
 
-| Component | Used On | Tier |
-|-----------|---------|------|
-| `AuthorizationStatusBadge` | Auth list, auth detail, client detail, session form, dashboard | 1-4 |
-| `UtilizationIndicator` (compact dot + %) | Auth list table cells, client list, dashboard widgets | 1-3 |
-| `UtilizationBar` (progress bar) | Auth detail, client detail auth cards, session form auth picker | 2-4 |
-| `ExpiryCountdown` (badge: "23d") | Auth list, auth detail header, client detail header, dashboard | 1-3 |
-| `AuthHealthDot` (colored dot) | Client list, dashboard distribution | 1 |
-| `AuthorizationPicker` (card sheet) | Session form, scheduling form | 2 |
-| `AuthConstraintBanner` (inline warning) | Scheduling form, session form | 2 |
-| `AuthAlertWidget` (dashboard card list) | Dashboard | 3 |
-| `RevenueAtRiskMetric` (single number) | Dashboard | 3 |
-| `AuthorizationTimeline` (horizontal range bars) | Auth detail Timeline tab, client detail | 4 |
-| `AuthActivityFeed` (vertical event list) | Auth detail Timeline tab | 4 |
-| `ReAuthChecklist` (progress tracker) | Auth detail page | 4 |
+| Component                                       | Used On                                                         | Tier |
+| ----------------------------------------------- | --------------------------------------------------------------- | ---- |
+| `AuthorizationStatusBadge`                      | Auth list, auth detail, client detail, session form, dashboard  | 1-4  |
+| `UtilizationIndicator` (compact dot + %)        | Auth list table cells, client list, dashboard widgets           | 1-3  |
+| `UtilizationBar` (progress bar)                 | Auth detail, client detail auth cards, session form auth picker | 2-4  |
+| `ExpiryCountdown` (badge: "23d")                | Auth list, auth detail header, client detail header, dashboard  | 1-3  |
+| `AuthHealthDot` (colored dot)                   | Client list, dashboard distribution                             | 1    |
+| `AuthorizationPicker` (card sheet)              | Session form, scheduling form                                   | 2    |
+| `AuthConstraintBanner` (inline warning)         | Scheduling form, session form                                   | 2    |
+| `AuthAlertWidget` (dashboard card list)         | Dashboard                                                       | 3    |
+| `RevenueAtRiskMetric` (single number)           | Dashboard                                                       | 3    |
+| `AuthorizationTimeline` (horizontal range bars) | Auth detail Timeline tab, client detail                         | 4    |
+| `AuthActivityFeed` (vertical event list)        | Auth detail Timeline tab                                        | 4    |
+| `ReAuthChecklist` (progress tracker)            | Auth detail page                                                | 4    |
 
 ### 8D. Implementation Priority (Addendum to Companion Research)
 
 The companion research (`authorization-tracking-ux-research.md`) defines the Sprint 2D-4B component build order. This research adds the following to that sequence:
 
-| Priority | New Component/Pattern | Sprint | Rationale |
-|----------|----------------------|--------|-----------|
-| A | Authorization summary in client detail header | 2D | System-wide visibility starts with the most-visited page |
-| B | `AuthHealthDot` on client list | 3B | Ambient awareness across the practice |
-| C | `AuthConstraintBanner` on scheduling form | 3A | Prevention > remediation |
-| D | Revenue at Risk metric on dashboard | 3B | Translates clinical data to financial urgency |
-| E | Authorization Health Score (simplified RAG) | 3B | Composite indicator for prioritization |
-| F | `ReAuthChecklist` (basic version) | 3B | Guide the recurring workflow |
-| G | `AuthorizationTimeline` (horizontal range bars) | 3B | Visual coverage history |
-| H | Authorization Health Score (weighted composite) | Phase 1.5 | Full formula requires tuning |
-| I | Re-auth checklist with AI progress summary | Phase 2 | Depends on AI infrastructure |
-| J | Offline auth caching for mobile | Phase 2 | Requires service worker infrastructure |
+| Priority | New Component/Pattern                           | Sprint    | Rationale                                                |
+| -------- | ----------------------------------------------- | --------- | -------------------------------------------------------- |
+| A        | Authorization summary in client detail header   | 2D        | System-wide visibility starts with the most-visited page |
+| B        | `AuthHealthDot` on client list                  | 3B        | Ambient awareness across the practice                    |
+| C        | `AuthConstraintBanner` on scheduling form       | 3A        | Prevention > remediation                                 |
+| D        | Revenue at Risk metric on dashboard             | 3B        | Translates clinical data to financial urgency            |
+| E        | Authorization Health Score (simplified RAG)     | 3B        | Composite indicator for prioritization                   |
+| F        | `ReAuthChecklist` (basic version)               | 3B        | Guide the recurring workflow                             |
+| G        | `AuthorizationTimeline` (horizontal range bars) | 3B        | Visual coverage history                                  |
+| H        | Authorization Health Score (weighted composite) | Phase 1.5 | Full formula requires tuning                             |
+| I        | Re-auth checklist with AI progress summary      | Phase 2   | Depends on AI infrastructure                             |
+| J        | Offline auth caching for mobile                 | Phase 2   | Requires service worker infrastructure                   |
 
 ---
 
 ## Sources
 
 ### System-Wide Quota/Status Patterns
+
 - [Stripe Billing Credits](https://stripe.com/blog/introducing-credits-for-usage-based-billing)
 - [Stripe Usage-Based Billing](https://docs.stripe.com/billing/subscriptions/usage-based)
 - [Stripe Thresholds](https://docs.stripe.com/billing/subscriptions/usage-based/thresholds)
@@ -685,6 +719,7 @@ The companion research (`authorization-tracking-ux-research.md`) defines the Spr
 - [Mercury Category Locked Cards](https://support.mercury.com/hc/en-us/articles/31669993068564-Creating-and-managing-category-locked-cards)
 
 ### Status Indicators and Design Systems
+
 - [Carbon Design System Status Indicators](https://carbondesignsystem.com/patterns/status-indicator-pattern/)
 - [Carbon Status Indicators v10](https://v10.carbondesignsystem.com/patterns/status-indicator-pattern/)
 - [NN/g Indicators, Validations, Notifications](https://www.nngroup.com/articles/indicators-validations-notifications/)
@@ -692,12 +727,14 @@ The companion research (`authorization-tracking-ux-research.md`) defines the Spr
 - [UX Best Practices for Status Indicators (KoruUX)](https://www.koruux.com/blog/ux-best-practices-designing-status-indicators/)
 
 ### Progressive Disclosure
+
 - [NN/g Progressive Disclosure](https://www.nngroup.com/articles/progressive-disclosure/)
 - [Progressive Disclosure in SaaS (Lollypop)](https://lollypop.design/blog/2025/may/progressive-disclosure/)
 - [Userpilot Progressive Disclosure Examples](https://userpilot.com/blog/progressive-disclosure-examples/)
 - [Information Density and Progressive Disclosure (Algolia)](https://www.algolia.com/blog/ux/information-density-and-progressive-disclosure-search-ux/)
 
 ### Health Scores and Composite Indicators
+
 - [Gainsight Customer Health Scores](https://www.gainsight.com/blog/customer-health-scores/)
 - [Gainsight Scorecards Overview](https://support.gainsight.com/gainsight_nxt/05Scorecards/01About/Scorecards_Overview)
 - [Gainsight Health Score Redesign](https://www.gainsight.com/blog/how-gainsight-redesigned-the-customer-health-score/)
@@ -708,17 +745,20 @@ The companion research (`authorization-tracking-ux-research.md`) defines the Spr
 - [RAG Status Dashboard (Mastt)](https://www.mastt.com/blogs/project-rag-status-dashboard)
 
 ### Scheduling and Constraint UX
+
 - [Hub Planner Overbooking Prevention](https://hubplanner.com/preventing-resource-over-booking-with-a-new-built-in-warning-system/)
 - [Passage Health ABA Scheduling](https://www.passagehealth.com/blog/aba-scheduler-software)
 - [ABA Matrix Authorization Management](https://www.abamatrix.com/aba-authorization-management/)
 
 ### Utilization Pacing and Burndown
+
 - [Budget Pacing Guide (Improvado)](https://improvado.io/blog/budget-pacing)
 - [Burn Rate Chart Guide (Mirorim)](https://mirorim.com/blog/burn-rate-chart/)
 - [Budget Burndown Charts (GP Strategies)](https://www.gpstrategies.com/blog/the-value-of-burndown-charts-to-manage-project-costs/)
 - [SLO Error Budget Burn Rate Visualization](https://oneuptime.com/blog/post/2026-02-06-slo-error-budget-burn-rate-grafana/view)
 
 ### Re-Authorization Workflow
+
 - [Manifestly Checklists](https://www.manifest.ly/features/)
 - [CheckFlow Recurring Checklists](https://checkflow.io/recurring-checklists)
 - [UHC TrackIt](https://www.uhcprovider.com/en/resource-library/provider-portal-resources/trackIt.html)
@@ -728,6 +768,7 @@ The companion research (`authorization-tracking-ux-research.md`) defines the Spr
 - [Waystar Automated Prior Authorization](https://www.waystar.com/blog-automated-prior-authorization-101-how-to-activate-staff-exception-based-workflows/)
 
 ### Timeline Visualization
+
 - [vis.js Timeline](https://visjs.github.io/vis-timeline/docs/timeline/)
 - [react-vis-timeline](https://github.com/razbensimon/react-vis-timeline)
 - [React Timeline Components (Bashooka)](https://bashooka.com/coding/react-libraries-to-visualize-timelines/)
@@ -735,6 +776,7 @@ The companion research (`authorization-tracking-ux-research.md`) defines the Spr
 - [Gantt Charts for Healthcare (ClickUp)](https://clickup.com/templates/gantt-chart/healthcare-administrators)
 
 ### ABA Practice Management and Authorization
+
 - [TherapyLake Authorization Tracking](https://blog.therapylake.com/aba-billing-authorization-automation/)
 - [CentralReach Proactive Authorization Management](https://centralreach.com/blog/enhance-aba-practices-with-proactive-authorization-management/)
 - [CentralReach CR Mobile](https://centralreach.com/products/cr-mobile/)
@@ -743,11 +785,13 @@ The companion research (`authorization-tracking-ux-research.md`) defines the Spr
 - [Operant Billing: Authorization Management in ABA](https://operantbilling.com/improving-authorization-management-in-aba-therapy-a-path-to-financial-health-and-client-success/)
 
 ### Mobile/Tablet Healthcare
+
 - [TallyFlex ABA Data Collection](https://tallyflex.com/)
 - [RethinkBH Mobile Data Collection](https://www.rethinkbehavioralhealth.com/our-solutions/aba-data-collection/)
 - [Passage Health Data Collection Software](https://www.passagehealth.com/blog/aba-data-collection-software)
 
 ### Revenue at Risk and Healthcare Dashboards
+
 - [Healthcare Dashboard Examples (Folio3)](https://data.folio3.com/blog/healthcare-dashboard-examples/)
 - [Revenue Cycle Dashboards (Azalea Health)](https://azaleahealth.com/blog/revenue-cycle-reporting-tips/)
 - [Healthcare KPI Dashboards (Medical Advantage)](https://www.medicaladvantage.com/blog/managing-your-portfolio-with-healthcare-kpi-dashboards/)

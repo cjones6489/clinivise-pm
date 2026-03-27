@@ -16,12 +16,14 @@ Before any technical review, challenge the framing:
 - **What happens if we don't build this?** If the answer is "nothing much," it's probably not worth doing right now.
 
 Offer two reframes:
+
 - **Expansion mode**: What would a wildly ambitious version look like? Is there a 10x version hiding inside this idea?
 - **Reduction mode**: What's the absolute minimum version that tests the hypothesis? Can we validate with a manual process before building?
 
 ## Competitive context
 
 Consider Clinivise's position:
+
 - **vs CentralReach**: Enterprise-grade, 4B+ data points, 5 AI products, but terrible UX and overengineered for small practices. Our wedge: simplicity + free tier + modern design.
 - **vs AlohaABA**: Simple + affordable ($29.99/staff), but weak data collection and non-customizable dashboards. Proves simplicity wins.
 - **vs Theralytics**: Highest-rated small practice tool (4.8/5, $15/user). Built by BCBAs. Our benchmark for usability.
@@ -30,12 +32,12 @@ Consider Clinivise's position:
 
 ## Personas to consider
 
-| Role | What they care about | Usage pattern |
-|------|---------------------|---------------|
-| **RBT** | Speed, minimal input, tablet-friendly | 6-8x/day session logging, field |
-| **BCBA** | Data visibility, auth tracking, supervision compliance | Daily, laptop/desktop |
-| **Billing Staff** | Claims, denials, revenue visibility | Daily, desktop, dual monitor |
-| **Practice Owner** | Revenue, staff utilization, growth | Weekly, high-level metrics |
+| Role               | What they care about                                   | Usage pattern                   |
+| ------------------ | ------------------------------------------------------ | ------------------------------- |
+| **RBT**            | Speed, minimal input, tablet-friendly                  | 6-8x/day session logging, field |
+| **BCBA**           | Data visibility, auth tracking, supervision compliance | Daily, laptop/desktop           |
+| **Billing Staff**  | Claims, denials, revenue visibility                    | Daily, desktop, dual monitor    |
+| **Practice Owner** | Revenue, staff utilization, growth                     | Weekly, high-level metrics      |
 
 ## Review areas
 
@@ -53,6 +55,7 @@ Present findings ONE AT A TIME:
 ## Completion
 
 After the review, output:
+
 - **Verdict**: BUILD / DEFER / KILL with reasoning
 - **Scope recommendation**: What to build first (MVP) vs what to defer
 - **Success metric**: How we'll measure if this worked (specific, measurable)

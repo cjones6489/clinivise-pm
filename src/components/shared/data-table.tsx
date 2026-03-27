@@ -47,7 +47,11 @@ function hasTable<TData, TValue>(
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   if (hasTable(props)) {
-    return <DataTableRenderer table={props.table} onRowClick={props.onRowClick}>{props.children}</DataTableRenderer>;
+    return (
+      <DataTableRenderer table={props.table} onRowClick={props.onRowClick}>
+        {props.children}
+      </DataTableRenderer>
+    );
   }
   return <DataTableInternal {...props} />;
 }
@@ -73,7 +77,11 @@ function DataTableInternal<TData, TValue>({
     state: { sorting, columnFilters },
   });
 
-  return <DataTableRenderer table={table} onRowClick={onRowClick}>{children}</DataTableRenderer>;
+  return (
+    <DataTableRenderer table={table} onRowClick={onRowClick}>
+      {children}
+    </DataTableRenderer>
+  );
 }
 
 function DataTableRenderer<TData>({
@@ -90,50 +98,50 @@ function DataTableRenderer<TData>({
       {children}
       <div className="fade-in border-border bg-card overflow-hidden rounded-xl border shadow-sm">
         <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted/40 hover:bg-muted/40">
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="text-muted-foreground px-3 py-2.5 text-[11px] font-semibold tracking-wider uppercase"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className={`hover:bg-accent/50 transition-colors ${onRowClick ? "cursor-pointer" : "cursor-default"}`}
-                  onClick={() => onRowClick?.(row.original)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-3 py-2.5 text-xs">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="bg-muted/40 hover:bg-muted/40">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className="text-muted-foreground px-3 py-2.5 text-[11px] font-semibold tracking-wider uppercase"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={table.getAllColumns().length}
-                  className="text-muted-foreground h-32 text-center text-xs"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className={`hover:bg-accent/50 transition-colors ${onRowClick ? "cursor-pointer" : "cursor-default"}`}
+                    onClick={() => onRowClick?.(row.original)}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="px-3 py-2.5 text-xs">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getAllColumns().length}
+                    className="text-muted-foreground h-32 text-center text-xs"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>

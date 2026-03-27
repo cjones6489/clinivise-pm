@@ -7,7 +7,12 @@ import { SessionDetailView } from "@/components/sessions/session-detail";
 import { SessionActions } from "@/components/sessions/session-actions";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import { formatDate } from "@/lib/utils";
-import { CREDENTIAL_LABELS, VALID_SESSION_TRANSITIONS, type CredentialType, type SessionStatus } from "@/lib/constants";
+import {
+  CREDENTIAL_LABELS,
+  VALID_SESSION_TRANSITIONS,
+  type CredentialType,
+  type SessionStatus,
+} from "@/lib/constants";
 import { hasPermission } from "@/lib/permissions";
 
 export const metadata: Metadata = {

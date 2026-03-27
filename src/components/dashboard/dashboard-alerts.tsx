@@ -108,7 +108,10 @@ function AlertRow({ group }: { group: AlertGroup }) {
         <HugeiconsIcon
           icon={Alert02Icon}
           size={16}
-          className={cn("shrink-0", isCritical ? "text-red-600 dark:text-red-400" : "text-amber-600 dark:text-amber-400")}
+          className={cn(
+            "shrink-0",
+            isCritical ? "text-red-600 dark:text-red-400" : "text-amber-600 dark:text-amber-400",
+          )}
         />
         <div className="min-w-0 flex-1">
           <span className="text-xs font-semibold">{group.label}</span>
@@ -138,10 +141,14 @@ export async function DashboardAlerts({ orgId }: { orgId: string }) {
           </span>
         </div>
         <div className="flex items-center gap-3 px-4 py-6">
-          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={20} className="text-emerald-500 dark:text-emerald-400" />
+          <HugeiconsIcon
+            icon={CheckmarkCircle02Icon}
+            size={20}
+            className="text-emerald-500 dark:text-emerald-400"
+          />
           <div>
             <p className="text-xs font-medium">All authorizations on track. No action items.</p>
-            <p className="text-xs text-muted-foreground">Everything looks good today.</p>
+            <p className="text-muted-foreground text-xs">Everything looks good today.</p>
           </div>
         </div>
       </div>
@@ -185,7 +192,10 @@ export function DashboardAlertsSkeleton() {
       </div>
       <div className="space-y-0">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 border-b border-border/40 px-4 py-3 last:border-b-0">
+          <div
+            key={i}
+            className="border-border/40 flex items-center gap-3 border-b px-4 py-3 last:border-b-0"
+          >
             <div className="bg-muted h-4 w-4 rounded-full" />
             <div className="flex-1 space-y-1.5">
               <div className="bg-muted h-3 w-32 rounded" />

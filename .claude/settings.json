@@ -22,8 +22,6 @@
       "WebSearch",
       "WebFetch"
     ],
-    "deny": [
-      "Bash(rm -rf *)"
-    ]
+    "deny": ["Bash(rm -rf *)"]
   }
 }

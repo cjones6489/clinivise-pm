@@ -84,7 +84,12 @@ export function ClientDetail({
       </TabsContent>
 
       <TabsContent value="goals" className="pt-4">
-        <ClientGoals clientId={client.id} goals={goals} goalDomains={goalDomains} canEdit={canEdit} />
+        <ClientGoals
+          clientId={client.id}
+          goals={goals}
+          goalDomains={goalDomains}
+          canEdit={canEdit}
+        />
       </TabsContent>
 
       <TabsContent value="contacts" className="pt-4">

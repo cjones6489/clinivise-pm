@@ -272,7 +272,11 @@ export const updateAuthorization = authActionClient
             .for("update");
 
           // If reducing approvedUnits, ensure it doesn't go below usedUnits
-          if (locked && svcFields.approvedUnits !== undefined && svcFields.approvedUnits < locked.usedUnits) {
+          if (
+            locked &&
+            svcFields.approvedUnits !== undefined &&
+            svcFields.approvedUnits < locked.usedUnits
+          ) {
             throw new ConflictError(
               `Cannot reduce approved units below used units (${locked.usedUnits} used). Cancel excess sessions first.`,
             );
@@ -350,7 +354,9 @@ export const archiveAuthorization = authActionClient
       .limit(1);
 
     if (activeSession) {
-      throw new ConflictError("Cannot archive an authorization with scheduled or flagged sessions. Resolve those sessions first.");
+      throw new ConflictError(
+        "Cannot archive an authorization with scheduled or flagged sessions. Resolve those sessions first.",
+      );
     }
 
     await db

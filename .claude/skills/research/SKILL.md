@@ -18,9 +18,11 @@ You are researching this topic to inform a design decision for Clinivise — an 
 Launch 3 agents in parallel with clearly separated responsibilities:
 
 ### Agent 1: Competitor & Platform Patterns
+
 Research how competitors and adjacent platforms implement this feature or solve this problem.
 
 Focus on:
+
 - **ABA competitors**: CentralReach, AlohaABA, Theralytics, RethinkBH, Motivity, Raven Health, Alpaca Health, Catalyst, Hi Rasmus
 - **Adjacent healthcare PM**: SimplePractice, Jane App, Healthie, Elation Health, Tebra/Kareo
 - **Adjacent AI healthcare**: Abridge, Suki, Freed AI, Waystar, Notable Health, Cohere Health
@@ -28,6 +30,7 @@ Focus on:
 - **Recent YC companies** building in healthcare/ABA/billing spaces
 
 For each relevant implementation found:
+
 - What's their data model and workflow for this feature?
 - What's the user experience like (UX)? Which persona does it serve?
 - What works well? What's broken, confusing, or over-engineered?
@@ -37,9 +40,11 @@ For each relevant implementation found:
 Use WebSearch extensively. Prioritize 2025-2026 sources.
 
 ### Agent 2: Technical Docs, Open Source & Known Pitfalls
+
 Research the technical foundations — libraries, protocols, standards, open-source implementations, and constraints that affect implementation.
 
 Focus on:
+
 - Official docs for any libraries/frameworks/APIs involved
 - Use Context7 for current documentation on relevant packages
 - **Open-source repos** that implement this feature or solve similar problems well
@@ -48,24 +53,29 @@ Focus on:
 - HIPAA considerations if the feature touches PHI
 
 For each relevant open-source repo found:
+
 - Repo name, URL, stars, last activity
 - What design pattern they use
 - What they got right vs wrong
 
 For each pitfall/constraint found:
+
 - What's the constraint or pitfall?
 - How should we design around it?
 
 ### Agent 3: Frontier Patterns & Best UX
+
 Research bleeding-edge approaches and the best user experiences for this feature.
 
 Focus on:
+
 - Novel approaches from recent startups or open-source projects
 - The cleanest user experiences for this feature — who has the best UX and why?
 - AI-native approaches that automate or simplify the workflow
 - Accessibility patterns for healthcare workers (tablet field use, touch targets, offline)
 
 For each pattern:
+
 - Who's doing it and since when?
 - Maturity: production-proven / early-adopter / experimental
 - Whether to adopt now, design for later, or just watch
@@ -75,22 +85,29 @@ For each pattern:
 After all agents return, synthesize findings into a structured response with these sections:
 
 ### How others do it
+
 Concise comparison table of the most relevant implementations. Include data model, UX approach, and notable design choices.
 
 ### Open-source references
+
 Table of the most relevant repos with: name, URL, stars, what pattern to study.
 
 ### Known pitfalls and regulatory constraints
+
 Specific issues, gotchas, compliance requirements, and failure modes. For each: what goes wrong and how to avoid it.
 
 ### Best UX patterns
+
 The cleanest user experiences found. What makes them good and what we should steal. Consider all personas (RBT on tablet, BCBA on laptop, billing staff on desktop).
 
 ### Frontier approaches
+
 Emerging patterns worth considering. Clearly separate production-proven from experimental.
 
 ### Recommended design direction
+
 Concrete recommendation for Clinivise specifically:
+
 - Suggested data model / architecture
 - UX design / interaction pattern
 - AI integration opportunity (if applicable)
@@ -98,10 +115,13 @@ Concrete recommendation for Clinivise specifically:
 - What to explicitly avoid
 
 ### Open questions
+
 Anything uncertain that needs validation before implementation.
 
 ### Decision points
+
 If the research surfaced trade-offs, ambiguities, or forks that need your input before planning, list them as specific questions. Examples:
+
 - "Competitors split on X vs Y — which fits our Phase 1 scope?"
 - "This feature has a simpler version (A) and a richer version (B) — which do we want?"
 - "The regulatory landscape is unclear on X — do we take the conservative or aggressive approach?"
@@ -110,7 +130,9 @@ If the research surfaced trade-offs, ambiguities, or forks that need your input 
 Only ask questions where the answer materially changes the architecture or scope. Skip this section if the path forward is clear.
 
 ### Depth check
+
 End with one of these verdicts:
+
 - **Sufficient for planning** — enough context to enter plan mode and `/plan-review`. No deeper research needed.
 - **Recommend `/deep-research`** — this topic has strategic implications, novel architecture, high regulatory risk, or enough complexity that the full 7-agent investigation with a saved document would materially improve the implementation. Explain what specifically remains uncertain and why the extra depth matters.
 

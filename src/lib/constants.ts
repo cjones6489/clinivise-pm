@@ -94,7 +94,10 @@ export const GOAL_STATUS_LABELS: Record<GoalStatus, string> = {
   discontinued: "Discontinued",
 };
 
-export const GOAL_STATUS_VARIANT: Record<GoalStatus, "default" | "secondary" | "outline" | "destructive"> = {
+export const GOAL_STATUS_VARIANT: Record<
+  GoalStatus,
+  "default" | "secondary" | "outline" | "destructive"
+> = {
   baseline: "outline",
   active: "default",
   mastered: "default",
@@ -512,13 +515,23 @@ export const CREDENTIAL_MODIFIERS: Record<string, string> = {
 /** CMS modifier ordering priority — credential first, telehealth second, etc. */
 export const MODIFIER_PRIORITY: Record<string, number> = {
   // Tier 1: Credential (pricing) modifiers
-  HM: 1, HN: 1, HO: 1, HP: 1,
+  HM: 1,
+  HN: 1,
+  HO: 1,
+  HP: 1,
   // Tier 2: Telehealth modifiers
-  "95": 2, GT: 2,
+  "95": 2,
+  GT: 2,
   // Tier 3: Distinct service modifiers
-  "59": 3, XE: 3, XP: 3, XS: 3, XU: 3,
+  "59": 3,
+  XE: 3,
+  XP: 3,
+  XS: 3,
+  XU: 3,
   // Tier 4: Informational modifiers
-  "76": 4, "77": 4, KX: 4,
+  "76": 4,
+  "77": 4,
+  KX: 4,
 };
 
 /** Max modifiers per claim line (CMS 1500 form limit). */
@@ -669,7 +682,10 @@ export const NOTE_STATUS_LABELS: Record<NoteStatus, string> = {
   locked: "Locked",
 };
 
-export const NOTE_STATUS_VARIANT: Record<NoteStatus, "secondary" | "outline" | "default" | "destructive"> = {
+export const NOTE_STATUS_VARIANT: Record<
+  NoteStatus,
+  "secondary" | "outline" | "default" | "destructive"
+> = {
   draft: "secondary",
   signed: "outline",
   cosigned: "default",
@@ -697,7 +713,10 @@ export const GOAL_PROGRESS_LABELS: Record<GoalProgressStatus, string> = {
   not_assessed: "Not Assessed",
 };
 
-export const GOAL_PROGRESS_VARIANT: Record<GoalProgressStatus, "default" | "secondary" | "outline" | "destructive"> = {
+export const GOAL_PROGRESS_VARIANT: Record<
+  GoalProgressStatus,
+  "default" | "secondary" | "outline" | "destructive"
+> = {
   met: "default",
   partially_met: "outline",
   not_met: "secondary",

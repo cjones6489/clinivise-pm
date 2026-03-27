@@ -14,23 +14,13 @@ const PermissionContext = createContext<PermissionContextValue | null>(null);
  * Provides the current user's role to all child components.
  * Set once in the dashboard layout from the server-side auth context.
  */
-export function PermissionProvider({
-  role,
-  children,
-}: {
-  role: string;
-  children: ReactNode;
-}) {
+export function PermissionProvider({ role, children }: { role: string; children: ReactNode }) {
   const value: PermissionContextValue = {
     role,
     can: (permission) => hasPermission(role, permission),
   };
 
-  return (
-    <PermissionContext.Provider value={value}>
-      {children}
-    </PermissionContext.Provider>
-  );
+  return <PermissionContext.Provider value={value}>{children}</PermissionContext.Provider>;
 }
 
 /**

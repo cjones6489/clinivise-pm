@@ -41,7 +41,10 @@ export function DashboardMetricsSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="border-border bg-card animate-pulse rounded-xl border px-4 py-4 shadow-sm">
+        <div
+          key={i}
+          className="border-border bg-card animate-pulse rounded-xl border px-4 py-4 shadow-sm"
+        >
           <div className="bg-muted h-3 w-20 rounded" />
           <div className="bg-muted mt-3 h-7 w-16 rounded" />
           <div className="bg-muted mt-2 h-3 w-24 rounded" />

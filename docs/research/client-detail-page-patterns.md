@@ -23,11 +23,13 @@
 ### 1a. CentralReach (ABA-specific, market leader)
 
 **Header / Banner:**
+
 - Contact details sidebar on the left side of the Dashboard displays a summary of the contact's basic profile information
 - Contact labels, basic information, and meta data visible in the sidebar
 - Expandable/collapsible sidebar toggled by clicking the contact name
 
 **Tabs / Sections:**
+
 - **Profile**: Account-specific info, office locations, user credentials, merchant settings, billing information
 - **Notes & Forms**: Electronic clinical documents for collecting and maintaining client clinical information; accessible from Profile tab > Notes & Forms
 - **Authorizations**: Accessible via the Billing module; shows total authorized hours, hours with scheduled appointment, hours worked, pending hours, remaining hours, and utilization rate
@@ -38,15 +40,18 @@
 - **Insurance**: Overview tab, Insurance tab, Subscriber tab, Patient tab for managing insurance information
 
 **Authorization Display:**
+
 - Authorizations section in the Billing module shows: total authorized hours, scheduled hours, worked hours, pending hours, remaining hours, utilization rate
 - Proactive authorization management with alerts for approaching limits
 
 **Quick Actions:**
+
 - View/edit profile, access notes & forms, manage billing, view schedule
 - Dashboard has 4 customizable widgets: call activity, files, messages, appointments
 - Widgets can be stretched, shrunk, dragged, and rearranged
 
 **Guardian / Contacts:**
+
 - Team menu includes directory of all contacts connected to the client
 - Auto-share client information with employees via connections feature
 
@@ -57,9 +62,11 @@
 ### 1b. AlohaABA (ABA-specific, mid-market)
 
 **Header / Banner:**
+
 - Client profile includes key details such as demographics, authorizations, and service information
 
 **Tabs / Sections:**
+
 - **Demographics**: Client intake data including demographics, medical history, treatment plans
 - **Contacts**: Guardian/caregiver information
 - **Insurance**: Insurance data stored in HIPAA-compliant location
@@ -67,6 +74,7 @@
 - **Authorization Management**: Real-time utilization visible in client profile; clicking shows scheduled, completed, billed, and cancelled appointments per service
 
 **Authorization Display:**
+
 - Authorization utilization is visible directly in the client profile (not buried in billing)
 - Clicking utilization opens detail view showing: scheduled, completed, billed, and cancelled appointments for each service in the authorization
 - Authorization utilization reports available within the schedule view
@@ -75,10 +83,12 @@
 - Tracks authorization balances across clients and codes
 
 **Quick Actions:**
+
 - Scheduling directly from client profile
 - Authorization alerts integrated into scheduling workflow
 
 **Guardian / Contacts:**
+
 - Share documents with parents/caregivers
 - Collect signatures from caregivers at session completion
 - Track communications between staff and caregivers
@@ -90,9 +100,11 @@
 ### 1c. Theralytics (ABA-specific, startup-friendly)
 
 **Header / Banner:**
+
 - Learner profile with basic identification and clinical details
 
 **Tabs / Sections:**
+
 - **Profile/Demographics**: Basic client information
 - **Scheduling**: Drag-and-drop appointments, drive-time/mileage tracking
 - **Data Collection**: Multiple collection methods, real-time data entry
@@ -101,9 +113,11 @@
 - **Billing**: Claims, payments, revenue management integrated with scheduling and documentation
 
 **Authorization Display:**
+
 - Authorization tracking integrated with scheduling and billing workflow
 
 **Quick Actions:**
+
 - Mobile app: collect data, view client details, take session notes, capture signatures with GPS coordinates, complete sessions (works offline)
 
 **Key Insight:** Theralytics differentiates with mobile-first field use and AI-generated session note narratives.
@@ -113,9 +127,11 @@
 ### 1d. Motivity (ABA-specific, clinical focus)
 
 **Header / Banner:**
+
 - Learner profile with identifying information
 
 **Tabs / Sections (Learner Dashboard):**
+
 - **Collect Data**: Real-time data collection during sessions
 - **Timeline and Reports**: Session history and progress data visualization
 - **Programs and Progress**: Clinical programming, targets, mastery criteria
@@ -124,6 +140,7 @@
 - **Pending Notes**: Notes awaiting signatures or approval, with statuses (missing signatures, rejected, awaiting approval)
 
 **Profile Information:**
+
 - Editable learner profile with fields for clinical details
 - Section for links to behavior plans or other relevant external files
 - Profile information can be auto-inserted into note templates
@@ -135,10 +152,12 @@
 ### 1e. SimplePractice (Multi-discipline therapy, widely used)
 
 **Header / Banner:**
+
 - Client name displayed prominently
 - Client profile opens to the Overview tab by default
 
 **Tabs / Sections:**
+
 - **Overview**: Chronological timeline of all client activity — appointments, documentation, and notes. Two view options: Excerpt View (2-row icon, more detail) and List View (4-row icon, compact). Right navigation panel with collapsible sections.
 - **Billing**: Complete billing summary — current balance, unallocated payments, unpaid/uninvoiced amounts. Invoices, insurance claims, payments. Actions: create invoice, statement, super bill, insurance claim.
 - **Files**: Intake forms, questionnaires, consent documents, uploaded files. Shows when forms were viewed or signed by client.
@@ -150,11 +169,13 @@
   - Contacts sub-tab (emergency contacts, guardians, beneficiaries)
 
 **Insurance Display:**
+
 - Insurance information entered via Client Info > Billing and Insurance tab
 - Billing profiles for insurance managed separately
 - Insurance verification with automated eligibility checks
 
 **Guardian / Contacts:**
+
 - Contacts tab within client edit: add emergency contact, third-party beneficiary, or guardian
 - Each contact listed with relationship type
 
@@ -165,11 +186,13 @@
 ### 1f. Jane App (Multi-discipline, health & wellness)
 
 **Header / Banner:**
+
 - Patient Profile Dashboard: row of metrics near the top showing appointment history, billing status, and account balance
 - Clickable metrics that navigate to relevant tabs
 - Pronouns field in profile
 
 **Tabs / Sections:**
+
 - **Dashboard/Summary**: Metrics row — total scheduled appointments (Booked, Arrived, Checked In, No Show), claims outstanding, account balance
 - **Appointments**: Full appointment history filterable by date range, state, location, staff member, billing status
 - **Billing**: Insurance Policies area, payment tracking, claims outstanding
@@ -177,6 +200,7 @@
 - **Relationships/Contacts**: Family profiles with relationship management. Link family members across profiles. Create new contacts or search existing.
 
 **Patient Profile Dashboard Metrics:**
+
 - Total scheduled appointments (clickable, navigates to Appointments tab)
 - No Show count (clickable, navigates to filtered Appointments)
 - Claims Outstanding (clickable, navigates to Billing > Insurance Policies)
@@ -189,9 +213,11 @@
 ### 1g. Healthie (Multi-discipline EHR)
 
 **Header / Banner:**
+
 - Quick Profile view showing summary stats and quick navigation
 
 **Tabs / Sections:**
+
 - **Actions Tab**: Designed for quick viewing and updating of key details in one place. Includes:
   - Insurance Billing Information (claims, benefits, eligibility)
   - Medications and Prescriptions
@@ -204,6 +230,7 @@
 - **Documents/Forms/Notes**: Uploaded files, completed forms, charting notes
 
 **Interface Features:**
+
 - Three-dot menu on each section for editing, deleting, managing
 - Direct "Add" button in sections for commonly used actions (based on user feedback)
 - Quick Profile feature for at-a-glance summary
@@ -215,6 +242,7 @@
 ### 1h. RethinkBH (ABA-specific, enterprise)
 
 **Tabs / Sections (from feature descriptions):**
+
 - Full EHR with document management
 - Clinical data auto-embedded into session notes
 - Customizable templates based on funder requirements
@@ -229,33 +257,33 @@
 
 ### Tabs/Sections per Platform
 
-| Section | CentralReach | AlohaABA | Theralytics | Motivity | SimplePractice | Jane App | Healthie |
-|---------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Overview/Dashboard** | Widgets | -- | -- | Dashboard | Timeline | Metrics Row | Actions Tab |
-| **Demographics/Profile** | Sidebar | Tab | Tab | Profile | Client Info | Profile | Quick Profile |
-| **Contacts/Guardians** | Team | Tab | -- | Team | Contacts tab | Relationships | -- |
-| **Insurance** | Multi-tab | Tab | -- | -- | Billing & Ins | Billing > Ins | Actions > Ins |
-| **Authorizations** | Billing module | Tab (inline) | Integrated | -- | -- | -- | -- |
-| **Sessions/Appointments** | Schedule | Sessions | Scheduling | Calendar | Overview timeline | Appointments | -- |
-| **Clinical Notes/Charts** | Notes & Forms | -- | Session Notes | Timeline & Reports | Files | Chart | Charting |
-| **Data Collection/Progress** | Learning tree | -- | Data Collection | Programs & Progress | -- | -- | Metrics |
-| **Billing** | Billing tab | -- | Billing | -- | Billing tab | Billing tab | Billing tab |
-| **Documents/Files** | Files | -- | -- | -- | Files tab | Chart (shared) | Documents |
-| **Care Plan/Goals** | -- | -- | Treatment plan | Programs | -- | -- | Care Plans |
-| **Activity/Timeline** | Call Activity | -- | -- | Timeline | Overview | -- | Journals |
+| Section                      |  CentralReach  |   AlohaABA   |   Theralytics   |      Motivity       |  SimplePractice   |    Jane App    |   Healthie    |
+| ---------------------------- | :------------: | :----------: | :-------------: | :-----------------: | :---------------: | :------------: | :-----------: |
+| **Overview/Dashboard**       |    Widgets     |      --      |       --        |      Dashboard      |     Timeline      |  Metrics Row   |  Actions Tab  |
+| **Demographics/Profile**     |    Sidebar     |     Tab      |       Tab       |       Profile       |    Client Info    |    Profile     | Quick Profile |
+| **Contacts/Guardians**       |      Team      |     Tab      |       --        |        Team         |   Contacts tab    | Relationships  |      --       |
+| **Insurance**                |   Multi-tab    |     Tab      |       --        |         --          |   Billing & Ins   | Billing > Ins  | Actions > Ins |
+| **Authorizations**           | Billing module | Tab (inline) |   Integrated    |         --          |        --         |       --       |      --       |
+| **Sessions/Appointments**    |    Schedule    |   Sessions   |   Scheduling    |      Calendar       | Overview timeline |  Appointments  |      --       |
+| **Clinical Notes/Charts**    | Notes & Forms  |      --      |  Session Notes  | Timeline & Reports  |       Files       |     Chart      |   Charting    |
+| **Data Collection/Progress** | Learning tree  |      --      | Data Collection | Programs & Progress |        --         |       --       |    Metrics    |
+| **Billing**                  |  Billing tab   |      --      |     Billing     |         --          |    Billing tab    |  Billing tab   |  Billing tab  |
+| **Documents/Files**          |     Files      |      --      |       --        |         --          |     Files tab     | Chart (shared) |   Documents   |
+| **Care Plan/Goals**          |       --       |      --      | Treatment plan  |      Programs       |        --         |       --       |  Care Plans   |
+| **Activity/Timeline**        | Call Activity  |      --      |       --        |      Timeline       |     Overview      |       --       |   Journals    |
 
 ### Header/Banner Information per Platform
 
-| Element | CentralReach | AlohaABA | SimplePractice | Jane App | Healthie |
-|---------|:---:|:---:|:---:|:---:|:---:|
-| Client name | Yes | Yes | Yes | Yes | Yes |
-| DOB / Age | Sidebar | Profile | Client Info | Profile | Profile |
-| Status indicator | Labels | -- | -- | -- | -- |
-| Diagnosis | Metadata | -- | -- | -- | -- |
-| Photo/Avatar | -- | -- | -- | -- | -- |
-| Metrics row | Widgets | -- | -- | Clickable metrics | Quick Profile |
-| Guardian info | Team tab | -- | Contacts tab | Relationships | -- |
-| Insurance status | Separate tab | -- | -- | Claims metric | Actions tab |
+| Element          | CentralReach | AlohaABA | SimplePractice |     Jane App      |   Healthie    |
+| ---------------- | :----------: | :------: | :------------: | :---------------: | :-----------: |
+| Client name      |     Yes      |   Yes    |      Yes       |        Yes        |      Yes      |
+| DOB / Age        |   Sidebar    | Profile  |  Client Info   |      Profile      |    Profile    |
+| Status indicator |    Labels    |    --    |       --       |        --         |      --       |
+| Diagnosis        |   Metadata   |    --    |       --       |        --         |      --       |
+| Photo/Avatar     |      --      |    --    |       --       |        --         |      --       |
+| Metrics row      |   Widgets    |    --    |       --       | Clickable metrics | Quick Profile |
+| Guardian info    |   Team tab   |    --    |  Contacts tab  |   Relationships   |      --       |
+| Insurance status | Separate tab |    --    |       --       |   Claims metric   |  Actions tab  |
 
 ---
 
@@ -264,6 +292,7 @@
 These sections appear across every platform studied. They are table stakes for a client detail page:
 
 ### 3a. Demographics / Profile
+
 - Client name (legal first, legal last, preferred name)
 - Date of birth + calculated age
 - Gender
@@ -272,6 +301,7 @@ These sections appear across every platform studied. They are table stakes for a
 - Status (active/inactive/on hold/discharged)
 
 ### 3b. Contacts / Guardians
+
 - Critical for ABA (clients are children)
 - Guardian name, relationship, phone, email
 - Emergency contact
@@ -279,6 +309,7 @@ These sections appear across every platform studied. They are table stakes for a
 - Multiple contacts supported
 
 ### 3c. Insurance Information
+
 - Primary insurance: payer, member ID, group number, plan type
 - Subscriber info (name, DOB, relationship — always needed for ABA dependents)
 - Policy effective/termination dates
@@ -286,16 +317,19 @@ These sections appear across every platform studied. They are table stakes for a
 - Secondary insurance support
 
 ### 3d. Clinical Notes / Documentation
+
 - Session notes or chart entries
 - Treatment plan reference
 - Assessment records
 
 ### 3e. Appointments / Sessions
+
 - Session history (date, provider, duration, CPT code, status)
 - Upcoming sessions
 - Filterable by date range
 
 ### 3f. Billing
+
 - Current balance
 - Invoice/claim history
 - Payment history
@@ -307,44 +341,52 @@ These sections appear across every platform studied. They are table stakes for a
 These are sections/features that separate the best platforms from the rest:
 
 ### 4a. Authorization Utilization on Client Page (ABA differentiator)
+
 - **Who does it well:** AlohaABA (inline on client profile), CentralReach (Billing module — buried)
 - **The gap:** Most platforms separate authorization data from the client page. BCBAs and schedulers need it front-and-center.
 - **Clinivise opportunity:** Show utilization bars with per-CPT breakdown directly on the client Overview tab. This is the #1 "hero moment" identified in the product spec.
 
 ### 4b. Clickable Metrics Dashboard (Jane App pattern)
+
 - Metrics row at the top that doubles as navigation shortcuts
 - Each metric click jumps to the relevant tab/filter
 - Clinivise should adopt this: metrics like "Auth Days Left," "Sessions This Month," "Used Units" each link to their detailed view.
 
 ### 4c. Actions Tab / Quick View (Healthie pattern)
+
 - Single tab consolidating quick views of all major data categories
 - Inline edit/add buttons per section
 - Three-dot menu for secondary actions
 - Reduces tab-switching for common workflows
 
 ### 4d. AI-Generated Session Summaries (Theralytics pattern)
+
 - Generative AI analyzes collected session data and drafts narrative summaries
 - Therapists review and finalize rather than writing from scratch
 - Reduces documentation time to a few clicks
 
 ### 4e. Family Profiles / Linked Clients (Jane App pattern)
+
 - Link sibling client records together
 - Share guardian contacts across family
 - View family billing summary
 - Critical for ABA (many families have 2-3 children in services)
 
 ### 4f. View Density Toggle (SimplePractice pattern)
+
 - Excerpt View vs. List View toggle on timeline/overview
 - Compact view for power users, expanded view for detailed review
 - Especially useful for high-volume ABA clients with many sessions
 
 ### 4g. Mobile Field Use (Theralytics / CentralReach Mobile)
+
 - Data collection, session notes, signature capture on mobile
 - GPS-stamped signatures
 - Offline capability with sync
 - Voice-to-text for notes
 
 ### 4h. Programs and Progress Tab (Motivity differentiator)
+
 - Clinical programming view: targets, mastery criteria, skill tracking
 - Not standard in PM tools — Motivity is clinically-focused
 - Consider for Phase 2+: visualizing progress toward treatment goals
@@ -381,17 +423,17 @@ Based on EHR best practices and ABA-specific research, the client header banner 
 
 ### 5c. Header Data Elements (Priority Order)
 
-| Element | Rationale | Source |
-|---------|-----------|--------|
-| **Client name** (large, bold) | Primary identifier; every platform shows this | Universal |
-| **DOB + Age** | Required for clinical context; age calculated automatically | EHR best practice |
-| **Gender** | Clinical relevance | EHR best practice |
-| **Diagnosis code + description** | ABA-specific: BCBAs need this at a glance | ABA workflow research |
-| **Status badge** | Active/Inactive/On Hold — color coded | Universal |
-| **Auth days remaining badge** | ABA-critical: how many days until current auth expires | CentralReach gap, product spec hero moment |
-| **Guardian name + contact** | ABA clients are children; guardian is primary contact | ABA intake research |
-| **Assigned BCBA** | Clinical accountability | ABA workflow |
-| **Primary insurance + verification** | Billing context without switching tabs | Healthie, CentralReach |
+| Element                              | Rationale                                                   | Source                                     |
+| ------------------------------------ | ----------------------------------------------------------- | ------------------------------------------ |
+| **Client name** (large, bold)        | Primary identifier; every platform shows this               | Universal                                  |
+| **DOB + Age**                        | Required for clinical context; age calculated automatically | EHR best practice                          |
+| **Gender**                           | Clinical relevance                                          | EHR best practice                          |
+| **Diagnosis code + description**     | ABA-specific: BCBAs need this at a glance                   | ABA workflow research                      |
+| **Status badge**                     | Active/Inactive/On Hold — color coded                       | Universal                                  |
+| **Auth days remaining badge**        | ABA-critical: how many days until current auth expires      | CentralReach gap, product spec hero moment |
+| **Guardian name + contact**          | ABA clients are children; guardian is primary contact       | ABA intake research                        |
+| **Assigned BCBA**                    | Clinical accountability                                     | ABA workflow                               |
+| **Primary insurance + verification** | Billing context without switching tabs                      | Healthie, CentralReach                     |
 
 ### 5d. What NOT to Put in the Header
 
@@ -411,12 +453,12 @@ The Overview tab is the default landing view. It should give a comprehensive sna
 
 Four clickable metric cards inspired by the Jane App pattern. Each card click navigates to the relevant tab.
 
-| Card | Content | Visual | Click Target |
-|------|---------|--------|--------------|
-| **Total Approved** | Sum of `approved_units` across active auth services, displayed as hours. Sub-text: breakdown by CPT ("97153: 100 · 97155: 20") | Large number, `tabular-nums`, `text-2xl font-semibold` | Authorizations tab |
-| **Used / Utilized** | Sum of `used_units`, displayed as hours. Sub-text: "61% utilized" with color-coded threshold (emerald <80%, amber 80-95%, red >95%) | Large number with color indicator | Authorizations tab |
-| **Weekly Avg** | Average session hours per week over the auth period | Number with trend arrow (up/down vs prior period) | Sessions tab |
-| **Days Left** | `end_date - today` from active authorization. Sub-text: "Auth expires {date}". Red if <14d, amber if <30d | Number with urgency color | Authorizations tab |
+| Card                | Content                                                                                                                             | Visual                                                 | Click Target       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------ |
+| **Total Approved**  | Sum of `approved_units` across active auth services, displayed as hours. Sub-text: breakdown by CPT ("97153: 100 · 97155: 20")      | Large number, `tabular-nums`, `text-2xl font-semibold` | Authorizations tab |
+| **Used / Utilized** | Sum of `used_units`, displayed as hours. Sub-text: "61% utilized" with color-coded threshold (emerald <80%, amber 80-95%, red >95%) | Large number with color indicator                      | Authorizations tab |
+| **Weekly Avg**      | Average session hours per week over the auth period                                                                                 | Number with trend arrow (up/down vs prior period)      | Sessions tab       |
+| **Days Left**       | `end_date - today` from active authorization. Sub-text: "Auth expires {date}". Red if <14d, amber if <30d                           | Number with urgency color                              | Authorizations tab |
 
 ### 6b. Authorized Services Card
 
@@ -437,6 +479,7 @@ Authorized Services                                    [View All →]
 ```
 
 **Design details:**
+
 - Progress bar color: emerald (<80%), amber (80-95%), red (>95%)
 - CPT code in monospace with primary color
 - "hrs remaining" aligned right, `tabular-nums`
@@ -553,23 +596,23 @@ Only appears when there are actionable items. Shown between metrics and services
 
 ### 7b. Tab Structure
 
-| Tab | Content | Role Priority |
-|-----|---------|---------------|
-| **Overview** (default) | Metric cards, alerts, auth utilization, insurance snapshot, care team, recent sessions | All roles |
-| **Insurance** | Full insurance policy cards with verification, subscriber details, card images | Billing staff, Admins |
-| **Authorizations** | All auths (active expanded, expired collapsed), per-service detail, upload auth letter | BCBAs, Billing staff |
-| **Sessions** | Full session history table, filterable, with "Log Session" action | BCBAs, RBTs |
-| **Documents** (Phase 2) | Uploaded files, auth letters, assessments, referrals | All roles |
-| **Edit** | Full client edit form (demographics, clinical, address, notes) | BCBAs, Admins |
+| Tab                     | Content                                                                                | Role Priority         |
+| ----------------------- | -------------------------------------------------------------------------------------- | --------------------- |
+| **Overview** (default)  | Metric cards, alerts, auth utilization, insurance snapshot, care team, recent sessions | All roles             |
+| **Insurance**           | Full insurance policy cards with verification, subscriber details, card images         | Billing staff, Admins |
+| **Authorizations**      | All auths (active expanded, expired collapsed), per-service detail, upload auth letter | BCBAs, Billing staff  |
+| **Sessions**            | Full session history table, filterable, with "Log Session" action                      | BCBAs, RBTs           |
+| **Documents** (Phase 2) | Uploaded files, auth letters, assessments, referrals                                   | All roles             |
+| **Edit**                | Full client edit form (demographics, clinical, address, notes)                         | BCBAs, Admins         |
 
 ### 7c. Role-Based Tab Emphasis
 
-| Role | Primary Tabs | Secondary Tabs |
-|------|-------------|----------------|
-| BCBA | Overview, Authorizations, Sessions | Insurance, Edit |
-| RBT | Overview (auth status check), Sessions | -- |
-| Billing Staff | Insurance, Authorizations, Overview | Sessions |
-| Admin | All tabs equally | -- |
+| Role          | Primary Tabs                           | Secondary Tabs  |
+| ------------- | -------------------------------------- | --------------- |
+| BCBA          | Overview, Authorizations, Sessions     | Insurance, Edit |
+| RBT           | Overview (auth status check), Sessions | --              |
+| Billing Staff | Insurance, Authorizations, Overview    | Sessions        |
+| Admin         | All tabs equally                       | --              |
 
 Tabs should remain visible to all authenticated roles but could show a subtle visual indicator for "your most relevant tabs" based on role.
 
@@ -586,22 +629,23 @@ Tabs should remain visible to all authenticated roles but could show a subtle vi
 
 ### 7e. What Makes Clinivise's Client Detail Better Than Competitors
 
-| Competitor Gap | Clinivise Advantage |
-|---------------|---------------------|
-| CentralReach buries auth utilization in Billing module | Auth utilization is the hero of the Overview tab with per-CPT progress bars |
-| CentralReach is not mobile-friendly | Responsive design with 44px+ touch targets, tablet-optimized layout |
-| AlohaABA has auth data but no unified Overview | Single Overview tab consolidates metrics, insurance, care team, sessions |
-| SimplePractice uses chronological timeline (noisy for high-volume ABA) | Structured cards and sections with progressive disclosure |
-| No ABA tool surfaces alerts proactively on the client page | Inline alert banners for expiring auths, missing insurance, under-utilization |
-| Most tools require 3-4 clicks to check auth remaining | Metric cards + utilization bars visible immediately on page load |
-| Guardian info often buried in contacts/edit screens | Guardian name + phone in the sticky header (ABA clients are children) |
-| No competitor uses clickable metrics as navigation | Metric cards double as tab shortcuts (Jane App pattern adapted for ABA) |
+| Competitor Gap                                                         | Clinivise Advantage                                                           |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| CentralReach buries auth utilization in Billing module                 | Auth utilization is the hero of the Overview tab with per-CPT progress bars   |
+| CentralReach is not mobile-friendly                                    | Responsive design with 44px+ touch targets, tablet-optimized layout           |
+| AlohaABA has auth data but no unified Overview                         | Single Overview tab consolidates metrics, insurance, care team, sessions      |
+| SimplePractice uses chronological timeline (noisy for high-volume ABA) | Structured cards and sections with progressive disclosure                     |
+| No ABA tool surfaces alerts proactively on the client page             | Inline alert banners for expiring auths, missing insurance, under-utilization |
+| Most tools require 3-4 clicks to check auth remaining                  | Metric cards + utilization bars visible immediately on page load              |
+| Guardian info often buried in contacts/edit screens                    | Guardian name + phone in the sticky header (ABA clients are children)         |
+| No competitor uses clickable metrics as navigation                     | Metric cards double as tab shortcuts (Jane App pattern adapted for ABA)       |
 
 ---
 
 ## 8. Sources
 
 ### ABA Practice Management Platforms
+
 - [CentralReach Help: Contact Details Sidebar](https://help.centralreach.com/contact-details-sidebar/)
 - [CentralReach Help: Manage Client Profile](https://help.centralreach.com/manage-my-client-profile/)
 - [CentralReach Help: Navigating Client Portal](https://help.centralreach.com/navigating-the-client-portal/)
@@ -619,6 +663,7 @@ Tabs should remain visible to all authenticated roles but could show a subtle vi
 - [RethinkBH: Practice Management](https://www.rethinkbehavioralhealth.com/our-solutions/practice-management/)
 
 ### General EHR / Therapy Platforms
+
 - [SimplePractice: Navigating Client Overview](https://support.simplepractice.com/hc/en-us/articles/5357432054541-Navigating-the-client-Overview-page)
 - [SimplePractice: Editing Client Info](https://support.simplepractice.com/hc/en-us/articles/360049778071-Editing-a-client-s-information)
 - [SimplePractice: Client Billing Overview](https://support.simplepractice.com/hc/en-us/articles/360056811751-Using-the-client-Billing-Overview-page)
@@ -634,6 +679,7 @@ Tabs should remain visible to all authenticated roles but could show a subtle vi
 - [Healthie: Collecting Insurance Information](https://help.gethealthie.com/article/288-collecting-insurance-information)
 
 ### EHR UX Design Principles
+
 - [Fuselab: EHR Interface Design Principles](https://fuselabcreative.com/ehr-interface-design-principles-ux-and-usability-challenges/)
 - [Purrweb: EMR/EHR Interface Design](https://www.purrweb.com/blog/emr-ehr-interface-design/)
 - [Zazz: 15 EHR/EMR Interface Principles](https://www.zazz.io/blog/ehr-emr-interface-design-principles/)
@@ -646,6 +692,7 @@ Tabs should remain visible to all authenticated roles but could show a subtle vi
 - [emedpractice: Patient 360 View](https://emedpractice.com/complete-health-profile-patient-360-view/)
 
 ### ABA Intake & Clinical Workflow
+
 - [ABA Engine: Guide to ABA Intake Forms](https://abaengine.com/blog/a-guide-to-using-aba-intake-forms/)
 - [Your Missing Piece: ABA Intake Paperwork](https://yourmissingpiece.com/blog/what-should-be-included-in-the-aba-intake-paperwork/)
 - [UW Autism Center: ABA Intake Packet](https://depts.washington.edu/uwautism/wp-content/uploads/2018/04/1b.-IntakeForm_ABA1.pdf)

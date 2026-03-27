@@ -12,10 +12,26 @@ export const metadata: Metadata = {
 const ROLE_DESCRIPTIONS: { role: string; description: string }[] = [
   { role: "Owner", description: "Full access. Manage billing, team, settings, and subscription." },
   { role: "Admin", description: "Full access except subscription management." },
-  { role: "BCBA", description: "Clinical access for assigned caseload. Create auths, log sessions, manage treatment plans." },
-  { role: "BCaBA", description: "Limited clinical access under BCBA supervision. Cannot create auths or sign off sessions." },
-  { role: "RBT", description: "Session logging for assigned clients only. Cannot see billing, insurance, or other clients." },
-  { role: "Billing Staff", description: "Insurance, claims, payments, payers. Cannot see clinical notes or treatment data." },
+  {
+    role: "BCBA",
+    description:
+      "Clinical access for assigned caseload. Create auths, log sessions, manage treatment plans.",
+  },
+  {
+    role: "BCaBA",
+    description:
+      "Limited clinical access under BCBA supervision. Cannot create auths or sign off sessions.",
+  },
+  {
+    role: "RBT",
+    description:
+      "Session logging for assigned clients only. Cannot see billing, insurance, or other clients.",
+  },
+  {
+    role: "Billing Staff",
+    description:
+      "Insurance, claims, payments, payers. Cannot see clinical notes or treatment data.",
+  },
 ];
 
 export default async function TeamPage() {
@@ -36,9 +52,9 @@ export default async function TeamPage() {
       <TeamTable members={members} currentUserId={user.id} canManage={canManage} />
 
       {/* Role Descriptions */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-        <div className="border-b border-border/60 bg-muted/20 px-4 py-2.5">
-          <span className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
+      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+        <div className="border-border/60 bg-muted/20 border-b px-4 py-2.5">
+          <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
             Role Descriptions
           </span>
         </div>
@@ -47,7 +63,7 @@ export default async function TeamPage() {
             {ROLE_DESCRIPTIONS.map((rd) => (
               <div key={rd.role} className="flex gap-3">
                 <span className="w-20 shrink-0 text-xs font-semibold">{rd.role}</span>
-                <span className="text-xs text-muted-foreground">{rd.description}</span>
+                <span className="text-muted-foreground text-xs">{rd.description}</span>
               </div>
             ))}
           </div>

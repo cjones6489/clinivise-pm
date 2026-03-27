@@ -41,7 +41,9 @@ export default async function AuthorizationsPage({
   const user = await requireAuth();
   const canCreate = hasPermission(user.role, "authorizations.write");
   const validKeys = FILTER_TABS.map((t) => t.key);
-  const activeTab = validKeys.includes(filterParam as FilterTab) ? (filterParam as FilterTab) : "all";
+  const activeTab = validKeys.includes(filterParam as FilterTab)
+    ? (filterParam as FilterTab)
+    : "all";
   const filters = getFiltersForTab(activeTab);
 
   const [authorizations, metrics] = await Promise.all([
@@ -52,7 +54,8 @@ export default async function AuthorizationsPage({
   // Show metric cards + filter tabs if the practice has any auth data at all (unfiltered)
   const hasAnyAuths = metrics.totalCount > 0;
   const utilizationLevel = getUtilizationLevel(metrics.avgUtilization);
-  const utilizationAccent = metrics.avgUtilization > 0 ? LEVEL_COLORS[utilizationLevel].text : undefined;
+  const utilizationAccent =
+    metrics.avgUtilization > 0 ? LEVEL_COLORS[utilizationLevel].text : undefined;
 
   return (
     <div className="space-y-6">
@@ -86,7 +89,9 @@ export default async function AuthorizationsPage({
               label="Expiring 30d"
               value={String(metrics.expiring30dCount)}
               sub="needs renewal"
-              accent={metrics.expiring30dCount > 0 ? "text-amber-600 dark:text-amber-400" : undefined}
+              accent={
+                metrics.expiring30dCount > 0 ? "text-amber-600 dark:text-amber-400" : undefined
+              }
             />
             <MetricCard
               label="Expired"
@@ -103,15 +108,15 @@ export default async function AuthorizationsPage({
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex gap-1 overflow-x-auto border-b border-border">
+          <div className="border-border flex gap-1 overflow-x-auto border-b">
             {FILTER_TABS.map((tab) => (
               <Link
                 key={tab.key}
                 href={tab.key === "all" ? "/authorizations" : `/authorizations?filter=${tab.key}`}
                 className={cn(
-                  "px-3 py-2 text-xs font-medium transition-colors -mb-px",
+                  "-mb-px px-3 py-2 text-xs font-medium transition-colors",
                   activeTab === tab.key
-                    ? "border-b-2 border-foreground text-foreground"
+                    ? "border-foreground text-foreground border-b-2"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -138,11 +143,15 @@ export default async function AuthorizationsPage({
         <EmptyState
           icon={FileValidationIcon}
           title={
-            activeTab === "active" ? "No active authorizations"
-            : activeTab === "expiring" ? "No expiring authorizations"
-            : activeTab === "expired" ? "No expired authorizations"
-            : activeTab === "pending" ? "No pending authorizations"
-            : "No authorizations found"
+            activeTab === "active"
+              ? "No active authorizations"
+              : activeTab === "expiring"
+                ? "No expiring authorizations"
+                : activeTab === "expired"
+                  ? "No expired authorizations"
+                  : activeTab === "pending"
+                    ? "No pending authorizations"
+                    : "No authorizations found"
           }
           description="No authorizations match the current filter."
         />

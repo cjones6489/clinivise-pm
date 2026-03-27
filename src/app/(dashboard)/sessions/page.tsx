@@ -46,7 +46,9 @@ export default async function SessionsPage({
   const user = await requireAuth();
   const canCreate = hasPermission(user.role, "sessions.write");
   const page = Math.max(0, parseInt(pageParam ?? "0", 10) || 0);
-  const activeTab = (["all", "week", "flagged"].includes(filterParam ?? "") ? filterParam : "all") as FilterTab;
+  const activeTab = (
+    ["all", "week", "flagged"].includes(filterParam ?? "") ? filterParam : "all"
+  ) as FilterTab;
   const filters = getFiltersForTab(activeTab);
 
   const [{ data: sessions, total, pageSize }, metrics] = await Promise.all([
@@ -83,34 +85,26 @@ export default async function SessionsPage({
               value={`${Number(metrics.hoursThisWeek).toFixed(1)}h`}
               sub="hours logged"
             />
-            <MetricCard
-              label="Sessions 7d"
-              value={String(metrics.sessions7d)}
-              sub="past 7 days"
-            />
+            <MetricCard label="Sessions 7d" value={String(metrics.sessions7d)} sub="past 7 days" />
             <MetricCard
               label="Flagged"
               value={String(metrics.flaggedCount)}
               sub="needs review"
               accent={metrics.flaggedCount > 0 ? "text-red-600 dark:text-red-400" : undefined}
             />
-            <MetricCard
-              label="Unbilled"
-              value="—"
-              sub="Phase 2"
-            />
+            <MetricCard label="Unbilled" value="—" sub="Phase 2" />
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex gap-1 overflow-x-auto border-b border-border">
+          <div className="border-border flex gap-1 overflow-x-auto border-b">
             {FILTER_TABS.map((tab) => (
               <Link
                 key={tab.key}
                 href={tab.key === "all" ? "/sessions" : `/sessions?filter=${tab.key}`}
                 className={cn(
-                  "px-3 py-2 text-xs font-medium transition-colors -mb-px",
+                  "-mb-px px-3 py-2 text-xs font-medium transition-colors",
                   activeTab === tab.key
-                    ? "border-b-2 border-foreground text-foreground"
+                    ? "border-foreground text-foreground border-b-2"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -127,7 +121,12 @@ export default async function SessionsPage({
       )}
 
       {sessions.length > 0 || page > 0 ? (
-        <SessionTable data={sessions} canEdit={canCreate} pagination={{ page, pageSize, total }} activeFilter={activeTab} />
+        <SessionTable
+          data={sessions}
+          canEdit={canCreate}
+          pagination={{ page, pageSize, total }}
+          activeFilter={activeTab}
+        />
       ) : hasAnySessions ? (
         <EmptyState
           icon={Clock01Icon}

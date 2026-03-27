@@ -13,9 +13,11 @@ All-in-one ABA therapy platform — clinical operations, practice management, an
 Every feature follows this sequence. Steps 1-2 happen BEFORE any code is written.
 
 **Step 1 — User Story**: Who does what, when, and why? Write a concrete scenario.
-> *"A BCBA opens a client's page Monday morning to check if their authorization is running low before scheduling this week's sessions."*
+
+> _"A BCBA opens a client's page Monday morning to check if their authorization is running low before scheduling this week's sessions."_
 
 **Step 2 — Page Design**: What do they see? What do they click? What data appears where? Reference the wireframe (`docs/design/clinivise-wireframes.jsx`) for layout patterns. Describe:
+
 - The page layout (metric cards, section cards, tables, action buttons)
 - The information hierarchy (what's the hero moment? what's secondary? what's metadata?)
 - The user's primary and secondary actions from this page
@@ -27,7 +29,7 @@ Every feature follows this sequence. Steps 1-2 happen BEFORE any code is written
 
 ### Why this order matters
 
-When you start with the schema and "slap a form on top," you get a database admin panel. When you start with the user's workflow, the schema naturally follows and the UI reflects actual usage patterns. Jeff Atwood: *"Before writing a single line of code, you need to have a clear idea of what the user interface will look like first."*
+When you start with the schema and "slap a form on top," you get a database admin panel. When you start with the user's workflow, the schema naturally follows and the UI reflects actual usage patterns. Jeff Atwood: _"Before writing a single line of code, you need to have a clear idea of what the user interface will look like first."_
 
 ### Design quality standard
 
@@ -35,23 +37,23 @@ Every page must have: a rich header with contextual metadata, section cards with
 
 ## Tech Stack
 
-| Layer | Technology | Notes |
-|-------|-----------|-------|
-| Framework | Next.js 16.2 | App Router, Server Components default |
-| Language | TypeScript 5.9 | Strict mode |
-| Styling | Tailwind CSS v4 | CSS-first config (`globals.css`), no `tailwind.config.js` |
-| Components | shadcn/ui (Mira style) | `radix-ui` unified package, `cn()` from `@/lib/utils` |
-| Database | Neon Postgres + Drizzle ORM 0.45 | Serverless driver, `@neondatabase/serverless` |
-| Auth | Clerk Pro | Organizations, RBAC, MFA. No BAA needed (staff-only) |
-| Server Actions | next-safe-action v8 | `authActionClient` injects org context |
-| Data Fetching | TanStack Query v5 | Client-side. Server components use direct DB calls |
-| Forms | React Hook Form + Zod v4 | `zod/v4` import path, `@hookform/resolvers` |
-| AI | Any LLM (prototype) → Bedrock (prod) | Direct API for now; migrate to Bedrock when handling real PHI |
-| File Storage | Vercel Blob | Auth letter PDFs. Covered under Vercel BAA |
-| Rate Limiting | Upstash Redis | HTTP-based, serverless-native |
-| Monitoring | Sentry v10 | Add PHI scrubbing before production |
-| Billing API | Stedi (Phase 2) | JSON-first EDI. Basic plan for dev, Developer for prod |
-| Testing | Vitest 4 + Playwright 1.58 | Unit + E2E |
+| Layer          | Technology                           | Notes                                                         |
+| -------------- | ------------------------------------ | ------------------------------------------------------------- |
+| Framework      | Next.js 16.2                         | App Router, Server Components default                         |
+| Language       | TypeScript 5.9                       | Strict mode                                                   |
+| Styling        | Tailwind CSS v4                      | CSS-first config (`globals.css`), no `tailwind.config.js`     |
+| Components     | shadcn/ui (Mira style)               | `radix-ui` unified package, `cn()` from `@/lib/utils`         |
+| Database       | Neon Postgres + Drizzle ORM 0.45     | Serverless driver, `@neondatabase/serverless`                 |
+| Auth           | Clerk Pro                            | Organizations, RBAC, MFA. No BAA needed (staff-only)          |
+| Server Actions | next-safe-action v8                  | `authActionClient` injects org context                        |
+| Data Fetching  | TanStack Query v5                    | Client-side. Server components use direct DB calls            |
+| Forms          | React Hook Form + Zod v4             | `zod/v4` import path, `@hookform/resolvers`                   |
+| AI             | Any LLM (prototype) → Bedrock (prod) | Direct API for now; migrate to Bedrock when handling real PHI |
+| File Storage   | Vercel Blob                          | Auth letter PDFs. Covered under Vercel BAA                    |
+| Rate Limiting  | Upstash Redis                        | HTTP-based, serverless-native                                 |
+| Monitoring     | Sentry v10                           | Add PHI scrubbing before production                           |
+| Billing API    | Stedi (Phase 2)                      | JSON-first EDI. Basic plan for dev, Developer for prod        |
+| Testing        | Vitest 4 + Playwright 1.58           | Unit + E2E                                                    |
 
 ## Commands
 
@@ -141,6 +143,7 @@ src/
 ## Documentation
 
 All project docs are indexed in `docs/INDEX.md`. Key references:
+
 - `docs/specs/product-spec.md` — **Page-by-page product spec.** Every page defined with user stories, layouts, data requirements, actions, and MVP scope. **Read the relevant page entry before building or redesigning any page.**
 - `docs/design/clinivise-wireframes.jsx` — Interactive wireframes showing intended page layouts, data density, and visual hierarchy. **Reference this alongside the product spec.**
 - `docs/specs/engineering-spec.md` — Full DB schema, config files, task breakdown

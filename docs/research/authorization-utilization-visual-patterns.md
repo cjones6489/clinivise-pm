@@ -4,6 +4,7 @@
 > Focus: Visual design patterns, user flows, and screen-level UX for authorization/utilization tracking. Covers healthcare PM, ABA-specific tools, design-leading SaaS, YC startups, tablet-first interfaces, and AI-native approaches.
 >
 > Companion documents:
+>
 > - [`authorization-tracking-ux-research.md`](authorization-tracking-ux-research.md) -- Component-level patterns, alerting, mobile UX
 > - [`authorization-tracking-competitive-research.md`](authorization-tracking-competitive-research.md) -- Competitor deep dives
 > - [`authorization-lifecycle-ux-research.md`](authorization-lifecycle-ux-research.md) -- System-wide integration, progressive disclosure
@@ -13,22 +14,22 @@
 
 ## Patterns to Steal: Summary Table
 
-| # | Pattern | Stolen From | Serves | Page Type | Maturity |
-|---|---------|-------------|--------|-----------|----------|
-| 1 | Segmented multi-color utilization bar | Linear + VA.gov | All personas | Client page + auth detail | Production-proven |
-| 2 | Budget-as-ambient-context (every screen shows budget) | Ramp Budgets | BCBA, Billing | Hybrid (pervasive) | Production-proven |
-| 3 | Burndown projection line ("units exhaust on [date]") | Mercury cash burn | BCBA, Admin | Auth detail + dashboard | Production-proven concept, novel in ABA |
-| 4 | Tiered usage meters with threshold coloring | Vercel usage dashboard | Admin, Billing | Dashboard | Production-proven |
-| 5 | Global filter dashboard (filter by BCBA/client/payer) | Notion Dashboards (March 2026) | Admin, BCBA | Dashboard | Production-proven |
-| 6 | Auth picker as touch-friendly card carousel | Motivity/Catalyst mobile patterns | RBT | Session form | Early-adopter (ABA mobile) |
-| 7 | AI-parsed auth letter with confidence-scored field review | Cohere Health + LandingAI | Billing | Auth creation flow | Production at scale (Cohere), novel in ABA |
-| 8 | Authorization pipeline / kanban status board | Cohere Health + healthcare PA tools | Billing | Standalone auth management | Production-proven (PA platforms) |
-| 9 | Predictive re-auth trigger with pre-populated renewal | Infinx + Waystar AI agents | BCBA, Billing | Auth detail + notification | Early-adopter |
-| 10 | Four-tier progressive disclosure (ambient > contextual > focused > deep) | Carbon Design System + Stripe | All personas | System-wide | Production-proven pattern, novel in ABA |
-| 11 | Pacing gauge: actual vs. expected utilization velocity | RethinkBH + Mercury | BCBA, Admin | Auth detail + dashboard | Production (RethinkBH), novel visual treatment |
-| 12 | Absence-is-success: quiet when healthy, loud when broken | Carbon + Mercury | All personas | System-wide | Production-proven |
-| 13 | Compact auth constraint warning at point of scheduling | Passage Health + AlohaABA | BCBA, Scheduler | Calendar/scheduling | Production-proven |
-| 14 | Authorization health score (composite metric) | Cohere Align trust score | Admin | Dashboard | Experimental |
+| #   | Pattern                                                                  | Stolen From                         | Serves          | Page Type                  | Maturity                                       |
+| --- | ------------------------------------------------------------------------ | ----------------------------------- | --------------- | -------------------------- | ---------------------------------------------- |
+| 1   | Segmented multi-color utilization bar                                    | Linear + VA.gov                     | All personas    | Client page + auth detail  | Production-proven                              |
+| 2   | Budget-as-ambient-context (every screen shows budget)                    | Ramp Budgets                        | BCBA, Billing   | Hybrid (pervasive)         | Production-proven                              |
+| 3   | Burndown projection line ("units exhaust on [date]")                     | Mercury cash burn                   | BCBA, Admin     | Auth detail + dashboard    | Production-proven concept, novel in ABA        |
+| 4   | Tiered usage meters with threshold coloring                              | Vercel usage dashboard              | Admin, Billing  | Dashboard                  | Production-proven                              |
+| 5   | Global filter dashboard (filter by BCBA/client/payer)                    | Notion Dashboards (March 2026)      | Admin, BCBA     | Dashboard                  | Production-proven                              |
+| 6   | Auth picker as touch-friendly card carousel                              | Motivity/Catalyst mobile patterns   | RBT             | Session form               | Early-adopter (ABA mobile)                     |
+| 7   | AI-parsed auth letter with confidence-scored field review                | Cohere Health + LandingAI           | Billing         | Auth creation flow         | Production at scale (Cohere), novel in ABA     |
+| 8   | Authorization pipeline / kanban status board                             | Cohere Health + healthcare PA tools | Billing         | Standalone auth management | Production-proven (PA platforms)               |
+| 9   | Predictive re-auth trigger with pre-populated renewal                    | Infinx + Waystar AI agents          | BCBA, Billing   | Auth detail + notification | Early-adopter                                  |
+| 10  | Four-tier progressive disclosure (ambient > contextual > focused > deep) | Carbon Design System + Stripe       | All personas    | System-wide                | Production-proven pattern, novel in ABA        |
+| 11  | Pacing gauge: actual vs. expected utilization velocity                   | RethinkBH + Mercury                 | BCBA, Admin     | Auth detail + dashboard    | Production (RethinkBH), novel visual treatment |
+| 12  | Absence-is-success: quiet when healthy, loud when broken                 | Carbon + Mercury                    | All personas    | System-wide                | Production-proven                              |
+| 13  | Compact auth constraint warning at point of scheduling                   | Passage Health + AlohaABA           | BCBA, Scheduler | Calendar/scheduling        | Production-proven                              |
+| 14  | Authorization health score (composite metric)                            | Cohere Align trust score            | Admin           | Dashboard                  | Experimental                                   |
 
 ---
 
@@ -51,6 +52,7 @@ Overall: 18/52 units (34.6%)
 ```
 
 Individual service line bars use threshold coloring:
+
 - **0-79% (emerald):** On track. Subtle, recedes.
 - **80-94% (amber):** Warning. Slightly more prominent.
 - **95-100% (red):** Critical. Demands attention.
@@ -59,6 +61,7 @@ Individual service line bars use threshold coloring:
 **Who it serves:** All personas. BCBAs see it on client detail pages. RBTs see it on the session form auth picker. Billing staff sees it on the auth list/detail. Admins see aggregated bars on the dashboard.
 
 **What makes it good UX:**
+
 - Encodes three dimensions in one compact element (CPT code, utilization ratio, health status via color)
 - Scannable at a glance -- you don't need to read numbers to know which service lines need attention
 - Linear proved that segmented bars can be information-dense without feeling cluttered
@@ -82,19 +85,20 @@ Budget/quota data is never hidden on a dedicated page -- it surfaces contextuall
 **Applied to Clinivise:**
 Authorization utilization data appears at seven touchpoints:
 
-| Touchpoint | What's Shown | Fidelity |
-|------------|-------------|----------|
-| **Sidebar nav** | Badge count of auths needing attention (e.g., "3") | Ambient |
-| **Dashboard** | Aggregated widget: "X auths expiring this week, Y at >80% utilization" | Focused |
-| **Client list** | Status dot (red/amber/green) per client based on worst-case auth | Ambient |
-| **Client detail header** | Auth summary card per active auth with utilization bar | Contextual |
+| Touchpoint                   | What's Shown                                                            | Fidelity   |
+| ---------------------------- | ----------------------------------------------------------------------- | ---------- |
+| **Sidebar nav**              | Badge count of auths needing attention (e.g., "3")                      | Ambient    |
+| **Dashboard**                | Aggregated widget: "X auths expiring this week, Y at >80% utilization"  | Focused    |
+| **Client list**              | Status dot (red/amber/green) per client based on worst-case auth        | Ambient    |
+| **Client detail header**     | Auth summary card per active auth with utilization bar                  | Contextual |
 | **Session form auth picker** | Card per eligible auth showing remaining units, utilization bar, expiry | Contextual |
-| **Auth list table** | Full table rows with utilization %, status badge, expiry countdown | Focused |
-| **Auth detail page** | Complete breakdown: tabs, service lines, sessions, documents, timeline | Deep dive |
+| **Auth list table**          | Full table rows with utilization %, status badge, expiry countdown      | Focused    |
+| **Auth detail page**         | Complete breakdown: tabs, service lines, sessions, documents, timeline  | Deep dive  |
 
 **Who it serves:** All personas at different levels. The key insight from Ramp: finance teams that see budget impact at decision time make better decisions than those who check a budget report weekly.
 
 **What makes it good UX:**
+
 - Prevents the "I had no idea the auth was almost used up" surprise that causes unbillable sessions
 - Context-appropriate detail: an RBT on a tablet during session logging sees "12 units remaining" (just enough to decide). A BCBA on the client page sees the full utilization bar with CPT breakdown.
 - Ramp proved that real-time budget visibility reduced overspend by 30% -- the same principle applies to authorization over-utilization
@@ -111,6 +115,7 @@ Authorization utilization data appears at seven touchpoints:
 
 **What it looks like:**
 A simple area chart or line chart on the authorization detail page showing:
+
 - X-axis: time (auth start date to auth end date)
 - Y-axis: units (0 to approved total)
 - **Actual consumption line:** Steps up with each session logged
@@ -137,6 +142,7 @@ Units
 **Who it serves:** BCBAs (primary -- they make scheduling decisions based on utilization pace). Admin/owners see aggregated burndown across the practice on the dashboard.
 
 **What makes it good UX:**
+
 - Mercury proved that showing "months of runway remaining" changes decision-making. Applied to auths: "weeks of units remaining" drives proactive re-authorization.
 - No ABA competitor offers predictive burndown visualization. CentralReach has scatter charts (complex, requires training). AlohaABA has basic utilization percentages (no projection). RethinkBH has "pacing" metrics but no visual burndown.
 - The projection makes abstract numbers concrete: "72% utilized" is hard to act on. "Units exhaust 3 weeks before auth expires" is immediately actionable.
@@ -176,6 +182,7 @@ Authorization Health Overview                    [Filter: All BCBAs v]
 **Who it serves:** Admin/owners and billing staff. This is the "practice-wide health check" view.
 
 **What makes it good UX:**
+
 - Vercel proved that developers care about quota usage and will proactively manage it when the data is visible and well-organized. Same principle: BCBAs and admins will proactively manage auth utilization when the dashboard makes it easy.
 - Aggregation by CPT code across the practice reveals patterns: "We're consistently over-utilizing 97153 across all clients" points to a systemic scheduling issue.
 - Threshold coloring eliminates the need to parse numbers -- the color IS the information.
@@ -215,6 +222,7 @@ The global filter operates on ALL widgets. When you select "Sarah Chen" as BCBA,
 **Who it serves:** Admin/owners (practice-wide view, filter by BCBA to review caseloads). BCBAs (filter to themselves for their own caseload overview).
 
 **What makes it good UX:**
+
 - Linear proved that "insights attached to the current view" is more useful than a separate analytics page. The same authorization data, filtered contextually, serves as both a practice-wide dashboard and a per-BCBA workload view.
 - Notion's implementation shows this can be done with standard database filtering -- no separate "reports" module needed.
 - Eliminates the need for a separate "BCBA caseload view" page. The dashboard IS the caseload view when filtered.
@@ -249,6 +257,7 @@ Cards are sorted by system recommendation (FIFO: oldest expiration first) with t
 **Who it serves:** RBTs (primary -- they log sessions on tablets in the field). BCBAs logging supervision sessions.
 
 **What makes it good UX:**
+
 - Catalyst users complain about "auto-switching to the next target" and scroll-to-top bugs on mobile. The card carousel avoids these issues by keeping each option discrete and visible.
 - Motivity is tablet-native but doesn't show utilization data inline during auth selection. This is an opportunity.
 - The card format communicates more context than a dropdown can: payer, CPT code, utilization, remaining units, and expiry all visible at a glance.
@@ -307,6 +316,7 @@ Fields marked with amber are pre-populated but the user must confirm before proc
 **Who it serves:** Billing staff (primary -- they receive and process auth letters). BCBAs (secondary -- they review auth details).
 
 **What makes it good UX:**
+
 - No ABA competitor does this. CentralReach, AlohaABA, Motivity, RethinkBH all require fully manual data entry from auth letters.
 - Cohere Health proved that 90% auto-processing is achievable with modern AI. Even 70% accuracy saves significant time.
 - The confidence scoring prevents blind trust in AI -- users know exactly which fields to verify.
@@ -348,6 +358,7 @@ Each card is a mini authorization summary with client name, payer, utilization o
 **Who it serves:** Billing staff (primary -- they manage the auth lifecycle). Admin/owners (practice-wide pipeline visibility).
 
 **What makes it good UX:**
+
 - Kanban boards are proven for workflow management in healthcare settings (ClickUp, KanbanZone, TeamHub all offer healthcare Kanban templates).
 - The pipeline view reveals bottlenecks: a growing "Pending Approval" column means payer response times are slow. A growing "Expiring" column means the re-auth process needs to start earlier.
 - This is more actionable than a table view for lifecycle management because the columns encode status visually.
@@ -366,11 +377,13 @@ Each card is a mini authorization summary with client name, payer, utilization o
 
 **What it looks like:**
 The system monitors each authorization and triggers a re-authorization workflow based on:
+
 1. **Utilization pace:** If units will exhaust before auth expiry (burndown projection)
 2. **Calendar proximity:** 30 days before expiry (configurable per payer, since some payers require 45-day lead time)
 3. **Payer-specific lead time:** Known processing times per payer stored in the system
 
 When triggered, the system:
+
 - Creates a notification: "Authorization for J. Martinez (Blue Cross, 97153) should be renewed. Current utilization: 82%. Auth expires in 28 days."
 - Pre-populates a renewal form with: previous auth details, updated utilization data, current session count, and a draft progress summary for the BCBA to review.
 - CTA: "Start Renewal" opens the re-auth workflow with pre-filled data.
@@ -378,6 +391,7 @@ When triggered, the system:
 **Who it serves:** BCBA (reviews clinical progress for renewal). Billing staff (manages submission). Admin (monitors pipeline).
 
 **What makes it good UX:**
+
 - SPRY proved that proactive resubmission prevents care interruptions. Expired auths = unbillable sessions = $0 revenue.
 - CoverMyMeds showed that proactive renewal prompts from payers to prescribers improve continuity of care.
 - Pre-populating the renewal with existing data saves the BCBA 20-30 minutes per re-auth (the Waystar benchmark: 24 minutes per manual authorization).
@@ -397,23 +411,27 @@ When triggered, the system:
 The same authorization data appears at four levels of detail, each appropriate to its context:
 
 **Tier 1 -- Ambient (peripheral awareness):**
+
 - Sidebar nav: red badge "3" on Authorizations
 - Client list: colored dot (red/amber/green/gray) based on worst-case auth status
 - Design: Badge pill, 4px dot indicator, count chip
 - Interaction: Click navigates to relevant detail
 
 **Tier 2 -- Contextual (working context):**
+
 - Session form: auth picker card with "Blue Cross | 97153 | 12/40 remaining" + utilization bar
 - Client detail header: summary card per active auth
 - Calendar tooltip: "Auth expires Jun 7 -- 12 units remaining"
 - Design: Compact card, inline text with badge, tooltip
 
 **Tier 3 -- Focused (management context):**
+
 - Auth list table: full row with utilization %, status, expiry, payer
 - Dashboard widget: severity-sorted alert cards
 - Design: Data table, alert widgets, metric cards
 
 **Tier 4 -- Deep dive (full context):**
+
 - Auth detail page: header + tabs (Overview, Services, Sessions, Documents, Timeline)
 - Burndown chart, full service line breakdown, session history, document uploads
 - Design: Rich header card + tabbed content
@@ -427,6 +445,7 @@ The same authorization data appears at four levels of detail, each appropriate t
 | Admin | Tier 1 + 3 | Aggregated health, revenue at risk, dashboard | Individual service line details |
 
 **What makes it good UX:**
+
 - Carbon Design System proved that status indicators must be contextual (placed near the element they describe), severity-driven (critical = high attention, healthy = low attention), and conditionally displayed (only show when something needs communication).
 - Stripe proved that usage data should appear at the point of billing/decision, not on a separate analytics page.
 - NN/g's research on progressive disclosure: "Defer advanced information to secondary screens. The key insight: every touchpoint shows exactly the right amount of detail for that context."
@@ -466,6 +485,7 @@ Authorization Pacing
 ```
 
 The gauge shows a marker for actual position and a marker for expected position on a single horizontal line. The gap between them tells the story. Pacing states:
+
 - **On pace** (within +/- 10%): green, no alert
 - **Ahead of pace** (>10% ahead): amber, risk of early exhaustion
 - **Behind pace** (>10% behind): amber, risk of under-utilization
@@ -475,6 +495,7 @@ The gauge shows a marker for actual position and a marker for expected position 
 **Who it serves:** BCBAs (scheduling decisions), Admin (practice-wide pacing review).
 
 **What makes it good UX:**
+
 - RethinkBH offers "authorization utilization pacing" as a feature but presents it as a report/metric, not as a visual gauge. The visual treatment makes it instantly comprehensible.
 - Under-utilization is as costly as over-utilization in ABA. Authorized hours not used = revenue left on the table + a signal to payers that fewer hours are needed (risking reduced future authorizations).
 - The dual-marker gauge communicates the relationship between time elapsed and units consumed in a way that a single percentage number cannot.
@@ -492,16 +513,17 @@ The gauge shows a marker for actual position and a marker for expected position 
 **What it looks like:**
 Rather than showing green "healthy" badges on every authorization, the system only surfaces visual indicators when something deviates from the expected state.
 
-| Auth State | Visual Treatment | Why |
-|-----------|-----------------|-----|
+| Auth State                                     | Visual Treatment                             | Why                                     |
+| ---------------------------------------------- | -------------------------------------------- | --------------------------------------- |
 | Active, healthy utilization, not expiring soon | No indicator, no badge, no color. Clean row. | Absence of signal = everything is fine. |
-| 80%+ utilization | Amber badge appears | Needs attention soon |
-| 95%+ utilization | Red badge appears | Needs immediate attention |
-| Expiring in 30 days | Blue "30d" countdown chip appears | Informational |
-| Expiring in 7 days | Red "7d" countdown chip appears | Urgent |
-| Over-utilized | Red "OVER" badge with icon | Critical |
+| 80%+ utilization                               | Amber badge appears                          | Needs attention soon                    |
+| 95%+ utilization                               | Red badge appears                            | Needs immediate attention               |
+| Expiring in 30 days                            | Blue "30d" countdown chip appears            | Informational                           |
+| Expiring in 7 days                             | Red "7d" countdown chip appears              | Urgent                                  |
+| Over-utilized                                  | Red "OVER" badge with icon                   | Critical                                |
 
 **What makes it good UX:**
+
 - Mercury's design philosophy: "highlights, not raw data." The dashboard surfaces insights -- things that are notable or need attention -- rather than displaying all data with equal weight.
 - Carbon Design System: "Conditional presence -- indicators appear or change based on conditions. They are not always visible." This prevents badge blindness where users stop seeing green "OK" badges because they're everywhere.
 - CentralReach's approach of showing utilization rates on every row leads to information overload. When everything has a badge, nothing stands out.
@@ -539,6 +561,7 @@ Schedule Session for James Martinez
 ```
 
 Four validation states:
+
 1. **No active auth:** Yellow banner. "No authorization found. Session may not be billable." CTA: "Create Authorization"
 2. **Auth expires before session:** Amber banner. "Authorization expires [date], before this session." CTA: "View Authorization"
 3. **Insufficient units:** Red banner with specific unit math. CTA: "Schedule Anyway" (with override reason, audit logged) or "Adjust Schedule"
@@ -547,6 +570,7 @@ Four validation states:
 **Who it serves:** BCBAs (scheduling decisions), schedulers, admin.
 
 **What makes it good UX:**
+
 - AlohaABA and Passage Health both validate auth limits at schedule time, but their warnings are generic ("beyond authorization limits"). Clinivise shows the specific unit math -- "4 units needed, 2 remaining" -- making the constraint concrete and actionable.
 - Hub Planner's pattern: show the warning during the scheduling process, not after submission. Prevention is better than error messages.
 - The "all clear" state being silent prevents banner fatigue -- most sessions will pass validation, so the warning is meaningful when it appears.
@@ -563,6 +587,7 @@ Four validation states:
 
 **What it looks like:**
 A single composite number (0-100) representing the overall health of an authorization, combining:
+
 - Utilization pace (on-track vs. ahead vs. behind)
 - Time remaining vs. units remaining ratio
 - Renewal status (is renewal in progress?)
@@ -588,6 +613,7 @@ Score ranges: 0-40 (red, critical), 41-70 (amber, needs attention), 71-100 (gree
 **Who it serves:** Admin/owners (practice-wide health overview). The aggregate of all authorization health scores across the practice gives a single "practice auth health" number.
 
 **What makes it good UX:**
+
 - Cohere Health's Align feature creates a "trust score" per provider that dynamically adjusts PA requirements. The same concept -- a composite score -- applied to authorization health gives admins a single number to monitor.
 - Credit score visualization is universally understood. People know "78 = good" without explanation.
 - Reduces cognitive load: instead of checking utilization %, expiry date, renewal status, and scheduling coverage separately, one number captures them all.
@@ -602,13 +628,13 @@ Score ranges: 0-40 (red, critical), 41-70 (amber, needs attention), 71-100 (gree
 
 Several YC-backed startups are attacking the prior authorization problem from different angles. The common thread: **AI agents that automate the entire authorization lifecycle, not just one step.**
 
-| Startup | YC Batch | Focus | Auth Approach |
-|---------|----------|-------|---------------|
-| **Saffron Health** | Recent | AI for specialist referrals | Agents complete prior authorizations, find in-network providers, help patients book |
-| **Locata** | Recent | Referral automation | AI agents automate PA submission, broadcast updates, follow up with patients |
-| **Beacon Health** | W26 | AI back-office employees | Automates PA, referrals, risk adjustment as background workflows |
-| **Ruma Care** | Recent | Infusion clinic automation | PA automation specifically for specialty medication administration |
-| **Prosper** | Recent | Healthcare workflow automation | AI agents for PA among other time-intensive workflows |
+| Startup            | YC Batch | Focus                          | Auth Approach                                                                       |
+| ------------------ | -------- | ------------------------------ | ----------------------------------------------------------------------------------- |
+| **Saffron Health** | Recent   | AI for specialist referrals    | Agents complete prior authorizations, find in-network providers, help patients book |
+| **Locata**         | Recent   | Referral automation            | AI agents automate PA submission, broadcast updates, follow up with patients        |
+| **Beacon Health**  | W26      | AI back-office employees       | Automates PA, referrals, risk adjustment as background workflows                    |
+| **Ruma Care**      | Recent   | Infusion clinic automation     | PA automation specifically for specialty medication administration                  |
+| **Prosper**        | Recent   | Healthcare workflow automation | AI agents for PA among other time-intensive workflows                               |
 
 **Key insight for Clinivise:** These startups are building general-purpose PA automation for large provider organizations. None are ABA-specific. The ABA authorization workflow has unique requirements (CPT 97153-97158, unit-based tracking with CMS 8-minute rule, frequency-based authorizations) that general PA automation doesn't handle. Clinivise's opportunity is ABA-specialized AI authorization management -- a niche too small for these startups but deeply valuable for small practices.
 
@@ -619,6 +645,7 @@ Several YC-backed startups are attacking the prior authorization problem from di
 ## Regulatory Context Informing UX (2026)
 
 The CMS Interoperability and Prior Authorization Final Rule takes effect in 2026:
+
 - Health plans must respond to urgent PA requests within 72 hours, standard within 7 days
 - Plans must support electronic PA (HL7 FHIR-based APIs)
 - Over 50 major insurers pledged to streamline PA starting in 2026
@@ -659,6 +686,7 @@ The CMS Interoperability and Prior Authorization Final Rule takes effect in 2026
 ## Sources
 
 ### ABA Practice Management
+
 - [CentralReach Authorization Analysis Report](https://help.centralreach.com/the-authorization-analysis-report/)
 - [AlohaABA Authorization Management](https://alohaaba.com/features/authorization-management)
 - [Motivity All-in-One ABA Software](https://www.motivity.net/solutions/aba-practice-management-all-in-one)
@@ -671,6 +699,7 @@ The CMS Interoperability and Prior Authorization Final Rule takes effect in 2026
 - [ABA Practice Utilization Scheduling Tips](https://ababuildingblocks.com/scheduling-tips-to-maximize-utilization/)
 
 ### Design-Leading SaaS
+
 - [Ramp Budgets Launch (Jan 2026)](https://ramp.com/blog/ramp-budgets-launch)
 - [Ramp Budgets Product Page](https://ramp.com/budgets)
 - [Mercury Cash Burn Rate](https://mercury.com/tools/cash-burn-rate-calculator)
@@ -683,6 +712,7 @@ The CMS Interoperability and Prior Authorization Final Rule takes effect in 2026
 - [Notion Dashboards Help](https://www.notion.com/help/dashboards)
 
 ### AI & Healthcare Authorization
+
 - [Cohere Health UM Suite](https://www.coherehealth.com/utilization-management-suite)
 - [Cohere Health Align](https://www.coherehealth.com/news/cohere-health-prior-authorization-compliance-ai)
 - [SPRY Prior Authorization Software](https://www.sprypt.com/prior-authorization)
@@ -693,17 +723,20 @@ The CMS Interoperability and Prior Authorization Final Rule takes effect in 2026
 - [Droidal AI Prior Authorization Trends](https://droidal.com/blog/ai-prior-authorization-trends-healthcare/)
 
 ### YC Startups (2025-2026)
+
 - [YC Healthcare Companies](https://www.ycombinator.com/companies/industry/healthcare)
 - [YC Healthcare IT Companies](https://www.ycombinator.com/companies/industry/Healthcare%20IT)
 - [Prior Authorization Commitment 2026 (MedCity News)](https://medcitynews.com/2025/12/prior-authorization-commitment-2026/)
 
 ### Regulatory
+
 - [CMS Prior Authorization Final Rule](https://drfirst.com/blog/how-2026-will-defog-the-prior-authorization-process/)
 - [CMS WISeR AI PA Pilot](https://www.jonesday.com/en/insights/2025/08/coming-january-2026-cms-launches-ai-program-to-screen-prior-authorization-requests-for-treatments)
 - [Health Affairs: AI in Utilization Review](https://www.healthaffairs.org/doi/10.1377/hlthaff.2025.00897)
 - [Prior Authorization Crackdowns 2026](https://www.bristolhcs.com/blog/blog-detail/prior-authorization-crackdowns-how-predictive-utilization-controls-are-reshaping-healthcare-in-2026)
 
 ### Design Systems & Patterns
+
 - [Carbon Design System Status Indicators](https://carbondesignsystem.com/patterns/status-indicator-pattern/)
 - [shadcn/ui Multi-Value Progress Bar Discussion](https://github.com/shadcn-ui/ui/discussions/3464)
 - [SaaS Dashboard Design Patterns](https://dashboarddesignpatterns.github.io/patterns.html)
@@ -713,6 +746,7 @@ The CMS Interoperability and Prior Authorization Final Rule takes effect in 2026
 - [Tablet App Design Tips](https://gapsystudio.com/blog/tablet-app-design/)
 
 ### Tablet / Mobile UX
+
 - [Healthcare UX/UI Design Trends 2026](https://www.excellentwebworld.com/healthcare-ux-ui-design-trends/)
 - [NN/g Tablet UX Report](https://media.nngroup.com/media/reports/free/Tablet_Website_and_Application_UX.pdf)
 - [Catalyst Data Collection Reviews](https://www.selecthub.com/p/aba-software/catalyst-data-collection/)

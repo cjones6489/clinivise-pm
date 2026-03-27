@@ -161,7 +161,9 @@ export const updateTeamMember = authActionClient
         await tx
           .update(clientProviders)
           .set(updates)
-          .where(eq(clientProviders.id, id));
+          .where(
+            and(eq(clientProviders.id, id), eq(clientProviders.organizationId, ctx.organizationId)),
+          );
       }
     });
 
@@ -203,7 +205,12 @@ export const removeFromTeam = authActionClient
     await db
       .update(clientProviders)
       .set({ endDate: new Date().toISOString().slice(0, 10) })
-      .where(eq(clientProviders.id, parsedInput.id));
+      .where(
+        and(
+          eq(clientProviders.id, parsedInput.id),
+          eq(clientProviders.organizationId, ctx.organizationId),
+        ),
+      );
 
     await logAudit({
       organizationId: ctx.organizationId,

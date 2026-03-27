@@ -58,8 +58,8 @@ function TeamMemberRow({
   isPending: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-border/30 px-4 py-2.5 last:border-b-0">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-[11px] font-semibold text-primary">
+    <div className="border-border/30 flex items-center gap-3 border-b px-4 py-2.5 last:border-b-0">
+      <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-semibold">
         {getInitials(member.providerFirstName, member.providerLastName)}
       </div>
       <div className="min-w-0 flex-1">
@@ -68,15 +68,16 @@ function TeamMemberRow({
             {member.providerFirstName} {member.providerLastName}
           </span>
           <Badge variant="outline" className="text-[9px]">
-            {CREDENTIAL_LABELS[member.credentialType as CredentialType] ?? member.credentialType.toUpperCase()}
+            {CREDENTIAL_LABELS[member.credentialType as CredentialType] ??
+              member.credentialType.toUpperCase()}
           </Badge>
           {member.isPrimary && (
-            <Badge className="border-amber-200 bg-amber-50 text-amber-700 text-[9px] dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400">
+            <Badge className="border-amber-200 bg-amber-50 text-[9px] text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400">
               Primary
             </Badge>
           )}
         </div>
-        <div className="text-[11px] text-muted-foreground">
+        <div className="text-muted-foreground text-[11px]">
           {CARE_TEAM_ROLE_LABELS[member.role as CareTeamRole] ?? member.role}
         </div>
       </div>
@@ -119,22 +120,22 @@ function ModalTeamRow({
   onRemove: () => void;
 }) {
   return (
-    <div className="flex items-center gap-2.5 border-b border-border/20 px-4 py-2 last:border-b-0">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-semibold text-primary">
+    <div className="border-border/20 flex items-center gap-2.5 border-b px-4 py-2 last:border-b-0">
+      <div className="bg-primary/10 text-primary flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold">
         {getInitials(member.providerFirstName, member.providerLastName)}
       </div>
       <div className="min-w-0 flex-1">
         <div className="text-xs font-medium">
           {member.providerFirstName} {member.providerLastName}
         </div>
-        <div className="text-[10px] text-muted-foreground">
+        <div className="text-muted-foreground text-[10px]">
           {CARE_TEAM_ROLE_LABELS[member.role as CareTeamRole] ?? member.role}
         </div>
       </div>
       <Button
         variant="ghost"
         size="icon"
-        className={`h-6 w-6 ${member.isPrimary ? "text-amber-500 cursor-default" : "text-muted-foreground/40 hover:text-amber-500"}`}
+        className={`h-6 w-6 ${member.isPrimary ? "cursor-default text-amber-500" : "text-muted-foreground/40 hover:text-amber-500"}`}
         onClick={member.isPrimary ? undefined : onSetPrimary}
         disabled={member.isPrimary}
         title={member.isPrimary ? "Primary provider" : "Set as primary"}
@@ -144,7 +145,7 @@ function ModalTeamRow({
       <Button
         variant="ghost"
         size="icon"
-        className="h-6 w-6 text-muted-foreground/40 hover:text-destructive"
+        className="text-muted-foreground/40 hover:text-destructive h-6 w-6"
         onClick={onRemove}
         title="Remove from team"
       >
@@ -220,23 +221,23 @@ function ManageTeamModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg p-0 gap-0 max-h-[85vh] flex flex-col">
+      <DialogContent className="flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-lg">
         <DialogHeader className="px-5 pt-5 pb-3">
           <DialogTitle className="text-sm font-semibold">Manage Care Team</DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
+          <DialogDescription className="text-muted-foreground text-xs">
             Search and add providers. Use the menu on each member to set primary or remove.
           </DialogDescription>
         </DialogHeader>
 
         {/* Search + Add section */}
-        <div className="border-t border-border/40">
+        <div className="border-border/40 border-t">
           <div className="px-4 py-3">
             <div className="relative">
               <HugeiconsIcon
                 icon={Search01Icon}
                 size={14}
                 strokeWidth={1.5}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                className="text-muted-foreground absolute top-1/2 left-2.5 -translate-y-1/2"
               />
               <Input
                 placeholder="Search providers to add..."
@@ -249,75 +250,81 @@ function ManageTeamModal({
           </div>
 
           {/* Available providers list */}
-          <div className="max-h-48 overflow-y-auto border-t border-border/30">
+          <div className="border-border/30 max-h-48 overflow-y-auto border-t">
             {availableProviders.length > 0 ? (
-            <>
-              {bcbas.length > 0 && (
-                <>
-                  <div className="sticky top-0 z-10 bg-muted/50 px-4 py-1.5">
-                    <span className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground">
-                      BCBAs & Supervisors
-                    </span>
+              <>
+                {bcbas.length > 0 && (
+                  <>
+                    <div className="bg-muted/50 sticky top-0 z-10 px-4 py-1.5">
+                      <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                        BCBAs & Supervisors
+                      </span>
+                    </div>
+                    {bcbas.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        disabled={isAdding}
+                        onClick={() => handleAdd(p)}
+                        className="hover:bg-accent/50 flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors disabled:opacity-50"
+                      >
+                        <div className="bg-primary/10 text-primary flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold">
+                          {getInitials(p.firstName, p.lastName)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="font-medium">
+                            {p.firstName} {p.lastName}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className="shrink-0 text-[9px]">
+                          {CREDENTIAL_LABELS[p.credentialType as CredentialType] ??
+                            p.credentialType.toUpperCase()}
+                        </Badge>
+                        <span className="text-primary shrink-0 text-[11px] font-medium">+ Add</span>
+                      </button>
+                    ))}
+                  </>
+                )}
+                {rbts.length > 0 && (
+                  <>
+                    <div className="bg-muted/50 sticky top-0 z-10 px-4 py-1.5">
+                      <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+                        RBTs & Technicians
+                      </span>
+                    </div>
+                    {rbts.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        disabled={isAdding}
+                        onClick={() => handleAdd(p)}
+                        className="hover:bg-accent/50 flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors disabled:opacity-50"
+                      >
+                        <div className="bg-primary/10 text-primary flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold">
+                          {getInitials(p.firstName, p.lastName)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="font-medium">
+                            {p.firstName} {p.lastName}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className="shrink-0 text-[9px]">
+                          {CREDENTIAL_LABELS[p.credentialType as CredentialType] ??
+                            p.credentialType.toUpperCase()}
+                        </Badge>
+                        <span className="text-primary shrink-0 text-[11px] font-medium">+ Add</span>
+                      </button>
+                    ))}
+                  </>
+                )}
+                {filtered.length === 0 && (
+                  <div className="text-muted-foreground px-4 py-4 text-center text-xs">
+                    No providers match your search.
                   </div>
-                  {bcbas.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      disabled={isAdding}
-                      onClick={() => handleAdd(p)}
-                      className="flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors hover:bg-accent/50 disabled:opacity-50"
-                    >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-semibold text-primary">
-                        {getInitials(p.firstName, p.lastName)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="font-medium">{p.firstName} {p.lastName}</span>
-                      </div>
-                      <Badge variant="outline" className="shrink-0 text-[9px]">
-                        {CREDENTIAL_LABELS[p.credentialType as CredentialType] ?? p.credentialType.toUpperCase()}
-                      </Badge>
-                      <span className="shrink-0 text-[11px] font-medium text-primary">+ Add</span>
-                    </button>
-                  ))}
-                </>
-              )}
-              {rbts.length > 0 && (
-                <>
-                  <div className="sticky top-0 z-10 bg-muted/50 px-4 py-1.5">
-                    <span className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground">
-                      RBTs & Technicians
-                    </span>
-                  </div>
-                  {rbts.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      disabled={isAdding}
-                      onClick={() => handleAdd(p)}
-                      className="flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors hover:bg-accent/50 disabled:opacity-50"
-                    >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-semibold text-primary">
-                        {getInitials(p.firstName, p.lastName)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="font-medium">{p.firstName} {p.lastName}</span>
-                      </div>
-                      <Badge variant="outline" className="shrink-0 text-[9px]">
-                        {CREDENTIAL_LABELS[p.credentialType as CredentialType] ?? p.credentialType.toUpperCase()}
-                      </Badge>
-                      <span className="shrink-0 text-[11px] font-medium text-primary">+ Add</span>
-                    </button>
-                  ))}
-                </>
-              )}
-              {filtered.length === 0 && (
-                <div className="px-4 py-4 text-center text-xs text-muted-foreground">
-                  No providers match your search.
-                </div>
-              )}
-            </>
+                )}
+              </>
             ) : (
-              <div className="px-4 py-4 text-center text-xs text-muted-foreground">
+              <div className="text-muted-foreground px-4 py-4 text-center text-xs">
                 All providers are already on this team.
               </div>
             )}
@@ -325,12 +332,12 @@ function ManageTeamModal({
         </div>
 
         {/* Current team */}
-        <div className="flex-1 overflow-y-auto border-t border-border/40">
+        <div className="border-border/40 flex-1 overflow-y-auto border-t">
           <div className="px-4 py-2.5">
-            <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+            <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
               Current Team
               {careTeam.length > 0 && (
-                <span className="ml-1.5 font-normal normal-case tracking-normal">
+                <span className="ml-1.5 font-normal tracking-normal normal-case">
                   ({careTeam.length})
                 </span>
               )}
@@ -341,29 +348,45 @@ function ManageTeamModal({
             <>
               {teamBcbas.length > 0 && (
                 <div>
-                  <div className="bg-muted/30 px-4 py-1 border-y border-border/20">
-                    <span className="text-[10px] font-medium text-muted-foreground">BCBAs & Supervisors</span>
+                  <div className="bg-muted/30 border-border/20 border-y px-4 py-1">
+                    <span className="text-muted-foreground text-[10px] font-medium">
+                      BCBAs & Supervisors
+                    </span>
                   </div>
                   {teamBcbas.map((m) => (
-                    <ModalTeamRow key={m.id} member={m} onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })} onRemove={() => executeRemoveAction({ id: m.id })} />
+                    <ModalTeamRow
+                      key={m.id}
+                      member={m}
+                      onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
+                      onRemove={() => executeRemoveAction({ id: m.id })}
+                    />
                   ))}
                 </div>
               )}
               {teamRbts.length > 0 && (
                 <div>
-                  <div className="bg-muted/30 px-4 py-1 border-y border-border/20">
-                    <span className="text-[10px] font-medium text-muted-foreground">RBTs & Technicians</span>
+                  <div className="bg-muted/30 border-border/20 border-y px-4 py-1">
+                    <span className="text-muted-foreground text-[10px] font-medium">
+                      RBTs & Technicians
+                    </span>
                   </div>
                   {teamRbts.map((m) => (
-                    <ModalTeamRow key={m.id} member={m} onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })} onRemove={() => executeRemoveAction({ id: m.id })} />
+                    <ModalTeamRow
+                      key={m.id}
+                      member={m}
+                      onSetPrimary={() => executeUpdate({ id: m.id, isPrimary: true })}
+                      onRemove={() => executeRemoveAction({ id: m.id })}
+                    />
                   ))}
                 </div>
               )}
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <HugeiconsIcon icon={UserIcon} size={20} className="mb-2 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">No team members yet. Add providers above.</p>
+              <HugeiconsIcon icon={UserIcon} size={20} className="text-muted-foreground mb-2" />
+              <p className="text-muted-foreground text-xs">
+                No team members yet. Add providers above.
+              </p>
             </div>
           )}
         </div>
@@ -402,20 +425,29 @@ export function ClientCareTeam({
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to remove provider"),
   });
 
-  const bcbaMembers = careTeam.filter((m) => ["bcba", "bcba_d", "bcaba"].includes(m.credentialType));
-  const rbtMembers = careTeam.filter((m) => !["bcba", "bcba_d", "bcaba"].includes(m.credentialType));
+  const bcbaMembers = careTeam.filter((m) =>
+    ["bcba", "bcba_d", "bcaba"].includes(m.credentialType),
+  );
+  const rbtMembers = careTeam.filter(
+    (m) => !["bcba", "bcba_d", "bcaba"].includes(m.credentialType),
+  );
 
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
+        <div className="text-muted-foreground text-xs">
           {careTeam.length > 0
             ? `${bcbaMembers.length} BCBA${bcbaMembers.length !== 1 ? "s" : ""} · ${rbtMembers.length} RBT${rbtMembers.length !== 1 ? "s" : ""}`
             : null}
         </div>
         {canEdit && (
-          <Button variant="outline" size="sm" className="text-xs" onClick={() => setModalOpen(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs"
+            onClick={() => setModalOpen(true)}
+          >
             <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
             Manage Team
           </Button>
@@ -424,16 +456,21 @@ export function ClientCareTeam({
 
       {/* Empty state */}
       {careTeam.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-border/40 bg-card py-8 text-center shadow-sm">
-          <div className="mb-3 rounded-lg bg-muted p-3">
+        <div className="border-border/40 bg-card flex flex-col items-center justify-center rounded-lg border py-8 text-center shadow-sm">
+          <div className="bg-muted mb-3 rounded-lg p-3">
             <HugeiconsIcon icon={UserIcon} size={24} className="text-muted-foreground" />
           </div>
           <p className="text-xs font-medium">No team members assigned</p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-[11px]">
             Add providers to this client&apos;s care team to track assignments and supervision.
           </p>
           {canEdit && (
-            <Button variant="outline" size="sm" className="mt-3 text-xs" onClick={() => setModalOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 text-xs"
+              onClick={() => setModalOpen(true)}
+            >
               <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
               Manage Team
             </Button>
@@ -442,9 +479,9 @@ export function ClientCareTeam({
       ) : (
         <>
           {bcbaMembers.length > 0 && (
-            <div className="overflow-hidden rounded-lg border border-border/40 bg-card shadow-sm">
-              <div className="border-b border-border/40 bg-muted/20 px-4 py-2">
-                <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+            <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
+              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
+                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
                   BCBAs & Supervisors
                 </span>
               </div>
@@ -461,9 +498,9 @@ export function ClientCareTeam({
           )}
 
           {rbtMembers.length > 0 && (
-            <div className="overflow-hidden rounded-lg border border-border/40 bg-card shadow-sm">
-              <div className="border-b border-border/40 bg-muted/20 px-4 py-2">
-                <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+            <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
+              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
+                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
                   RBTs & Technicians
                 </span>
               </div>
@@ -495,14 +532,18 @@ export function ClientCareTeam({
       {/* Remove confirmation */}
       <ConfirmDialog
         open={!!removeTarget}
-        onOpenChange={(open) => { if (!open) setRemoveTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setRemoveTarget(null);
+        }}
         title="Remove from care team"
         description={
           removeTarget
             ? `Remove ${removeTarget.providerFirstName} ${removeTarget.providerLastName} from this client's care team? They can still log sessions for this client.`
             : ""
         }
-        onConfirm={async () => { if (removeTarget) await executeRemove({ id: removeTarget.id }); }}
+        onConfirm={async () => {
+          if (removeTarget) await executeRemove({ id: removeTarget.id });
+        }}
         variant="destructive"
         confirmLabel="Remove"
       />

@@ -23,6 +23,7 @@
 **AI Platform:** cari -- proprietary generative AI trained on 4B+ care data points, 50+ clinical/billing experts, 437+ years of ABA experience.
 
 **Specific AI Products:**
+
 - **CR ScheduleAI** -- Analyzes hundreds of data points to match providers to clients and optimize schedules. Behavioral Innovations (3,000 employees, 86 clinics) reported 75% time savings -- schedules that took 8-10 hours now done in minutes. New 2025 features include embedded cancellation reoptimization and bulk editing.
 - **CR NoteGuardAI** -- Audits 100% of clinical notes for payer compliance and audit-readiness. Auto-corrects fixable errors, quarantines unfixable ones for manual review. 12+ providers serving 5,000+ learners purchased within first 30 days.
 - **CR NoteDraftAI** -- Generates first-draft session notes from session details in real time.
@@ -46,6 +47,7 @@
 ### Raven Health (Small Practice Focus)
 
 **AI Features:**
+
 - AI-generated session notes that auto-pull session details and compare to previous sessions for progress tracking
 - AI-generated session summaries for progress analysis
 - AI-driven data integration into visual dashboards and reports
@@ -67,6 +69,7 @@
 ### Alpaca Health (BCBA-Focused, Solo/Small Practice)
 
 **AI Features:**
+
 - AI notetaking during parent interviews, caregiver trainings, RBT supervision sessions
 - AI treatment plan generation (medical history section, goals, interventions)
 - AI client record review and information extraction
@@ -89,6 +92,7 @@
 ### Mentalyc (AI Therapy Notes, 25K+ Clinicians)
 
 **AI Features:**
+
 - Ambient audio capture during therapy sessions
 - AI-generated progress notes from audio/text
 - Multiple note formats (SOAP, DAP, etc.)
@@ -99,6 +103,7 @@
 **Technical Approach:** Speech-to-text + LLM note generation. HIPAA compliant, SOC 2 Type II certified. Does not use clinician data for AI training.
 
 **User Reception (4.5/5 Capterra, 4.4/5 Trustpilot, ~125 reviews total):**
+
 - **Positive:** "Cut charting time by two-thirds." Accurately captures therapeutic interventions. Pulls supporting quotes.
 - **Negative:** "The AI makes things up that are not said in the session, and the notes rarely reflect what actually did happen." System crashes. Extended downtime. Slow uploads. AI hallucination is a real and documented problem.
 
@@ -113,6 +118,7 @@
 ### RethinkBH (Enterprise ABA)
 
 **AI Features:**
+
 - **Session Note AI (launched 2025):** Generates structured, data-driven session summaries directly from collected session data. Built on Azure OpenAI.
 - Real-time alerts when session data changes after note completion
 - Full clinician editorial control over generated notes
@@ -132,6 +138,7 @@
 ### Neuromnia (Nia Chat -- AI Copilot for ABA)
 
 **AI Features:**
+
 - AI-driven SOAP notes
 - Interdisciplinary treatment planning (ABA, Speech, OT)
 - VB-MAPP, ABLLS-R, AFLS skill goal generation
@@ -154,6 +161,7 @@
 ### Hi Rasmus (Clinical Platform for ABA)
 
 **AI Features:**
+
 - AI session note generation from session data
 - Guided prompts and review for note creation
 - HiQ Impact Score for measuring clinical effectiveness
@@ -171,6 +179,7 @@
 ### Artemis ABA (Salesforce-Built)
 
 **AI Features:**
+
 - AI-powered session notes (3x faster)
 - AI-generated session summaries with guided prompts
 - AI assessment creation
@@ -189,6 +198,7 @@
 ### Motivity ($27M Raised in 2025)
 
 **AI Features:**
+
 - AI scheduling for patient/provider matching
 - AI-driven analytics for clinical decision support
 - Caregiver engagement tools
@@ -233,6 +243,7 @@
 ### The LLM Wrapper Problem (Per The Behavior Academy)
 
 The ABA field has a documented problem with AI tools that:
+
 - Pass data directly to commercial LLMs (GPT, Claude, Gemini) with no real modification
 - Don't understand clinical risk or data privacy
 - Can't align outputs with behavior analytic principles
@@ -248,6 +259,7 @@ The ABA field has a documented problem with AI tools that:
 ### Abridge (Ambient Clinical Documentation -- Market Leader)
 
 **What it actually does:**
+
 - Ambient listening captures doctor-patient conversation
 - NLP creates transcript, separating chitchat from clinical content
 - LLM converts transcript to narrative clinical notes
@@ -269,6 +281,7 @@ The ABA field has a documented problem with AI tools that:
 ### Suki AI ($70M Series D, 400+ Health Systems)
 
 **What it actually does:**
+
 - Ambient mode captures entire patient-clinician conversation
 - Bi-directional EHR integration (Epic, Cerner, athenahealth, MEDITECH)
 - Auto-suggests ICD-10 and E/M codes from documentation
@@ -286,6 +299,7 @@ The ABA field has a documented problem with AI tools that:
 ### Freed AI (25K+ Clinicians, Simplicity-First)
 
 **What it actually does:**
+
 - Ambient conversation capture (live or file upload)
 - SOAP notes generated in ~40 seconds
 - Templates that learn clinician preferences over time
@@ -305,6 +319,7 @@ The ABA field has a documented problem with AI tools that:
 ### DeepScribe (Specialty-Focused, 98.8 KLAS Score)
 
 **What it actually does:**
+
 - Ambient scribing tuned for complex specialties (oncology, cardiology, etc.)
 - Pulls relevant history, labs, diagnostics into coherent longitudinal notes
 - HCC, CPT, and ICD-10 suggestions embedded in notes
@@ -317,6 +332,7 @@ The ABA field has a documented problem with AI tools that:
 ### Nabla (AI Copilot for Consultations)
 
 **What it actually does:**
+
 - Ambient AI using Microsoft speech-to-text + fine-tuned Whisper + GPT series
 - Real-time SOAP note generation
 - **Magic Edit** -- clinicians give natural language directions to modify notes
@@ -330,6 +346,7 @@ The ABA field has a documented problem with AI tools that:
 ### Regard (AI Clinical Reasoning, 150+ Hospitals)
 
 **What it actually does:**
+
 - Reviews 100% of patient data
 - Recommends diagnoses with clinical evidence
 - Generates care plans and draft notes BEFORE encounters
@@ -342,6 +359,7 @@ The ABA field has a documented problem with AI tools that:
 ### Notable Health (Healthcare Admin Automation)
 
 **What it actually does:**
+
 - AI + RPA to automate back-office workflows
 - Digitizes patient intake (questionnaires, consent forms)
 - Automates scheduling, reminders, referral intake
@@ -357,6 +375,7 @@ The ABA field has a documented problem with AI tools that:
 ### Viz.ai (Clinical AI Workflows, 1,700+ Hospitals)
 
 **What it actually does:**
+
 - 50+ FDA-cleared algorithms analyzing medical imaging
 - Real-time alerts to specialists (90% reviewed within 5 minutes)
 - Closed-loop care coordination communication
@@ -371,6 +390,7 @@ The ABA field has a documented problem with AI tools that:
 ### Cohere Health (AI Prior Authorization Platform)
 
 **What it actually does:**
+
 - Integrates with EHRs for inline authorization management
 - **Cohere Align** (2025): Analyzes provider historical behavior to identify trusted clinicians. ~80% of PA submissions streamlined for pre-approved providers. 55% reduction in provider submission time.
 - **Cohere Review Assist** (2025): For acute inpatient care. 50% faster authorization completion.
@@ -384,6 +404,7 @@ The ABA field has a documented problem with AI tools that:
 ### Waystar (Olive AI Assets Acquired)
 
 **What it actually does:**
+
 - $1B+ annual revenue (2025). 24% YoY growth.
 - **Altitude AI** prevented $15B+ in denials for clients in 2025
 - Reduced appeal time by 90%
@@ -401,6 +422,7 @@ The ABA field has a documented problem with AI tools that:
 ### Infinx (AI Authorization Management)
 
 **What it actually does:**
+
 - Automated prior authorization initiation, checks, submissions, updates
 - Real-time eligibility and benefits verification
 - Service-level benefit granularity (not just general plan status)
@@ -415,6 +437,7 @@ The ABA field has a documented problem with AI tools that:
 ### Infinitus Health (AI Phone Agents)
 
 **What it actually does:**
+
 - Voice AI agents that make phone calls to insurance companies
 - Navigates IVR menus, engages in real-time conversations with payer reps
 - Uses proprietary knowledge graph to push back against incorrect payer information
@@ -468,6 +491,7 @@ The ABA field has a documented problem with AI tools that:
 ### LunaBill (YC F25 -- AI Voice Agents for Insurance Calls)
 
 **What it actually does:**
+
 - AI voice agents fine-tuned on 1.2M+ call transcripts
 - Automates: claim status inquiries, A/R recovery, appeals follow-up
 - Results: 12x productivity (300+ claim follow-ups/day vs. 25/day manual)
@@ -484,6 +508,7 @@ The ABA field has a documented problem with AI tools that:
 ### ENTER Health (AI-First RCM Platform)
 
 **What it actually does:**
+
 - **ContractAI** -- Manages all payer contracts (fee-for-service, value-based, workers comp, etc.)
 - **ClaimAI** -- AI reads clinical notes, applies CPT/ICD codes, learns from payer feedback
 - **DenialAI** -- Automated denial management
@@ -536,18 +561,18 @@ The ABA field has a documented problem with AI tools that:
 
 ### Where the Market is WEAK (Our Opportunities)
 
-| Gap | Details | Clinivise Opportunity |
-|-----|---------|----------------------|
-| **Small practice pricing** | CentralReach is too expensive. AI features are per-add-on. | Free PM + AI-native features included. Monetize on billing (2-4% rev share). |
-| **Data-grounded AI notes** | Most tools use ambient audio (hallucination-prone) or generic LLM wrappers. | Generate notes FROM structured session data (like RethinkBH) with linked evidence (like Abridge). |
-| **Authorization intelligence** | No platform proactively manages auth utilization with AI. Basic tracking exists but no predictive pacing, no auto-renewal prompts, no optimization. | AI that predicts auth exhaustion, recommends session pacing, auto-alerts on expiring auths, suggests re-auth timing, drafts re-auth requests. |
-| **ABA-specific claim scrubbing** | Generic claim scrubbers don't know ABA billing rules (CMS 8-min rule, modifier requirements, auth-to-session matching). | Pre-submission validation against ABA-specific rules, payer-specific requirements, and authorization limits. |
-| **Denial prediction for ABA** | No ABA-specific denial prediction. Generic RCM tools don't understand ABA claim patterns. | ML model trained on ABA denial patterns to flag high-risk claims before submission. |
-| **AI auth letter parsing** | Only Alpaca does basic document review. No one does intelligent extraction from authorization letters. | OCR + LLM extraction of approved units, CPT codes, date ranges, conditions from auth letters. Auto-populate auth records. |
-| **Session prep automation** | No one pre-populates session context. | Before each session: show last session summary, auth utilization %, goals in progress, parent communication notes, suggested focus areas. |
-| **Parent-facing summaries** | Minimal AI for parent communication. | Auto-generate plain-language progress summaries for parents from session data. |
-| **Billing code validation** | RBTs frequently miscoded. BCBAs must review. | AI suggests CPT codes based on session activities, flags mismatches between documented activities and selected codes. |
-| **Integrated voice-to-insurance** | No ABA platform has built-in voice agents for insurance calls. | Partner with LunaBill or Infinitus for Phase 2 insurance call automation. |
+| Gap                               | Details                                                                                                                                             | Clinivise Opportunity                                                                                                                         |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Small practice pricing**        | CentralReach is too expensive. AI features are per-add-on.                                                                                          | Free PM + AI-native features included. Monetize on billing (2-4% rev share).                                                                  |
+| **Data-grounded AI notes**        | Most tools use ambient audio (hallucination-prone) or generic LLM wrappers.                                                                         | Generate notes FROM structured session data (like RethinkBH) with linked evidence (like Abridge).                                             |
+| **Authorization intelligence**    | No platform proactively manages auth utilization with AI. Basic tracking exists but no predictive pacing, no auto-renewal prompts, no optimization. | AI that predicts auth exhaustion, recommends session pacing, auto-alerts on expiring auths, suggests re-auth timing, drafts re-auth requests. |
+| **ABA-specific claim scrubbing**  | Generic claim scrubbers don't know ABA billing rules (CMS 8-min rule, modifier requirements, auth-to-session matching).                             | Pre-submission validation against ABA-specific rules, payer-specific requirements, and authorization limits.                                  |
+| **Denial prediction for ABA**     | No ABA-specific denial prediction. Generic RCM tools don't understand ABA claim patterns.                                                           | ML model trained on ABA denial patterns to flag high-risk claims before submission.                                                           |
+| **AI auth letter parsing**        | Only Alpaca does basic document review. No one does intelligent extraction from authorization letters.                                              | OCR + LLM extraction of approved units, CPT codes, date ranges, conditions from auth letters. Auto-populate auth records.                     |
+| **Session prep automation**       | No one pre-populates session context.                                                                                                               | Before each session: show last session summary, auth utilization %, goals in progress, parent communication notes, suggested focus areas.     |
+| **Parent-facing summaries**       | Minimal AI for parent communication.                                                                                                                | Auto-generate plain-language progress summaries for parents from session data.                                                                |
+| **Billing code validation**       | RBTs frequently miscoded. BCBAs must review.                                                                                                        | AI suggests CPT codes based on session activities, flags mismatches between documented activities and selected codes.                         |
+| **Integrated voice-to-insurance** | No ABA platform has built-in voice agents for insurance calls.                                                                                      | Partner with LunaBill or Infinitus for Phase 2 insurance call automation.                                                                     |
 
 ### What We Should NOT Build
 
@@ -596,6 +621,7 @@ The ABA field has a documented problem with AI tools that:
 ## Sources
 
 ### ABA Competitors
+
 - [Raven Health AI Features](https://ravenhealth.com/key-features-ai-capabilities/)
 - [Raven Health Pricing](https://ravenhealth.com/pricing/)
 - [Alpaca Health for Providers](https://www.alpacahealth.io/for-providers)
@@ -624,6 +650,7 @@ The ABA field has a documented problem with AI tools that:
 - [AlohaABA Features](https://alohaaba.com/)
 
 ### Practitioner Insights
+
 - [LLM Wrappers in ABA (The Behavior Academy)](https://www.thebehavioracademy.com/blog/llm-wrappers-in-aba)
 - [AI in Today's ABA: Safe Automation (The Behavior Academy)](https://www.thebehavioracademy.com/newsletters/chiron-the-ai-literacy-series-for-aba-professionals/posts/ai-in-todays-aba-is-it-safe-to-automate)
 - [AI in ABA: What Behavior Analysts Need to Know](https://www.appliedbehavioranalysisedu.org/2024/01/integration-of-aba-with-artificial-intelligence-ai/)
@@ -631,6 +658,7 @@ The ABA field has a documented problem with AI tools that:
 - [AI in Behavior Analysis (ABA Matrix)](https://www.abamatrix.com/ai-in-behavior-analysis/)
 
 ### Adjacent Healthcare AI
+
 - [Abridge AI Review (DeepCura)](https://www.deepcura.com/resources/abridge-ai-review)
 - [Abridge Business Breakdown (Contrary Research)](https://research.contrary.com/company/abridge)
 - [Abridge AI at Johns Hopkins](https://it.johnshopkins.edu/ai/abridge-ai-scribe/)
@@ -647,6 +675,7 @@ The ABA field has a documented problem with AI tools that:
 - [Viz.ai Stroke Studies (ISC 2025)](https://www.viz.ai/news/new-studies-demonstrate-impact-of-vizais-stroke-solution)
 
 ### Insurance/Authorization AI
+
 - [Cohere Health AI Prior Auth](https://www.coherehealth.com/)
 - [Cohere Health Compliance AI](https://www.coherehealth.com/news/cohere-health-prior-authorization-compliance-ai)
 - [Top 5 AI Vendors for Prior Authorization (Innovaccer)](https://innovaccer.com/blogs/top-5-ai-vendors-for-prior-authorization-2025)
@@ -658,6 +687,7 @@ The ABA field has a documented problem with AI tools that:
 - [CMS 2026 PA Mandate (PharmiWeb)](https://www.pharmiweb.com/press-release/2025-07-26/major-health-insurers-slash-prior-authorization-requirements)
 
 ### Billing/Claims AI
+
 - [AI Claim Denial Management (Aspirion)](https://www.aspirion.com/turning-the-denial-tables-ai-tools-that-actually-help-hospitals-win/)
 - [AI Denial Management Impact (Invensis)](https://www.invensis.net/blog/impact-of-ai-on-denial-management)
 - [AI Appeal Letters (NYX Health)](https://nyxhealth.com/nyx-health-ai/)
@@ -670,6 +700,7 @@ The ABA field has a documented problem with AI tools that:
 - [Stedi Healthcare API](https://www.stedi.com/docs/healthcare)
 
 ### AI Trust & Complaints
+
 - [AI Hallucination in Healthcare (CIO)](https://www.cio.com/article/3593403/patients-may-suffer-from-hallucinations-of-ai-medical-transcription-tools.html)
 - [Hallucinations in AI Medical Summaries (Clinical Trials Arena)](https://www.clinicaltrialsarena.com/news/hallucinations-in-ai-generated-medical-summaries-remain-a-grave-concern/)
 - [Physician AI Trust Survey (Healthcare Dive)](https://www.healthcaredive.com/news/physician-ai-adoption-doximity-accuracy-reliability/814960/)

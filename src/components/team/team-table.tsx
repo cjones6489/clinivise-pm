@@ -29,11 +29,14 @@ import { cn } from "@/lib/utils";
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
   owner: "bg-primary/10 text-primary border-primary/20",
-  admin: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800",
+  admin:
+    "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800",
   bcba: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800",
-  bcaba: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-800",
+  bcaba:
+    "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-800",
   rbt: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800",
-  billing_staff: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-800",
+  billing_staff:
+    "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-800",
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -75,13 +78,21 @@ export function TeamTable({
 
   return (
     <>
-      <div className="fade-in overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="fade-in border-border bg-card overflow-hidden rounded-xl border shadow-sm">
         {/* Header */}
-        <div className="hidden grid-cols-[2fr_2fr_1fr_0.8fr_40px] gap-2 border-b border-border bg-muted/50 px-4 py-2 sm:grid">
-          <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Name</span>
-          <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Email</span>
-          <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Role</span>
-          <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Status</span>
+        <div className="border-border bg-muted/50 hidden grid-cols-[2fr_2fr_1fr_0.8fr_40px] gap-2 border-b px-4 py-2 sm:grid">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+            Name
+          </span>
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+            Email
+          </span>
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+            Role
+          </span>
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+            Status
+          </span>
           <span />
         </div>
 
@@ -98,7 +109,7 @@ export function TeamTable({
           return (
             <div
               key={member.id}
-              className="grid grid-cols-1 gap-2 border-b border-border/40 px-4 py-2.5 last:border-0 sm:grid-cols-[2fr_2fr_1fr_0.8fr_40px] sm:items-center"
+              className="border-border/40 grid grid-cols-1 gap-2 border-b px-4 py-2.5 last:border-0 sm:grid-cols-[2fr_2fr_1fr_0.8fr_40px] sm:items-center"
             >
               {/* Name + credential */}
               <div>
@@ -106,15 +117,13 @@ export function TeamTable({
                   {member.firstName && member.lastName
                     ? `${member.firstName} ${member.lastName}`
                     : member.email.split("@")[0]}
-                  {isSelf && <span className="ml-1 text-muted-foreground">(you)</span>}
+                  {isSelf && <span className="text-muted-foreground ml-1">(you)</span>}
                 </div>
-                {credLabel && (
-                  <div className="text-[11px] text-muted-foreground">{credLabel}</div>
-                )}
+                {credLabel && <div className="text-muted-foreground text-[11px]">{credLabel}</div>}
               </div>
 
               {/* Email */}
-              <div className="text-xs text-muted-foreground truncate">{member.email}</div>
+              <div className="text-muted-foreground truncate text-xs">{member.email}</div>
 
               {/* Role */}
               <div>
@@ -148,7 +157,12 @@ export function TeamTable({
 
               {/* Status */}
               <div>
-                <span className={cn("text-xs font-medium capitalize", STATUS_STYLES[member.status] ?? "")}>
+                <span
+                  className={cn(
+                    "text-xs font-medium capitalize",
+                    STATUS_STYLES[member.status] ?? "",
+                  )}
+                >
                   {member.status}
                 </span>
               </div>
@@ -182,7 +196,7 @@ export function TeamTable({
         })}
 
         {members.length === 0 && (
-          <div className="px-4 py-8 text-center text-xs text-muted-foreground">
+          <div className="text-muted-foreground px-4 py-8 text-center text-xs">
             No team members yet. Invite your first team member to get started.
           </div>
         )}

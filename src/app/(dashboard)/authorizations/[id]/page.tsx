@@ -15,7 +15,14 @@ import { UtilizationBar } from "@/components/shared/utilization-bar";
 import { ExpiryBadge, getExpiryLevel } from "@/components/shared/expiry-badge";
 import { MetricCard } from "@/components/shared/metric-card";
 import { getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { cn, formatDate, daysUntilExpiry } from "@/lib/utils";
 import { hasPermission } from "@/lib/permissions";
@@ -53,35 +60,48 @@ export default async function AuthorizationDetailPage({
   // Expiry alert — derived from shared getExpiryLevel thresholds
   const expiryLevel = getExpiryLevel(daysLeft, false);
   const expiryMessage =
-    daysLeft < 0 ? "This authorization has expired."
-    : daysLeft === 0 ? "This authorization expires today. Submit a renewal request."
-    : expiryLevel === "critical" ? `This authorization expires in ${daysLeft} day${daysLeft !== 1 ? "s" : ""}. Submit a renewal request.`
-    : expiryLevel === "warning" ? `This authorization expires in ${daysLeft} days. Plan for renewal.`
-    : null;
+    daysLeft < 0
+      ? "This authorization has expired."
+      : daysLeft === 0
+        ? "This authorization expires today. Submit a renewal request."
+        : expiryLevel === "critical"
+          ? `This authorization expires in ${daysLeft} day${daysLeft !== 1 ? "s" : ""}. Submit a renewal request.`
+          : expiryLevel === "warning"
+            ? `This authorization expires in ${daysLeft} days. Plan for renewal.`
+            : null;
 
   // Pre-compute metric card values
   const utilizationPct = totalApproved > 0 ? Math.round((totalUsed / totalApproved) * 100) : 0;
   const utilizationLevel = getUtilizationLevel(utilizationPct);
   const now = new Date();
-  const weeklyBurn = totalApproved > 0
-    ? (() => {
-        const startMs = new Date(authorization.startDate).getTime();
-        const endMs = new Date(authorization.endDate).getTime();
-        const weeksElapsed = Math.max(1, (Math.min(now.getTime(), endMs) - startMs) / (7 * MS_PER_DAY));
-        return (unitsToHours(totalUsed) / weeksElapsed).toFixed(1);
-      })()
-    : "0";
+  const weeklyBurn =
+    totalApproved > 0
+      ? (() => {
+          const startMs = new Date(authorization.startDate).getTime();
+          const endMs = new Date(authorization.endDate).getTime();
+          const weeksElapsed = Math.max(
+            1,
+            (Math.min(now.getTime(), endMs) - startMs) / (7 * MS_PER_DAY),
+          );
+          return (unitsToHours(totalUsed) / weeksElapsed).toFixed(1);
+        })()
+      : "0";
 
   return (
     <div className="space-y-4">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild><Link href="/authorizations">Authorizations</Link></BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link href="/authorizations">Authorizations</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{authorization.authorizationNumber ?? `${authorization.clientLastName}, ${authorization.clientFirstName}`}</BreadcrumbPage>
+            <BreadcrumbPage>
+              {authorization.authorizationNumber ??
+                `${authorization.clientLastName}, ${authorization.clientFirstName}`}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -97,12 +117,14 @@ export default async function AuthorizationDetailPage({
               : "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30",
           )}
         >
-          <p className={cn(
-            "text-xs font-medium",
-            expiryLevel === "critical" || daysLeft < 0
-              ? "text-red-700 dark:text-red-400"
-              : "text-amber-700 dark:text-amber-400",
-          )}>
+          <p
+            className={cn(
+              "text-xs font-medium",
+              expiryLevel === "critical" || daysLeft < 0
+                ? "text-red-700 dark:text-red-400"
+                : "text-amber-700 dark:text-amber-400",
+            )}
+          >
             {expiryMessage}
           </p>
         </div>
@@ -117,17 +139,21 @@ export default async function AuthorizationDetailPage({
                 {authorization.clientLastName}, {authorization.clientFirstName}
               </h1>
               <AuthStatusBadge status={authorization.status} />
-              <ExpiryBadge endDate={authorization.endDate} startDate={authorization.startDate} showFullDate />
+              <ExpiryBadge
+                endDate={authorization.endDate}
+                startDate={authorization.startDate}
+                showFullDate
+              />
             </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
               <span>{authorization.payerName}</span>
               {authorization.authorizationNumber && (
                 <span>Auth #{authorization.authorizationNumber}</span>
               )}
-              <span>{formatDate(authorization.startDate)} — {formatDate(authorization.endDate)}</span>
-              {authorization.diagnosisCode && (
-                <span>{authorization.diagnosisCode}</span>
-              )}
+              <span>
+                {formatDate(authorization.startDate)} — {formatDate(authorization.endDate)}
+              </span>
+              {authorization.diagnosisCode && <span>{authorization.diagnosisCode}</span>}
             </div>
           </div>
           {canEdit && (
@@ -139,8 +165,12 @@ export default async function AuthorizationDetailPage({
 
         {/* Overall utilization bar */}
         {totalApproved > 0 && (
-          <div className="mt-4 border-t border-border pt-4">
-            <UtilizationBar usedUnits={totalUsed} approvedUnits={totalApproved} label="Overall Utilization" />
+          <div className="border-border mt-4 border-t pt-4">
+            <UtilizationBar
+              usedUnits={totalUsed}
+              approvedUnits={totalApproved}
+              label="Overall Utilization"
+            />
           </div>
         )}
       </div>
@@ -152,7 +182,13 @@ export default async function AuthorizationDetailPage({
             label="Days Remaining"
             value={daysLeft >= 0 ? String(daysLeft) : "Expired"}
             sub={`Expires ${formatDate(authorization.endDate)}`}
-            accent={daysLeft <= 7 ? "text-red-600 dark:text-red-400" : daysLeft <= 30 ? "text-amber-600 dark:text-amber-400" : undefined}
+            accent={
+              daysLeft <= 7
+                ? "text-red-600 dark:text-red-400"
+                : daysLeft <= 30
+                  ? "text-amber-600 dark:text-amber-400"
+                  : undefined
+            }
           />
           <MetricCard
             label="Hours Used"
@@ -165,11 +201,7 @@ export default async function AuthorizationDetailPage({
             value={`${unitsToHours(totalApproved).toFixed(1)}h`}
             sub={`${authorization.services.length} service line${authorization.services.length !== 1 ? "s" : ""}`}
           />
-          <MetricCard
-            label="Weekly Burn"
-            value={`${weeklyBurn}h`}
-            sub="avg per week"
-          />
+          <MetricCard label="Weekly Burn" value={`${weeklyBurn}h`} sub="avg per week" />
         </div>
       )}
 

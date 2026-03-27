@@ -22,18 +22,19 @@
 
 ### Vercel AI SDK (ai) -- RECOMMENDED
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/vercel/ai |
-| Stars | ~38K |
-| NPM Weekly Downloads | ~2.8M |
-| License | Apache-2.0 |
-| Latest Version | AI SDK 6 (current major) |
-| Pricing | Free, open source |
+| Metric               | Value                        |
+| -------------------- | ---------------------------- |
+| GitHub               | https://github.com/vercel/ai |
+| Stars                | ~38K                         |
+| NPM Weekly Downloads | ~2.8M                        |
+| License              | Apache-2.0                   |
+| Latest Version       | AI SDK 6 (current major)     |
+| Pricing              | Free, open source            |
 
 **What it does:** The leading TypeScript toolkit for building AI-powered apps. Provides unified API across 25+ LLM providers, streaming-first primitives, React Server Component integration, and structured output with Zod schemas.
 
 **AI SDK 6 key features:**
+
 - `generateObject` + `generateText` unified for multi-step tool calling loops ending in structured output
 - `Agent` abstraction: define once with model, instructions, tools; reuse across the app. `ToolLoopAgent` handles automated loops (configurable up to 20 steps)
 - `toModelOutput` separates tool results from what gets sent to the model (solves large output / binary data issues)
@@ -44,6 +45,7 @@
 - Image editing capabilities
 
 **AI SDK 5 changes (July 2025):**
+
 - SSE replaces WebSockets for streaming
 - Dynamic tooling with `inputSchema` and `outputSchema`
 - Experimental text-to-speech and transcription support (OpenAI, ElevenLabs, Deepgram)
@@ -58,11 +60,11 @@
 
 ### Anthropic SDK (@anthropic-ai/sdk)
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/anthropics/anthropic-sdk-typescript |
-| License | MIT |
-| Pricing | Free SDK; pay per API call |
+| Metric  | Value                                                  |
+| ------- | ------------------------------------------------------ |
+| GitHub  | https://github.com/anthropics/anthropic-sdk-typescript |
+| License | MIT                                                    |
+| Pricing | Free SDK; pay per API call                             |
 
 **What it does:** Official TypeScript SDK for Claude API. Supports structured outputs (JSON matching a schema), tool use, streaming, and multi-turn conversations.
 
@@ -74,13 +76,13 @@
 
 ### Instructor JS (@instructor-ai/instructor)
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/instructor-ai/instructor-js |
-| Stars | ~726 |
-| NPM Weekly Downloads | ~14,769 |
-| License | MIT |
-| Pricing | Free, open source |
+| Metric               | Value                                          |
+| -------------------- | ---------------------------------------------- |
+| GitHub               | https://github.com/instructor-ai/instructor-js |
+| Stars                | ~726                                           |
+| NPM Weekly Downloads | ~14,769                                        |
+| License              | MIT                                            |
+| Pricing              | Free, open source                              |
 
 **What it does:** Structured extraction from LLMs using Zod schemas. Wraps OpenAI function calling. Supports Anthropic, Azure, Cohere via `llm-polyglot`. Patching approach: wraps your SDK client to add schema enforcement.
 
@@ -92,23 +94,25 @@
 
 ### LangChain.js (langchain)
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/langchain-ai/langchainjs |
-| Stars | ~17.3K |
-| NPM Weekly Downloads | ~1M |
-| License | MIT |
-| Bundle Size | ~101.2 kB gzipped |
-| Pricing | Free, open source |
+| Metric               | Value                                       |
+| -------------------- | ------------------------------------------- |
+| GitHub               | https://github.com/langchain-ai/langchainjs |
+| Stars                | ~17.3K                                      |
+| NPM Weekly Downloads | ~1M                                         |
+| License              | MIT                                         |
+| Bundle Size          | ~101.2 kB gzipped                           |
+| Pricing              | Free, open source                           |
 
 **What it does:** Port of the Python LangChain framework. Chains, agents, tools, memory, RAG, document loaders, vector stores. Comprehensive but heavy.
 
 **Pros:**
+
 - Most comprehensive framework for complex agent workflows and RAG
 - Runnable interface with built-in batch parallelism for LLM calls
 - Huge ecosystem of integrations
 
 **Cons:**
+
 - Heavy bundle size (101.2 kB gzipped), blocks edge runtime deployment
 - "Powerful but sometimes overly complex" for straightforward use cases
 - Multiple abstractions for simple workflows feel excessive
@@ -122,18 +126,19 @@
 
 ### Mastra (mastra)
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/mastra-ai/mastra |
-| Stars | ~22K |
-| NPM Weekly Downloads | ~300K+ |
-| License | Elastic License 2.0 |
-| Latest Version | 1.0 (Jan 2026) |
-| Pricing | Free, open source (EL2.0) |
+| Metric               | Value                               |
+| -------------------- | ----------------------------------- |
+| GitHub               | https://github.com/mastra-ai/mastra |
+| Stars                | ~22K                                |
+| NPM Weekly Downloads | ~300K+                              |
+| License              | Elastic License 2.0                 |
+| Latest Version       | 1.0 (Jan 2026)                      |
+| Pricing              | Free, open source (EL2.0)           |
 
 **What it does:** TypeScript-native AI agent framework from the Gatsby team. YC-backed. Includes agents, RAG pipelines, workflows, built-in observability. Builds on top of Vercel AI SDK for model interaction.
 
 **Key features:**
+
 - `requestContextSchema` (Zod) for runtime validation of agent context
 - Clean agent abstraction with model routing
 - Integrates with Inngest for workflow orchestration
@@ -149,14 +154,14 @@
 
 ### pdf-parse
 
-| Metric | Value |
-|--------|-------|
-| NPM | https://www.npmjs.com/package/pdf-parse |
-| Weekly Downloads | ~2.5M+ |
-| Latest Version | 2.4.5 |
-| Last Updated | ~4 months ago |
-| License | MIT |
-| Pricing | Free, open source |
+| Metric           | Value                                   |
+| ---------------- | --------------------------------------- |
+| NPM              | https://www.npmjs.com/package/pdf-parse |
+| Weekly Downloads | ~2.5M+                                  |
+| Latest Version   | 2.4.5                                   |
+| Last Updated     | ~4 months ago                           |
+| License          | MIT                                     |
+| Pricing          | Free, open source                       |
 
 **What it does:** Pure TypeScript, cross-platform PDF text extraction. Works in Node.js, browsers, serverless (Vercel, AWS Lambda, Cloudflare Workers). Extracts text content from PDFs.
 
@@ -170,13 +175,13 @@
 
 ### Tesseract.js
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/naptha/tesseract.js |
-| Stars | ~37.5K |
-| NPM Weekly Downloads | ~431K |
-| License | Apache-2.0 |
-| Pricing | Free, open source |
+| Metric               | Value                                  |
+| -------------------- | -------------------------------------- |
+| GitHub               | https://github.com/naptha/tesseract.js |
+| Stars                | ~37.5K                                 |
+| NPM Weekly Downloads | ~431K                                  |
+| License              | Apache-2.0                             |
+| Pricing              | Free, open source                      |
 
 **What it does:** Pure JavaScript OCR engine. Runs in browser and Node.js. Supports 100+ languages. Wraps the Tesseract OCR engine via WebAssembly.
 
@@ -191,12 +196,12 @@
 
 ### Amazon Textract
 
-| Metric | Value |
-|--------|-------|
-| Service | AWS Textract API |
-| SDK | @aws-sdk/client-textract |
+| Metric  | Value                                                               |
+| ------- | ------------------------------------------------------------------- |
+| Service | AWS Textract API                                                    |
+| SDK     | @aws-sdk/client-textract                                            |
 | Pricing | Pay-per-page ($1.50/1000 pages for text, $50/1000 for forms/tables) |
-| HIPAA | Yes (BAA available) |
+| HIPAA   | Yes (BAA available)                                                 |
 
 **What it does:** Cloud OCR with structured data extraction. Handles forms, tables, handwriting. 95-99% accuracy on printed documents. Marginally better than Tesseract on handwritten text.
 
@@ -211,12 +216,12 @@
 
 ### Reducto
 
-| Metric | Value |
-|--------|-------|
-| Website | https://reducto.ai |
+| Metric  | Value                              |
+| ------- | ---------------------------------- |
+| Website | https://reducto.ai                 |
 | Pricing | $0.015/page starting, credit-based |
-| HIPAA | Yes (SOC2, HIPAA, BAA available) |
-| YC | Yes |
+| HIPAA   | Yes (SOC2, HIPAA, BAA available)   |
+| YC      | Yes                                |
 
 **What it does:** AI-powered document parsing API. 99.24% extraction accuracy on clinical documents. FHIR/HL7 mapping. Prior authorization document processing.
 
@@ -228,11 +233,11 @@
 
 ### LlamaParse / Unstructured / Docling
 
-| Tool | Stars | License | Best For |
-|------|-------|---------|----------|
-| LlamaParse | N/A (API) | Freemium | Speed (~6s/doc), structure preservation |
-| Unstructured | N/A (Platform) | Apache-2.0 / Enterprise | Enterprise pipelines, SOC2/HIPAA |
-| Docling | ~37K | MIT | Free, multi-format, IBM-backed |
+| Tool         | Stars          | License                 | Best For                                |
+| ------------ | -------------- | ----------------------- | --------------------------------------- |
+| LlamaParse   | N/A (API)      | Freemium                | Speed (~6s/doc), structure preservation |
+| Unstructured | N/A (Platform) | Apache-2.0 / Enterprise | Enterprise pipelines, SOC2/HIPAA        |
+| Docling      | ~37K           | MIT                     | Free, multi-format, IBM-backed          |
 
 **LlamaParse:** Fast, good at maintaining document structure. Best for financial reports and contracts. API-based.
 
@@ -250,17 +255,18 @@
 
 ### AssemblyAI -- RECOMMENDED for Healthcare
 
-| Metric | Value |
-|--------|-------|
-| NPM Package | assemblyai |
-| SDK Language | TypeScript (native) |
-| HIPAA | Yes (BAA available, SOC2 Type 2, ISO 27001) |
-| Pricing | $0.15/hr (Universal-2), $0.21/hr (Universal-3-Pro) |
-| PII Redaction | Built-in, 30+ entity types |
+| Metric        | Value                                              |
+| ------------- | -------------------------------------------------- |
+| NPM Package   | assemblyai                                         |
+| SDK Language  | TypeScript (native)                                |
+| HIPAA         | Yes (BAA available, SOC2 Type 2, ISO 27001)        |
+| Pricing       | $0.15/hr (Universal-2), $0.21/hr (Universal-3-Pro) |
+| PII Redaction | Built-in, 30+ entity types                         |
 
 **What it does:** Speech-to-text API with speaker diarization, PII redaction, sentiment analysis, and AI-powered analysis features. TypeScript SDK for Node.js.
 
 **Key healthcare features:**
+
 - HIPAA-compliant with BAA
 - PII redaction for medical record numbers, SSNs, PHI
 - Speaker diarization (therapist vs client)
@@ -276,17 +282,18 @@
 
 ### Deepgram
 
-| Metric | Value |
-|--------|-------|
-| Website | https://deepgram.com |
-| Medical Model | Nova-3 Medical |
-| HIPAA | Yes (BAA, VPC deployment options) |
-| Pricing | ~$0.0077/min pay-as-you-go ($0.46/hr) |
-| Latency | Sub-300ms streaming |
+| Metric        | Value                                 |
+| ------------- | ------------------------------------- |
+| Website       | https://deepgram.com                  |
+| Medical Model | Nova-3 Medical                        |
+| HIPAA         | Yes (BAA, VPC deployment options)     |
+| Pricing       | ~$0.0077/min pay-as-you-go ($0.46/hr) |
+| Latency       | Sub-300ms streaming                   |
 
 **What it does:** AI speech-to-text with medical-specific model. Nova-3 Medical has 63.7% better WER than next-best competitor on clinical audio. Pretrained on millions of medical conversations.
 
 **Key advantages:**
+
 - Nova-3 Medical: understands pharmaceutical names, clinical shorthand, regulatory language
 - 40% better on medical keyterm error rate vs competitors
 - Sub-300ms latency for real-time streaming
@@ -301,11 +308,11 @@
 
 ### OpenAI Whisper API
 
-| Metric | Value |
-|--------|-------|
-| Provider | OpenAI |
-| Pricing | $0.006/min (~$0.36/hr) |
-| HIPAA | No BAA available |
+| Metric   | Value                  |
+| -------- | ---------------------- |
+| Provider | OpenAI                 |
+| Pricing  | $0.006/min (~$0.36/hr) |
+| HIPAA    | No BAA available       |
 
 **What it does:** General-purpose speech recognition. Good accuracy on clean audio.
 
@@ -319,12 +326,12 @@
 
 ### Speechmatics
 
-| Metric | Value |
-|--------|-------|
-| Medical Model | Medical Speech-to-Text (Sep 2025) |
-| Accuracy | 93% general, 4% Keyword Error Rate on medical terms |
-| Languages | 55 languages, 7 with medical models |
-| HIPAA | Enterprise plans |
+| Metric        | Value                                               |
+| ------------- | --------------------------------------------------- |
+| Medical Model | Medical Speech-to-Text (Sep 2025)                   |
+| Accuracy      | 93% general, 4% Keyword Error Rate on medical terms |
+| Languages     | 55 languages, 7 with medical models                 |
+| HIPAA         | Enterprise plans                                    |
 
 **What it does:** Medical-grade STT with 93% accuracy and 50% fewer errors on medical terms vs peers. Real-time speaker diarization for clinicians/patients/family. Supports telehealth, EHR scribes, bedside tools.
 
@@ -336,11 +343,11 @@
 
 ### Web Speech API (Browser Native)
 
-| Metric | Value |
-|--------|-------|
-| Cost | Free |
-| Accuracy | Low-moderate |
-| HIPAA | No (sends audio to Google/Apple servers) |
+| Metric   | Value                                    |
+| -------- | ---------------------------------------- |
+| Cost     | Free                                     |
+| Accuracy | Low-moderate                             |
+| HIPAA    | No (sends audio to Google/Apple servers) |
 
 **What it does:** Browser-native speech recognition. Free, zero dependencies, works offline in some browsers.
 
@@ -354,18 +361,19 @@
 
 ### Inngest -- RECOMMENDED
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/inngest/inngest |
-| Stars | ~4.8K |
-| License | Source-available (not self-hostable) |
-| Vercel Integration | First-class (Marketplace) |
-| Free Tier | 100K executions/month (via Vercel) |
-| Paid | $75/mo Pro (1M executions) |
+| Metric             | Value                                |
+| ------------------ | ------------------------------------ |
+| GitHub             | https://github.com/inngest/inngest   |
+| Stars              | ~4.8K                                |
+| License            | Source-available (not self-hostable) |
+| Vercel Integration | First-class (Marketplace)            |
+| Free Tier          | 100K executions/month (via Vercel)   |
+| Paid               | $75/mo Pro (1M executions)           |
 
 **What it does:** Event-driven, durable workflow engine. Runs on your existing serverless platform. Deploy Inngest functions alongside your Next.js app on Vercel. Handles retries, recovery, concurrency, throttling, rate limiting, debouncing, and batching.
 
 **AI-specific features:**
+
 - AgentKit for agentic orchestration (early access)
 - `step.ai` for AI model calls with production-ready infrastructure
 - `useAgent` React hook for streaming real-time updates from durable AI workflows
@@ -384,13 +392,13 @@
 
 ### Trigger.dev
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/triggerdotdev/trigger.dev |
-| Stars | ~13.7K |
-| License | Apache-2.0 (self-hostable) |
-| Free Tier | $5/month free usage |
-| Pricing | Usage-based compute ($0.0000169/sec micro) |
+| Metric    | Value                                        |
+| --------- | -------------------------------------------- |
+| GitHub    | https://github.com/triggerdotdev/trigger.dev |
+| Stars     | ~13.7K                                       |
+| License   | Apache-2.0 (self-hostable)                   |
+| Free Tier | $5/month free usage                          |
+| Pricing   | Usage-based compute ($0.0000169/sec micro)   |
 
 **What it does:** Background jobs platform with dedicated compute (not serverless). No timeout limits. Tasks can run minutes to hours. Built for AI agent workloads with retries, scheduling, and observability.
 
@@ -404,13 +412,13 @@
 
 ### Claude Agent SDK (@anthropic-ai/claude-agent-sdk)
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/anthropics/claude-agent-sdk-typescript |
-| NPM | @anthropic-ai/claude-agent-sdk |
-| Latest | v0.2.81 |
-| License | MIT |
-| Pricing | Free SDK; pay per Claude API call |
+| Metric  | Value                                                     |
+| ------- | --------------------------------------------------------- |
+| GitHub  | https://github.com/anthropics/claude-agent-sdk-typescript |
+| NPM     | @anthropic-ai/claude-agent-sdk                            |
+| Latest  | v0.2.81                                                   |
+| License | MIT                                                       |
+| Pricing | Free SDK; pay per Claude API call                         |
 
 **What it does:** Programmatic access to Claude Code's capabilities. Agents can understand codebases, edit files, run commands, execute complex workflows. V2 interface (preview) simplifies multi-turn conversations.
 
@@ -433,6 +441,7 @@
 - No need to maintain separate ML training pipelines
 
 **JavaScript ML libraries (TensorFlow.js, Brain.js, ml5.js):**
+
 - TensorFlow.js: powerful but heavy, requires ML expertise, training data pipelines
 - Brain.js: simple neural networks, not suited for complex healthcare prediction
 - ml5.js: educational, not production-ready
@@ -447,18 +456,19 @@
 
 ### Langfuse -- RECOMMENDED (Self-Hostable)
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/langfuse/langfuse |
-| Stars | ~20K+ |
-| License | MIT |
-| Self-Hostable | Yes (Docker Compose, Helm, VM) |
-| Free Tier | Self-hosted unlimited; Cloud 50K events/mo |
-| Pricing | Self-hosted free; Cloud from $50/mo |
+| Metric        | Value                                      |
+| ------------- | ------------------------------------------ |
+| GitHub        | https://github.com/langfuse/langfuse       |
+| Stars         | ~20K+                                      |
+| License       | MIT                                        |
+| Self-Hostable | Yes (Docker Compose, Helm, VM)             |
+| Free Tier     | Self-hosted unlimited; Cloud 50K events/mo |
+| Pricing       | Self-hosted free; Cloud from $50/mo        |
 
 **What it does:** Open source LLM engineering platform. Tracing, prompt management, evaluations, datasets, playground. OpenTelemetry compatible.
 
 **Key advantages:**
+
 - Fully MIT-licensed, self-hostable (critical for HIPAA)
 - All features available in self-hosted version (no feature gating)
 - PostgreSQL + ClickHouse backend
@@ -472,12 +482,12 @@
 
 ### Helicone
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/Helicone/helicone |
-| License | Apache-2.0 |
+| Metric    | Value                                    |
+| --------- | ---------------------------------------- |
+| GitHub    | https://github.com/Helicone/helicone     |
+| License   | Apache-2.0                               |
 | Free Tier | 10K requests/mo (or 100K via some plans) |
-| Pricing | From $20/seat/mo |
+| Pricing   | From $20/seat/mo                         |
 
 **What it does:** LLM observability platform. One-line proxy integration (change base URL). Cloudflare Workers + ClickHouse architecture. Built-in caching (20-30% cost reduction), analytics, cost tracking.
 
@@ -492,16 +502,17 @@
 
 ### Portkey AI Gateway
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/Portkey-AI/gateway |
-| License | MIT |
-| Built In | TypeScript |
-| Pricing | Dev free; Pro paid |
+| Metric   | Value                                 |
+| -------- | ------------------------------------- |
+| GitHub   | https://github.com/Portkey-AI/gateway |
+| License  | MIT                                   |
+| Built In | TypeScript                            |
+| Pricing  | Dev free; Pro paid                    |
 
 **What it does:** AI gateway for routing to 1600+ models. Caching (simple and semantic), fallbacks, retries, load balancing, timeouts. Written in TypeScript.
 
 **Key features:**
+
 - Automatic fallbacks between providers (e.g., Claude -> GPT if Claude is down)
 - Semantic caching for repeated queries
 - Request routing and load balancing
@@ -515,18 +526,19 @@
 
 ### Promptfoo
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/promptfoo/promptfoo |
-| Stars | High (300K+ developers, 127 Fortune 500) |
-| License | MIT |
-| NPM Downloads | 1.6M+ |
-| Pricing | Free, open source (acquired by OpenAI Mar 2026) |
-| Language | TypeScript (96.6%) |
+| Metric        | Value                                           |
+| ------------- | ----------------------------------------------- |
+| GitHub        | https://github.com/promptfoo/promptfoo          |
+| Stars         | High (300K+ developers, 127 Fortune 500)        |
+| License       | MIT                                             |
+| NPM Downloads | 1.6M+                                           |
+| Pricing       | Free, open source (acquired by OpenAI Mar 2026) |
+| Language      | TypeScript (96.6%)                              |
 
 **What it does:** CLI and library for evaluating and red-teaming LLM apps. Compare model outputs, test prompt quality, scan for 50+ vulnerability types. Runs locally.
 
 **Key features:**
+
 - Prompt evaluation (side-by-side comparison across models)
 - Red teaming (50+ attack plugins)
 - LLM-as-a-judge scoring
@@ -542,10 +554,10 @@
 
 ### Braintrust
 
-| Metric | Value |
-|--------|-------|
-| Website | https://www.braintrust.dev |
-| License | Proprietary (cloud platform) |
+| Metric       | Value                                    |
+| ------------ | ---------------------------------------- |
+| Website      | https://www.braintrust.dev               |
+| License      | Proprietary (cloud platform)             |
 | Integrations | Vercel AI SDK, OpenAI, Mastra, LangChain |
 
 **What it does:** AI observability platform with evals, prompt management, monitoring. AutoEvals library for automated quality scoring. "Loop" AI agent auto-generates eval datasets.
@@ -560,16 +572,17 @@
 
 ### Medplum (FHIR Platform)
 
-| Metric | Value |
-|--------|-------|
-| GitHub | https://github.com/medplum/medplum |
-| License | Apache-2.0 |
-| Latest | v5 |
+| Metric  | Value                                  |
+| ------- | -------------------------------------- |
+| GitHub  | https://github.com/medplum/medplum     |
+| License | Apache-2.0                             |
+| Latest  | v5                                     |
 | Pricing | Open source; managed hosting available |
 
 **What it does:** Open-source, FHIR-compliant healthcare platform. API for clinical data, React components, Bot framework for workflows. v5 added AI capabilities with MCP server support and custom FHIR operations.
 
 **AI features:**
+
 - `$ai` FHIR operation for LLM integration
 - MCP server for AI model access to healthcare data
 - AuditEvent logging for all AI agent actions
@@ -591,6 +604,7 @@
 **JavaScript gap:** Clinical NER and CPT code extraction do not have viable JS/TS libraries. The ecosystem is Python-dominated.
 
 **Practical approach for Clinivise:**
+
 1. Use LLMs (Claude) for CPT code extraction from session notes. Claude already understands ABA billing codes (97151-97158, 0362T-0374T).
 2. Validate LLM-extracted codes against a local lookup table of valid ABA CPT codes.
 3. Use structured output (AI SDK `generateObject`) to get typed, validated code suggestions.
@@ -605,6 +619,7 @@ This approach avoids Python dependencies and leverages tools already in our stac
 ### Reducto (Healthcare Document Processing)
 
 Already covered in Document Processing section. Key healthcare facts:
+
 - 99.24% accuracy on clinical documents
 - HIPAA/SOC2/BAA compliant
 - FHIR/HL7 mapping, Epic/Cerner interop
@@ -619,37 +634,37 @@ Already covered in Document Processing section. Key healthcare facts:
 
 ### Phase 1 (Now) -- Core AI Stack
 
-| Layer | Library | Why |
-|-------|---------|-----|
-| **LLM Integration** | Vercel AI SDK 6 (`ai`) | Unified API, structured output with Zod, streaming, Agent abstraction, Bedrock provider for production migration |
-| **Structured Output** | AI SDK `generateObject` + Zod v4 | Native in AI SDK 6, no extra library needed. Type-safe extraction for auth letters, session notes |
-| **PDF Extraction** | `pdf-parse` | 2.5M weekly downloads, works on Vercel, handles typed PDFs |
-| **OCR Fallback** | `tesseract.js` | Free, no API costs, handles scanned auth letters |
-| **Background Jobs** | Inngest | Durable workflows, Vercel-native, 100K free executions/month, retries and observability built-in |
-| **Prompt Testing** | `promptfoo` | Test auth letter prompts, compare models, runs locally (no PHI exposure) |
-| **LLM Observability** | Langfuse (self-hosted) | MIT, full self-hosting, prompt management, tracing. Deploy on AWS alongside Bedrock |
+| Layer                 | Library                          | Why                                                                                                              |
+| --------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **LLM Integration**   | Vercel AI SDK 6 (`ai`)           | Unified API, structured output with Zod, streaming, Agent abstraction, Bedrock provider for production migration |
+| **Structured Output** | AI SDK `generateObject` + Zod v4 | Native in AI SDK 6, no extra library needed. Type-safe extraction for auth letters, session notes                |
+| **PDF Extraction**    | `pdf-parse`                      | 2.5M weekly downloads, works on Vercel, handles typed PDFs                                                       |
+| **OCR Fallback**      | `tesseract.js`                   | Free, no API costs, handles scanned auth letters                                                                 |
+| **Background Jobs**   | Inngest                          | Durable workflows, Vercel-native, 100K free executions/month, retries and observability built-in                 |
+| **Prompt Testing**    | `promptfoo`                      | Test auth letter prompts, compare models, runs locally (no PHI exposure)                                         |
+| **LLM Observability** | Langfuse (self-hosted)           | MIT, full self-hosting, prompt management, tracing. Deploy on AWS alongside Bedrock                              |
 
 ### Phase 2 (Production) -- Additions
 
-| Layer | Library | Why |
-|-------|---------|-----|
-| **LLM Provider** | AWS Bedrock via `@ai-sdk/amazon-bedrock` | HIPAA-eligible Claude access. One-line provider swap from direct Anthropic |
-| **Document Processing** | Amazon Textract OR Reducto | Production OCR + form extraction. Textract if staying AWS-native, Reducto if prior auth accuracy is paramount |
-| **Speech-to-Text** | AssemblyAI | HIPAA/BAA, TypeScript SDK, PII redaction, speaker diarization, $0.15-0.21/hr |
-| **AI Gateway** | Portkey | Provider fallbacks, caching, load balancing when running multiple AI services |
-| **Denial Prediction** | LLM-based via AI SDK | No traditional ML needed. Use Claude with structured output for risk scoring |
+| Layer                   | Library                                  | Why                                                                                                           |
+| ----------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **LLM Provider**        | AWS Bedrock via `@ai-sdk/amazon-bedrock` | HIPAA-eligible Claude access. One-line provider swap from direct Anthropic                                    |
+| **Document Processing** | Amazon Textract OR Reducto               | Production OCR + form extraction. Textract if staying AWS-native, Reducto if prior auth accuracy is paramount |
+| **Speech-to-Text**      | AssemblyAI                               | HIPAA/BAA, TypeScript SDK, PII redaction, speaker diarization, $0.15-0.21/hr                                  |
+| **AI Gateway**          | Portkey                                  | Provider fallbacks, caching, load balancing when running multiple AI services                                 |
+| **Denial Prediction**   | LLM-based via AI SDK                     | No traditional ML needed. Use Claude with structured output for risk scoring                                  |
 
 ### What to Avoid
 
-| Library | Reason |
-|---------|--------|
-| LangChain.js | Overkill for our use cases. Heavy bundle, excessive abstraction for single-step AI tasks |
-| Instructor JS | AI SDK 6 provides native structured output. Redundant |
-| OpenAI Whisper | Hallucination risk in medical contexts. No BAA. OpenAI warns against healthcare use |
-| Web Speech API | Audio sent to Google/Apple. No HIPAA compliance |
+| Library                  | Reason                                                                                          |
+| ------------------------ | ----------------------------------------------------------------------------------------------- |
+| LangChain.js             | Overkill for our use cases. Heavy bundle, excessive abstraction for single-step AI tasks        |
+| Instructor JS            | AI SDK 6 provides native structured output. Redundant                                           |
+| OpenAI Whisper           | Hallucination risk in medical contexts. No BAA. OpenAI warns against healthcare use             |
+| Web Speech API           | Audio sent to Google/Apple. No HIPAA compliance                                                 |
 | TensorFlow.js / Brain.js | Traditional ML is unnecessary when LLMs handle prediction tasks better with less infrastructure |
-| Mastra | Adds abstraction on top of AI SDK without proportional benefit for Phase 1 |
-| Claude Agent SDK | Built for coding agents, not healthcare workflows |
+| Mastra                   | Adds abstraction on top of AI SDK without proportional benefit for Phase 1                      |
+| Claude Agent SDK         | Built for coding agents, not healthcare workflows                                               |
 
 ### Architecture Pattern
 
@@ -666,14 +681,14 @@ User Action (e.g., upload auth letter)
 
 ### Cost Estimate (Phase 1, ~100 AI calls/day)
 
-| Service | Monthly Cost |
-|---------|-------------|
-| Anthropic Claude API (direct) | ~$30-50 |
-| Inngest | Free (100K executions/mo) |
-| Langfuse (self-hosted) | Free (infrastructure cost only) |
-| pdf-parse + Tesseract.js | Free |
-| Promptfoo | Free |
-| **Total** | **~$30-50/mo** |
+| Service                       | Monthly Cost                    |
+| ----------------------------- | ------------------------------- |
+| Anthropic Claude API (direct) | ~$30-50                         |
+| Inngest                       | Free (100K executions/mo)       |
+| Langfuse (self-hosted)        | Free (infrastructure cost only) |
+| pdf-parse + Tesseract.js      | Free                            |
+| Promptfoo                     | Free                            |
+| **Total**                     | **~$30-50/mo**                  |
 
 ---
 

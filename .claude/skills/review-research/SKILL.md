@@ -19,6 +19,7 @@ Platform vision: Clinivise aims to be the best-designed, AI-native ABA practice 
 
 Objective:
 Find both directions of misalignment:
+
 - Where research recommendations make wrong assumptions about how our code actually works
 - Where our codebase is behind industry best practices and should evolve to match the research recommendations
 
@@ -60,18 +61,23 @@ Instructions:
 Return the review in exactly this structure:
 
 ## Research Review Summary
+
 - Alignment score: /10 (how well recommendations fit our codebase)
 - Ready to implement as-is: Yes / No
 - Biggest misalignments
 
 ## Validated Recommendations
+
 List recommendations that are confirmed correct after codebase verification. For each:
+
 - What was recommended
 - How it aligns with existing code (cite files/patterns)
 - Any minor adjustments needed
 
 ## Misalignments Found
+
 For each misalignment:
+
 - Severity: Critical / High / Medium / Low
 - What the research recommended
 - What the codebase actually does or requires
@@ -79,16 +85,21 @@ For each misalignment:
 - How to fix the recommendation
 
 ## Missing Context
+
 List important codebase details the research didn't account for that affect the recommendations.
 
 ## Existing Code the Research Missed
+
 List functions, utilities, patterns, or prior implementations that already exist and should be reused rather than rebuilt.
 
 ## Convention Violations
+
 List where recommendations would break established project conventions, with the correct convention cited.
 
 ## Upgrade Opportunities
+
 List where the research reveals that our codebase is behind best practices or missing patterns that strong platforms use. For each:
+
 - What the research recommends (and who does it well)
 - What our codebase currently does
 - Why upgrading matters for our platform vision
@@ -96,13 +107,16 @@ List where the research reveals that our codebase is behind best practices or mi
 - Whether to do it now or track for later
 
 ## Revised Recommendation
+
 Based on the review, provide the corrected implementation approach that:
+
 - Fixes wrong assumptions from the research
 - Uses existing code where it's already good
 - Adopts better patterns from the research where our code should evolve
 - Follows project conventions where they're sound, upgrades them where they're not
 
 ## Updated File List
+
 Provide the corrected list of files that actually need to change, with specific changes for each.
 
 Final rule:

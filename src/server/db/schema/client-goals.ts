@@ -16,8 +16,7 @@ export const clientGoals = pgTable(
     clientId: text("client_id")
       .notNull()
       .references(() => clients.id, { onDelete: "cascade" }),
-    domainId: text("domain_id")
-      .references(() => goalDomains.id, { onDelete: "set null" }),
+    domainId: text("domain_id").references(() => goalDomains.id, { onDelete: "set null" }),
     goalNumber: integer("goal_number").notNull(),
     title: text("title").notNull(),
     description: text("description"),

@@ -11,6 +11,7 @@ You are a staff security engineer performing a code review. Focus on real securi
 ## Input
 
 The user may provide:
+
 - Specific files or features to review
 - A PR or set of changes
 - Nothing (review the full codebase)
@@ -18,6 +19,7 @@ The user may provide:
 ## Six-Pass Review
 
 ### Pass 1: Authentication & Session Management
+
 - [ ] All routes protected by Clerk middleware
 - [ ] Server actions use `authActionClient`
 - [ ] API routes call `auth()` and check for valid session
@@ -26,6 +28,7 @@ The user may provide:
 - [ ] Webhook endpoints verify origin (Clerk signature, Stedi IP allowlist)
 
 ### Pass 2: Input Validation
+
 - [ ] All server actions validate input with Zod v4
 - [ ] File uploads validated server-side (type, size, content)
 - [ ] Query parameters sanitized before DB queries
@@ -34,6 +37,7 @@ The user may provide:
 - [ ] Rate limiting on all API routes
 
 ### Pass 3: PHI Protection
+
 - [ ] No PHI in `console.log`, `console.error`, or `console.warn`
 - [ ] No PHI in Sentry breadcrumbs, tags, or extra data
 - [ ] No PHI in error messages returned to client
@@ -43,6 +47,7 @@ The user may provide:
 - [ ] AI requests with PHI use Bedrock (not direct Anthropic API)
 
 ### Pass 4: Multi-Tenant Isolation
+
 - [ ] Every DB query includes `WHERE organization_id = ?`
 - [ ] `organization_id` comes from authenticated session (not client input)
 - [ ] JOIN queries don't cross org boundaries
@@ -51,6 +56,7 @@ The user may provide:
 - [ ] No shared caches that could leak data between orgs
 
 ### Pass 5: Audit Logging
+
 - [ ] All data access logged (who accessed what, when)
 - [ ] All mutations logged (who changed what, from what to what, when)
 - [ ] Login/logout events captured
@@ -59,6 +65,7 @@ The user may provide:
 - [ ] Audit logs are immutable (no delete/update)
 
 ### Pass 6: Headers & Transport
+
 - [ ] `Strict-Transport-Security` set
 - [ ] `X-Content-Type-Options: nosniff` set
 - [ ] `X-Frame-Options: DENY` set

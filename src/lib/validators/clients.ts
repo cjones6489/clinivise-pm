@@ -5,6 +5,7 @@ import {
   clientStatusSchema,
   referralSourceSchema,
   genderSchema,
+  npiSchema,
   updatedAtSchema,
 } from "./index";
 
@@ -84,9 +85,11 @@ const clientFieldsSchema = z.object({
     .string()
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => v || undefined)
+    .pipe(npiSchema),
   medicaidId: z
     .string()
+    .max(20)
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),

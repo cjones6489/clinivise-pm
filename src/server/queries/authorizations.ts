@@ -170,7 +170,9 @@ function buildAuthFilterConditions(orgId: string, filters?: AuthFilters): SQL[] 
         conditions.push(sql`${authorizations.endDate} <= ${thirtyDaysStr}`);
         break;
       case "expired":
-        conditions.push(sql`(${authorizations.status} = 'expired' or (${authorizations.status} = 'approved' and ${authorizations.endDate} < ${todayStr}))`);
+        conditions.push(
+          sql`(${authorizations.status} = 'expired' or (${authorizations.status} = 'approved' and ${authorizations.endDate} < ${todayStr}))`,
+        );
         break;
       case "pending":
         conditions.push(sql`${authorizations.status} = 'pending'`);
@@ -230,8 +232,9 @@ export async function getAlertCount(orgId: string): Promise<number> {
       endDate: authorizations.endDate,
       totalApproved:
         sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.mapWith(Number),
-      totalUsed:
-        sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.mapWith(Number),
+      totalUsed: sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.mapWith(
+        Number,
+      ),
     })
     .from(authorizations)
     .leftJoin(authorizationServices, eq(authorizations.id, authorizationServices.authorizationId))

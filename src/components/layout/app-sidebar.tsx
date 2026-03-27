@@ -61,11 +61,13 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
     <Sidebar>
       <SidebarHeader className="border-sidebar-border border-b px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-500 text-sm font-bold text-primary-foreground shadow-sm shadow-blue-400/20">
+          <div className="text-primary-foreground flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-500 text-sm font-bold shadow-sm shadow-blue-400/20">
             C
           </div>
           <div>
-            <div className="text-sidebar-foreground text-sm font-semibold tracking-tight">Clinivise</div>
+            <div className="text-sidebar-foreground text-sm font-semibold tracking-tight">
+              Clinivise
+            </div>
             <p className="text-sidebar-foreground/40 text-xs font-medium tracking-widest uppercase">
               Practice Management
             </p>
@@ -93,8 +95,8 @@ export function AppSidebar({ userRole, alertCount }: { userRole?: string; alertC
                         isActive={isActive}
                         className={
                           isActive
-                            ? "h-9 bg-accent font-medium text-primary shadow-sm"
-                            : "h-9 text-sidebar-foreground/75 hover:bg-accent/50 hover:text-sidebar-foreground"
+                            ? "bg-accent text-primary h-9 font-medium shadow-sm"
+                            : "text-sidebar-foreground/75 hover:bg-accent/50 hover:text-sidebar-foreground h-9"
                         }
                       >
                         <Link href={item.href} className="gap-3">

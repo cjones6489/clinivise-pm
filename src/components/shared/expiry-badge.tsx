@@ -67,7 +67,12 @@ export function ExpiryBadge({
 
   if (isFuture && startDate) {
     return (
-      <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold", styles.badge)}>
+      <span
+        className={cn(
+          "inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+          styles.badge,
+        )}
+      >
         Starts {formatDate(startDate)}
       </span>
     );
@@ -76,13 +81,16 @@ export function ExpiryBadge({
   if (level === "expired") {
     return (
       <span className="inline-flex items-center gap-1">
-        <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold", styles.badge)}>
+        <span
+          className={cn(
+            "inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+            styles.badge,
+          )}
+        >
           Expired
         </span>
         {showFullDate && (
-          <span className="text-[10px] text-muted-foreground">
-            {formatDate(endDate)}
-          </span>
+          <span className="text-muted-foreground text-[10px]">{formatDate(endDate)}</span>
         )}
       </span>
     );
@@ -90,13 +98,16 @@ export function ExpiryBadge({
 
   return (
     <span className="inline-flex items-center gap-1">
-      <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular-nums", styles.badge)}>
+      <span
+        className={cn(
+          "inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular-nums",
+          styles.badge,
+        )}
+      >
         {daysLeft === 0 ? "Today" : `${daysLeft}d`}
       </span>
       {showFullDate && (
-        <span className="text-[10px] text-muted-foreground">
-          Expires {formatDate(endDate)}
-        </span>
+        <span className="text-muted-foreground text-[10px]">Expires {formatDate(endDate)}</span>
       )}
     </span>
   );

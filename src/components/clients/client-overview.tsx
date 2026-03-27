@@ -18,7 +18,11 @@ import {
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
 import { MetricCard } from "@/components/shared/metric-card";
-import { UtilizationBar, getUtilizationLevel, LEVEL_COLORS } from "@/components/shared/utilization-bar";
+import {
+  UtilizationBar,
+  getUtilizationLevel,
+  LEVEL_COLORS,
+} from "@/components/shared/utilization-bar";
 import { getExpiryLevel } from "@/components/shared/expiry-badge";
 
 function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -80,13 +84,16 @@ export function ClientOverview({
 
   const expiryLevel = getExpiryLevel(daysLeft, false);
   const daysLeftAccent =
-    expiryLevel === "critical" ? "text-red-600 dark:text-red-400"
-    : expiryLevel === "warning" ? "text-amber-600 dark:text-amber-400"
-    : "text-emerald-600 dark:text-emerald-400";
+    expiryLevel === "critical"
+      ? "text-red-600 dark:text-red-400"
+      : expiryLevel === "warning"
+        ? "text-amber-600 dark:text-amber-400"
+        : "text-emerald-600 dark:text-emerald-400";
 
   // Weekly average: total used hours / weeks elapsed
   const weeksElapsed = authUtilization ? Math.max(1, authUtilization.daysElapsed / 7) : 0;
-  const weeklyAvgHours = weeksElapsed > 0 ? (unitsToHours(totalUsed) / weeksElapsed).toFixed(1) : "0.0";
+  const weeklyAvgHours =
+    weeksElapsed > 0 ? (unitsToHours(totalUsed) / weeksElapsed).toFixed(1) : "0.0";
 
   // Under-utilization detection: <50% used with >50% of auth period elapsed
   const periodPctElapsed = authUtilization
@@ -106,7 +113,8 @@ export function ClientOverview({
             Under-utilization detected
           </div>
           <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400/80">
-            {utilizationPct}% of approved hours used with {Math.round(periodPctElapsed)}% of the authorization period elapsed. Consider reviewing the treatment schedule.
+            {utilizationPct}% of approved hours used with {Math.round(periodPctElapsed)}% of the
+            authorization period elapsed. Consider reviewing the treatment schedule.
           </p>
         </div>
       )}
@@ -150,32 +158,42 @@ export function ClientOverview({
         {/* Clinical Info */}
         <SectionCard title="Clinical Info">
           {client.diagnosisCode && (
-            <KVRow label="Diagnosis" value={<span className="font-mono">{client.diagnosisCode}</span>} />
+            <KVRow
+              label="Diagnosis"
+              value={<span className="font-mono">{client.diagnosisCode}</span>}
+            />
           )}
           {client.diagnosisDescription && (
             <KVRow label="Description" value={client.diagnosisDescription} />
           )}
           {client.secondaryDiagnosisCodes && client.secondaryDiagnosisCodes.length > 0 && (
-            <KVRow label="Comorbidities" value={<span className="font-mono">{client.secondaryDiagnosisCodes.join(", ")}</span>} />
+            <KVRow
+              label="Comorbidities"
+              value={<span className="font-mono">{client.secondaryDiagnosisCodes.join(", ")}</span>}
+            />
           )}
-          {client.primaryLanguage && (
-            <KVRow label="Language" value={client.primaryLanguage} />
-          )}
-          {client.interpreterNeeded && (
-            <KVRow label="Interpreter" value="Needed" />
-          )}
+          {client.primaryLanguage && <KVRow label="Language" value={client.primaryLanguage} />}
+          {client.interpreterNeeded && <KVRow label="Interpreter" value="Needed" />}
           {client.referringProviderName && (
-            <KVRow label="Referring Provider" value={
-              <span>
-                {client.referringProviderName}
-                {client.referringProviderNpi && (
-                  <span className="text-muted-foreground ml-1 font-mono text-[11px]">NPI {client.referringProviderNpi}</span>
-                )}
-              </span>
-            } />
+            <KVRow
+              label="Referring Provider"
+              value={
+                <span>
+                  {client.referringProviderName}
+                  {client.referringProviderNpi && (
+                    <span className="text-muted-foreground ml-1 font-mono text-[11px]">
+                      NPI {client.referringProviderNpi}
+                    </span>
+                  )}
+                </span>
+              }
+            />
           )}
           {client.medicaidId && (
-            <KVRow label="Medicaid ID" value={<span className="font-mono">{client.medicaidId}</span>} />
+            <KVRow
+              label="Medicaid ID"
+              value={<span className="font-mono">{client.medicaidId}</span>}
+            />
           )}
           {!client.diagnosisCode && !client.referringProviderName && !client.primaryLanguage && (
             <p className="text-muted-foreground py-2 text-xs">No clinical details on file</p>
@@ -225,14 +243,18 @@ export function ClientOverview({
                   .slice(0, 2);
                 return (
                   <div key={member.id} className="flex items-center gap-2.5">
-                    <div className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold ${member.isPrimary ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                    <div
+                      className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold ${member.isPrimary ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+                    >
                       {initials}
                     </div>
                     <div>
                       <div className="text-xs font-medium">
                         {name}
                         {member.isPrimary && (
-                          <span className="text-primary ml-1.5 text-[11px] font-normal">Primary</span>
+                          <span className="text-primary ml-1.5 text-[11px] font-normal">
+                            Primary
+                          </span>
                         )}
                       </div>
                       <div className="text-muted-foreground text-[11px]">
@@ -247,7 +269,6 @@ export function ClientOverview({
             <p className="text-muted-foreground py-2 text-xs">No team members assigned</p>
           )}
         </SectionCard>
-
       </div>
 
       {/* Authorized Services — per-CPT utilization bars */}
@@ -269,7 +290,8 @@ export function ClientOverview({
         ) : authUtilization ? (
           <div className="flex flex-col items-center justify-center py-6 text-center">
             <p className="text-muted-foreground text-xs">
-              Active authorization has no service lines defined. Add service lines to track utilization.
+              Active authorization has no service lines defined. Add service lines to track
+              utilization.
             </p>
           </div>
         ) : (
@@ -288,7 +310,7 @@ export function ClientOverview({
         title="Recent Sessions"
         action={
           sessions.length > 5 ? (
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-muted-foreground text-[11px]">
               Showing 5 of {sessions.length} · see Sessions tab
             </span>
           ) : undefined
@@ -299,11 +321,17 @@ export function ClientOverview({
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-border border-b">
-                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Date</th>
-                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">CPT</th>
-                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Provider</th>
-                  <th className="px-2 py-1.5 text-right font-medium text-muted-foreground">Units</th>
-                  <th className="px-2 py-1.5 text-left font-medium text-muted-foreground">Status</th>
+                  <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">Date</th>
+                  <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">CPT</th>
+                  <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
+                    Provider
+                  </th>
+                  <th className="text-muted-foreground px-2 py-1.5 text-right font-medium">
+                    Units
+                  </th>
+                  <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -311,12 +339,19 @@ export function ClientOverview({
                   <tr key={s.id} className="border-border border-b last:border-0">
                     <td className="px-2 py-1.5 tabular-nums">{formatDate(s.sessionDate)}</td>
                     <td className="px-2 py-1.5 font-medium tabular-nums">{s.cptCode}</td>
-                    <td className="px-2 py-1.5 text-muted-foreground">
+                    <td className="text-muted-foreground px-2 py-1.5">
                       {s.providerLastName}, {s.providerFirstName}{" "}
-                      <span className="text-[11px]">({CREDENTIAL_LABELS[s.providerCredentialType as CredentialType] ?? s.providerCredentialType})</span>
+                      <span className="text-[11px]">
+                        (
+                        {CREDENTIAL_LABELS[s.providerCredentialType as CredentialType] ??
+                          s.providerCredentialType}
+                        )
+                      </span>
                     </td>
                     <td className="px-2 py-1.5 text-right tabular-nums">{s.units}</td>
-                    <td className="px-2 py-1.5"><SessionStatusBadge status={s.status} /></td>
+                    <td className="px-2 py-1.5">
+                      <SessionStatusBadge status={s.status} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -324,8 +359,11 @@ export function ClientOverview({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-6 text-center">
-            <p className="text-xs text-muted-foreground">No sessions yet.</p>
-            <Link href={`/sessions/new?clientId=${client.id}`} className="mt-1 text-xs text-primary hover:underline">
+            <p className="text-muted-foreground text-xs">No sessions yet.</p>
+            <Link
+              href={`/sessions/new?clientId=${client.id}`}
+              className="text-primary mt-1 text-xs hover:underline"
+            >
               Log your first session &rarr;
             </Link>
           </div>

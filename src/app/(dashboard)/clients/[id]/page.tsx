@@ -16,7 +16,14 @@ import { getClientSessions } from "@/server/queries/sessions";
 import { ExpiryBadge } from "@/components/shared/expiry-badge";
 import { Button } from "@/components/ui/button";
 import { ClientDetail } from "@/components/clients/client-detail";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { CLIENT_STATUS_LABELS, CLIENT_STATUS_VARIANT, type ClientStatus } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
@@ -33,20 +40,31 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const canEdit = hasPermission(user.role, "clients.write");
   const canManagePayers = hasPermission(user.role, "payers.write");
 
-  const [client, contacts, careTeam, availableProviders, goals, goalDomains, insurance, payerOptions, authorizations, sessions, authUtilization] =
-    await Promise.all([
-      getClientById(user.organizationId, id),
-      getClientContacts(user.organizationId, id),
-      getCareTeam(user.organizationId, id),
-      canEdit ? getAvailableProviders(user.organizationId, id) : Promise.resolve([]),
-      getClientGoals(user.organizationId, id),
-      canEdit ? getGoalDomains(user.organizationId) : Promise.resolve([]),
-      getClientInsurance(user.organizationId, id),
-      canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
-      getClientAuthorizations(user.organizationId, id),
-      getClientSessions(user.organizationId, id),
-      getClientAuthUtilization(user.organizationId, id),
-    ]);
+  const [
+    client,
+    contacts,
+    careTeam,
+    availableProviders,
+    goals,
+    goalDomains,
+    insurance,
+    payerOptions,
+    authorizations,
+    sessions,
+    authUtilization,
+  ] = await Promise.all([
+    getClientById(user.organizationId, id),
+    getClientContacts(user.organizationId, id),
+    getCareTeam(user.organizationId, id),
+    canEdit ? getAvailableProviders(user.organizationId, id) : Promise.resolve([]),
+    getClientGoals(user.organizationId, id),
+    canEdit ? getGoalDomains(user.organizationId) : Promise.resolve([]),
+    getClientInsurance(user.organizationId, id),
+    canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
+    getClientAuthorizations(user.organizationId, id),
+    getClientSessions(user.organizationId, id),
+    getClientAuthUtilization(user.organizationId, id),
+  ]);
 
   if (!client) {
     notFound();
@@ -61,11 +79,15 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild><Link href="/clients">Clients</Link></BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link href="/clients">Clients</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{client.firstName} {client.lastName}</BreadcrumbPage>
+            <BreadcrumbPage>
+              {client.firstName} {client.lastName}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -98,7 +120,10 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             {CLIENT_STATUS_LABELS[status] ?? status}
           </Badge>
           {insurance.length > 0 && (
-            <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
+            <Badge
+              variant="outline"
+              className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400"
+            >
               Insured
             </Badge>
           )}

@@ -17,6 +17,18 @@ import { NotFoundError, ConflictError } from "@/lib/errors";
 import { logAudit } from "@/server/audit";
 import { requirePermission } from "@/lib/permissions";
 
+// ── Valid goal status transitions ────────────────────────────────────────────
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  baseline: ["active", "on_hold", "discontinued"],
+  active: ["mastered", "on_hold", "discontinued"],
+  mastered: ["maintenance", "active", "on_hold", "discontinued"],
+  maintenance: ["generalization", "mastered", "active", "on_hold", "discontinued"],
+  generalization: ["met", "maintenance", "active", "on_hold", "discontinued"],
+  met: ["active"], // reactivate
+  on_hold: ["baseline", "active", "discontinued"],
+  discontinued: ["active"], // reactivate
+};
+
 // ── Goal CRUD ────────────────────────────────────────────────────────────────
 
 export const createGoal = authActionClient
@@ -96,7 +108,7 @@ export const updateGoal = authActionClient
     const { id, ...updates } = parsedInput;
 
     const [existing] = await db
-      .select({ id: clientGoals.id, clientId: clientGoals.clientId })
+      .select({ id: clientGoals.id, clientId: clientGoals.clientId, status: clientGoals.status })
       .from(clientGoals)
       .where(
         and(
@@ -107,6 +119,16 @@ export const updateGoal = authActionClient
       )
       .limit(1);
     if (!existing) throw new NotFoundError("Goal");
+
+    // Validate status transition
+    if (updates.status && updates.status !== existing.status) {
+      const allowed = VALID_TRANSITIONS[existing.status];
+      if (!allowed || !allowed.includes(updates.status)) {
+        throw new ConflictError(
+          `Cannot transition goal from "${existing.status}" to "${updates.status}".`,
+        );
+      }
+    }
 
     // Verify domain belongs to this org if changing it
     if (updates.domainId) {
@@ -129,11 +151,35 @@ export const updateGoal = authActionClient
       if (value !== undefined) setValues[key] = value ?? null;
     }
 
+    // Auto-set metDate when marking as met, clear when leaving met
+    if (updates.status === "met" && existing.status !== "met") {
+      setValues.metDate = new Date().toISOString().slice(0, 10);
+    } else if (updates.status && updates.status !== "met" && existing.status === "met") {
+      setValues.metDate = null;
+    }
+
     if (Object.keys(setValues).length > 0) {
       await db
         .update(clientGoals)
         .set(setValues)
-        .where(eq(clientGoals.id, id));
+        .where(and(eq(clientGoals.id, id), eq(clientGoals.organizationId, ctx.organizationId)));
+
+      // Cascade status to objectives when goal reaches terminal states
+      if (updates.status === "met" || updates.status === "discontinued") {
+        await db
+          .update(clientGoalObjectives)
+          .set({
+            status: updates.status,
+            ...(updates.status === "met" ? { metDate: new Date().toISOString().slice(0, 10) } : {}),
+          })
+          .where(
+            and(
+              eq(clientGoalObjectives.goalId, id),
+              eq(clientGoalObjectives.organizationId, ctx.organizationId),
+              isNull(clientGoalObjectives.deletedAt),
+            ),
+          );
+      }
     }
 
     await logAudit({
@@ -172,7 +218,12 @@ export const deleteGoal = authActionClient
       await tx
         .update(clientGoals)
         .set({ deletedAt: new Date() })
-        .where(eq(clientGoals.id, parsedInput.id));
+        .where(
+          and(
+            eq(clientGoals.id, parsedInput.id),
+            eq(clientGoals.organizationId, ctx.organizationId),
+          ),
+        );
 
       await tx
         .update(clientGoalObjectives)
@@ -283,14 +334,24 @@ export const updateObjective = authActionClient
       await db
         .update(clientGoalObjectives)
         .set(setValues)
-        .where(eq(clientGoalObjectives.id, id));
+        .where(
+          and(
+            eq(clientGoalObjectives.id, id),
+            eq(clientGoalObjectives.organizationId, ctx.organizationId),
+          ),
+        );
     }
 
     // Get the client ID for revalidation
     const [goal] = await db
       .select({ clientId: clientGoals.clientId })
       .from(clientGoals)
-      .where(and(eq(clientGoals.id, existing.goalId), eq(clientGoals.organizationId, ctx.organizationId)))
+      .where(
+        and(
+          eq(clientGoals.id, existing.goalId),
+          eq(clientGoals.organizationId, ctx.organizationId),
+        ),
+      )
       .limit(1);
 
     await logAudit({
@@ -330,12 +391,22 @@ export const deleteObjective = authActionClient
     await db
       .update(clientGoalObjectives)
       .set({ deletedAt: new Date() })
-      .where(eq(clientGoalObjectives.id, parsedInput.id));
+      .where(
+        and(
+          eq(clientGoalObjectives.id, parsedInput.id),
+          eq(clientGoalObjectives.organizationId, ctx.organizationId),
+        ),
+      );
 
     const [goal] = await db
       .select({ clientId: clientGoals.clientId })
       .from(clientGoals)
-      .where(and(eq(clientGoals.id, existing.goalId), eq(clientGoals.organizationId, ctx.organizationId)))
+      .where(
+        and(
+          eq(clientGoals.id, existing.goalId),
+          eq(clientGoals.organizationId, ctx.organizationId),
+        ),
+      )
       .limit(1);
 
     await logAudit({

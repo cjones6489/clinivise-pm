@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, index, uniqueIndex, date, integer, numeric } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  index,
+  uniqueIndex,
+  date,
+  integer,
+  numeric,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { organizations } from "./organizations";

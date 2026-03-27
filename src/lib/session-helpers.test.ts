@@ -82,9 +82,9 @@ describe("computeModifierCodes", () => {
   });
 
   it("throws ConflictError when total modifiers exceed 4", () => {
-    expect(() =>
-      computeModifierCodes("rbt", "02", ["59", "XP", "76"]),
-    ).toThrow("Too many modifiers (5)");
+    expect(() => computeModifierCodes("rbt", "02", ["59", "XP", "76"])).toThrow(
+      "Too many modifiers (5)",
+    );
   });
 
   it("allows exactly 4 modifiers", () => {

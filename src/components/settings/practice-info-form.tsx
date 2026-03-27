@@ -44,8 +44,8 @@ const COMMON_TIMEZONES = [
 
 function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between border-b border-border/40 py-2 last:border-0">
-      <span className="text-xs text-muted-foreground">{label}</span>
+    <div className="border-border/40 flex items-baseline justify-between border-b py-2 last:border-0">
+      <span className="text-muted-foreground text-xs">{label}</span>
       <span className="text-xs font-medium">{value}</span>
     </div>
   );
@@ -61,9 +61,9 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-2.5">
-        <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+    <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+      <div className="border-border/60 bg-muted/20 flex items-center justify-between border-b px-4 py-2.5">
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
           {title}
         </span>
         {action}
@@ -170,9 +170,15 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
             }
           >
             <KVRow label="NPI" value={<span className="font-mono tabular-nums">{org.npi}</span>} />
-            <KVRow label="Tax ID" value={<span className="font-mono tabular-nums">{org.taxId}</span>} />
+            <KVRow
+              label="Tax ID"
+              value={<span className="font-mono tabular-nums">{org.taxId}</span>}
+            />
             {org.taxonomyCode && (
-              <KVRow label="Taxonomy Code" value={<span className="font-mono">{org.taxonomyCode}</span>} />
+              <KVRow
+                label="Taxonomy Code"
+                value={<span className="font-mono">{org.taxonomyCode}</span>}
+              />
             )}
           </SectionCard>
         ) : (
@@ -184,7 +190,8 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
               Complete your billing profile
             </div>
             <p className="mt-1 text-xs text-blue-600 dark:text-blue-400/80">
-              Add your NPI and Tax ID to prepare for claims submission. These identifiers are required on every insurance claim.
+              Add your NPI and Tax ID to prepare for claims submission. These identifiers are
+              required on every insurance claim.
             </p>
           </div>
         )}
@@ -218,7 +225,8 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
                     <SelectContent>
                       {COMMON_TIMEZONES.map((tz) => (
                         <SelectItem key={tz} value={tz} className="text-xs">
-                          {tz.replace("America/", "").replace("Pacific/", "").replace(/_/g, " ")} ({tz})
+                          {tz.replace("America/", "").replace("Pacific/", "").replace(/_/g, " ")} (
+                          {tz})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -230,18 +238,32 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
             <div className="grid grid-cols-2 gap-3">
               <Field>
                 <Label className="text-xs font-medium">Phone</Label>
-                <Input type="tel" {...register("phone")} className="h-8 text-xs" placeholder="(512) 555-0100" />
+                <Input
+                  type="tel"
+                  {...register("phone")}
+                  className="h-8 text-xs"
+                  placeholder="(512) 555-0100"
+                />
               </Field>
               <Field>
                 <Label className="text-xs font-medium">Email</Label>
-                <Input type="email" {...register("email")} className="h-8 text-xs" placeholder="office@clinic.com" />
+                <Input
+                  type="email"
+                  {...register("email")}
+                  className="h-8 text-xs"
+                  placeholder="office@clinic.com"
+                />
                 <FieldError>{errors.email?.message}</FieldError>
               </Field>
             </div>
 
             <Field>
               <Label className="text-xs font-medium">Address</Label>
-              <Input {...register("addressLine1")} className="h-8 text-xs" placeholder="Street address" />
+              <Input
+                {...register("addressLine1")}
+                className="h-8 text-xs"
+                placeholder="Street address"
+              />
             </Field>
             <div className="grid grid-cols-3 gap-3">
               <Field>
@@ -263,12 +285,22 @@ export function PracticeInfoForm({ org }: { org: Organization }) {
           <div className="space-y-3">
             <Field>
               <Label className="text-xs font-medium">NPI</Label>
-              <Input {...register("npi")} className="h-8 font-mono text-xs" placeholder="10-digit NPI" maxLength={10} inputMode="numeric" />
+              <Input
+                {...register("npi")}
+                className="h-8 font-mono text-xs"
+                placeholder="10-digit NPI"
+                maxLength={10}
+                inputMode="numeric"
+              />
               <FieldError>{errors.npi?.message}</FieldError>
             </Field>
             <Field>
               <Label className="text-xs font-medium">Tax ID (EIN)</Label>
-              <Input {...register("taxId")} className="h-8 font-mono text-xs" placeholder="XX-XXXXXXX" />
+              <Input
+                {...register("taxId")}
+                className="h-8 font-mono text-xs"
+                placeholder="XX-XXXXXXX"
+              />
               <FieldError>{errors.taxId?.message}</FieldError>
             </Field>
             <Field>

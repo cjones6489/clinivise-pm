@@ -46,7 +46,8 @@ const sessionFieldsSchema = z.object({
   cptCode: z.enum(cptCodes, { message: "Select a CPT code" }),
   modifierCodes: z
     .array(
-      z.string()
+      z
+        .string()
         .min(1, "Modifier cannot be empty")
         .max(2, "Modifier must be 1-2 characters")
         .transform((v) => v.toUpperCase()),

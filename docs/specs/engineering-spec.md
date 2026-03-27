@@ -348,7 +348,7 @@ export const sessionStatusEnum = pgEnum("session_status", [
   "completed",
   "cancelled",
   "no_show",
-  "flagged",      // Auto-set when session logged while client insurance is inactive
+  "flagged", // Auto-set when session logged while client insurance is inactive
 ]);
 
 // ── Claim ───────────────────────────────────────────────
@@ -393,20 +393,22 @@ import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
 export const organizations = pgTable("organizations", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   clerkOrgId: text("clerk_org_id").notNull().unique(),
   name: text("name").notNull(),
-  npi: text("npi"),                          // Practice NPI (Type 2)
-  taxId: text("tax_id"),                     // EIN for billing
+  npi: text("npi"), // Practice NPI (Type 2)
+  taxId: text("tax_id"), // EIN for billing
   phone: text("phone"),
   email: text("email"),
   addressLine1: text("address_line_1"),
   addressLine2: text("address_line_2"),
   city: text("city"),
-  state: text("state"),                      // 2-letter code
+  state: text("state"), // 2-letter code
   zipCode: text("zip_code"),
-  taxonomyCode: text("taxonomy_code"),       // e.g., "103K00000X" for behavior analyst
-  stediApiKey: text("stedi_api_key"),        // Encrypted, per-org Stedi key (Phase 2)
+  taxonomyCode: text("taxonomy_code"), // e.g., "103K00000X" for behavior analyst
+  stediApiKey: text("stedi_api_key"), // Encrypted, per-org Stedi key (Phase 2)
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
@@ -421,21 +423,27 @@ import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { userRoleEnum } from "./enums";
 
-export const users = pgTable("users", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  clerkUserId: text("clerk_user_id").notNull().unique(),
-  organizationId: text("organization_id").notNull(),
-  email: text("email").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  role: userRoleEnum("role").notNull().default("rbt"),
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("users_org_idx").on(table.organizationId),
-  index("users_clerk_idx").on(table.clerkUserId),
-]);
+export const users = pgTable(
+  "users",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    clerkUserId: text("clerk_user_id").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    email: text("email").notNull(),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    role: userRoleEnum("role").notNull().default("rbt"),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("users_org_idx").on(table.organizationId),
+    index("users_clerk_idx").on(table.clerkUserId),
+  ],
+);
 ```
 
 ### 3.4 Providers
@@ -446,26 +454,32 @@ import { pgTable, text, timestamp, boolean, index, date } from "drizzle-orm/pg-c
 import { nanoid } from "nanoid";
 import { credentialTypeEnum } from "./enums";
 
-export const providers = pgTable("providers", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  userId: text("user_id"),                           // Links to users table (nullable for external providers)
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  npi: text("npi"),                                  // Individual NPI (Type 1)
-  credentialType: credentialTypeEnum("credential_type").notNull(),
-  credentialNumber: text("credential_number"),        // e.g., BACB cert number
-  credentialExpiry: date("credential_expiry"),
-  supervisorId: text("supervisor_id"),               // Self-referencing — RBT's supervising BCBA
-  modifierCode: text("modifier_code"),               // HM, HN, HO, HP — derived from credential
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("providers_org_idx").on(table.organizationId),
-  index("providers_user_idx").on(table.userId),
-  index("providers_supervisor_idx").on(table.supervisorId),
-]);
+export const providers = pgTable(
+  "providers",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    userId: text("user_id"), // Links to users table (nullable for external providers)
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    npi: text("npi"), // Individual NPI (Type 1)
+    credentialType: credentialTypeEnum("credential_type").notNull(),
+    credentialNumber: text("credential_number"), // e.g., BACB cert number
+    credentialExpiry: date("credential_expiry"),
+    supervisorId: text("supervisor_id"), // Self-referencing — RBT's supervising BCBA
+    modifierCode: text("modifier_code"), // HM, HN, HO, HP — derived from credential
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("providers_org_idx").on(table.organizationId),
+    index("providers_user_idx").on(table.userId),
+    index("providers_supervisor_idx").on(table.supervisorId),
+  ],
+);
 ```
 
 ### 3.5 Clients & Client Insurance
@@ -475,57 +489,69 @@ export const providers = pgTable("providers", {
 import { pgTable, text, timestamp, boolean, index, date } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
-export const clients = pgTable("clients", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  dateOfBirth: date("date_of_birth").notNull(),
-  gender: text("gender"),                            // M, F, U — required for claims
-  phone: text("phone"),
-  email: text("email"),
-  addressLine1: text("address_line_1"),
-  addressLine2: text("address_line_2"),
-  city: text("city"),
-  state: text("state"),
-  zipCode: text("zip_code"),
-  diagnosisCode: text("diagnosis_code").default("F84.0"), // Primary dx — almost always ASD
-  diagnosisDescription: text("diagnosis_description").default("Autism Spectrum Disorder"),
-  assignedBcbaId: text("assigned_bcba_id"),          // FK to providers
-  intakeDate: date("intake_date"),
-  dischargeDate: date("discharge_date"),
-  isActive: boolean("is_active").default(true).notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("clients_org_idx").on(table.organizationId),
-  index("clients_bcba_idx").on(table.assignedBcbaId),
-  index("clients_name_idx").on(table.organizationId, table.lastName, table.firstName),
-]);
+export const clients = pgTable(
+  "clients",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    dateOfBirth: date("date_of_birth").notNull(),
+    gender: text("gender"), // M, F, U — required for claims
+    phone: text("phone"),
+    email: text("email"),
+    addressLine1: text("address_line_1"),
+    addressLine2: text("address_line_2"),
+    city: text("city"),
+    state: text("state"),
+    zipCode: text("zip_code"),
+    diagnosisCode: text("diagnosis_code").default("F84.0"), // Primary dx — almost always ASD
+    diagnosisDescription: text("diagnosis_description").default("Autism Spectrum Disorder"),
+    assignedBcbaId: text("assigned_bcba_id"), // FK to providers
+    intakeDate: date("intake_date"),
+    dischargeDate: date("discharge_date"),
+    isActive: boolean("is_active").default(true).notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("clients_org_idx").on(table.organizationId),
+    index("clients_bcba_idx").on(table.assignedBcbaId),
+    index("clients_name_idx").on(table.organizationId, table.lastName, table.firstName),
+  ],
+);
 
-export const clientInsurance = pgTable("client_insurance", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  clientId: text("client_id").notNull(),
-  payerId: text("payer_id").notNull(),
-  memberId: text("member_id").notNull(),             // Insurance member/subscriber ID
-  groupNumber: text("group_number"),
-  subscriberFirstName: text("subscriber_first_name"),
-  subscriberLastName: text("subscriber_last_name"),
-  subscriberDateOfBirth: date("subscriber_date_of_birth"),
-  relationshipToSubscriber: text("relationship_to_subscriber").default("self"), // self, spouse, child, other
-  isPrimary: boolean("is_primary").default(true).notNull(),
-  effectiveDate: date("effective_date"),
-  terminationDate: date("termination_date"),
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("client_insurance_org_idx").on(table.organizationId),
-  index("client_insurance_client_idx").on(table.clientId),
-  index("client_insurance_payer_idx").on(table.payerId),
-]);
+export const clientInsurance = pgTable(
+  "client_insurance",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    clientId: text("client_id").notNull(),
+    payerId: text("payer_id").notNull(),
+    memberId: text("member_id").notNull(), // Insurance member/subscriber ID
+    groupNumber: text("group_number"),
+    subscriberFirstName: text("subscriber_first_name"),
+    subscriberLastName: text("subscriber_last_name"),
+    subscriberDateOfBirth: date("subscriber_date_of_birth"),
+    relationshipToSubscriber: text("relationship_to_subscriber").default("self"), // self, spouse, child, other
+    isPrimary: boolean("is_primary").default(true).notNull(),
+    effectiveDate: date("effective_date"),
+    terminationDate: date("termination_date"),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("client_insurance_org_idx").on(table.organizationId),
+    index("client_insurance_client_idx").on(table.clientId),
+    index("client_insurance_payer_idx").on(table.payerId),
+  ],
+);
 ```
 
 ### 3.6 Payers
@@ -535,24 +561,30 @@ export const clientInsurance = pgTable("client_insurance", {
 import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
-export const payers = pgTable("payers", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  name: text("name").notNull(),                      // e.g., "Aetna", "Blue Cross CA"
-  stediPayerId: text("stedi_payer_id"),              // Stedi's payer identifier
-  payerType: text("payer_type").default("commercial"), // commercial, medicaid, medicare, tricare
-  phone: text("phone"),
-  authPhone: text("auth_phone"),                     // Auth department phone
-  claimsAddress: text("claims_address"),
-  timely_filing_days: text("timely_filing_days"),    // e.g., "90", "180"
-  notes: text("notes"),
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("payers_org_idx").on(table.organizationId),
-  index("payers_stedi_idx").on(table.stediPayerId),
-]);
+export const payers = pgTable(
+  "payers",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    name: text("name").notNull(), // e.g., "Aetna", "Blue Cross CA"
+    stediPayerId: text("stedi_payer_id"), // Stedi's payer identifier
+    payerType: text("payer_type").default("commercial"), // commercial, medicaid, medicare, tricare
+    phone: text("phone"),
+    authPhone: text("auth_phone"), // Auth department phone
+    claimsAddress: text("claims_address"),
+    timely_filing_days: text("timely_filing_days"), // e.g., "90", "180"
+    notes: text("notes"),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("payers_org_idx").on(table.organizationId),
+    index("payers_stedi_idx").on(table.stediPayerId),
+  ],
+);
 ```
 
 ### 3.7 Authorizations & Authorization Services
@@ -560,99 +592,124 @@ export const payers = pgTable("payers", {
 ```typescript
 // src/db/schema/authorizations.ts
 import {
-  pgTable, text, timestamp, boolean, index, date, integer, numeric,
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  date,
+  integer,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { authStatusEnum } from "./enums";
 
-export const authorizations = pgTable("authorizations", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  clientId: text("client_id").notNull(),
-  payerId: text("payer_id").notNull(),
-  clientInsuranceId: text("client_insurance_id").notNull(),
-  authorizationNumber: text("authorization_number"),  // Payer-assigned auth number
-  status: authStatusEnum("status").notNull().default("pending"),
-  startDate: date("start_date").notNull(),
-  endDate: date("end_date").notNull(),
-  diagnosisCode: text("diagnosis_code").default("F84.0"),
-  notes: text("notes"),
-  // AI-parsed fields (populated by auth letter parser)
-  aiParsedData: text("ai_parsed_data"),              // JSON blob of parsed auth letter data
-  aiConfidenceScore: numeric("ai_confidence_score", { precision: 3, scale: 2 }),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("auths_org_idx").on(table.organizationId),
-  index("auths_client_idx").on(table.clientId),
-  index("auths_status_idx").on(table.organizationId, table.status),
-  index("auths_end_date_idx").on(table.organizationId, table.endDate),
-]);
+export const authorizations = pgTable(
+  "authorizations",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    clientId: text("client_id").notNull(),
+    payerId: text("payer_id").notNull(),
+    clientInsuranceId: text("client_insurance_id").notNull(),
+    authorizationNumber: text("authorization_number"), // Payer-assigned auth number
+    status: authStatusEnum("status").notNull().default("pending"),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    diagnosisCode: text("diagnosis_code").default("F84.0"),
+    notes: text("notes"),
+    // AI-parsed fields (populated by auth letter parser)
+    aiParsedData: text("ai_parsed_data"), // JSON blob of parsed auth letter data
+    aiConfidenceScore: numeric("ai_confidence_score", { precision: 3, scale: 2 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("auths_org_idx").on(table.organizationId),
+    index("auths_client_idx").on(table.clientId),
+    index("auths_status_idx").on(table.organizationId, table.status),
+    index("auths_end_date_idx").on(table.organizationId, table.endDate),
+  ],
+);
 
-export const authorizationServices = pgTable("authorization_services", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  authorizationId: text("authorization_id").notNull(),
-  cptCode: text("cpt_code").notNull(),               // e.g., "97153"
-  approvedUnits: integer("approved_units").notNull(), // Total approved 15-min units
-  usedUnits: integer("used_units").default(0).notNull(),
-  frequency: text("frequency"),                       // e.g., "per week", "per auth period"
-  maxUnitsPerDay: integer("max_units_per_day"),
-  maxUnitsPerWeek: integer("max_units_per_week"),
-  notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("auth_services_org_idx").on(table.organizationId),
-  index("auth_services_auth_idx").on(table.authorizationId),
-  index("auth_services_cpt_idx").on(table.authorizationId, table.cptCode),
-]);
+export const authorizationServices = pgTable(
+  "authorization_services",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    authorizationId: text("authorization_id").notNull(),
+    cptCode: text("cpt_code").notNull(), // e.g., "97153"
+    approvedUnits: integer("approved_units").notNull(), // Total approved 15-min units
+    usedUnits: integer("used_units").default(0).notNull(),
+    frequency: text("frequency"), // e.g., "per week", "per auth period"
+    maxUnitsPerDay: integer("max_units_per_day"),
+    maxUnitsPerWeek: integer("max_units_per_week"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("auth_services_org_idx").on(table.organizationId),
+    index("auth_services_auth_idx").on(table.authorizationId),
+    index("auth_services_cpt_idx").on(table.authorizationId, table.cptCode),
+  ],
+);
 ```
 
 ### 3.8 Sessions
 
 ```typescript
 // src/db/schema/sessions.ts
-import {
-  pgTable, text, timestamp, index, date, integer, numeric,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, date, integer, numeric } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { sessionStatusEnum, placeOfServiceEnum } from "./enums";
 
-export const sessions = pgTable("sessions", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  clientId: text("client_id").notNull(),
-  providerId: text("provider_id").notNull(),         // Who delivered the session
-  supervisorId: text("supervisor_id"),               // Supervising BCBA (if provider is RBT)
-  authorizationId: text("authorization_id"),         // Which auth this session draws from
-  authorizationServiceId: text("authorization_service_id"), // Specific service line
-  sessionDate: date("session_date").notNull(),
-  startTime: timestamp("start_time", { withTimezone: true }),
-  endTime: timestamp("end_time", { withTimezone: true }),
-  cptCode: text("cpt_code").notNull(),               // e.g., "97153"
-  modifierCodes: text("modifier_codes").array(),      // e.g., ["HM", "95"]
-  units: integer("units").notNull(),                  // 15-min units (calculated from duration)
-  placeOfService: placeOfServiceEnum("place_of_service").notNull().default("12"),
-  status: sessionStatusEnum("status").notNull().default("completed"),
-  notes: text("notes"),
-  // Billing linkage
-  claimId: text("claim_id"),                         // Linked when session is billed
-  billedAmount: numeric("billed_amount", { precision: 10, scale: 2 }),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("sessions_org_idx").on(table.organizationId),
-  index("sessions_client_idx").on(table.clientId),
-  index("sessions_provider_idx").on(table.providerId),
-  index("sessions_auth_idx").on(table.authorizationId),
-  index("sessions_date_idx").on(table.organizationId, table.sessionDate),
-  index("sessions_claim_idx").on(table.claimId),
-  index("sessions_unbilled_idx").on(table.organizationId, table.status).where(
-    // Partial index: only completed sessions without a claim
-    // Note: actual SQL expression needed in migration
-  ),
-]);
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    clientId: text("client_id").notNull(),
+    providerId: text("provider_id").notNull(), // Who delivered the session
+    supervisorId: text("supervisor_id"), // Supervising BCBA (if provider is RBT)
+    authorizationId: text("authorization_id"), // Which auth this session draws from
+    authorizationServiceId: text("authorization_service_id"), // Specific service line
+    sessionDate: date("session_date").notNull(),
+    startTime: timestamp("start_time", { withTimezone: true }),
+    endTime: timestamp("end_time", { withTimezone: true }),
+    cptCode: text("cpt_code").notNull(), // e.g., "97153"
+    modifierCodes: text("modifier_codes").array(), // e.g., ["HM", "95"]
+    units: integer("units").notNull(), // 15-min units (calculated from duration)
+    placeOfService: placeOfServiceEnum("place_of_service").notNull().default("12"),
+    status: sessionStatusEnum("status").notNull().default("completed"),
+    notes: text("notes"),
+    // Billing linkage
+    claimId: text("claim_id"), // Linked when session is billed
+    billedAmount: numeric("billed_amount", { precision: 10, scale: 2 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("sessions_org_idx").on(table.organizationId),
+    index("sessions_client_idx").on(table.clientId),
+    index("sessions_provider_idx").on(table.providerId),
+    index("sessions_auth_idx").on(table.authorizationId),
+    index("sessions_date_idx").on(table.organizationId, table.sessionDate),
+    index("sessions_claim_idx").on(table.claimId),
+    index("sessions_unbilled_idx")
+      .on(table.organizationId, table.status)
+      .where
+      // Partial index: only completed sessions without a claim
+      // Note: actual SQL expression needed in migration
+      (),
+  ],
+);
 ```
 
 ### 3.9 Claims, Claim Lines & Claim Responses (Phase 2)
@@ -660,89 +717,114 @@ export const sessions = pgTable("sessions", {
 ```typescript
 // src/db/schema/claims.ts
 import {
-  pgTable, text, timestamp, index, date, integer, numeric, jsonb,
+  pgTable,
+  text,
+  timestamp,
+  index,
+  date,
+  integer,
+  numeric,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { claimStatusEnum } from "./enums";
 
-export const claims = pgTable("claims", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  clientId: text("client_id").notNull(),
-  clientInsuranceId: text("client_insurance_id").notNull(),
-  payerId: text("payer_id").notNull(),
-  renderingProviderId: text("rendering_provider_id").notNull(),
-  billingProviderId: text("billing_provider_id"),     // Usually the org/group NPI
-  authorizationId: text("authorization_id"),
-  claimNumber: text("claim_number"),                  // Internal claim number
-  stediTransactionId: text("stedi_transaction_id"),   // Stedi's tracking ID
-  status: claimStatusEnum("status").notNull().default("draft"),
-  serviceDate: date("service_date").notNull(),        // Date of service
-  submittedAt: timestamp("submitted_at", { withTimezone: true }),
-  totalBilledAmount: numeric("total_billed_amount", { precision: 10, scale: 2 }),
-  totalAllowedAmount: numeric("total_allowed_amount", { precision: 10, scale: 2 }),
-  totalPaidAmount: numeric("total_paid_amount", { precision: 10, scale: 2 }),
-  patientResponsibility: numeric("patient_responsibility", { precision: 10, scale: 2 }),
-  diagnosisCode: text("diagnosis_code").default("F84.0"),
-  placeOfService: text("place_of_service"),
-  // AI pre-claim check results
-  aiPreCheckResult: jsonb("ai_pre_check_result"),     // JSON: { score, issues, suggestions }
-  aiPreCheckAt: timestamp("ai_pre_check_at", { withTimezone: true }),
-  notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("claims_org_idx").on(table.organizationId),
-  index("claims_client_idx").on(table.clientId),
-  index("claims_status_idx").on(table.organizationId, table.status),
-  index("claims_stedi_idx").on(table.stediTransactionId),
-  index("claims_payer_idx").on(table.payerId),
-]);
+export const claims = pgTable(
+  "claims",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    clientId: text("client_id").notNull(),
+    clientInsuranceId: text("client_insurance_id").notNull(),
+    payerId: text("payer_id").notNull(),
+    renderingProviderId: text("rendering_provider_id").notNull(),
+    billingProviderId: text("billing_provider_id"), // Usually the org/group NPI
+    authorizationId: text("authorization_id"),
+    claimNumber: text("claim_number"), // Internal claim number
+    stediTransactionId: text("stedi_transaction_id"), // Stedi's tracking ID
+    status: claimStatusEnum("status").notNull().default("draft"),
+    serviceDate: date("service_date").notNull(), // Date of service
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    totalBilledAmount: numeric("total_billed_amount", { precision: 10, scale: 2 }),
+    totalAllowedAmount: numeric("total_allowed_amount", { precision: 10, scale: 2 }),
+    totalPaidAmount: numeric("total_paid_amount", { precision: 10, scale: 2 }),
+    patientResponsibility: numeric("patient_responsibility", { precision: 10, scale: 2 }),
+    diagnosisCode: text("diagnosis_code").default("F84.0"),
+    placeOfService: text("place_of_service"),
+    // AI pre-claim check results
+    aiPreCheckResult: jsonb("ai_pre_check_result"), // JSON: { score, issues, suggestions }
+    aiPreCheckAt: timestamp("ai_pre_check_at", { withTimezone: true }),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("claims_org_idx").on(table.organizationId),
+    index("claims_client_idx").on(table.clientId),
+    index("claims_status_idx").on(table.organizationId, table.status),
+    index("claims_stedi_idx").on(table.stediTransactionId),
+    index("claims_payer_idx").on(table.payerId),
+  ],
+);
 
-export const claimLines = pgTable("claim_lines", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  claimId: text("claim_id").notNull(),
-  sessionId: text("session_id"),                     // Source session
-  lineNumber: integer("line_number").notNull(),
-  cptCode: text("cpt_code").notNull(),
-  modifierCodes: text("modifier_codes").array(),
-  units: integer("units").notNull(),
-  chargeAmount: numeric("charge_amount", { precision: 10, scale: 2 }).notNull(),
-  allowedAmount: numeric("allowed_amount", { precision: 10, scale: 2 }),
-  paidAmount: numeric("paid_amount", { precision: 10, scale: 2 }),
-  adjustmentReasonCode: text("adjustment_reason_code"),  // CARC code
-  adjustmentAmount: numeric("adjustment_amount", { precision: 10, scale: 2 }),
-  remarkCode: text("remark_code"),                       // RARC code
-  serviceDateFrom: date("service_date_from").notNull(),
-  serviceDateTo: date("service_date_to"),
-  renderingProviderNpi: text("rendering_provider_npi"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("claim_lines_org_idx").on(table.organizationId),
-  index("claim_lines_claim_idx").on(table.claimId),
-  index("claim_lines_session_idx").on(table.sessionId),
-]);
+export const claimLines = pgTable(
+  "claim_lines",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    claimId: text("claim_id").notNull(),
+    sessionId: text("session_id"), // Source session
+    lineNumber: integer("line_number").notNull(),
+    cptCode: text("cpt_code").notNull(),
+    modifierCodes: text("modifier_codes").array(),
+    units: integer("units").notNull(),
+    chargeAmount: numeric("charge_amount", { precision: 10, scale: 2 }).notNull(),
+    allowedAmount: numeric("allowed_amount", { precision: 10, scale: 2 }),
+    paidAmount: numeric("paid_amount", { precision: 10, scale: 2 }),
+    adjustmentReasonCode: text("adjustment_reason_code"), // CARC code
+    adjustmentAmount: numeric("adjustment_amount", { precision: 10, scale: 2 }),
+    remarkCode: text("remark_code"), // RARC code
+    serviceDateFrom: date("service_date_from").notNull(),
+    serviceDateTo: date("service_date_to"),
+    renderingProviderNpi: text("rendering_provider_npi"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("claim_lines_org_idx").on(table.organizationId),
+    index("claim_lines_claim_idx").on(table.claimId),
+    index("claim_lines_session_idx").on(table.sessionId),
+  ],
+);
 
-export const claimResponses = pgTable("claim_responses", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  claimId: text("claim_id").notNull(),
-  responseType: text("response_type").notNull(),     // "277ca" or "835"
-  stediTransactionId: text("stedi_transaction_id"),
-  rawResponse: jsonb("raw_response"),                // Full Stedi response payload
-  statusCode: text("status_code"),                   // e.g., "A1" accepted, "R3" rejected
-  statusDescription: text("status_description"),
-  effectiveDate: date("effective_date"),
-  checkNumber: text("check_number"),                 // For 835 ERA
-  checkAmount: numeric("check_amount", { precision: 10, scale: 2 }),
-  receivedAt: timestamp("received_at", { withTimezone: true }).defaultNow().notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("claim_responses_org_idx").on(table.organizationId),
-  index("claim_responses_claim_idx").on(table.claimId),
-  index("claim_responses_type_idx").on(table.responseType),
-]);
+export const claimResponses = pgTable(
+  "claim_responses",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    claimId: text("claim_id").notNull(),
+    responseType: text("response_type").notNull(), // "277ca" or "835"
+    stediTransactionId: text("stedi_transaction_id"),
+    rawResponse: jsonb("raw_response"), // Full Stedi response payload
+    statusCode: text("status_code"), // e.g., "A1" accepted, "R3" rejected
+    statusDescription: text("status_description"),
+    effectiveDate: date("effective_date"),
+    checkNumber: text("check_number"), // For 835 ERA
+    checkAmount: numeric("check_amount", { precision: 10, scale: 2 }),
+    receivedAt: timestamp("received_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("claim_responses_org_idx").on(table.organizationId),
+    index("claim_responses_claim_idx").on(table.claimId),
+    index("claim_responses_type_idx").on(table.responseType),
+  ],
+);
 ```
 
 ### 3.10 Eligibility Checks (Phase 2)
@@ -752,34 +834,40 @@ export const claimResponses = pgTable("claim_responses", {
 import { pgTable, text, timestamp, index, jsonb } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
-export const eligibilityChecks = pgTable("eligibility_checks", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  clientId: text("client_id").notNull(),
-  clientInsuranceId: text("client_insurance_id").notNull(),
-  payerId: text("payer_id").notNull(),
-  stediTransactionId: text("stedi_transaction_id"),
-  requestPayload: jsonb("request_payload"),          // What we sent to Stedi
-  responsePayload: jsonb("response_payload"),        // Raw 271 response
-  // Parsed/interpreted fields
-  isEligible: text("is_eligible"),                   // "active", "inactive", "unknown"
-  planName: text("plan_name"),
-  planType: text("plan_type"),
-  copay: text("copay"),
-  coinsurance: text("coinsurance"),
-  deductible: text("deductible"),
-  deductibleRemaining: text("deductible_remaining"),
-  outOfPocketMax: text("out_of_pocket_max"),
-  outOfPocketRemaining: text("out_of_pocket_remaining"),
-  abaSpecificBenefits: jsonb("aba_specific_benefits"), // Parsed ABA coverage details
-  aiInterpretation: text("ai_interpretation"),        // Claude's plain-English summary
-  checkedAt: timestamp("checked_at", { withTimezone: true }).defaultNow().notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("eligibility_org_idx").on(table.organizationId),
-  index("eligibility_client_idx").on(table.clientId),
-  index("eligibility_date_idx").on(table.organizationId, table.checkedAt),
-]);
+export const eligibilityChecks = pgTable(
+  "eligibility_checks",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    clientId: text("client_id").notNull(),
+    clientInsuranceId: text("client_insurance_id").notNull(),
+    payerId: text("payer_id").notNull(),
+    stediTransactionId: text("stedi_transaction_id"),
+    requestPayload: jsonb("request_payload"), // What we sent to Stedi
+    responsePayload: jsonb("response_payload"), // Raw 271 response
+    // Parsed/interpreted fields
+    isEligible: text("is_eligible"), // "active", "inactive", "unknown"
+    planName: text("plan_name"),
+    planType: text("plan_type"),
+    copay: text("copay"),
+    coinsurance: text("coinsurance"),
+    deductible: text("deductible"),
+    deductibleRemaining: text("deductible_remaining"),
+    outOfPocketMax: text("out_of_pocket_max"),
+    outOfPocketRemaining: text("out_of_pocket_remaining"),
+    abaSpecificBenefits: jsonb("aba_specific_benefits"), // Parsed ABA coverage details
+    aiInterpretation: text("ai_interpretation"), // Claude's plain-English summary
+    checkedAt: timestamp("checked_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("eligibility_org_idx").on(table.organizationId),
+    index("eligibility_client_idx").on(table.clientId),
+    index("eligibility_date_idx").on(table.organizationId, table.checkedAt),
+  ],
+);
 ```
 
 ### 3.11 Documents
@@ -790,26 +878,32 @@ import { pgTable, text, timestamp, integer, index } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { documentTypeEnum } from "./enums";
 
-export const documents = pgTable("documents", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  clientId: text("client_id"),
-  authorizationId: text("authorization_id"),
-  claimId: text("claim_id"),
-  documentType: documentTypeEnum("document_type").notNull(),
-  fileName: text("file_name").notNull(),
-  fileUrl: text("file_url").notNull(),               // Vercel Blob URL
-  fileSizeBytes: integer("file_size_bytes"),
-  mimeType: text("mime_type"),
-  uploadedByUserId: text("uploaded_by_user_id"),
-  aiProcessed: text("ai_processed").default("pending"), // pending, processing, completed, failed
-  aiExtractedData: text("ai_extracted_data"),         // JSON of parsed content
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("documents_org_idx").on(table.organizationId),
-  index("documents_client_idx").on(table.clientId),
-  index("documents_auth_idx").on(table.authorizationId),
-]);
+export const documents = pgTable(
+  "documents",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    clientId: text("client_id"),
+    authorizationId: text("authorization_id"),
+    claimId: text("claim_id"),
+    documentType: documentTypeEnum("document_type").notNull(),
+    fileName: text("file_name").notNull(),
+    fileUrl: text("file_url").notNull(), // Vercel Blob URL
+    fileSizeBytes: integer("file_size_bytes"),
+    mimeType: text("mime_type"),
+    uploadedByUserId: text("uploaded_by_user_id"),
+    aiProcessed: text("ai_processed").default("pending"), // pending, processing, completed, failed
+    aiExtractedData: text("ai_extracted_data"), // JSON of parsed content
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("documents_org_idx").on(table.organizationId),
+    index("documents_client_idx").on(table.clientId),
+    index("documents_auth_idx").on(table.authorizationId),
+  ],
+);
 ```
 
 ### 3.12 Audit Logs
@@ -819,41 +913,47 @@ export const documents = pgTable("documents", {
 import { pgTable, text, timestamp, jsonb, index } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
-export const auditLogs = pgTable("audit_logs", {
-  id: text("id").primaryKey().$defaultFn(() => nanoid()),
-  organizationId: text("organization_id").notNull(),
-  userId: text("user_id"),                           // Who performed the action
-  action: text("action").notNull(),                  // e.g., "client.create", "session.update", "claim.submit"
-  entityType: text("entity_type").notNull(),         // e.g., "client", "session", "claim"
-  entityId: text("entity_id"),                       // ID of affected record
-  metadata: jsonb("metadata"),                       // Additional context (old values, new values, IP, etc.)
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-  index("audit_org_idx").on(table.organizationId),
-  index("audit_user_idx").on(table.userId),
-  index("audit_entity_idx").on(table.entityType, table.entityId),
-  index("audit_date_idx").on(table.organizationId, table.createdAt),
-]);
+export const auditLogs = pgTable(
+  "audit_logs",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    organizationId: text("organization_id").notNull(),
+    userId: text("user_id"), // Who performed the action
+    action: text("action").notNull(), // e.g., "client.create", "session.update", "claim.submit"
+    entityType: text("entity_type").notNull(), // e.g., "client", "session", "claim"
+    entityId: text("entity_id"), // ID of affected record
+    metadata: jsonb("metadata"), // Additional context (old values, new values, IP, etc.)
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("audit_org_idx").on(table.organizationId),
+    index("audit_user_idx").on(table.userId),
+    index("audit_entity_idx").on(table.entityType, table.entityId),
+    index("audit_date_idx").on(table.organizationId, table.createdAt),
+  ],
+);
 ```
 
 #### Audit Logging Triggers (HIPAA Requirement)
 
 Every server action that creates, updates, or deletes a record MUST auto-log via the `authActionClient` middleware. Implement this as a `withAuditLog` wrapper in `src/server/services/audit.ts` that the safe-action middleware calls after successful mutations. The following events MUST generate audit entries:
 
-| Action Pattern | Entity Type | When |
-|---------------|-------------|------|
-| `client.create`, `client.update`, `client.delete` | client | Any client record mutation |
-| `client_insurance.create`, `client_insurance.update` | client_insurance | Insurance policy changes |
-| `authorization.create`, `authorization.update` | authorization | Auth record mutations |
-| `session.create`, `session.update`, `session.delete` | session | Session logging/editing |
-| `claim.create`, `claim.submit`, `claim.void` | claim | Any claim lifecycle event |
-| `claim_response.received` | claim_response | 277CA or 835 ERA received via webhook |
-| `eligibility.check` | eligibility_check | Every eligibility verification (Stedi) |
-| `document.upload`, `document.delete` | document | File uploads/removals |
-| `user.invite`, `user.role_change`, `user.deactivate` | user | Team membership changes |
-| `ai.parse_auth_letter` | document | AI processing of auth letter PDFs |
+| Action Pattern                                       | Entity Type       | When                                   |
+| ---------------------------------------------------- | ----------------- | -------------------------------------- |
+| `client.create`, `client.update`, `client.delete`    | client            | Any client record mutation             |
+| `client_insurance.create`, `client_insurance.update` | client_insurance  | Insurance policy changes               |
+| `authorization.create`, `authorization.update`       | authorization     | Auth record mutations                  |
+| `session.create`, `session.update`, `session.delete` | session           | Session logging/editing                |
+| `claim.create`, `claim.submit`, `claim.void`         | claim             | Any claim lifecycle event              |
+| `claim_response.received`                            | claim_response    | 277CA or 835 ERA received via webhook  |
+| `eligibility.check`                                  | eligibility_check | Every eligibility verification (Stedi) |
+| `document.upload`, `document.delete`                 | document          | File uploads/removals                  |
+| `user.invite`, `user.role_change`, `user.deactivate` | user              | Team membership changes                |
+| `ai.parse_auth_letter`                               | document          | AI processing of auth letter PDFs      |
 
 **Never log PHI content** in the audit metadata — log resource IDs only (e.g., "User X viewed Client #123" not "User X viewed John Doe's insurance card"). Store old/new values for field-level changes ONLY for non-PHI fields (status changes, role changes, etc.).
 
@@ -916,9 +1016,7 @@ const nextConfig: NextConfig = {
   // Disable image optimization for HIPAA (avoid Vercel CDN caching PHI-adjacent images)
   images: {
     unoptimized: false,
-    remotePatterns: [
-      { protocol: "https", hostname: "img.clerk.com" },
-    ],
+    remotePatterns: [{ protocol: "https", hostname: "img.clerk.com" }],
   },
 
   // Server actions config
@@ -1341,9 +1439,9 @@ export const PLACE_OF_SERVICE = {
 
 // ── Authorization Alert Thresholds ──────────────────────
 export const AUTH_ALERT_THRESHOLDS = {
-  EXPIRY_WARNING_DAYS: 30,       // Alert when auth expires within 30 days
-  UTILIZATION_WARNING_PCT: 80,   // Alert when utilization hits 80%
-  UTILIZATION_CRITICAL_PCT: 95,  // Critical alert at 95%
+  EXPIRY_WARNING_DAYS: 30, // Alert when auth expires within 30 days
+  UTILIZATION_WARNING_PCT: 80, // Alert when utilization hits 80%
+  UTILIZATION_CRITICAL_PCT: 95, // Critical alert at 95%
 } as const;
 
 // ── User Roles ──────────────────────────────────────────
@@ -1526,6 +1624,7 @@ overpriced legacy software.
 ## 7. Phase 1 Task Breakdown
 
 ### Sprint 1: Foundation (Days 1-3)
+
 1. Initialize Next.js project with all packages
 2. Configure Clerk (org, roles, sign-in/sign-up pages)
 3. Set up Neon database + run initial Drizzle migration
@@ -1538,6 +1637,7 @@ overpriced legacy software.
 10. Build shared form patterns (FormField wrappers)
 
 ### Sprint 2: Core CRUD (Days 4-7)
+
 11. Provider management (list, create, edit)
 12. Client management (list, create, edit, detail page)
 13. Client insurance (add/edit policies per client)
@@ -1547,6 +1647,7 @@ overpriced legacy software.
 17. Authorization utilization tracking (used vs approved)
 
 ### Sprint 3: Sessions & Alerts (Days 8-10)
+
 18. Session logging form (provider, client, CPT, units, POS)
     - Include auth enforcement: warn/block if logging would exceed authorized units (replicate VGPM's best feature)
     - Auto-populate modifier codes based on provider credential type (RBT→HM, BCBA→HO, etc.)
@@ -1559,6 +1660,7 @@ overpriced legacy software.
 25. Recent sessions widget
 
 ### Sprint 4: AI & Documents (Days 11-14)
+
 26. File upload component (Vercel Blob integration)
 27. Document management (upload, list, associate with client/auth)
 28. AWS Bedrock client setup + prompt builder

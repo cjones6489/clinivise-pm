@@ -26,24 +26,24 @@ function ClientRow({ client }: { client: DashboardClientRow }) {
             · {client.diagnosisCode ?? "—"} · Age {age}
           </span>
         </div>
-        <div className="text-xs text-muted-foreground truncate">
-          {client.payerName ?? "—"}
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {client.bcbaName ?? "—"}
-        </div>
+        <div className="text-muted-foreground truncate text-xs">{client.payerName ?? "—"}</div>
+        <div className="text-muted-foreground text-xs">{client.bcbaName ?? "—"}</div>
         <div>
           {client.totalApproved > 0 ? (
-            <UtilizationBar usedUnits={client.totalUsed} approvedUnits={client.totalApproved} compact />
+            <UtilizationBar
+              usedUnits={client.totalUsed}
+              approvedUnits={client.totalApproved}
+              compact
+            />
           ) : (
-            <span className="text-xs text-muted-foreground">—</span>
+            <span className="text-muted-foreground text-xs">—</span>
           )}
         </div>
         <div>
           {client.nearestExpiry ? (
             <ExpiryBadge endDate={client.nearestExpiry} />
           ) : (
-            <span className="text-xs text-muted-foreground">—</span>
+            <span className="text-muted-foreground text-xs">—</span>
           )}
         </div>
         <HugeiconsIcon icon={ArrowRight01Icon} size={14} className="text-muted-foreground" />
@@ -63,9 +63,13 @@ function ClientRow({ client }: { client: DashboardClientRow }) {
           {client.nearestExpiry && <ExpiryBadge endDate={client.nearestExpiry} />}
         </div>
         {client.totalApproved > 0 ? (
-          <UtilizationBar usedUnits={client.totalUsed} approvedUnits={client.totalApproved} compact />
+          <UtilizationBar
+            usedUnits={client.totalUsed}
+            approvedUnits={client.totalApproved}
+            compact
+          />
         ) : (
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             {client.bcbaName ? `${client.bcbaName} · No auth` : "No auth"}
           </span>
         )}
@@ -90,7 +94,7 @@ export async function DashboardClients({ orgId }: { orgId: string }) {
         </span>
         <div className="flex items-center gap-2">
           {needsAttention.length > 0 && (
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-muted-foreground text-[11px]">
               {needsAttention.length} need{needsAttention.length !== 1 ? "" : "s"} attention
             </span>
           )}
@@ -102,11 +106,21 @@ export async function DashboardClients({ orgId }: { orgId: string }) {
 
       {/* Desktop header */}
       <div className="border-border bg-muted/50 hidden grid-cols-[2fr_0.8fr_1fr_1.5fr_0.8fr_24px] gap-2 border-b px-4 py-2 sm:grid">
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Client</span>
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Payer</span>
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">BCBA</span>
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Utilization</span>
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">Expiry</span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+          Client
+        </span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+          Payer
+        </span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+          BCBA
+        </span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+          Utilization
+        </span>
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+          Expiry
+        </span>
         <span />
       </div>
 
@@ -116,7 +130,7 @@ export async function DashboardClients({ orgId }: { orgId: string }) {
           <ClientRow key={client.id} client={client} />
         ))}
         {healthy.length > 0 && needsAttention.length > 0 && (
-          <div className="border-border/40 bg-muted/20 border-b px-4 py-1.5 text-[11px] text-muted-foreground">
+          <div className="border-border/40 bg-muted/20 text-muted-foreground border-b px-4 py-1.5 text-[11px]">
             On track ({healthy.length})
           </div>
         )}
@@ -137,7 +151,10 @@ export function DashboardClientsSkeleton() {
       </div>
       <div>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-4 border-b border-border/40 px-4 py-3 last:border-b-0">
+          <div
+            key={i}
+            className="border-border/40 flex items-center gap-4 border-b px-4 py-3 last:border-b-0"
+          >
             <div className="flex-1 space-y-1.5">
               <div className="bg-muted h-3 w-40 rounded" />
               <div className="bg-muted h-3 w-24 rounded" />

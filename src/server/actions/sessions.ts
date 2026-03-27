@@ -128,10 +128,7 @@ async function validateSessionForeignKeys(
  *  BCaBAs are NOT blocked — they are considered QHPs by some payers/states.
  *  The session form shows a warning for BCaBAs, but the server does not block. */
 function validateCptCredential(credentialType: string, cptCode: string) {
-  if (
-    credentialType === "rbt" &&
-    (QHP_ONLY_CPT_CODES as readonly string[]).includes(cptCode)
-  ) {
+  if (credentialType === "rbt" && (QHP_ONLY_CPT_CODES as readonly string[]).includes(cptCode)) {
     throw new ConflictError(
       `CPT ${cptCode} requires a qualified healthcare professional (BCBA/BCBA-D). RBT providers cannot bill this code.`,
     );
@@ -226,11 +223,11 @@ export const createSession = authActionClient
     );
 
     // Compute actual minutes from times
-    const { startTimestamp, endTimestamp, actualMinutes: rawMinutes } = computeActualMinutes(
-      parsedInput.sessionDate,
-      parsedInput.startTime,
-      parsedInput.endTime,
-    );
+    const {
+      startTimestamp,
+      endTimestamp,
+      actualMinutes: rawMinutes,
+    } = computeActualMinutes(parsedInput.sessionDate, parsedInput.startTime, parsedInput.endTime);
     // Defense-in-depth: clamp negative minutes (validator should prevent, but guard the DB)
     const actualMinutes = rawMinutes != null && rawMinutes < 0 ? null : rawMinutes;
 
@@ -411,11 +408,11 @@ export const updateSession = authActionClient
       input.modifierCodes,
     );
 
-    const { startTimestamp, endTimestamp, actualMinutes: rawMinutes } = computeActualMinutes(
-      input.sessionDate,
-      input.startTime,
-      input.endTime,
-    );
+    const {
+      startTimestamp,
+      endTimestamp,
+      actualMinutes: rawMinutes,
+    } = computeActualMinutes(input.sessionDate, input.startTime, input.endTime);
     const actualMinutes = rawMinutes != null && rawMinutes < 0 ? null : rawMinutes;
 
     const newAuthServiceId = input.authorizationServiceId ?? null;
@@ -553,7 +550,9 @@ export const cancelSession = authActionClient
       const [session] = await tx
         .select()
         .from(sessions)
-        .where(and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)))
+        .where(
+          and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)),
+        )
         .for("update")
         .limit(1);
 
@@ -607,10 +606,7 @@ export const cancelSession = authActionClient
             : session.notes,
         })
         .where(
-          and(
-            eq(sessions.id, parsedInput.id),
-            eq(sessions.organizationId, ctx.organizationId),
-          ),
+          and(eq(sessions.id, parsedInput.id), eq(sessions.organizationId, ctx.organizationId)),
         );
 
       return session;

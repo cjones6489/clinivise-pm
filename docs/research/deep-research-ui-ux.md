@@ -13,12 +13,15 @@ This research synthesizes findings from 6 specialized research agents analyzing:
 ## Executive Summary
 
 ### The Opportunity
+
 ABA software is stuck in 2012. CentralReach's inconsistent save behavior causes data loss. AlohaABA's reporting isn't customizable. RethinkBH can't edit data after entry. No competitor has a command palette, keyboard-first navigation, or AI-native design. The design bar is on the floor.
 
 ### The Strategy
+
 Build a **data-dense, speed-obsessed, authorization-aware** interface that borrows patterns from Linear (information hierarchy), Mercury (financial data density), Stripe (billing UI), and SimplePractice (healthcare PM polish) — adapted to ABA-specific workflows.
 
 ### The 5 Bets
+
 1. **Speed as a feature** — Session logging in < 30 seconds. Pre-fill everything. Cmd+K command palette. Keyboard-first.
 2. **Authorization utilization as first-class citizen** — Progress bars everywhere, color-coded thresholds, proactive alerts at point of action.
 3. **Zero data anxiety** — Auto-save with visible status. Optimistic UI. localStorage form persistence. Never lose work.
@@ -26,6 +29,7 @@ Build a **data-dense, speed-obsessed, authorization-aware** interface that borro
 5. **AI-native from day one** — Confidence-based displays, linked evidence, audit trails built into every AI interaction.
 
 ### The Biggest Risks
+
 - Session timer drift in background browser tabs (use Web Workers)
 - TanStack Query cache surviving org switches (data leak)
 - Pre-fill errors creating incorrect billing submissions
@@ -38,14 +42,14 @@ Build a **data-dense, speed-obsessed, authorization-aware** interface that borro
 
 Six specialized agents conducted parallel research:
 
-| Agent | Focus | Key Methods |
-|-------|-------|-------------|
-| **Competitive/Platform** | ABA competitors + adjacent well-designed platforms | Web research on 15+ platforms, user reviews, UX analysis |
-| **Open Source/Repo** | Well-designed OSS projects for UI inspiration | GitHub analysis of 30+ repos, stack comparison |
-| **Documentation** | Healthcare UX standards, ABA workflows, library docs | ONC/NIST guidelines, BACB requirements, Context7 library docs |
-| **Architecture/DX** | Component patterns, state management, performance | Next.js/TanStack/shadcn architectural research |
-| **Frontier/Emerging** | Bleeding-edge UI patterns, AI integration, YC startups | Startup research, emerging pattern analysis |
-| **Risk/Failure Mode** | UI/UX failure modes, edge cases, safety risks | EHR safety literature, healthcare IT hazard reports |
+| Agent                    | Focus                                                  | Key Methods                                                   |
+| ------------------------ | ------------------------------------------------------ | ------------------------------------------------------------- |
+| **Competitive/Platform** | ABA competitors + adjacent well-designed platforms     | Web research on 15+ platforms, user reviews, UX analysis      |
+| **Open Source/Repo**     | Well-designed OSS projects for UI inspiration          | GitHub analysis of 30+ repos, stack comparison                |
+| **Documentation**        | Healthcare UX standards, ABA workflows, library docs   | ONC/NIST guidelines, BACB requirements, Context7 library docs |
+| **Architecture/DX**      | Component patterns, state management, performance      | Next.js/TanStack/shadcn architectural research                |
+| **Frontier/Emerging**    | Bleeding-edge UI patterns, AI integration, YC startups | Startup research, emerging pattern analysis                   |
+| **Risk/Failure Mode**    | UI/UX failure modes, edge cases, safety risks          | EHR safety literature, healthcare IT hazard reports           |
 
 ---
 
@@ -60,6 +64,7 @@ Six specialized agents conducted parallel research:
 **Nielsen Norman Group** healthcare UX research confirms: when staff create paper workarounds, the interface has failed. Display contextually appropriate defaults. Never use ambiguous temporal references — always explicit dates.
 
 **WCAG 2.2 / Section 508** non-negotiable requirements:
+
 - 4.5:1 contrast ratio for standard text
 - 3:1 for large text and non-text UI components
 - Never rely on color alone — status indicators must combine at least 2 of: color, shape/icon, text
@@ -90,13 +95,13 @@ Six specialized agents conducted parallel research:
 
 ### ABA Competitors — What They Get Wrong
 
-| Competitor | Rating | Key UX Failures | Our Opening |
-|-----------|--------|-----------------|-------------|
-| **CentralReach** | 4.3/5 | Inconsistent save behavior (data loss), deep navigation trees, frequent auto-logouts deleting unsaved data, 87% of users report advanced feature problems | Over-engineered for small practices |
-| **AlohaABA** | 4.9/5 | No unique client identifier, non-customizable dashboards, cumbersome note navigation, slow | Simple but limited depth |
-| **RethinkBH** | — | Cannot edit data after entry, non-existent customer service, doesn't scale, mobile app unreliable | Critical data integrity gap |
-| **Motivity** | — | PM features still maturing, $48/learner all-in-one pricing | Clinical-first, PM second |
-| **Raven Health** | — | New/unproven at scale, limited integrations, % of collections can get expensive | Validates our pricing model |
+| Competitor       | Rating | Key UX Failures                                                                                                                                           | Our Opening                         |
+| ---------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **CentralReach** | 4.3/5  | Inconsistent save behavior (data loss), deep navigation trees, frequent auto-logouts deleting unsaved data, 87% of users report advanced feature problems | Over-engineered for small practices |
+| **AlohaABA**     | 4.9/5  | No unique client identifier, non-customizable dashboards, cumbersome note navigation, slow                                                                | Simple but limited depth            |
+| **RethinkBH**    | —      | Cannot edit data after entry, non-existent customer service, doesn't scale, mobile app unreliable                                                         | Critical data integrity gap         |
+| **Motivity**     | —      | PM features still maturing, $48/learner all-in-one pricing                                                                                                | Clinical-first, PM second           |
+| **Raven Health** | —      | New/unproven at scale, limited integrations, % of collections can get expensive                                                                           | Validates our pricing model         |
 
 **Theralytics** (4.8/5, 98% satisfaction) is the small-practice benchmark: built by BCBAs, billing pulls from session data automatically, progress graphs update in real-time, transparent pricing ($15/user/month). We must match this baseline.
 
@@ -109,6 +114,7 @@ Six specialized agents conducted parallel research:
 **Jane App** — Best-in-industry design for physiotherapy PM. Color-coded scheduling that's visually scannable at a glance. "Calming" interface philosophy — healthcare should feel trustworthy, not overwhelming.
 
 **Linear** — Gold standard for dense data UI:
+
 - **Warm neutrals** (shifted from cool blue-gray to warmer gray — "crisp but less saturated")
 - **Minimal accent color** (monochrome + meaningful status colors only)
 - **Keyboard-first** (C to create, Cmd+K command palette, x to select)
@@ -123,14 +129,14 @@ Six specialized agents conducted parallel research:
 
 ### Design Decisions Validated by Research
 
-| Decision | Validated By | Rationale |
-|----------|-------------|-----------|
-| Mira compact typography (12px base) | Linear, Retool, Tremor | Data-dense interfaces need compact type |
-| Warm neutral palette | Linear 2025 refresh | Warmer grays feel crisp but calmer for all-day use |
-| Minimal accent color | Linear, Stripe | Color should be meaningful (status), not decorative |
-| Skeleton loaders over spinners | SimplePractice, Vercel | 30% faster perceived performance |
-| Sidebar navigation | Linear, Stripe, all ABA tools | Standard for PM tools; collapsible for mobile |
-| `tabular-nums` on financial data | Mercury, Stripe | Alignment of monetary values in columns |
+| Decision                            | Validated By                  | Rationale                                           |
+| ----------------------------------- | ----------------------------- | --------------------------------------------------- |
+| Mira compact typography (12px base) | Linear, Retool, Tremor        | Data-dense interfaces need compact type             |
+| Warm neutral palette                | Linear 2025 refresh           | Warmer grays feel crisp but calmer for all-day use  |
+| Minimal accent color                | Linear, Stripe                | Color should be meaningful (status), not decorative |
+| Skeleton loaders over spinners      | SimplePractice, Vercel        | 30% faster perceived performance                    |
+| Sidebar navigation                  | Linear, Stripe, all ABA tools | Standard for PM tools; collapsible for mobile       |
+| `tabular-nums` on financial data    | Mercury, Stripe               | Alignment of monetary values in columns             |
 
 ---
 
@@ -139,11 +145,13 @@ Six specialized agents conducted parallel research:
 ### Priority 1 — Near-Identical Stack (use as primary references)
 
 **next-shadcn-dashboard-starter** (Kiranism)
+
 - GitHub: https://github.com/Kiranism/next-shadcn-dashboard-starter | 6.1k stars
 - Stack: Next.js 16, React 19, TypeScript, shadcn/ui, Tailwind CSS v4, Clerk, TanStack Data Tables, React Hook Form, Zod, Recharts, Zustand, Nuqs, Sentry
 - Why it matters: Nearly identical stack to Clinivise. Reference for RBAC sidebar with Clerk Organizations, feature-based folder structure, data table patterns with Nuqs URL state.
 
 **shadcn-table (tablecn)** (sadmann7)
+
 - GitHub: https://github.com/sadmann7/shadcn-table | 6k stars | Demo: https://tablecn.com/
 - Stack: Next.js, shadcn/ui, TanStack React Table, Drizzle ORM, PostgreSQL, Zod
 - Why it matters: Definitive server-side data table with our exact DB stack. Notion/Airtable-style faceted filters, Linear-style compact filters, skeleton loading, bulk action bar.
@@ -151,16 +159,19 @@ Six specialized agents conducted parallel research:
 ### Priority 2 — Domain-Relevant Patterns
 
 **Midday** (midday-ai)
+
 - GitHub: https://github.com/midday-ai/midday | 14.1k stars
 - Stack: TypeScript, Next.js, React, Tailwind CSS, shadcn/ui, Supabase
 - Why it matters: 232 dashboard components including time tracking (`tracker-calendar`, `tracker-timer`, `tracker-schedule`) and invoicing. UI package extends shadcn with `currency-input`, `date-range-picker`, `quantity-input`, `time-range-input` — all directly useful for our forms.
 
 **Medplum**
+
 - GitHub: https://github.com/medplum/medplum | 2.2k stars | Last active: March 2026
 - Stack: TypeScript, React, Node.js, PostgreSQL, FHIR
 - Why it matters: Healthcare-specific React components: `PatientTimeline`, `Scheduler`, `CodingInput` (CPT code entry), `MoneyInput`, `SearchControl`. Timeline pattern is perfect for client history and audit trail.
 
 **Tremor** (acquired by Vercel, Jan 2025)
+
 - GitHub: https://github.com/tremorlabs/tremor | 3.3k stars
 - Stack: TypeScript, React, Tailwind CSS, Radix UI
 - Why it matters: 39 dashboard components. `CategoryBar` is perfect for authorization utilization (colored segments at 80%/95%/100% thresholds). `SparkChart` enables inline mini-charts in table cells. `Tracker` visualizes session attendance patterns.
@@ -196,6 +207,7 @@ Six specialized agents conducted parallel research:
 **Overview:** Server Components by default. `'use client'` only for interactivity, hooks, or browser APIs. Data flows from Server Component (page) → Suspense boundary → async Server Component (data loader) → Client Component (interactive table/form receiving data as props).
 
 **Component tier model:**
+
 ```
 Tier 1: shadcn/ui primitives (never modify)
 Tier 2: Domain wrappers (thin, adds domain semantics — CurrencyInput, CptCodeSelect)
@@ -204,6 +216,7 @@ Tier 4: Page sections (ClientTable, SessionForm, DashboardMetrics)
 ```
 
 **Three-tier state management:**
+
 ```
 Tier 1: SERVER STATE    → TanStack Query (cache, refetch, optimistic updates)
 Tier 2: URL STATE       → nuqs (table filters, pagination, search, selected tab)
@@ -252,6 +265,7 @@ src/components/shared/data-table/
 ```
 
 Usage: compound composition pattern where sub-components access the TanStack Table instance via context:
+
 ```tsx
 <DataTable data={clients} columns={columns}>
   <DataTable.Toolbar>
@@ -303,6 +317,7 @@ Each section is an async Server Component that fetches its own data. Related wid
 **Design Philosophy: "Anti-CentralReach"**
 
 Every design decision should answer: "Would a frustrated CentralReach user feel relief when they see this?" The three emotional responses we're designing for:
+
 1. **"This is fast"** — session logging < 30 seconds, pre-filled forms, Cmd+K navigation
 2. **"I can see everything I need"** — data-dense tables, inline auth utilization, sticky context headers
 3. **"My work is safe"** — visible save state, auto-save, form persistence, optimistic UI with clear rollback
@@ -391,13 +406,13 @@ No Zustand. No Redux. No Jotai. Three concerns, three built-in solutions plus Re
 
 ### Performance Targets
 
-| Metric | Target |
-|--------|--------|
-| First Load JS per route | < 100KB |
-| Shared JS (framework) | < 85KB |
-| FCP | < 1.0s |
-| LCP | < 2.0s |
-| INP | < 200ms |
+| Metric                    | Target                 |
+| ------------------------- | ---------------------- |
+| First Load JS per route   | < 100KB                |
+| Shared JS (framework)     | < 85KB                 |
+| FCP                       | < 1.0s                 |
+| LCP                       | < 2.0s                 |
+| INP                       | < 200ms                |
 | Session log form → submit | < 30 seconds user time |
 
 ---
@@ -407,43 +422,52 @@ No Zustand. No Redux. No Jotai. Three concerns, three built-in solutions plus Re
 ### Adopt Now (Phase 1)
 
 **Command Palette (Cmd+K)** — Production-proven (Linear, Vercel, Ramp). shadcn Command component already installed. Index clients, providers, authorizations. Add quick-create actions. No ABA competitor has this.
-- *Maturity:* Production-proven in SaaS, early-adopter in healthcare
-- *Complexity:* Low-medium (cmdk handles the hard parts)
-- *Competitive advantage:* High — makes Clinivise the only keyboard-first ABA tool
+
+- _Maturity:_ Production-proven in SaaS, early-adopter in healthcare
+- _Complexity:_ Low-medium (cmdk handles the hard parts)
+- _Competitive advantage:_ High — makes Clinivise the only keyboard-first ABA tool
 
 **Confidence-Based AI Display** — When parsing authorization letters with AI, show confidence scores on extracted fields. High-confidence auto-fills; low-confidence highlights for manual review. Each field clickable to see source text. Pattern used by Abridge ("Linked Evidence"), GitHub Copilot (ghost text), and agentic-design.ai pattern library.
-- *Maturity:* Production-proven (Copilot pattern), early-adopter (healthcare confidence routing)
-- *Complexity:* Medium
-- *Competitive advantage:* High — AI-native from day one vs. competitors bolting AI on later
+
+- _Maturity:_ Production-proven (Copilot pattern), early-adopter (healthcare confidence routing)
+- _Complexity:_ Medium
+- _Competitive advantage:_ High — AI-native from day one vs. competitors bolting AI on later
 
 **Inline Sparklines & Micro-Charts** — Tremor's `SparkChart` and `CategoryBar` components. Auth utilization progress bars with colored thresholds. Inline trend charts in table cells. Revenue sparklines in dashboard cards.
-- *Maturity:* Production-proven (Tremor acquired by Vercel)
-- *Complexity:* Low (Tremor components are Tailwind-native)
+
+- _Maturity:_ Production-proven (Tremor acquired by Vercel)
+- _Complexity:_ Low (Tremor components are Tailwind-native)
 
 **Proactive Authorization Alerts at Point of Action** — Not just dashboard widgets. When logging a session: "3 units remaining on this auth." When scheduling: "Auth expires in 7 days." Tiered: 80% = subtle badge, 95% = inline banner, 100%+ = blocking modal.
-- *Maturity:* Production-proven concept, poorly implemented in ABA tools
-- *Competitive advantage:* Very high — no competitor surfaces this intelligence contextually
+
+- _Maturity:_ Production-proven concept, poorly implemented in ABA tools
+- _Competitive advantage:_ Very high — no competitor surfaces this intelligence contextually
 
 **Role-Based UI Density** — RBT dashboard = simplified session focus. BCBA dashboard = data-rich analysis. Not adaptive AI — role-based layout configuration using existing RBAC.
-- *Maturity:* Production-proven
-- *Complexity:* Medium (role-conditional rendering, multiple dashboard layouts)
+
+- _Maturity:_ Production-proven
+- _Complexity:_ Medium (role-conditional rendering, multiple dashboard layouts)
 
 ### Design For Later (Phase 2-3)
 
 **Ambient Voice Documentation** — RBTs capture voice during sessions → AI generates structured notes post-session. Used by Suki AI (76% documentation time reduction), Abridge (#1 Best in KLAS for Ambient AI), Raven Health (voice-to-text notes). Build the `lib/ai.ts` wrapper now with a "transcript → structured note" pipeline in mind.
-- *Maturity:* Production-proven (medical STT APIs), early-adopter (ABA-specific)
-- *Target:* Phase 2-3
+
+- _Maturity:_ Production-proven (medical STT APIs), early-adopter (ABA-specific)
+- _Target:_ Phase 2-3
 
 **PWA / Offline Session Logging** — RBTs in the field need offline data entry. Serwist for Next.js PWA, IndexedDB + Background Sync achieves 99.8% sync success across 500K+ healthcare users. Design session data model with "unsynced" state now.
-- *Maturity:* Production-proven (PWA APIs), medium (healthcare offline)
-- *Target:* Phase 2
+
+- _Maturity:_ Production-proven (PWA APIs), medium (healthcare offline)
+- _Target:_ Phase 2
 
 **Dark Mode** — Foundation already in place (OKLCH semantic tokens, dark mode CSS variables in globals.css). When ready, it's a CSS variable swap.
-- *Maturity:* Production-proven
-- *Target:* Phase 2 (low effort if semantic tokens are consistent — they are)
+
+- _Maturity:_ Production-proven
+- _Target:_ Phase 2 (low effort if semantic tokens are consistent — they are)
 
 **Real-Time Presence** — "Dr. Smith is viewing Jordan's auth." Liveblocks for React/Next.js provides ready-made infrastructure. Foundation is the audit log (Phase 1).
-- *Target:* Phase 2-3
+
+- _Target:_ Phase 2-3
 
 ### Watch (Phase 3+)
 
@@ -503,57 +527,58 @@ Founded by a BCBA, mobile-first, free + managed billing (% of collections). Vali
 
 ### Critical Severity (9 items — must address before shipping)
 
-| ID | Risk | Likelihood | Mitigation |
-|----|------|-----------|------------|
-| R2.5 | **Session timer drift** in background browser tabs — Chrome throttles `setInterval` to 1-min resolution. RBTs switch apps during sessions. Timer shows wrong elapsed time → wrong billing. | High | Web Worker for timer. Calculate from `Date.now() - startTime`, not counter increment. Reconcile on `visibilitychange`. |
-| R7.1 | **TanStack Query cache survives org switch** — consultant BCBA switches orgs, cache still shows previous org's data. Data leak. | High | `queryClient.clear()` on org switch. `orgId` in every query key. Integration test for cross-org data isolation. |
-| R4.4 | **Double-submit on slow connections** — RBT clicks Save, nothing happens, clicks again. Two sessions created, double-billing. | High | Disable button + `isPending` spinner on click. Server-side idempotency keys (generated client-side on form mount). |
-| R5.3 | **Data loss from poor network** — RBT finishes home-visit session, saves, request fails (dead zone), closes tab thinking it saved. | High | Persist form state to localStorage on field change. Persistent (non-dismissible) error banner on failure. Retry queue on `navigator.onLine` change. |
-| R2.1 | **CMS vs AMA unit calculation confusion** — UI shows units using one method, payer expects the other. Claim denied. | High | Show active calculation method label on every unit display. Live unit calculator during session entry. Warning when aggregation method differs from payer preference. |
-| R2.2 | **Auth unit tracker stale data** — RBT sees "12 remaining," another RBT already consumed 10. Over-utilization. | High | 30-second TanStack Query stale time for auth data. "Last updated" timestamp. Refresh button. Atomic SQL increments prevent DB-level corruption. |
-| R1.1 | **Wrong-field data entry** — dense forms cause entry in wrong CPT code row or wrong client record. | High | Visual grouping with section headers. Active-field left-border accent. Persistent client name header on all forms. |
-| R7.3 | **URL manipulation → cross-org data access** — shared URL with resource ID, server-side org filter has a bug. | Medium | Every server fetch filters by `organization_id` from session. Generic 404 for cross-org resources (never "access denied"). Automated cross-org access tests. |
-| R7.4 | **Clerk orgId null on server** — documented edge case where `auth()` returns `userId` but null `orgId`. | Medium | Hard-fail in `authActionClient` on null `orgId`. Redirect to org selection page. Explicit null check in all server components. |
+| ID   | Risk                                                                                                                                                                                       | Likelihood | Mitigation                                                                                                                                                            |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R2.5 | **Session timer drift** in background browser tabs — Chrome throttles `setInterval` to 1-min resolution. RBTs switch apps during sessions. Timer shows wrong elapsed time → wrong billing. | High       | Web Worker for timer. Calculate from `Date.now() - startTime`, not counter increment. Reconcile on `visibilitychange`.                                                |
+| R7.1 | **TanStack Query cache survives org switch** — consultant BCBA switches orgs, cache still shows previous org's data. Data leak.                                                            | High       | `queryClient.clear()` on org switch. `orgId` in every query key. Integration test for cross-org data isolation.                                                       |
+| R4.4 | **Double-submit on slow connections** — RBT clicks Save, nothing happens, clicks again. Two sessions created, double-billing.                                                              | High       | Disable button + `isPending` spinner on click. Server-side idempotency keys (generated client-side on form mount).                                                    |
+| R5.3 | **Data loss from poor network** — RBT finishes home-visit session, saves, request fails (dead zone), closes tab thinking it saved.                                                         | High       | Persist form state to localStorage on field change. Persistent (non-dismissible) error banner on failure. Retry queue on `navigator.onLine` change.                   |
+| R2.1 | **CMS vs AMA unit calculation confusion** — UI shows units using one method, payer expects the other. Claim denied.                                                                        | High       | Show active calculation method label on every unit display. Live unit calculator during session entry. Warning when aggregation method differs from payer preference. |
+| R2.2 | **Auth unit tracker stale data** — RBT sees "12 remaining," another RBT already consumed 10. Over-utilization.                                                                             | High       | 30-second TanStack Query stale time for auth data. "Last updated" timestamp. Refresh button. Atomic SQL increments prevent DB-level corruption.                       |
+| R1.1 | **Wrong-field data entry** — dense forms cause entry in wrong CPT code row or wrong client record.                                                                                         | High       | Visual grouping with section headers. Active-field left-border accent. Persistent client name header on all forms.                                                    |
+| R7.3 | **URL manipulation → cross-org data access** — shared URL with resource ID, server-side org filter has a bug.                                                                              | Medium     | Every server fetch filters by `organization_id` from session. Generic 404 for cross-org resources (never "access denied"). Automated cross-org access tests.          |
+| R7.4 | **Clerk orgId null on server** — documented edge case where `auth()` returns `userId` but null `orgId`.                                                                                    | Medium     | Hard-fail in `authActionClient` on null `orgId`. Redirect to org selection page. Explicit null check in all server components.                                        |
 
 ### High Severity (17 items — significant UX/operational impact)
 
-| ID | Risk | Mitigation |
-|----|------|------------|
-| R1.3 | Alert fatigue on auth warnings | Tiered presentation: 80% = subtle badge, 95% = inline banner, 100%+ = blocking modal. Never toast for auth alerts. |
-| R4.1 | Pre-fill errors creating wrong submissions | Visual distinction on pre-filled values. "Today's or yesterday's?" prompt before 10 AM. |
-| R4.3 | Multi-tab editing conflict (last write wins) | Optimistic concurrency: `updated_at` comparison before save. Conflict resolution UI. |
-| R3.1 | Row selection lost across pagination | Store selections by row ID. Show persistent selection count banner. |
-| R5.1 | Virtual keyboard hiding input on tablet | `scrollIntoView({ block: 'center' })` on focus. Action buttons at top, not bottom. |
-| R5.2 | Touch targets too small in compact Mira UI | `min-h-11 min-w-11` (44px) on all interactives. `pointer: coarse` media query for tablet adjustments. |
-| R6.1 | Red/green invisible to colorblind (8% of males) | Never color alone. Every status: color + icon + text label. Test with Chrome DevTools colorblind simulator. |
-| R8.2 | Billing status confusion → double-billing | Strict state machine. Timestamps + reasons on state transitions. Block duplicate claims for same service dates + CPT + client. |
-| R9.1 | Toast used for critical errors (auto-dismisses, missed) | Toasts for success only. Inline persistent banners for errors. Modals for critical failures. |
-| R9.2 | Timezone/DST boundary → wrong session date | Store UTC with timezone. Derive session date from start time in org's timezone. Never `new Date()` for date-only values. |
-| R9.4 | Optimistic update reverts silently after navigation | Global persistent notification for failed mutations. Failed-mutation retry queue. No optimistic updates for critical mutations (session save, claim submission). |
-| R9.5 | Stale form data overwrites concurrent edit | Compare `dataUpdatedAt` against form load timestamp. Show merge warning if underlying data changed during edit. |
-| R6.2 | TanStack Table not accessible to screen readers | Semantic `<table>` markup. `aria-sort` on sortable headers. `aria-live` for filter results. |
-| R2.3 | FIFO auth selection billing wrong auth | Show which auth will be used on session form. Visual split if units cross two auths. Manual override with audit trail. |
-| R7.2 | Browser back button shows previous org data | `Cache-Control: no-store` on authenticated pages. Full page reload on org switch. |
-| R8.1 | Floating point display errors on monetary values | Never convert monetary strings to `Number()`. `<Money>` component formats from string. Lint rule banning `parseFloat()`/`Number()` on money. |
-| R1.4 | Copy-paste propagating errors across notes | Pre-fill templates with dynamic data. Flag notes >80% identical to previous session. "Copied from" provenance indicator. |
+| ID   | Risk                                                    | Mitigation                                                                                                                                                       |
+| ---- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1.3 | Alert fatigue on auth warnings                          | Tiered presentation: 80% = subtle badge, 95% = inline banner, 100%+ = blocking modal. Never toast for auth alerts.                                               |
+| R4.1 | Pre-fill errors creating wrong submissions              | Visual distinction on pre-filled values. "Today's or yesterday's?" prompt before 10 AM.                                                                          |
+| R4.3 | Multi-tab editing conflict (last write wins)            | Optimistic concurrency: `updated_at` comparison before save. Conflict resolution UI.                                                                             |
+| R3.1 | Row selection lost across pagination                    | Store selections by row ID. Show persistent selection count banner.                                                                                              |
+| R5.1 | Virtual keyboard hiding input on tablet                 | `scrollIntoView({ block: 'center' })` on focus. Action buttons at top, not bottom.                                                                               |
+| R5.2 | Touch targets too small in compact Mira UI              | `min-h-11 min-w-11` (44px) on all interactives. `pointer: coarse` media query for tablet adjustments.                                                            |
+| R6.1 | Red/green invisible to colorblind (8% of males)         | Never color alone. Every status: color + icon + text label. Test with Chrome DevTools colorblind simulator.                                                      |
+| R8.2 | Billing status confusion → double-billing               | Strict state machine. Timestamps + reasons on state transitions. Block duplicate claims for same service dates + CPT + client.                                   |
+| R9.1 | Toast used for critical errors (auto-dismisses, missed) | Toasts for success only. Inline persistent banners for errors. Modals for critical failures.                                                                     |
+| R9.2 | Timezone/DST boundary → wrong session date              | Store UTC with timezone. Derive session date from start time in org's timezone. Never `new Date()` for date-only values.                                         |
+| R9.4 | Optimistic update reverts silently after navigation     | Global persistent notification for failed mutations. Failed-mutation retry queue. No optimistic updates for critical mutations (session save, claim submission). |
+| R9.5 | Stale form data overwrites concurrent edit              | Compare `dataUpdatedAt` against form load timestamp. Show merge warning if underlying data changed during edit.                                                  |
+| R6.2 | TanStack Table not accessible to screen readers         | Semantic `<table>` markup. `aria-sort` on sortable headers. `aria-live` for filter results.                                                                      |
+| R2.3 | FIFO auth selection billing wrong auth                  | Show which auth will be used on session form. Visual split if units cross two auths. Manual override with audit trail.                                           |
+| R7.2 | Browser back button shows previous org data             | `Cache-Control: no-store` on authenticated pages. Full page reload on org switch.                                                                                |
+| R8.1 | Floating point display errors on monetary values        | Never convert monetary strings to `Number()`. `<Money>` component formats from string. Lint rule banning `parseFloat()`/`Number()` on money.                     |
+| R1.4 | Copy-paste propagating errors across notes              | Pre-fill templates with dynamic data. Flag notes >80% identical to previous session. "Copied from" provenance indicator.                                         |
 
 ### Medium Severity (9 items)
 
-| ID | Risk | Mitigation |
-|----|------|------------|
-| R3.2 | Active filters not visually obvious | "Showing 12 of 85 (3 filters)" with "Clear all" button. Never hide total count. |
-| R7.5 | RBAC UI shows then blocks forbidden actions | `usePermission()` hook. Conditionally render (not just disable). Shared permission map. |
-| R9.3 | Neon cold start (3-5s) perceived as broken | Skeleton UI via Suspense. Consider warming endpoint during business hours. |
-| R9.6 | Audit log volume degrades performance | Partition by month. Separate indexes. Log only mutations in Phase 1. |
-| R8.3 | Sum-of-parts ≠ total from independent rounding | Calculate totals from unrounded values. "Largest remainder" rounding. Tests for 3+ line items. |
-| R3.4 | Bulk action on wrong row set after filter change | Clear selection on filter change. List affected items in confirmation dialog. |
-| R4.2 | Validation timing causing partial data loss | `mode: 'onBlur'` for fields, `mode: 'onSubmit'` for cross-field. Never clear valid fields on re-render. |
-| R5.4 | Orientation change breaks form layout | Controlled components (RHF handles this). Test both orientations. Pin scroll position. |
-| R4.5 | Required fields not visually distinct | Red asterisk on required, "(optional)" text on optional. |
+| ID   | Risk                                             | Mitigation                                                                                              |
+| ---- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| R3.2 | Active filters not visually obvious              | "Showing 12 of 85 (3 filters)" with "Clear all" button. Never hide total count.                         |
+| R7.5 | RBAC UI shows then blocks forbidden actions      | `usePermission()` hook. Conditionally render (not just disable). Shared permission map.                 |
+| R9.3 | Neon cold start (3-5s) perceived as broken       | Skeleton UI via Suspense. Consider warming endpoint during business hours.                              |
+| R9.6 | Audit log volume degrades performance            | Partition by month. Separate indexes. Log only mutations in Phase 1.                                    |
+| R8.3 | Sum-of-parts ≠ total from independent rounding   | Calculate totals from unrounded values. "Largest remainder" rounding. Tests for 3+ line items.          |
+| R3.4 | Bulk action on wrong row set after filter change | Clear selection on filter change. List affected items in confirmation dialog.                           |
+| R4.2 | Validation timing causing partial data loss      | `mode: 'onBlur'` for fields, `mode: 'onSubmit'` for cross-field. Never clear valid fields on re-render. |
+| R5.4 | Orientation change breaks form layout            | Controlled components (RHF handles this). Test both orientations. Pin scroll position.                  |
+| R4.5 | Required fields not visually distinct            | Red asterisk on required, "(optional)" text on optional.                                                |
 
 ### Prioritized Action Items
 
 **Before writing any UI code:**
+
 1. Create `<Money>` component (string → formatted, no `Number()` conversion)
 2. Create `usePermission()` hook with shared permission map
 3. Establish org-switch cleanup (`queryClient.clear()` on Clerk org change)
@@ -561,6 +586,7 @@ Founded by a BCBA, mobile-first, free + managed billing (% of collections). Vali
 5. Define error display strategy: toasts for success only, banners for errors, modals for critical
 
 **During each feature sprint:**
+
 - Every data table: semantic HTML, `aria-sort`, filter count, null handling
 - Every form: pre-fill visual distinction, blur validation, dirty tracking, localStorage persistence
 - Every status indicator: color + text + icon triple encoding
@@ -571,17 +597,21 @@ Founded by a BCBA, mobile-first, free + managed billing (% of collections). Vali
 ## Recommended Technical Direction
 
 ### Design Pattern
+
 Data-dense, Mira-compact interfaces with three-level visual hierarchy (primary/secondary/tertiary). Progressive disclosure: glance → scan → drill-down. Authorization utilization as first-class visual element.
 
 ### Architecture
+
 Server Components first. Composable DataTable with Context Provider. Three-tier state (TanStack Query + nuqs + useState). Staggered Suspense streaming for dashboards. FormProvider for multi-section forms.
 
 ### Libraries/Tools
+
 - Add: `nuqs` (URL state management) — only new dependency needed
 - Existing: TanStack Query, TanStack Table, React Hook Form, Zod v4, Recharts, shadcn/ui, Sonner
 - Consider: Tremor spark chart components (for inline micro-charts)
 
 ### Implementation Approach
+
 1. **App shell first** — Sidebar + page header + Cmd+K palette. Establishes navigation pattern.
 2. **Client list table** — First real data-dense screen. Establishes DataTable compound component pattern.
 3. **Dashboard** — Suspense streaming + metric cards + auth alerts. Establishes dashboard pattern.
@@ -589,6 +619,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 5. **Authorization detail** — Utilization bar + service breakdown + alert banners. The signature UX element.
 
 ### What to Do Now
+
 - Install `nuqs`
 - Build `<Money>`, `<StatusBadge>`, `<EmptyState>` shared components
 - Build `usePermission()`, `useAutoSave()`, `useUnsavedChanges()` hooks
@@ -598,6 +629,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - Add semantic status color tokens to `globals.css` `@theme inline`
 
 ### What to Defer
+
 - Virtual scrolling (until audit trail table proves it's needed)
 - PWA/offline support (Phase 2)
 - Voice input (Phase 2-3)
@@ -606,6 +638,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - WebSocket infrastructure (polling is sufficient for ABA data frequency)
 
 ### What to Avoid
+
 - Global state libraries (Zustand, Redux, Jotai) — not needed
 - Custom UI primitives when shadcn components exist
 - Inline table editing for financial/billing data (use modal/sheet)
@@ -636,6 +669,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 ## Sources and References
 
 ### Official Documentation
+
 - [ONC Health IT Playbook — Usability](https://playbook.healthit.gov/playbook/full/)
 - [ONC Usability and Provider Burden](https://healthit.gov/usability-and-provider-burden/)
 - [NIST GCR 15-996 — Health IT User Interface Design](https://nvlpubs.nist.gov/nistpubs/gcr/2015/NIST.GCR.15-996.pdf)
@@ -649,6 +683,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - [Next.js PWA Guide](https://nextjs.org/docs/app/guides/progressive-web-apps)
 
 ### Healthcare UX Research
+
 - [Nielsen Norman Group — Medical Usability](https://www.nngroup.com/articles/medical-usability/)
 - [PMC — Heuristics for Clinical Decision Support](https://pmc.ncbi.nlm.nih.gov/articles/PMC5333283/)
 - [PMC — EHR Usability Challenges and Documentation Burden](https://pmc.ncbi.nlm.nih.gov/articles/PMC12206486/)
@@ -659,6 +694,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - [Carbon Design System — Status Indicators](https://carbondesignsystem.com/patterns/status-indicator-pattern/)
 
 ### ABA Industry
+
 - [AlohaABA — CPT Code Guide](https://alohaaba.com/blogs/understanding-cpt-codes-for-aba-therapy-billing-a-comprehensive-guide)
 - [Artemis ABA — Session Notes Guide](https://www.artemisaba.com/blog/aba-session-notes)
 - [Praxis Notes — RBT Supervision 2025](https://www.praxisnotes.com/resources/rbt-supervision-documentation-2025-bacb-guide)
@@ -668,6 +704,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - [CentralReach Alternatives — Noteable](https://mynoteable.com/blog/centralreachalternatives)
 
 ### Design Research
+
 - [Tufte's Data Visualization Principles](https://jtr13.github.io/cc19/tuftes-principles-of-data-ink.html)
 - [Dashboard Cognitive Design Guidelines — UX Magazine](https://uxmag.com/articles/four-cognitive-design-guidelines-for-effective-information-dashboards)
 - [Data Dashboard Patterns — Pencil & Paper](https://www.pencilandpaper.io/articles/ux-pattern-analysis-data-dashboards)
@@ -678,6 +715,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - [Auto-Saving Forms Done Right — CodeMiner42](https://blog.codeminer42.com/auto-saving-forms-done-right-1-2/)
 
 ### AI and Emerging Patterns
+
 - [Microsoft Dragon Copilot at HIMSS 2026](https://www.microsoft.com/en-us/industry/blog/healthcare/2026/03/05/unify-simplify-scale-microsoft-dragon-copilot-meets-the-moment-at-himss-2026/)
 - [Abridge AI Platform](https://www.abridge.com/ai)
 - [Suki AI — Ambient Clinical Intelligence](https://www.suki.ai/)
@@ -689,6 +727,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - [LunaBill — YC F25](https://www.ycombinator.com/companies/lunabill)
 
 ### Platform and Product References
+
 - [Raven Health](https://ravenhealth.com/)
 - [Passage Health](https://www.passagehealth.com/)
 - [Mentalyc AI Notes](https://www.mentalyc.com/)
@@ -698,6 +737,7 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - [Jane App](https://jane.app/)
 
 ### Repositories and Code References
+
 - [next-shadcn-dashboard-starter](https://github.com/Kiranism/next-shadcn-dashboard-starter) — 6.1k stars, Feb 2026
 - [shadcn-table (tablecn)](https://github.com/sadmann7/shadcn-table) — 6k stars
 - [Midday](https://github.com/midday-ai/midday) — 14.1k stars
@@ -716,21 +756,25 @@ Server Components first. Composable DataTable with Context Provider. Three-tier 
 - [Kimai](https://github.com/kimai/kimai) — 4.6k stars
 
 ### Security and Multi-Tenancy
+
 - [OWASP Multi-Tenant Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Multi_Tenant_Security_Cheat_Sheet.html)
 - [Vanta Data Leak — ComplyDog](https://complydog.com/blog/vanta-data-leak)
 - [Cross-Tenant Leakage Prevention — Agnite](https://agnitestudio.com/blog/preventing-cross-tenant-leakage/)
 
 ### Accessibility
+
 - [WCAG 2.1 — Use of Color](https://www.w3.org/WAI/WCAG21/Understanding/use-of-color.html)
 - [Section 508 — Making Color Usage Accessible](https://www.section508.gov/create/making-color-usage-accessible/)
 - [Healthcare App Accessibility — BounDev](https://www.boundev.com/blog/healthcare-app-accessibility-wcag-compliance)
 - [React Aria useTable — Adobe](https://react-spectrum.adobe.com/react-aria/useTable.html)
 
 ### Financial UI
+
 - [Floating Point Breaking Financial Software](https://medium.com/@sohail_saifii/the-floating-point-standard-thats-silently-breaking-financial-software-7f7e93430dbb)
 - [Floats Don't Work for Storing Cents — Modern Treasury](https://www.moderntreasury.com/journal/floats-dont-work-for-storing-cents)
 
 ### Internal Codebase References
+
 - `src/app/globals.css` — OKLCH color tokens, Mira theme, dark mode variables
 - `src/components/ui/` — 32 installed shadcn/ui components
 - `src/lib/utils.ts` — `cn()` class merging helper

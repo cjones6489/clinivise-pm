@@ -1,7 +1,16 @@
 import "server-only";
 
 import { db } from "@/server/db";
-import { clients, clientContacts, clientInsurance, clientProviders, payers, authorizations, authorizationServices, providers } from "@/server/db/schema";
+import {
+  clients,
+  clientContacts,
+  clientInsurance,
+  clientProviders,
+  payers,
+  authorizations,
+  authorizationServices,
+  providers,
+} from "@/server/db/schema";
 import { eq, and, isNull, ne, asc, desc, sql } from "drizzle-orm";
 
 export type Client = typeof clients.$inferSelect;
@@ -67,8 +76,12 @@ export async function getClientsForList(orgId: string): Promise<ClientListItem[]
   const authUtil = db
     .select({
       clientId: authorizations.clientId,
-      totalApproved: sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.as("total_approved"),
-      totalUsed: sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.as("total_used"),
+      totalApproved: sql<number>`coalesce(sum(${authorizationServices.approvedUnits}), 0)::int`.as(
+        "total_approved",
+      ),
+      totalUsed: sql<number>`coalesce(sum(${authorizationServices.usedUnits}), 0)::int`.as(
+        "total_used",
+      ),
       nearestExpiry: sql<string>`min(${authorizations.endDate})`.as("nearest_expiry"),
       maxUtilizationPct: sql<number>`coalesce(max(
         case when ${authorizationServices.approvedUnits} > 0

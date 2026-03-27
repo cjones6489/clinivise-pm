@@ -13,6 +13,7 @@ The research synthesizes findings from 6 specialized agents analyzing: competito
 ## Executive Summary
 
 ### The Landscape
+
 - **CentralReach** is the AI leader with 5 products trained on 4B+ data points, but their UX is terrible (87% complain about advanced features) and AI feels bolted on.
 - **Every ABA competitor** has shallow AI: primarily note generation. No one has AI authorization management, claim scrubbing, denial prediction, or scheduling optimization.
 - **Adjacent healthcare AI** is moving fast: Abridge (ambient scribing, #1 Best in KLAS), Waystar (prevented $15B in denials), LunaBill (YC F25, 12x billing team productivity), Infinitus (100M+ AI phone call minutes).
@@ -26,6 +27,7 @@ The fundamental insight from this research: **"AI-native" means AI drives routin
 Clinivise's AI should be invisible. Users interact with forms, tables, and dashboards. AI powers what those forms suggest, what those tables highlight, and what those dashboards surface. If users are thinking about AI, the UX is wrong.
 
 ### The 7 AI Principles
+
 1. **Data-grounded, not generative** — AI outputs from structured session data (not freeform generation)
 2. **Linked evidence** — every AI output traceable to its source (Abridge's gold standard)
 3. **Clinician-in-the-loop** — the user is always the author; AI produces drafts, not decisions
@@ -35,6 +37,7 @@ Clinivise's AI should be invisible. Users interact with forms, tables, and dashb
 7. **Honest about confidence** — every AI output has a confidence score; no false certainty
 
 ### The Architecture
+
 - **Vercel AI SDK 6** as the AI abstraction layer (not hand-rolled `lib/ai.ts`)
 - **`generateObject` + Zod schemas** for all structured AI extraction
 - **Deterministic state machines with AI at bounded decision points** — AI never controls flow
@@ -46,14 +49,14 @@ Clinivise's AI should be invisible. Users interact with forms, tables, and dashb
 
 ## Research Method
 
-| Agent | Focus | Key Output |
-|-------|-------|------------|
-| **Competitive AI** | Every AI feature in 15+ ABA and healthcare platforms | `docs/ai-competitive-landscape.md` |
-| **Architecture** | Document processing, structured output, agent patterns, HIPAA | Synthesis below |
-| **Open Source** | AI SDKs, document processing, STT, agent frameworks, observability | `docs/ai-libraries-research.md` |
-| **Frontier** | YC startups, AI-native RCM, production agents, predictive AI | `docs/deep-research-frontier-ai.md` |
-| **Risk** | Hallucination, FCA liability, PHI, model drift, state regulation | `docs/ai-risk-analysis.md` |
-| **DX/Product** | Native vs bolted-on AI, interaction patterns, autonomy levels, anti-patterns | Synthesis below |
+| Agent              | Focus                                                                        | Key Output                          |
+| ------------------ | ---------------------------------------------------------------------------- | ----------------------------------- |
+| **Competitive AI** | Every AI feature in 15+ ABA and healthcare platforms                         | `docs/ai-competitive-landscape.md`  |
+| **Architecture**   | Document processing, structured output, agent patterns, HIPAA                | Synthesis below                     |
+| **Open Source**    | AI SDKs, document processing, STT, agent frameworks, observability           | `docs/ai-libraries-research.md`     |
+| **Frontier**       | YC startups, AI-native RCM, production agents, predictive AI                 | `docs/deep-research-frontier-ai.md` |
+| **Risk**           | Hallucination, FCA liability, PHI, model drift, state regulation             | `docs/ai-risk-analysis.md`          |
+| **DX/Product**     | Native vs bolted-on AI, interaction patterns, autonomy levels, anti-patterns | Synthesis below                     |
 
 ---
 
@@ -62,6 +65,7 @@ Clinivise's AI should be invisible. Users interact with forms, tables, and dashb
 ### Vercel AI SDK 6 (Primary AI Framework)
 
 The AI SDK provides the cleanest TypeScript-native approach for our stack. Key capabilities:
+
 - **`generateObject`** with `Output.object()` — structured extraction from documents with automatic Zod schema validation
 - **`generateText`** with tool calling — multi-step workflows where AI uses defined tools
 - **Provider-agnostic** — swap `anthropic()` for `bedrock()` in one line for HIPAA production
@@ -89,15 +93,15 @@ Amazon Bedrock is HIPAA-eligible. Claude models on Bedrock are covered under AWS
 
 ### What ABA Competitors Actually Ship for AI
 
-| Platform | AI Features | Technical Approach | User Reception |
-|----------|------------|-------------------|----------------|
-| **CentralReach** | ScheduleAI, NoteGuardAI, NoteDraftAI, ClaimCheckAI, ClaimAgentAI | Trained on 4B+ data points. Acquired SpectrumAI + AI Measures (Aug 2025) | Enterprise users. "Advanced features have many problems." ScheduleAI "hasn't saved time yet." |
-| **RethinkBH** | AI session notes FROM structured data (not audio) | Azure OpenAI | Smart approach — reduces hallucination by grounding in structured input |
-| **Raven Health** | AI session notes, "AI insights" | Not disclosed | Shallow — primarily note generation |
-| **Alpaca Health** | AI note-taking, treatment plan generation, record review | LLM-based | For solo BCBAs only. "AI-first" marketing, unclear depth. |
-| **Mentalyc** | AI therapy notes from audio/text | LLM-based | 30K+ clinicians. Users want more customization. |
-| **Motivity** | AI R&D ($11M SBIR grants, $27M funding 2025) | Unknown (in development) | Nothing shipped yet. |
-| **Neuromnia** | ABA-specific AI assistant | Fine-tuned Llama 3.1 on synthetic ABA data | Chat-based UI — red flag. |
+| Platform          | AI Features                                                      | Technical Approach                                                       | User Reception                                                                                |
+| ----------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| **CentralReach**  | ScheduleAI, NoteGuardAI, NoteDraftAI, ClaimCheckAI, ClaimAgentAI | Trained on 4B+ data points. Acquired SpectrumAI + AI Measures (Aug 2025) | Enterprise users. "Advanced features have many problems." ScheduleAI "hasn't saved time yet." |
+| **RethinkBH**     | AI session notes FROM structured data (not audio)                | Azure OpenAI                                                             | Smart approach — reduces hallucination by grounding in structured input                       |
+| **Raven Health**  | AI session notes, "AI insights"                                  | Not disclosed                                                            | Shallow — primarily note generation                                                           |
+| **Alpaca Health** | AI note-taking, treatment plan generation, record review         | LLM-based                                                                | For solo BCBAs only. "AI-first" marketing, unclear depth.                                     |
+| **Mentalyc**      | AI therapy notes from audio/text                                 | LLM-based                                                                | 30K+ clinicians. Users want more customization.                                               |
+| **Motivity**      | AI R&D ($11M SBIR grants, $27M funding 2025)                     | Unknown (in development)                                                 | Nothing shipped yet.                                                                          |
+| **Neuromnia**     | ABA-specific AI assistant                                        | Fine-tuned Llama 3.1 on synthetic ABA data                               | Chat-based UI — red flag.                                                                     |
 
 **Critical gap**: No ABA competitor has AI authorization management, AI claim scrubbing, AI denial prediction, or AI scheduling optimization. These are all massive workflow automation opportunities.
 
@@ -117,13 +121,13 @@ Amazon Bedrock is HIPAA-eligible. Claude models on Bedrock are covered under AWS
 
 The research clearly distinguishes two approaches:
 
-| Aspect | AI-Bolted-On (CentralReach) | AI-Native (Clinivise target) |
-|--------|---------------------------|------------------------------|
-| Default behavior | User drives, AI assists on request | AI drives routine work, user supervises exceptions |
-| AI visibility | "Click here for AI" buttons, separate AI tab | Invisible — AI is the intelligence behind every screen |
-| Trust model | User must opt-in to each AI action | System earns trust through accuracy, user can dial up autonomy |
-| Failure mode | AI broken = feature unavailable | AI broken = graceful degradation to manual workflow |
-| Architecture | AI service called by existing features | AI infrastructure that every feature is built on |
+| Aspect           | AI-Bolted-On (CentralReach)                  | AI-Native (Clinivise target)                                   |
+| ---------------- | -------------------------------------------- | -------------------------------------------------------------- |
+| Default behavior | User drives, AI assists on request           | AI drives routine work, user supervises exceptions             |
+| AI visibility    | "Click here for AI" buttons, separate AI tab | Invisible — AI is the intelligence behind every screen         |
+| Trust model      | User must opt-in to each AI action           | System earns trust through accuracy, user can dial up autonomy |
+| Failure mode     | AI broken = feature unavailable              | AI broken = graceful degradation to manual workflow            |
+| Architecture     | AI service called by existing features       | AI infrastructure that every feature is built on               |
 
 The **Cursor vs VS Code + Copilot** analogy is instructive: Copilot is an extension bolted onto VS Code through APIs. Cursor is a VS Code fork where AI is built into the core — the text buffer, the terminal, the file explorer. Same underlying models, dramatically different experience.
 
@@ -133,26 +137,26 @@ The **Cursor vs VS Code + Copilot** analogy is instructive: Copilot is an extens
 
 ### Recommended Phase 1 Stack
 
-| Layer | Tool | Cost | Why |
-|-------|------|------|-----|
-| **LLM Integration** | Vercel AI SDK 6 (`ai`) | Free | 2.8M downloads, native Next.js, Zod v4, provider-agnostic |
-| **LLM Provider (dev)** | `@ai-sdk/anthropic` | ~$30-50/mo | Claude Sonnet for dev/prototyping |
-| **LLM Provider (prod)** | `@ai-sdk/amazon-bedrock` | Pay-per-use | HIPAA-eligible, one-line swap from Anthropic |
-| **PDF Processing** | `pdf-parse` | Free | 2.5M+ weekly downloads, works on Vercel |
-| **OCR Fallback** | `tesseract.js` | Free | 37.5K stars, for scanned documents |
-| **Background Jobs** | Inngest | Free (100K/mo) | Vercel-native, durable workflows, `step.ai` for AI calls |
-| **LLM Observability** | Langfuse (self-hosted) | Free | 20K+ stars, MIT, PHI-safe (self-hosted) |
-| **Prompt Testing** | promptfoo | Free | MIT, 300K+ developers, runs locally |
+| Layer                   | Tool                     | Cost           | Why                                                       |
+| ----------------------- | ------------------------ | -------------- | --------------------------------------------------------- |
+| **LLM Integration**     | Vercel AI SDK 6 (`ai`)   | Free           | 2.8M downloads, native Next.js, Zod v4, provider-agnostic |
+| **LLM Provider (dev)**  | `@ai-sdk/anthropic`      | ~$30-50/mo     | Claude Sonnet for dev/prototyping                         |
+| **LLM Provider (prod)** | `@ai-sdk/amazon-bedrock` | Pay-per-use    | HIPAA-eligible, one-line swap from Anthropic              |
+| **PDF Processing**      | `pdf-parse`              | Free           | 2.5M+ weekly downloads, works on Vercel                   |
+| **OCR Fallback**        | `tesseract.js`           | Free           | 37.5K stars, for scanned documents                        |
+| **Background Jobs**     | Inngest                  | Free (100K/mo) | Vercel-native, durable workflows, `step.ai` for AI calls  |
+| **LLM Observability**   | Langfuse (self-hosted)   | Free           | 20K+ stars, MIT, PHI-safe (self-hosted)                   |
+| **Prompt Testing**      | promptfoo                | Free           | MIT, 300K+ developers, runs locally                       |
 
 ### What NOT to Use
 
-| Tool | Why Not |
-|------|---------|
-| **LangChain.js / LangGraph** | Overkill abstraction for defined workflows. AI SDK covers everything. |
-| **OpenAI Whisper** | Researchers found hallucination of fake medical treatments. OpenAI warns against high-risk domain use. |
-| **Vector databases (Pinecone, etc.)** | No RAG needed — documents are processed individually, not searched semantically. |
-| **Custom ML models** | Volume too low for training. LLM APIs handle ABA use cases directly. |
-| **Zustand/Redux for AI state** | TanStack Query handles AI response caching. No additional state library needed. |
+| Tool                                  | Why Not                                                                                                |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **LangChain.js / LangGraph**          | Overkill abstraction for defined workflows. AI SDK covers everything.                                  |
+| **OpenAI Whisper**                    | Researchers found hallucination of fake medical treatments. OpenAI warns against high-risk domain use. |
+| **Vector databases (Pinecone, etc.)** | No RAG needed — documents are processed individually, not searched semantically.                       |
+| **Custom ML models**                  | Volume too low for training. LLM APIs handle ABA use cases directly.                                   |
+| **Zustand/Redux for AI state**        | TanStack Query handles AI response caching. No additional state library needed.                        |
 
 ### Key Open Source References
 
@@ -225,7 +229,8 @@ src/server/ai/
 
 The most impactful Phase 1 AI feature. Currently, staff manually transcribe authorization letters into the system — 15-20 minutes per letter, error-prone, tedious.
 
-*How it works:*
+_How it works:_
+
 1. User drops PDF onto upload zone
 2. AI extracts structured fields in 5-15 seconds via `generateObject` with `AuthorizationLetterSchema`
 3. Side-by-side view: PDF on left, extracted form on right
@@ -233,9 +238,10 @@ The most impactful Phase 1 AI feature. Currently, staff manually transcribe auth
 5. User reviews, corrects errors, clicks "Confirm"
 6. Data saves to `authorizations` + `authorization_services`
 
-*Autonomy level:* L3 (Automation with approval) — AI drafts, user verifies.
+_Autonomy level:_ L3 (Automation with approval) — AI drafts, user verifies.
 
-*Key design decisions:*
+_Key design decisions:_
+
 - Field-by-field confirmation required. **NO "Confirm All" button** (risk agent finding: automation complacency is the highest-likelihood critical risk)
 - Clicking any extracted field highlights its source location in the PDF (Abridge's "linked evidence" pattern)
 - Store AI extraction results and user's final edits separately for accuracy measurement
@@ -245,7 +251,8 @@ The most impactful Phase 1 AI feature. Currently, staff manually transcribe auth
 
 After session timer stops, AI generates a note draft based on structured session data — NOT ambient audio.
 
-*How it works:*
+_How it works:_
+
 1. RBT taps "Stop" on session timer
 2. System auto-calculates units (CMS 8-minute rule — deterministic, not AI)
 3. Note field appears with AI-generated draft (ghost text)
@@ -253,9 +260,10 @@ After session timer stops, AI generates a note draft based on structured session
 5. RBT edits details specific to this session, signs
 6. Small "AI-assisted" badge, never "AI-generated note"
 
-*Autonomy level:* L3 → progressive to L4 as accuracy proves out.
+_Autonomy level:_ L3 → progressive to L4 as accuracy proves out.
 
-*Key design decisions:*
+_Key design decisions:_
+
 - Generate from structured data, not audio (RethinkBH's smart approach — dramatically reduces hallucination)
 - Template varies by CPT code (97153 direct therapy note ≠ 97155 supervision note)
 - Never say "AI-generated" — say "Session note draft"
@@ -265,25 +273,28 @@ After session timer stops, AI generates a note draft based on structured session
 
 Not AI in the LLM sense — deterministic computation that surfaces proactive insights.
 
-*What it surfaces:*
+_What it surfaces:_
+
 - Units remaining per CPT code per authorization
 - Projected exhaustion date (linear projection from usage trend)
 - Under-utilization alerts (<50% used with >50% of period elapsed)
 - Expiring auth warnings (30/14/7 days)
 - Revenue at risk (under-utilized units × typical rate)
 
-*How it appears:*
+_How it appears:_
+
 - Progress bars on client detail, session form, dashboard
 - "Attention needed" section on dashboard (max 5-7 items)
 - Inline alerts at point of action ("3 units remaining on this auth" when logging a session)
 
-*Autonomy level:* L5 (Full automation) — pure math, no AI interpretation needed.
+_Autonomy level:_ L5 (Full automation) — pure math, no AI interpretation needed.
 
 **4. Session Documentation Completeness Check**
 
 Post-save quality check that runs automatically.
 
-*What it checks (deterministic rules, not LLM):*
+_What it checks (deterministic rules, not LLM):_
+
 - Required fields present (start time, end time, CPT code, place of service)
 - Session duration matches logged units (flag if >8-minute discrepancy)
 - Active authorization exists for this CPT code and date
@@ -291,12 +302,13 @@ Post-save quality check that runs automatically.
 - Provider credential matches CPT code requirements
 - Supervisor co-signature required for RBT sessions
 
-*How it appears:*
+_How it appears:_
+
 - NEVER blocks the save (runs post-save)
 - Toast notification if issues found: "1 item needs attention"
 - Clicking shows a checklist
 
-*Autonomy level:* L4 (Automation with notification)
+_Autonomy level:_ L4 (Automation with notification)
 
 #### Phase 2 — Billing AI (Build After Claims Infrastructure)
 
@@ -304,7 +316,8 @@ Post-save quality check that runs automatically.
 
 AI + rules-based checks before claim submission.
 
-*Checks:*
+_Checks:_
+
 - Authorization valid for service date
 - Units don't exceed remaining authorized
 - CPT + modifier combination valid
@@ -312,27 +325,27 @@ AI + rules-based checks before claim submission.
 - Historical denial patterns for this payer + CPT code
 - Timely filing deadline approaching (alert within 15 days)
 
-*Autonomy level:* L3 (Automation with approval)
+_Autonomy level:_ L3 (Automation with approval)
 
 **6. CPT Code Suggestion**
 
 When logging a session, suggest the most likely CPT code based on provider type, client's authorization, and past session patterns.
 
-*Autonomy level:* L2 (Suggestion) — pre-fill with option to change.
+_Autonomy level:_ L2 (Suggestion) — pre-fill with option to change.
 
 **7. Claim Denial Prediction**
 
 Before submission, assess risk of denial based on historical patterns.
 
-*Technical approach:* LLM-based analysis via `generateObject` with a risk assessment schema, feeding historical denial patterns as context. NYU research confirms LLMs outperform supervised ML for insurance claim denial prediction.
+_Technical approach:_ LLM-based analysis via `generateObject` with a risk assessment schema, feeding historical denial patterns as context. NYU research confirms LLMs outperform supervised ML for insurance claim denial prediction.
 
-*Autonomy level:* L2 (Suggestion) — risk score + specific risk factors + suggested fixes.
+_Autonomy level:_ L2 (Suggestion) — risk score + specific risk factors + suggested fixes.
 
 **8. AI Appeal Letter Generation**
 
 When a claim is denied, AI drafts an appeal letter citing the specific denial reason, relevant CPT codes, and supporting clinical documentation.
 
-*Autonomy level:* L3 (Automation with approval)
+_Autonomy level:_ L3 (Automation with approval)
 
 #### Phase 3 — Advanced Intelligence
 
@@ -385,34 +398,40 @@ Env vars to add:
 ### Adopt Now
 
 **Confidence-Based Routing** — Production-proven pattern used by every successful healthcare AI system. High confidence (>90%) auto-processes, medium (65-90%) gets flagged fields, low (<65%) routes to full manual review.
-- *Who*: Abridge, Suki, Waystar, every production healthcare AI
-- *Maturity*: Production-proven
-- *Clinivise action*: Build into auth letter parser (Phase 1)
+
+- _Who_: Abridge, Suki, Waystar, every production healthcare AI
+- _Maturity_: Production-proven
+- _Clinivise action_: Build into auth letter parser (Phase 1)
 
 **Progressive Autonomy** — Start conservative, earn trust with accuracy data, gradually expand automation.
-- *Pattern*: Month 1 = AI suggests. Month 3 = auto-process high-confidence. Month 6 = AI handles 80%+.
-- *Who*: Linear Triage Intelligence, GitHub Copilot adoption patterns
-- *Maturity*: Production-proven
-- *Clinivise action*: Ship every AI feature in suggestion mode. Track acceptance rates. Offer autonomy upgrade when acceptance >80%.
+
+- _Pattern_: Month 1 = AI suggests. Month 3 = auto-process high-confidence. Month 6 = AI handles 80%+.
+- _Who_: Linear Triage Intelligence, GitHub Copilot adoption patterns
+- _Maturity_: Production-proven
+- _Clinivise action_: Ship every AI feature in suggestion mode. Track acceptance rates. Offer autonomy upgrade when acceptance >80%.
 
 **Data-Grounded Generation** — Generate AI outputs from structured data, not freeform. Dramatically reduces hallucination.
-- *Who*: RethinkBH (notes from structured session data, not audio)
-- *Maturity*: Production-proven
-- *Clinivise action*: Session notes generated from CPT code + duration + client goals + provider patterns. Never freeform generation.
+
+- _Who_: RethinkBH (notes from structured session data, not audio)
+- _Maturity_: Production-proven
+- _Clinivise action_: Session notes generated from CPT code + duration + client goals + provider patterns. Never freeform generation.
 
 ### Design For Later
 
 **AI Voice Agents for Insurance** — LunaBill proves this works ($764K ARR, 100% pilot-to-paid). Infinitus has 100M+ minutes. Integration opportunity for Phase 3 billing automation.
-- *Maturity*: Production-proven (at those companies)
-- *Clinivise action*: Build API integration points. Partner, don't build.
+
+- _Maturity_: Production-proven (at those companies)
+- _Clinivise action_: Build API integration points. Partner, don't build.
 
 **Ambient Voice Documentation** — Abridge, Suki, Freed proving ambient capture → structured notes. Deepgram Nova-3 Medical has best medical accuracy.
-- *Maturity*: Production-proven for general medicine, early-adopter for ABA
-- *Clinivise action*: Design session note input to accept multiple formats (typed, audio upload, structured form). When voice is added later, it slots in. Phase 2-3.
+
+- _Maturity_: Production-proven for general medicine, early-adopter for ABA
+- _Clinivise action_: Design session note input to accept multiple formats (typed, audio upload, structured form). When voice is added later, it slots in. Phase 2-3.
 
 **AI Compliance Monitoring** — CentralReach's NoteGuardAI audits documentation quality. This is low-hanging fruit once you have session note data.
-- *Maturity*: Early-adopter
-- *Clinivise action*: Phase 2 — AI reviews session notes for completeness, clinical appropriateness, payer-specific requirements.
+
+- _Maturity_: Early-adopter
+- _Clinivise action_: Phase 2 — AI reviews session notes for completeness, clinical appropriateness, payer-specific requirements.
 
 ### Watch
 
@@ -452,28 +471,29 @@ No ABA competitor lets practices choose their AI autonomy level. Clinivise can: 
 
 ### Critical Risks (from `docs/ai-risk-analysis.md`)
 
-| Risk | Why It Matters | Mitigation |
-|------|---------------|------------|
-| **FCA conflict of interest** | Our 2-4% of collections model means AI that inflates billing creates False Claims Act exposure. UCHealth settled for $23M. | AI never generates billing amounts. Unit calculations are deterministic code. AI suggests, code calculates. |
-| **Automation complacency** | At 95% accuracy, staff rubber-stamp AI outputs. Wrong auth data flows to billing. | Field-by-field confirmation required. NO "Confirm All" button. Track override rates. |
-| **PHI exposure** | PHI sent to non-BAA-covered LLM provider = HIPAA violation. | Synthetic data only for dev. Bedrock with BAA for production. Enforce in code. |
-| **Model drift** | LLM quality degrades silently over 90 days as providers update models. | Build golden evaluation set of 50+ synthetic auth letters. Run regression tests on every prompt change. |
-| **State regulation fragmentation** | 47 states introduced 250+ healthcare AI bills in 2025. IL prohibits autonomous therapeutic AI. TX requires written disclosure. FL requires 24-hour consent for AI transcription. | Feature flags per state. Conservative defaults. Legal review before launching voice features. |
-| **AI hallucination in billing context** | AI extracts "200 units" when the auth letter says "120 units." Flows to billing. | Confidence scores on every field. Cross-validate against DB (does this payer exist? Is the CPT code valid?). Human review for all fields below 90% confidence. |
+| Risk                                    | Why It Matters                                                                                                                                                                   | Mitigation                                                                                                                                                     |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **FCA conflict of interest**            | Our 2-4% of collections model means AI that inflates billing creates False Claims Act exposure. UCHealth settled for $23M.                                                       | AI never generates billing amounts. Unit calculations are deterministic code. AI suggests, code calculates.                                                    |
+| **Automation complacency**              | At 95% accuracy, staff rubber-stamp AI outputs. Wrong auth data flows to billing.                                                                                                | Field-by-field confirmation required. NO "Confirm All" button. Track override rates.                                                                           |
+| **PHI exposure**                        | PHI sent to non-BAA-covered LLM provider = HIPAA violation.                                                                                                                      | Synthetic data only for dev. Bedrock with BAA for production. Enforce in code.                                                                                 |
+| **Model drift**                         | LLM quality degrades silently over 90 days as providers update models.                                                                                                           | Build golden evaluation set of 50+ synthetic auth letters. Run regression tests on every prompt change.                                                        |
+| **State regulation fragmentation**      | 47 states introduced 250+ healthcare AI bills in 2025. IL prohibits autonomous therapeutic AI. TX requires written disclosure. FL requires 24-hour consent for AI transcription. | Feature flags per state. Conservative defaults. Legal review before launching voice features.                                                                  |
+| **AI hallucination in billing context** | AI extracts "200 units" when the auth letter says "120 units." Flows to billing.                                                                                                 | Confidence scores on every field. Cross-validate against DB (does this payer exist? Is the CPT code valid?). Human review for all fields below 90% confidence. |
 
 ### High Risks
 
-| Risk | Mitigation |
-|------|------------|
-| **LLM API cost overruns** | Track cost per org per month. Set per-org monthly limits. Alert at 80% of budget. |
-| **AI feature abandonment** | Ship in shadow mode first. Measure accuracy before showing to users. Progressive rollout. |
-| **Over-reliance** (automation complacency) | Show accuracy stats. Require periodic manual review. Never auto-escalate autonomy. |
-| **Prompt sensitivity** | Regression test suite with golden evaluation set. Version every prompt. Log promptId per AI call. |
-| **Multi-provider output inconsistency** | Test all prompts against both Anthropic and Bedrock before production migration. Pin model versions. |
+| Risk                                       | Mitigation                                                                                           |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| **LLM API cost overruns**                  | Track cost per org per month. Set per-org monthly limits. Alert at 80% of budget.                    |
+| **AI feature abandonment**                 | Ship in shadow mode first. Measure accuracy before showing to users. Progressive rollout.            |
+| **Over-reliance** (automation complacency) | Show accuracy stats. Require periodic manual review. Never auto-escalate autonomy.                   |
+| **Prompt sensitivity**                     | Regression test suite with golden evaluation set. Version every prompt. Log promptId per AI call.    |
+| **Multi-provider output inconsistency**    | Test all prompts against both Anthropic and Bedrock before production migration. Pin model versions. |
 
 ### The "95% Accuracy" Trap
 
 The risk research identified this as the most dangerous failure pattern: AI is 95% accurate, which sounds great, but:
+
 - Staff stop checking because "it's almost always right"
 - The 5% errors flow unchecked into billing
 - Over months, systematic errors accumulate
@@ -489,6 +509,7 @@ The risk research identified this as the most dangerous failure pattern: AI is 9
 ### Phase 1 (Now)
 
 **Build:**
+
 1. `src/server/ai/` directory structure with Vercel AI SDK
 2. Auth letter parsing pipeline (upload → extract → validate → review → save)
 3. Session note draft generation (from structured data)
@@ -497,11 +518,13 @@ The risk research identified this as the most dangerous failure pattern: AI is 9
 6. Golden evaluation set for regression testing (50+ synthetic auth letters)
 
 **Install:**
+
 ```bash
 pnpm add ai @ai-sdk/anthropic @ai-sdk/amazon-bedrock inngest
 ```
 
 **Add env vars:**
+
 ```
 ANTHROPIC_API_KEY=sk-ant-...
 AI_PROVIDER=anthropic  # Switch to 'bedrock' for production
@@ -556,6 +579,7 @@ AI_PROVIDER=anthropic  # Switch to 'bedrock' for production
 - `docs/ai-risk-analysis.md` — 38-item risk matrix with mitigations
 
 ### Official Documentation
+
 - [Vercel AI SDK 6 Documentation](https://ai-sdk.dev/docs)
 - [Vercel AI SDK 6 Release Blog](https://vercel.com/blog/ai-sdk-6)
 - [AI SDK Workflow Patterns](https://ai-sdk.dev/docs/agents/workflows)
@@ -564,6 +588,7 @@ AI_PROVIDER=anthropic  # Switch to 'bedrock' for production
 - [HIPAA Compliance for GenAI on AWS](https://aws.amazon.com/blogs/industries/hipaa-compliance-for-generative-ai-solutions-on-aws/)
 
 ### Platform and Product References
+
 - [Abridge AI Platform](https://www.abridge.com/ai)
 - [Waystar AI for Revenue Cycle](https://www.waystar.com/)
 - [LunaBill — YC F25](https://www.ycombinator.com/companies/lunabill)
@@ -574,6 +599,7 @@ AI_PROVIDER=anthropic  # Switch to 'bedrock' for production
 - [Cohere Health — AI Prior Authorization](https://www.coherehealth.com/)
 
 ### Repositories
+
 - [Vercel AI SDK](https://github.com/vercel/ai) — 18K+ stars
 - [Langfuse](https://github.com/langfuse/langfuse) — 20K+ stars, MIT
 - [promptfoo](https://github.com/promptfoo/promptfoo) — 6K+ stars, MIT
@@ -582,6 +608,7 @@ AI_PROVIDER=anthropic  # Switch to 'bedrock' for production
 - [tesseract.js](https://github.com/naptha/tesseract.js) — 37.5K stars
 
 ### Research and Analysis
+
 - [NYU: LLMs Outperform Supervised ML for Claim Denial Prediction](https://arxiv.org/abs/2404.04504)
 - [Healthcare AI Funding 2025 — $10.7B](https://www.bessemervp.com/roadmap-healthtech/)
 - [ECRI Top 10 Health Technology Hazards 2026](https://home.ecri.org/blogs/ecri-thought-leadership-resources/top-10-health-technology-hazards-for-2026-executive-brief)
@@ -591,6 +618,7 @@ AI_PROVIDER=anthropic  # Switch to 'bedrock' for production
 - [GitHub Copilot: 30% Acceptance Rate](https://www.itpro.com/technology/artificial-intelligence/github-30-of-copilot-coding-suggestions-are-accepted)
 
 ### Internal Codebase References
+
 - `src/lib/env.ts` — Existing Bedrock env vars (AWS_REGION, BEDROCK_MODEL_ID)
 - `src/lib/safe-action.ts` — authActionClient pattern for org-scoped mutations
 - `src/server/db/schema/` — Authorization and session schemas

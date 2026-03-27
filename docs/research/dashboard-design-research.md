@@ -22,12 +22,14 @@
 **Home/Landing Page:** Customizable widget-based dashboard ("My Dashboard"). Users land on their dashboard with an agenda view and configurable widgets. Navigation is module-based with icons along the top bar.
 
 **Metrics/KPIs Shown:**
+
 - Authorization utilization rates (hours authorized vs. hours worked vs. hours scheduled)
 - Billing performance and daily average billing
 - Customizable BI dashboards with KPI widgets (via paid add-on "INSI")
 - Client progress tracking via graphs
 
 **Alerts/Notifications:**
+
 - Unconverted billable appointments (blue lightning bolt icon)
 - Partially converted billable appointments (yellow lightning bolt icon)
 - Overdue tasks
@@ -36,6 +38,7 @@
 **Navigation:** Top navigation bar with module icons: Dashboard, Contacts, Messages, Files, Billing, HR, Claims, Scheduling, Tasks. Each module is a distinct section.
 
 **Quick Actions:**
+
 - Convert billable appointments directly from dashboard
 - Create tasks from dashboard
 - Send messages
@@ -44,6 +47,7 @@
 **Client Overview:** Contacts module with employee, client, generic, and provider categories. Filterable, sortable, bulk-updatable.
 
 **Unique Patterns:**
+
 - Widget-based dashboard is fully customizable (drag and rearrange)
 - "My Agenda" as a separate day-planning view
 - Unconverted appointment tracking with visual icons (lightning bolts)
@@ -58,6 +62,7 @@
 **Home/Landing Page:** "My Dashboard" is the first screen after login. Accessed via icon on left sidebar. Completely customizable by user and permissions level.
 
 **Metrics/KPIs Shown:**
+
 - Unbilled appointments count
 - Revenue trends
 - Client progress
@@ -66,12 +71,14 @@
 - Operational, financial, and clinical data combined into visual dashboards
 
 **Alerts/Notifications:**
+
 - Unbilled Appointments Widget (ensures no sessions fall through cracks)
 - Widgets scoped by "My" (personal) vs. organizational level
 
 **Navigation:** Left sidebar with icons. Clean, minimal design focused on ease of use.
 
 **Quick Actions:**
+
 - Access scheduling for billable, non-billable, drive time, mileage appointments, and breaks
 - Billing management
 - Payroll management
@@ -79,6 +86,7 @@
 **Client Overview:** Client management accessible from sidebar navigation.
 
 **Unique Patterns:**
+
 - "My" prefix widgets = personal data; no prefix = organization-wide data
 - Customizable per user AND per permission level (different staff levels get different default widgets)
 - Strong focus on unbilled appointment tracking as a revenue-loss prevention feature
@@ -91,18 +99,21 @@
 **Home/Landing Page:** Activity Dashboard with customizable metrics. Users create their own dashboards via "+ Create Dashboard" button.
 
 **Metrics/KPIs Shown:**
+
 - Revenue metrics
 - Claim status
 - Appointment trends
 - Custom-selected metrics per dashboard
 
 **Alerts/Notifications:**
+
 - Real-time data updates
 - Configurable alerts based on dashboard filters
 
 **Navigation:** Standard sidebar navigation. Known for intuitive design.
 
 **Quick Actions:**
+
 - Create custom activity dashboards
 - Add filters to dashboard data
 - Share dashboards with other team members
@@ -110,6 +121,7 @@
 **Client Overview:** Client management with scheduling integration.
 
 **Unique Patterns:**
+
 - User-created dashboards (not just widget customization, but full dashboard creation)
 - Interactive charts and graphs for data exploration
 - Shareable dashboards (collaboration feature)
@@ -122,18 +134,21 @@
 **Home/Landing Page:** Practice Management Dashboard showing therapy session data, key metrics, and progress trends in one view.
 
 **Metrics/KPIs Shown (4 Key Metrics Framework):**
+
 1. Attendance rate and no-show/cancellation rate
 2. Gross collection rate, claim approval rate, average reimbursement time
 3. Authorization renewal tracking and treatment duration
 4. Clinical progress (skill acquisition rates, behavior goal mastery %)
 
 **Alerts/Notifications:**
+
 - Authorization renewal reminders
 - Clinical outcome trend alerts
 
 **Navigation:** Web + mobile (iOS/Android) with mobile-first design. Offline-capable with sync.
 
 **Quick Actions:**
+
 - Monitor client progress
 - Manage treatment plans
 - Analyze financial performance
@@ -141,6 +156,7 @@
 **Client Overview:** Centralized client data management with customizable graphing.
 
 **Unique Patterns:**
+
 - Mobile-first design with offline capability and seamless sync
 - AI-powered features for clinical insights
 - Cross-platform (web, iOS, Android) with consistent experience
@@ -154,6 +170,7 @@
 **Home/Landing Page:** Calendar is the landing page. Analytics dashboard is a separate section.
 
 **Analytics Dashboard Metrics (5 tiles):**
+
 1. **Income** snapshot (total revenue for date range + projected income for next month)
 2. **Outstanding Balances** (client + insurance payer amounts owed)
 3. **Claims Filed** (counts by status: Paid, Rejected, Denied, Deductible, Accepted, Other)
@@ -161,12 +178,14 @@
 5. **Notes** status
 
 **Alerts/Notifications:**
+
 - Appointment reminders (automated)
 - Claim status changes
 
 **Navigation:** Clean sidebar navigation. Calendar-first design.
 
 **Quick Actions:**
+
 - Drag-and-drop calendar scheduling
 - Client search from calendar view
 - Manage waiting list from home page
@@ -174,6 +193,7 @@
 **Client Overview:** Client charts accessible from calendar; intuitive flow from intake to billing.
 
 **Unique Patterns:**
+
 - Calendar as home page (not dashboard) -- therapists think in terms of "who am I seeing today"
 - Projected income based on historical reimbursement data (forward-looking metric)
 - Date range selector (current month, last 30 days, last month, this year, custom) on analytics
@@ -187,22 +207,26 @@
 **Home/Landing Page:** Day Sheet (daily schedule) is the default view. Practitioner Dashboard is toggled on/off via the top-right corner toggle.
 
 **Dashboard Sections (3 modules):**
+
 1. **Chart Status** -- distribution of signed, drafted, and never-started chart entries for arrived appointments in past 90 days
 2. **Top Treatments** -- most frequently booked session types in past 365 days with counts
 3. **Patient Metrics** -- average visits per client, total new clients (365-day range)
 
 **Clinic Owner Additional View:**
+
 - Financial metrics (toggle-controlled by permission level)
 - Supervision tab for reviewing supervisee charts
 - Compensation reports for tracking practitioner income
 
 **Alerts/Notifications:**
+
 - Chart completion status (never started charts = action needed)
 - Supervision review queue
 
 **Navigation:** Blue banner at top with Day Sheet access on the left. Sidebar for main sections.
 
 **Quick Actions:**
+
 - Toggle dashboard visibility
 - Click chart status to filter charts
 - Jump to supervision tab
@@ -211,6 +235,7 @@
 **Client Overview:** Patient profile dashboard with visit history.
 
 **Unique Patterns:**
+
 - Privacy Mode (Shift+P) -- instantly obfuscates patient names on dashboard (great for screen sharing or public spaces)
 - Day Sheet as default, dashboard as optional overlay (respects different workflow preferences)
 - Chart Status module drives documentation completion behavior
@@ -224,12 +249,14 @@
 **Home/Landing Page:** Provider Dashboard with activity feed and task management.
 
 **Dashboard Sections:**
+
 1. **Appointments** -- unconfirmed appointments needing action
 2. **Tasks** -- due and overdue task items
 3. **Activity Feed** -- newsfeed of client entries (food logs, metrics, workouts) with reaction/comment capability
 4. **Business Analytics Board** (Practice Plus plans and above)
 
 **Reporting Dashboards:**
+
 - **Appointments Dashboard** -- visual display of appointment report data
 - **Provider Utilization Dashboard** -- three core metrics:
   - Total Availability Hours
@@ -237,6 +264,7 @@
   - Utilization Percentage (booked / available)
 
 **Alerts/Notifications:**
+
 - Unconfirmed appointment alerts
 - Task due/overdue notifications
 - Email notifications for tasks
@@ -244,6 +272,7 @@
 **Navigation:** Sidebar navigation. Calendar accessible as separate view.
 
 **Quick Actions:**
+
 - Add appointment from dashboard
 - Add task from dashboard
 - React to or comment on client activity entries
@@ -251,6 +280,7 @@
 **Client Overview:** Client profiles with engagement tracking and metrics.
 
 **Unique Patterns:**
+
 - Activity feed with social-media-style engagement (reactions + comments on client entries)
 - Provider Utilization Dashboard as a dedicated view with 3 focused metrics
 - Mobile app mirrors web dashboard exactly
@@ -263,12 +293,14 @@
 **Home/Landing Page:** Home page with daily agenda and action items. Color-coding highlights what needs immediate action.
 
 **Dashboard Sections:**
+
 1. **Today's Appointments** -- daily agenda at top left with click-to-expand appointment details
 2. **Charting Tasks** -- incomplete documentation
 3. **Client Management** -- alerts and actions
 4. **Claim Actions** -- billing tasks
 
 **Alerts/Notifications:**
+
 - Treatment plans expiring within 2 weeks
 - Expired treatment plans
 - Color-coded urgency indicators
@@ -276,11 +308,13 @@
 **Navigation:** Standard navigation. Home page is action-oriented.
 
 **Quick Actions:**
+
 - Click appointment to see details (time, type, client alert on hover)
 - Expand/collapse task sections
 - Direct links to relevant modules from action items
 
 **Unique Patterns:**
+
 - Collapsible task sections to keep the home page clean
 - Color-coding for urgency (immediate attention items stand out)
 - Treatment plan expiration warnings surfaced on home screen
@@ -293,6 +327,7 @@
 **Home/Landing Page:** Dashboard with appointment count indicator and customizable analytics.
 
 **Metrics/KPIs Shown:**
+
 - Session data (real-time)
 - Appointment counts with numbered badge
 - Billing and claims status
@@ -301,6 +336,7 @@
 - Payor hour utilization
 
 **Alerts/Notifications:**
+
 - Payor hours underused
 - Staff overbooked
 - Clinical outcomes off track
@@ -308,10 +344,12 @@
 **Navigation:** Dashboard with tabs. Appointments tab shows daily count.
 
 **Quick Actions:**
+
 - View by learner, location, team, or payor
 - Custom or ready-made dashboards
 
 **Unique Patterns:**
+
 - Amazon QuickSight-powered BI for advanced analytics
 - Alert when "payor hours are underused, staff is overbooked, or clinical outcomes are off track" -- proactive problem detection
 - Multi-dimensional filtering (learner, location, team, payor)
@@ -323,6 +361,7 @@
 **Home/Landing Page:** Unified dashboard showing revenue, utilization, cancellations, and authorizations in one view.
 
 **Metrics/KPIs Shown:**
+
 - Revenue
 - Utilization rates
 - Cancellation tracking
@@ -330,17 +369,20 @@
 - Real-time KPI dashboards
 
 **Alerts/Notifications:**
+
 - Exception-based alerts (only surfaces problems)
 - Scheduling gap detection
 
 **Navigation:** Product menu: Scheduling, Practice Management, Data and Collections, Reporting, MEBS, Billing Automation, Managed Billing Services, RCM.
 
 **Quick Actions:**
+
 - Review combined schedules
 - Drill down to appointment details
 - Interactive dashboard exploration
 
 **Unique Patterns:**
+
 - "360-degree outlook" on clients -- comprehensive view from one screen
 - Exception-based alerting (only alerts you when something is wrong)
 - Built on Salesforce Cloud (enterprise-grade but heavy)
@@ -353,23 +395,27 @@
 **Home/Landing Page:** Integrated dashboard with task-driven alerts.
 
 **Metrics/KPIs Shown:**
+
 - Claim status
 - ERA activity
 - Denial history
 - Revenue cycle visibility
 
 **Alerts/Notifications:**
+
 - Next-step alerts (tells you what to do AND where to go)
 - Task management to prevent items from falling through cracks
 
 **Navigation:** Integrated workflow -- notes flow into billing, data feeds into reports.
 
 **Quick Actions:**
+
 - Calendar automations
 - Scheduling client appointments and internal meetings
 - HIPAA-compliant telehealth (Supervision Mode)
 
 **Unique Patterns:**
+
 - "Tells you the next step and exactly where to go" -- guided workflow, not just data display
 - Everything connects: notes -> billing -> reports (no duplicate data entry)
 - Calendar Automations for recurring scheduling patterns
@@ -391,7 +437,7 @@ Based on research across ABA platforms and practitioner workflows:
 6. **RBT supervision queue** -- which supervisees need observation? Which charts need review?
 7. **Cancellation/no-show alerts** -- gaps in today's schedule that need rescheduling
 
-**Key insight:** BCBAs think in terms of *client caseload health* and *team oversight*. They want a "clinical command center" not a financial dashboard.
+**Key insight:** BCBAs think in terms of _client caseload health_ and _team oversight_. They want a "clinical command center" not a financial dashboard.
 
 ### What an RBT Needs First Thing
 
@@ -402,7 +448,7 @@ Based on research across ABA platforms and practitioner workflows:
 5. **Pending notes** -- any unsigned session notes from previous days
 6. **Communication** -- messages from BCBA about client updates or schedule changes
 
-**Key insight:** RBTs need a *stripped-down, mobile-friendly, session-focused* interface. Large touch targets, minimal taps. They are actively working with a child -- the software must not compete for attention.
+**Key insight:** RBTs need a _stripped-down, mobile-friendly, session-focused_ interface. Large touch targets, minimal taps. They are actively working with a child -- the software must not compete for attention.
 
 ### What a Practice Owner/Admin Needs
 
@@ -416,7 +462,7 @@ Based on research across ABA platforms and practitioner workflows:
 8. **Collection rate** -- net collection rate (target: 95%+)
 9. **Credential tracking** -- staff credential expirations approaching
 
-**Key insight:** Owners think in terms of *practice health metrics* and *revenue leakage prevention*. They want trends, not just snapshots.
+**Key insight:** Owners think in terms of _practice health metrics_ and _revenue leakage prevention_. They want trends, not just snapshots.
 
 ---
 
@@ -424,23 +470,23 @@ Based on research across ABA platforms and practitioner workflows:
 
 ### Comparison Table
 
-| Feature | CentralReach | AlohaABA | Theralytics | Raven Health | SimplePractice | Jane App | Healthie | TherapyAppt | Motivity | Artemis | Noteable |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Default landing page** | Dashboard | Dashboard | Dashboard | Dashboard | Calendar | Day Sheet | Dashboard | Home/Agenda | Dashboard | Dashboard | Dashboard |
-| **Today's schedule visible?** | Via Agenda widget | Yes | No (separate) | Yes | Yes (calendar) | Yes (Day Sheet) | Via calendar | Yes (top-left) | Yes (badge) | Yes | Yes |
-| **Metric cards/tiles** | Widget-based | Widget-based | Custom charts | 4 key metrics | 5 tiles | 3 modules | 3+ sections | 4 sections | Custom | 4 KPIs | Task-driven |
-| **Authorization tracking** | Yes (dedicated) | Limited | Yes | Yes | N/A | N/A | N/A | N/A | Yes | Yes | Yes |
-| **Unbilled session alerts** | Yes (icons) | Yes (widget) | No | No | Via claims | No | No | No | No | No | Yes |
-| **Financial metrics** | Via BI add-on | Yes | Yes | Yes | Yes (5 tiles) | Permission-gated | Paid tier | Limited | Via QuickSight | Yes | Yes |
-| **Task/to-do list** | Yes (widget) | No | No | No | No | No | Yes | Yes (collapsible) | No | No | Yes |
-| **Activity feed** | No | No | No | No | No | No | Yes | No | No | No | No |
-| **Chart/note completion** | No | No | No | No | Yes | Yes (90-day) | No | Yes | No | No | Yes |
-| **Quick add actions** | Yes | Yes | Yes | Yes | Yes (drag-drop) | Yes | Yes | Limited | Limited | Yes | Yes |
-| **Mobile-optimized** | No | No | No | Yes (mobile-first) | Yes | Yes (tablet) | Yes | No | Yes | No | Yes |
-| **Custom dashboards** | Yes (widgets) | Yes (widgets) | Yes (create new) | No | No | No | No | No | Yes (BI) | Yes | No |
-| **Role-based views** | Yes | Yes | No | No | Limited | Yes | Limited | No | No | Yes | No |
-| **Privacy mode** | No | No | No | No | No | Yes (Shift+P) | No | No | No | No | No |
-| **Guided next steps** | No | No | No | No | No | No | No | No | No | No | Yes |
+| Feature                       | CentralReach      | AlohaABA      | Theralytics      | Raven Health       | SimplePractice  | Jane App         | Healthie     | TherapyAppt       | Motivity       | Artemis   | Noteable    |
+| ----------------------------- | ----------------- | ------------- | ---------------- | ------------------ | --------------- | ---------------- | ------------ | ----------------- | -------------- | --------- | ----------- |
+| **Default landing page**      | Dashboard         | Dashboard     | Dashboard        | Dashboard          | Calendar        | Day Sheet        | Dashboard    | Home/Agenda       | Dashboard      | Dashboard | Dashboard   |
+| **Today's schedule visible?** | Via Agenda widget | Yes           | No (separate)    | Yes                | Yes (calendar)  | Yes (Day Sheet)  | Via calendar | Yes (top-left)    | Yes (badge)    | Yes       | Yes         |
+| **Metric cards/tiles**        | Widget-based      | Widget-based  | Custom charts    | 4 key metrics      | 5 tiles         | 3 modules        | 3+ sections  | 4 sections        | Custom         | 4 KPIs    | Task-driven |
+| **Authorization tracking**    | Yes (dedicated)   | Limited       | Yes              | Yes                | N/A             | N/A              | N/A          | N/A               | Yes            | Yes       | Yes         |
+| **Unbilled session alerts**   | Yes (icons)       | Yes (widget)  | No               | No                 | Via claims      | No               | No           | No                | No             | No        | Yes         |
+| **Financial metrics**         | Via BI add-on     | Yes           | Yes              | Yes                | Yes (5 tiles)   | Permission-gated | Paid tier    | Limited           | Via QuickSight | Yes       | Yes         |
+| **Task/to-do list**           | Yes (widget)      | No            | No               | No                 | No              | No               | Yes          | Yes (collapsible) | No             | No        | Yes         |
+| **Activity feed**             | No                | No            | No               | No                 | No              | No               | Yes          | No                | No             | No        | No          |
+| **Chart/note completion**     | No                | No            | No               | No                 | Yes             | Yes (90-day)     | No           | Yes               | No             | No        | Yes         |
+| **Quick add actions**         | Yes               | Yes           | Yes              | Yes                | Yes (drag-drop) | Yes              | Yes          | Limited           | Limited        | Yes       | Yes         |
+| **Mobile-optimized**          | No                | No            | No               | Yes (mobile-first) | Yes             | Yes (tablet)     | Yes          | No                | Yes            | No        | Yes         |
+| **Custom dashboards**         | Yes (widgets)     | Yes (widgets) | Yes (create new) | No                 | No              | No               | No           | No                | Yes (BI)       | Yes       | No          |
+| **Role-based views**          | Yes               | Yes           | No               | No                 | Limited         | Yes              | Limited      | No                | No             | Yes       | No          |
+| **Privacy mode**              | No                | No            | No               | No                 | No              | Yes (Shift+P)    | No           | No                | No             | No        | No          |
+| **Guided next steps**         | No                | No            | No               | No                 | No              | No               | No           | No                | No             | No        | Yes         |
 
 ---
 
@@ -449,16 +495,21 @@ Based on research across ABA platforms and practitioner workflows:
 These patterns appear across most or all platforms researched:
 
 ### 1. Dashboard is the Landing Page (8 of 11)
+
 Most platforms land users on a dashboard, not a calendar. The exceptions (SimplePractice, Jane App) serve solo practitioners who think in terms of "my schedule today." For multi-user ABA practices, a dashboard with schedule context wins.
 
 ### 2. Today's Schedule is Always Visible
+
 Whether as a dedicated widget, a sidebar, or the full page -- every platform surfaces today's appointments prominently. This is the single most important piece of information when a clinician opens the software.
 
 ### 3. Widget/Card-Based Layout
+
 Every modern platform uses some form of cards, tiles, or widgets to organize dashboard information. Typically 3-5 key metric cards at the top, with detailed sections below.
 
 ### 4. Sidebar Navigation
+
 Left sidebar is the dominant navigation pattern for practice management software. Typical order:
+
 1. Dashboard / Home
 2. Schedule / Calendar
 3. Clients / Patients
@@ -469,42 +520,53 @@ Left sidebar is the dominant navigation pattern for practice management software
 8. Settings
 
 ### 5. Action-Oriented Design
+
 Dashboards surface things that need attention, not just data. Unbilled sessions, unsigned notes, expiring authorizations -- the best dashboards are to-do lists disguised as dashboards.
 
 ### 6. Date Range Filtering
+
 Financial and operational metrics are always filterable by date range (today, this week, this month, custom range).
 
 ### 7. Color-Coding for Status
+
 Consistent use of color to indicate status: green = complete/good, yellow/amber = warning/needs attention, red = overdue/critical. Applied to appointments, chart completion, authorization utilization.
 
 ---
 
 ## Differentiators
 
-What separates the *best* dashboards from the mediocre ones:
+What separates the _best_ dashboards from the mediocre ones:
 
 ### 1. Guided Workflow (Noteable)
-Instead of just showing data, Noteable tells you *what to do next and where to go*. This is the most powerful pattern for reducing cognitive load. Most platforms show you a wall of data; the best ones tell you the single most important thing to do right now.
+
+Instead of just showing data, Noteable tells you _what to do next and where to go_. This is the most powerful pattern for reducing cognitive load. Most platforms show you a wall of data; the best ones tell you the single most important thing to do right now.
 
 ### 2. Exception-Based Alerting (Artemis, Motivity)
+
 Only surface problems. Don't show "12 sessions completed today" -- show "3 sessions have no notes" or "2 authorizations under 20% utilization." Happy paths don't need dashboard space.
 
 ### 3. Privacy Mode (Jane App)
+
 Shift+P to instantly obfuscate all patient names. Essential for screen sharing, working in public spaces, or quick demos. No other platform has this.
 
 ### 4. Projected Revenue (SimplePractice)
+
 Not just "what did we earn" but "what will we earn next month" based on scheduled appointments and historical reimbursement rates. Forward-looking metrics are rare and valuable.
 
 ### 5. Personal vs. Organization Scope (AlohaABA)
+
 "My Unbilled Sessions" vs. "Unbilled Sessions" -- same widget, different scope. Simple naming convention that solves the "whose data am I looking at?" problem elegantly.
 
 ### 6. Mobile-First with Offline (Raven Health)
+
 Designed for the field first, desktop second. Offline data collection with seamless sync. Critical for RBTs who work in homes with poor connectivity.
 
 ### 7. Activity Feed with Social Engagement (Healthie)
+
 Client activity as a scrollable feed with reactions and comments. Creates a sense of connection and makes monitoring feel natural rather than clinical.
 
 ### 8. Chart Status as Behavioral Nudge (Jane App)
+
 Showing the distribution of signed/drafted/never-started charts for the past 90 days creates accountability without micromanagement. Practitioners self-correct when they see their completion rates.
 
 ---
@@ -663,6 +725,7 @@ The dashboard should be the landing page for ALL roles, but the content adapts b
 ### Metric Card Specifications
 
 Each metric card should follow this structure:
+
 - **Size:** Equal width, 4 per row on desktop, 2 per row on tablet, 1 per row on mobile
 - **Height:** Fixed height (~120px) for visual consistency
 - **Content:**
@@ -684,25 +747,23 @@ Based on research, Clinivise should use this sidebar order:
 6. **Sessions** (clock icon) -- session log and management
 7. **Reports** (chart icon) -- analytics and reporting (Phase 1: basic)
 
-**Phase 2 additions (below a divider):**
-8. **Billing** (dollar icon) -- claims, ERA, payments
-9. **Settings** (gear icon) -- practice settings, integrations
+**Phase 2 additions (below a divider):** 8. **Billing** (dollar icon) -- claims, ERA, payments 9. **Settings** (gear icon) -- practice settings, integrations
 
 ### Key ABA-Specific KPIs to Surface
 
 Based on industry research, these are the metrics that matter most:
 
-| KPI | Target | Alert Threshold | Dashboard Location |
-|-----|--------|-----------------|-------------------|
-| Authorization utilization | 85-95% | <50% or >95% | BCBA + Admin metric card |
-| Cancellation rate | <10% | >10% weekly | Admin metric card |
-| Billing lag (days to submit) | <2 days | >3 days | Admin metric card |
-| Net collection rate | >95% | <90% | Admin metric card |
-| Staff utilization (billable %) | 75-85% | <70% or >90% | Admin metric card |
-| Unsigned session notes | 0 | >0 | BCBA + RBT metric card |
-| Expiring authorizations | 0 within 14 days | Any within 14 days | BCBA + Admin action items |
-| Revenue per session (avg) | Varies by payer | Declining trend | Admin trend chart |
-| Treatment plan adherence | >90% | <80% | BCBA view (Phase 2) |
+| KPI                            | Target           | Alert Threshold    | Dashboard Location        |
+| ------------------------------ | ---------------- | ------------------ | ------------------------- |
+| Authorization utilization      | 85-95%           | <50% or >95%       | BCBA + Admin metric card  |
+| Cancellation rate              | <10%             | >10% weekly        | Admin metric card         |
+| Billing lag (days to submit)   | <2 days          | >3 days            | Admin metric card         |
+| Net collection rate            | >95%             | <90%               | Admin metric card         |
+| Staff utilization (billable %) | 75-85%           | <70% or >90%       | Admin metric card         |
+| Unsigned session notes         | 0                | >0                 | BCBA + RBT metric card    |
+| Expiring authorizations        | 0 within 14 days | Any within 14 days | BCBA + Admin action items |
+| Revenue per session (avg)      | Varies by payer  | Declining trend    | Admin trend chart         |
+| Treatment plan adherence       | >90%             | <80%               | BCBA view (Phase 2)       |
 
 ### Implementation Priority
 
@@ -728,6 +789,7 @@ Based on industry research, these are the metrics that matter most:
 ## Sources
 
 ### ABA-Specific Platforms
+
 - [CentralReach - ABA Practice Management](https://centralreach.com/products/aba-practice-management-software/)
 - [CentralReach - Available Dashboard Widgets](https://community.centralreach.com/s/article/knowledge-available-widgets-in-my-dashboard)
 - [CentralReach - Authorization Utilization Dashboard](https://community.centralreach.com/s/article/knowledge-the-authorization-utilization-hour-based-dashboard)
@@ -747,6 +809,7 @@ Based on industry research, these are the metrics that matter most:
 - [Measure PM - ABA Practice Management](https://measurepm.com/)
 
 ### General Practice Management
+
 - [SimplePractice - Analytics Dashboard](https://support.simplepractice.com/hc/en-us/articles/7796201723789-Understanding-your-Analytics-dashboard-and-reports)
 - [SimplePractice - Calendar Navigation](https://support.simplepractice.com/hc/en-us/articles/207625726-Navigating-your-calendar)
 - [Jane App - Practitioner Dashboard Explained](https://jane.app/guide/the-practitioner-dashboard-explained)
@@ -757,12 +820,14 @@ Based on industry research, these are the metrics that matter most:
 - [TherapyAppointment - Home Dashboard](https://support.therapyappointment.com/article/229-dashboard)
 
 ### Dashboard Design Best Practices
+
 - [Healthcare Dashboard Design Best Practices - FuseLab Creative](https://fuselabcreative.com/healthcare-dashboard-design-best-practices/)
 - [Best Practices in Healthcare Dashboard Design - Thinkitive](https://www.thinkitive.com/blog/best-practices-in-healthcare-dashboard-design/)
 - [Healthcare Dashboard Examples - Arcadia](https://arcadia.io/resources/healthcare-dashboard-examples)
 - [UX/UI Best Practices for Healthcare Analytics Dashboards - Sidekick](https://www.sidekickinteractive.com/designing-your-app/uxui-best-practices-for-healthcare-analytics-dashboards/)
 
 ### ABA Practice KPIs & Workflows
+
 - [Top KPIs to Track in ABA Practice Management - Motivity](https://www.motivity.net/blog/aba-practice-management-kpi)
 - [Top KPIs in ABA Practice Management - LeadSquared](https://www.leadsquared.com/us/industries/healthcare/kpis-to-track-in-aba-practice-management/)
 - [ABA Practice Management Tasks - ABA Matrix](https://www.abamatrix.com/aba-practice-management-software-tasks/)

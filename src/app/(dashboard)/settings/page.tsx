@@ -18,8 +18,8 @@ export default async function SettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader title="Settings" description="Practice configuration and profile" />
-        <div className="overflow-hidden rounded-xl border border-border bg-card px-4 py-8 text-center shadow-sm">
-          <p className="text-xs text-muted-foreground">
+        <div className="border-border bg-card overflow-hidden rounded-xl border px-4 py-8 text-center shadow-sm">
+          <p className="text-muted-foreground text-xs">
             Organization not found. Please contact support if this issue persists.
           </p>
         </div>

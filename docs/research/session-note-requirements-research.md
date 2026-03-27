@@ -28,6 +28,7 @@ ABA therapy involves multiple layers of clinical documentation. Understanding th
 **What it is:** The overarching document written by the BCBA after the initial assessment (97151). Defines the client's diagnosis, baseline functioning, treatment goals, target behaviors, interventions, and recommended service hours. Updated every 6-12 months or at re-authorization.
 
 **Contains:**
+
 - Diagnosis (ICD-10 codes, typically F84.0 for autism)
 - Functional Behavior Assessment (FBA) results
 - Measurable goals with baselines and criteria for mastery
@@ -48,6 +49,7 @@ ABA therapy involves multiple layers of clinical documentation. Understanding th
 **What it is:** Written after EVERY session by the rendering provider (RBT, BCaBA, or BCBA). Documents what happened during that specific session: goals targeted, interventions used, client responses, behavioral data, and session summary.
 
 **Key characteristics:**
+
 - Written per session, per provider, per day
 - Primarily objective and data-driven
 - Ties directly to a specific CPT code and billed units
@@ -60,6 +62,7 @@ ABA therapy involves multiple layers of clinical documentation. Understanding th
 **What it is:** A higher-level summary written by the supervising BCBA, typically every 30-90 days (varies by payer). Synthesizes data across multiple sessions to evaluate progress toward treatment plan goals. Used for re-authorization requests.
 
 **Contains:**
+
 - Summary of data across the reporting period
 - Progress toward each treatment plan goal (met, partially met, not met, regression)
 - Graph analysis and trend interpretation
@@ -166,69 +169,69 @@ These fields are universally required across all payers for any ABA session note
 
 ### 3.1 Session Identification (auto-populated in PM systems)
 
-| Field | Required? | Notes |
-|-------|-----------|-------|
-| Client full name | Yes | Legal name matching insurance records |
-| Client date of birth | Yes | Additional identifier for auditors |
-| Date of service | Yes | Must match the claim date |
-| Session start time | Yes | Exact time, not approximate |
-| Session end time | Yes | Must support 15-minute unit calculation |
-| Duration (minutes) | Yes | Calculated from start/end times |
-| Billable units | Yes | Must align with duration per CMS/AMA rules |
-| Place of service | Yes | Code + location (Home, Clinic, School, Community, Telehealth) |
-| Service location address | Some payers | Required for home/community services |
+| Field                    | Required?   | Notes                                                         |
+| ------------------------ | ----------- | ------------------------------------------------------------- |
+| Client full name         | Yes         | Legal name matching insurance records                         |
+| Client date of birth     | Yes         | Additional identifier for auditors                            |
+| Date of service          | Yes         | Must match the claim date                                     |
+| Session start time       | Yes         | Exact time, not approximate                                   |
+| Session end time         | Yes         | Must support 15-minute unit calculation                       |
+| Duration (minutes)       | Yes         | Calculated from start/end times                               |
+| Billable units           | Yes         | Must align with duration per CMS/AMA rules                    |
+| Place of service         | Yes         | Code + location (Home, Clinic, School, Community, Telehealth) |
+| Service location address | Some payers | Required for home/community services                          |
 
 ### 3.2 Provider & Credentials
 
-| Field | Required? | Notes |
-|-------|-----------|-------|
-| Rendering provider full name | Yes | Must match NPI on claim |
-| Provider credential type | Yes | RBT, BCaBA, BCBA, BCBA-D |
-| Provider signature | Yes | Electronic acceptable with audit trail |
-| Signature date | Yes | Must be within 24-72 hours of session |
-| Supervising BCBA name | Conditional | Required when rendering provider is RBT or BCaBA |
-| Others present | Yes | Names and relationships (parent, sibling, aide) |
+| Field                        | Required?   | Notes                                            |
+| ---------------------------- | ----------- | ------------------------------------------------ |
+| Rendering provider full name | Yes         | Must match NPI on claim                          |
+| Provider credential type     | Yes         | RBT, BCaBA, BCBA, BCBA-D                         |
+| Provider signature           | Yes         | Electronic acceptable with audit trail           |
+| Signature date               | Yes         | Must be within 24-72 hours of session            |
+| Supervising BCBA name        | Conditional | Required when rendering provider is RBT or BCaBA |
+| Others present               | Yes         | Names and relationships (parent, sibling, aide)  |
 
 ### 3.3 Service & Billing
 
-| Field | Required? | Notes |
-|-------|-----------|-------|
-| CPT code | Yes | Must match service actually delivered |
-| Modifier code(s) | Yes | Credential-based (HM, HN, HO) + telehealth (95, GT) |
-| Authorization number | Yes | Linked to active authorization for that CPT/date |
-| Diagnosis code (ICD-10) | Yes | Usually F84.0 (autism) |
+| Field                   | Required? | Notes                                               |
+| ----------------------- | --------- | --------------------------------------------------- |
+| CPT code                | Yes       | Must match service actually delivered               |
+| Modifier code(s)        | Yes       | Credential-based (HM, HN, HO) + telehealth (95, GT) |
+| Authorization number    | Yes       | Linked to active authorization for that CPT/date    |
+| Diagnosis code (ICD-10) | Yes       | Usually F84.0 (autism)                              |
 
 ### 3.4 Clinical Content (The Heart of the Note)
 
-| Field | Required? | Notes |
-|-------|-----------|-------|
-| Client presentation | Yes | Observable behavior at session start |
-| Goals/programs targeted | Yes | Must link to current treatment plan objectives |
-| Interventions/techniques used | Yes | Specific ABA techniques: DTT, NET, prompting, etc. |
-| Data: trial scores/percentages | Yes | Measurable, objective data |
-| Data: prompt levels | Yes | FP, PP, M, V, G, I (Full Physical to Independent) |
-| Behavior incidents | Conditional | Required if significant behaviors occurred |
-| ABC data | Conditional | For behavior incidents: Antecedent, Behavior, Consequence |
-| Session narrative/summary | Yes | What happened, progress made, barriers encountered |
-| Response to treatment | Yes | How client responded to interventions, linked to goals |
+| Field                          | Required?   | Notes                                                     |
+| ------------------------------ | ----------- | --------------------------------------------------------- |
+| Client presentation            | Yes         | Observable behavior at session start                      |
+| Goals/programs targeted        | Yes         | Must link to current treatment plan objectives            |
+| Interventions/techniques used  | Yes         | Specific ABA techniques: DTT, NET, prompting, etc.        |
+| Data: trial scores/percentages | Yes         | Measurable, objective data                                |
+| Data: prompt levels            | Yes         | FP, PP, M, V, G, I (Full Physical to Independent)         |
+| Behavior incidents             | Conditional | Required if significant behaviors occurred                |
+| ABC data                       | Conditional | For behavior incidents: Antecedent, Behavior, Consequence |
+| Session narrative/summary      | Yes         | What happened, progress made, barriers encountered        |
+| Response to treatment          | Yes         | How client responded to interventions, linked to goals    |
 
 ### 3.5 Assessment & Planning
 
-| Field | Required? | Notes |
-|-------|-----------|-------|
-| Progress per goal | Yes | Met / Partially met / Not met / Regression |
-| Recommendations/next steps | Yes | Plan for next session |
-| Caregiver communication | Conditional | If caregiver present or communicated with |
-| Treatment plan changes | Conditional | For 97155 notes -- what was modified and why |
+| Field                      | Required?   | Notes                                        |
+| -------------------------- | ----------- | -------------------------------------------- |
+| Progress per goal          | Yes         | Met / Partially met / Not met / Regression   |
+| Recommendations/next steps | Yes         | Plan for next session                        |
+| Caregiver communication    | Conditional | If caregiver present or communicated with    |
+| Treatment plan changes     | Conditional | For 97155 notes -- what was modified and why |
 
 ### 3.6 Compliance & Signatures
 
-| Field | Required? | Notes |
-|-------|-----------|-------|
-| Provider digital signature | Yes | Must demonstrate intent; audit trail required |
-| Signature timestamp | Yes | Date signed, ideally auto-captured |
-| Caregiver signature | Some payers | Required by some commercial payers and some states |
-| Note completion timestamp | System | Must show note was completed within 24-72 hours |
+| Field                      | Required?   | Notes                                              |
+| -------------------------- | ----------- | -------------------------------------------------- |
+| Provider digital signature | Yes         | Must demonstrate intent; audit trail required      |
+| Signature timestamp        | Yes         | Date signed, ideally auto-captured                 |
+| Caregiver signature        | Some payers | Required by some commercial payers and some states |
+| Note completion timestamp  | System      | Must show note was completed within 24-72 hours    |
 
 ### 3.7 Universal Minimum Standard
 
@@ -257,20 +260,21 @@ Different CPT codes require different note content because they represent differ
 
 **Required note content (beyond universal fields):**
 
-| Element | What to document |
-|---------|-----------------|
-| Treatment plan goals addressed | List each goal/objective targeted during the session, referencing the ITP |
-| ABA techniques implemented | Specific techniques: DTT, NET, incidental teaching, chaining, shaping, etc. |
-| Prompt levels used per goal | Document the prompt hierarchy: FP, PP, M, V, G, I |
-| Trial/opportunity data | Number of trials, percentage correct, frequency counts, duration measures |
-| Reinforcement | Type of reinforcement used, schedule, effectiveness |
-| Behavior data | Frequency, duration, intensity of target behaviors |
-| ABC data for incidents | Antecedent, Behavior, Consequence for any significant behavior events |
-| Client presentation | Observable behavior at session start (mood, engagement, readiness) |
-| Session narrative | Summary of activities, transitions, notable events |
-| Progress assessment | Per-goal: met/partially met/not met |
+| Element                        | What to document                                                            |
+| ------------------------------ | --------------------------------------------------------------------------- |
+| Treatment plan goals addressed | List each goal/objective targeted during the session, referencing the ITP   |
+| ABA techniques implemented     | Specific techniques: DTT, NET, incidental teaching, chaining, shaping, etc. |
+| Prompt levels used per goal    | Document the prompt hierarchy: FP, PP, M, V, G, I                           |
+| Trial/opportunity data         | Number of trials, percentage correct, frequency counts, duration measures   |
+| Reinforcement                  | Type of reinforcement used, schedule, effectiveness                         |
+| Behavior data                  | Frequency, duration, intensity of target behaviors                          |
+| ABC data for incidents         | Antecedent, Behavior, Consequence for any significant behavior events       |
+| Client presentation            | Observable behavior at session start (mood, engagement, readiness)          |
+| Session narrative              | Summary of activities, transitions, notable events                          |
+| Progress assessment            | Per-goal: met/partially met/not met                                         |
 
 **What auditors look for in 97153 notes:**
+
 - Data must be **objective and measurable** -- never "client did well" or "good session"
 - Each note must be **individualized** -- cloned/copy-pasted notes are a top audit failure
 - Interventions must **link to specific treatment plan goals** -- random activities not tied to goals trigger denials
@@ -280,14 +284,17 @@ Different CPT codes require different note content because they represent differ
 **Example note section (97153):**
 
 > **Goals Targeted:**
+>
 > 1. Manding (requesting) -- Target: 15 independent mands per session
 > 2. Gross motor imitation -- Target: 80% correct across 20 trials
 >
 > **Interventions & Data:**
+>
 > - Manding: NET procedures during play. 14 independent mands, 6 prompted (gestural). Total: 20 opportunities, 70% independent. Edible reinforcement on VR3 schedule.
 > - Gross motor imitation: DTT with picture cards. 16/20 correct (80%) with model prompts faded to gestural on 3 trials. Token board reinforcement.
 >
 > **Behavior:**
+>
 > - Elopement: 1 occurrence during transition to table (antecedent: timer ended preferred activity; consequence: physical redirection, 10-sec delay, re-presented demand). No aggression. Duration: ~8 seconds.
 >
 > **Assessment:**
@@ -303,6 +310,7 @@ Different CPT codes require different note content because they represent differ
 **Who writes the note:** BCBA or BCBA-D only. BCaBAs in some states.
 
 **Critical documentation requirement:** The note MUST document:
+
 1. **What data prompted the modification** -- "Skill X plateaued at 60% across last 3 sessions"
 2. **What was modified** -- "Changed prompt hierarchy from most-to-least to least-to-most"
 3. **Why it was modified** -- Clinical rationale tied to data
@@ -310,6 +318,7 @@ Different CPT codes require different note content because they represent differ
 5. **Updated protocol** -- What the new protocol looks like going forward
 
 **What auditors look for in 97155 notes:**
+
 - **Modification must be real-time** -- Cannot bill 97155 for reviewing data after the session and updating the plan
 - **Must be distinguishable from 97153** -- If the note reads like an RBT session note with no modifications, it will be denied
 - **Data-driven rationale** -- "I changed the approach because..." must be backed by objective data
@@ -337,19 +346,20 @@ Different CPT codes require different note content because they represent differ
 
 **Unique documentation requirements:**
 
-| Element | What to document |
-|---------|-----------------|
-| Caregiver name and relationship | Required -- who was trained (parent, teacher, aide) |
-| Client present? | Must explicitly state whether the client was present |
-| Training objectives | 1-2 measurable caregiver objectives for the session |
-| Teaching method | How training was delivered: explain, model, role-play, feedback |
-| Caregiver demonstration | Did the caregiver demonstrate the skill? Fidelity/competency check |
-| Caregiver response/competency | How well did the caregiver implement the technique? |
-| Generalization plan | How will the caregiver apply this outside of training? |
-| Homework/follow-up task | Specific practice assignment for the caregiver |
-| Link to treatment plan | How this training supports the client's treatment goals |
+| Element                         | What to document                                                   |
+| ------------------------------- | ------------------------------------------------------------------ |
+| Caregiver name and relationship | Required -- who was trained (parent, teacher, aide)                |
+| Client present?                 | Must explicitly state whether the client was present               |
+| Training objectives             | 1-2 measurable caregiver objectives for the session                |
+| Teaching method                 | How training was delivered: explain, model, role-play, feedback    |
+| Caregiver demonstration         | Did the caregiver demonstrate the skill? Fidelity/competency check |
+| Caregiver response/competency   | How well did the caregiver implement the technique?                |
+| Generalization plan             | How will the caregiver apply this outside of training?             |
+| Homework/follow-up task         | Specific practice assignment for the caregiver                     |
+| Link to treatment plan          | How this training supports the client's treatment goals            |
 
 **What auditors look for in 97156 notes:**
+
 - **Must be training, not just talking** -- A conversation with a parent about the week is NOT 97156. Must document specific skills taught and caregiver practice.
 - **Caregiver competency data** -- Did the parent actually demonstrate the technique? What was their fidelity score?
 - **Client presence documented** -- Explicitly state "client present" or "client not present"
@@ -361,10 +371,12 @@ Different CPT codes require different note content because they represent differ
 > Caregiver: Maria Thompson (mother). Client (Marcus) present.
 >
 > **Training Objectives:**
+>
 > 1. Teach mother to implement 3-step prompting sequence for manding during mealtimes
 > 2. Review and practice differential reinforcement for appropriate requesting vs. tantrum
 >
 > **Teaching Method & Caregiver Response:**
+>
 > 1. Explained 3-step prompting (wait 5 sec -> gestural -> model). Modeled with Marcus during snack. Mother practiced 10 opportunities: implemented correct prompt sequence on 8/10 (80% fidelity). Errors: skipped wait time on 2 opportunities (moved directly to model prompt).
 > 2. Reviewed DRA procedure. Mother correctly delivered reinforcement for appropriate mands on 9/10 opportunities. Correctly withheld reinforcement during 1 tantrum episode (extinction).
 >
@@ -382,19 +394,20 @@ Different CPT codes require different note content because they represent differ
 
 **Unique documentation requirements:**
 
-| Element | What to document |
-|---------|-----------------|
-| Assessment activities conducted | Interviews, observations, standardized tools used |
-| Assessment tools | VB-MAPP, ABLLS-R, AFLS, Vineland, etc. -- name each tool |
-| Caregiver participation | At least one session must include caregiver; document their input |
-| Face-to-face vs. non-face-to-face time | Must track separately; payers scrutinize time allocation |
-| Findings/results | Summary of what was observed/measured |
-| Diagnostic impressions | Link to ICD-10 diagnosis |
-| Treatment recommendations | Recommended services, hours, goals |
-| Individual session length | Each assessment session should be no longer than 2 hours |
-| Total assessment time | Should not exceed 8 hours total (some payers allow more with justification) |
+| Element                                | What to document                                                            |
+| -------------------------------------- | --------------------------------------------------------------------------- |
+| Assessment activities conducted        | Interviews, observations, standardized tools used                           |
+| Assessment tools                       | VB-MAPP, ABLLS-R, AFLS, Vineland, etc. -- name each tool                    |
+| Caregiver participation                | At least one session must include caregiver; document their input           |
+| Face-to-face vs. non-face-to-face time | Must track separately; payers scrutinize time allocation                    |
+| Findings/results                       | Summary of what was observed/measured                                       |
+| Diagnostic impressions                 | Link to ICD-10 diagnosis                                                    |
+| Treatment recommendations              | Recommended services, hours, goals                                          |
+| Individual session length              | Each assessment session should be no longer than 2 hours                    |
+| Total assessment time                  | Should not exceed 8 hours total (some payers allow more with justification) |
 
 **What auditors look for in 97151 notes:**
+
 - **Data collection alone is insufficient** -- Tally marks/raw scores without narrative explanation will be denied
 - **Caregiver session documented** -- At least one session must include caregiver interview
 - **Time tracking accuracy** -- Payers scrutinize assessment hours, especially beyond 8 hours
@@ -404,20 +417,21 @@ Different CPT codes require different note content because they represent differ
 ### 4.5 Do Different Codes Need Different Templates?
 
 **Yes, absolutely.** The documentation requirements are different enough that a single generic template will either:
+
 - Miss required fields for specific codes (e.g., caregiver competency data for 97156)
 - Include irrelevant fields that waste time (e.g., asking RBTs about protocol modifications for 97153)
 
 **Recommended approach:** One base template with code-specific sections that appear/hide based on the selected CPT code.
 
-| CPT Code | Template Variant | Unique Sections |
-|----------|-----------------|-----------------|
-| 97153 | Direct therapy (RBT) | Goals data table, prompt levels, behavior incidents, ABC data |
-| 97155 | Protocol modification (BCBA) | Modification rationale, data prompting change, what changed, client response, updated protocol |
-| 97156 | Caregiver training (BCBA) | Caregiver name/relationship, client present Y/N, training objectives, teaching method, caregiver competency, homework |
-| 97151 | Assessment (BCBA) | Assessment tools used, F2F vs non-F2F time, caregiver participation, findings, recommendations |
-| 97154 | Group therapy (RBT) | Group composition, individual data per client, group dynamics |
-| 97157 | Group caregiver training (BCBA) | Attendee list, group training objectives, individual competency notes |
-| 97158 | Group protocol modification (BCBA) | Per-client modifications within group context |
+| CPT Code | Template Variant                   | Unique Sections                                                                                                       |
+| -------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 97153    | Direct therapy (RBT)               | Goals data table, prompt levels, behavior incidents, ABC data                                                         |
+| 97155    | Protocol modification (BCBA)       | Modification rationale, data prompting change, what changed, client response, updated protocol                        |
+| 97156    | Caregiver training (BCBA)          | Caregiver name/relationship, client present Y/N, training objectives, teaching method, caregiver competency, homework |
+| 97151    | Assessment (BCBA)                  | Assessment tools used, F2F vs non-F2F time, caregiver participation, findings, recommendations                        |
+| 97154    | Group therapy (RBT)                | Group composition, individual data per client, group dynamics                                                         |
+| 97157    | Group caregiver training (BCBA)    | Attendee list, group training objectives, individual competency notes                                                 |
+| 97158    | Group protocol modification (BCBA) | Per-client modifications within group context                                                                         |
 
 ---
 
@@ -425,11 +439,11 @@ Different CPT codes require different note content because they represent differ
 
 ### 5.1 Note Length and Detail
 
-| Session Length | Expected Note Length | Detail Level |
-|---------------|---------------------|-------------|
-| 1 hour (4 units) | 150-300 words | 2-4 goals with data, brief narrative |
-| 2 hours (8 units) | 250-500 words | 4-6 goals with data, behavior section, fuller narrative |
-| 3+ hours (12+ units) | 400-800 words | 6+ goals, multiple behavior entries, detailed narrative |
+| Session Length       | Expected Note Length | Detail Level                                            |
+| -------------------- | -------------------- | ------------------------------------------------------- |
+| 1 hour (4 units)     | 150-300 words        | 2-4 goals with data, brief narrative                    |
+| 2 hours (8 units)    | 250-500 words        | 4-6 goals with data, behavior section, fuller narrative |
+| 3+ hours (12+ units) | 400-800 words        | 6+ goals, multiple behavior entries, detailed narrative |
 
 **Minimum acceptable:** A note must have enough detail to demonstrate that the billed service was actually delivered and was medically necessary. A 2-hour session note that is only 2 sentences will fail an audit. Conversely, a novel-length note for a 30-minute session is suspicious.
 
@@ -502,11 +516,11 @@ Jessica Smith, RBT | Signed: 03/26/2026 11:15 AM
 
 ### 5.3 Time to Complete
 
-| Method | Time per Note (for 2-hour session) |
-|--------|------------------------------------|
-| Manual free-text (blank screen) | 15-30 minutes |
-| Template-based PM system | 8-12 minutes |
-| AI-assisted (draft from structured data) | 2-5 minutes |
+| Method                                   | Time per Note (for 2-hour session) |
+| ---------------------------------------- | ---------------------------------- |
+| Manual free-text (blank screen)          | 15-30 minutes                      |
+| Template-based PM system                 | 8-12 minutes                       |
+| AI-assisted (draft from structured data) | 2-5 minutes                        |
 
 AI-assisted note generation is the single biggest documentation time reduction. Platforms with AI (Raven Health, CentralReach NoteDraftAI, Passage Health + Frontera) report **60-80% reduction** in documentation time.
 
@@ -570,6 +584,7 @@ The most prescriptive payer for ABA documentation. Requires:
 ### 6.7 Key Takeaway
 
 No payer requires a specific note FORMAT (SOAP vs narrative). All payers require the same core CONTENT. The differences are in:
+
 - Frequency of progress reports (quarterly vs. semi-annual)
 - Specific fields emphasized (TRICARE is most prescriptive)
 - Audit frequency and methodology
@@ -582,15 +597,15 @@ No payer requires a specific note FORMAT (SOAP vs narrative). All payers require
 
 ### 7.1 Audit Triggers
 
-| Trigger | Description |
-|---------|-------------|
-| High therapy hours | Clients receiving 30+ hours/week of direct therapy |
-| Repeated claim denials | Pattern of coding errors or missing documentation |
-| Inconsistent documentation | Mismatches between billed codes and documented services |
-| Expired authorizations | Billing beyond authorization dates or units |
-| Random sampling | Routine compliance audits (especially Medicaid) |
-| Whistleblower/complaint | Staff or parent reports of billing irregularities |
-| AI-based claims review | Commercial payers now use AI to catch overutilization, supervision gaps, and documentation inconsistencies |
+| Trigger                    | Description                                                                                                |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| High therapy hours         | Clients receiving 30+ hours/week of direct therapy                                                         |
+| Repeated claim denials     | Pattern of coding errors or missing documentation                                                          |
+| Inconsistent documentation | Mismatches between billed codes and documented services                                                    |
+| Expired authorizations     | Billing beyond authorization dates or units                                                                |
+| Random sampling            | Routine compliance audits (especially Medicaid)                                                            |
+| Whistleblower/complaint    | Staff or parent reports of billing irregularities                                                          |
+| AI-based claims review     | Commercial payers now use AI to catch overutilization, supervision gaps, and documentation inconsistencies |
 
 ### 7.2 What Auditors Specifically Look For
 
@@ -646,6 +661,7 @@ Ranked by frequency of audit findings:
 **No.** Session notes are NOT submitted with claims. The claim (CMS-1500 or 837P electronic) contains only billing data: CPT code, units, date, provider NPI, modifiers, diagnosis code, and charges. The session note stays on file.
 
 **However:** Payers can and do request session notes at any time for:
+
 - Pre-payment review (before paying the claim)
 - Post-payment audit (after paying, reviewing for recoupment)
 - Quality monitoring (routine compliance checks)
@@ -655,14 +671,14 @@ When notes are requested, they're typically needed within 5-10 business days. In
 
 ### 8.2 Record Retention Requirements
 
-| Standard | Retention Period | Notes |
-|----------|-----------------|-------|
-| BACB Ethics Code 2.0 | 7 years from service termination | Professional requirement |
-| Federal Medicaid | 7 years minimum | Can be longer per state |
-| HIPAA | No specific requirement | Defers to state/payer |
-| State laws (typical) | 7-10 years for adults | Varies significantly |
-| Minors | Until age of majority + state requirement | Often 18 + 7 = age 25 |
-| Best practice | 10 years | Covers all scenarios |
+| Standard             | Retention Period                          | Notes                    |
+| -------------------- | ----------------------------------------- | ------------------------ |
+| BACB Ethics Code 2.0 | 7 years from service termination          | Professional requirement |
+| Federal Medicaid     | 7 years minimum                           | Can be longer per state  |
+| HIPAA                | No specific requirement                   | Defers to state/payer    |
+| State laws (typical) | 7-10 years for adults                     | Varies significantly     |
+| Minors               | Until age of majority + state requirement | Often 18 + 7 = age 25    |
+| Best practice        | 10 years                                  | Covers all scenarios     |
 
 **For ABA specifically:** Since most clients are minors, the practical requirement is often **until the client turns 18 + 7 years = age 25 minimum.**
 
@@ -677,13 +693,13 @@ When notes are requested, they're typically needed within 5-10 business days. In
 
 ### 8.4 Note Completion Timeliness
 
-| Standard | Timeframe | Notes |
-|----------|-----------|-------|
-| Best practice | Same day / immediately after session | While details are fresh |
-| Industry standard | Within 24 hours | Most PM systems enforce this |
-| Maximum acceptable | 72 hours | Beyond this, accuracy questioned |
-| BCBA co-signature | Within 48 hours | If required by payer |
-| Audit red flag | >72 hours | Late notes trigger scrutiny |
+| Standard           | Timeframe                            | Notes                            |
+| ------------------ | ------------------------------------ | -------------------------------- |
+| Best practice      | Same day / immediately after session | While details are fresh          |
+| Industry standard  | Within 24 hours                      | Most PM systems enforce this     |
+| Maximum acceptable | 72 hours                             | Beyond this, accuracy questioned |
+| BCBA co-signature  | Within 48 hours                      | If required by payer             |
+| Audit red flag     | >72 hours                            | Late notes trigger scrutiny      |
 
 ---
 
@@ -796,12 +812,14 @@ This is the single biggest competitive differentiator for Clinivise. Based on re
 - Competitors WITHOUT AI notes: AlohaABA, ABA Matrix, Artemis
 
 **How it would work in Clinivise:**
+
 1. RBT enters structured data during/after session (goals, trial counts, prompt levels, behaviors)
 2. System generates a draft narrative from the structured data
 3. RBT reviews, edits if needed, and signs
 4. The structured data is the source of truth; the narrative is the human-readable audit document
 
 **This inverts the typical documentation flow:** Instead of writing a narrative and hoping it contains the right data, the RBT enters data and the system writes the narrative. This ensures:
+
 - All required fields are captured (structured input validates completeness)
 - Objective language (AI doesn't write "client did well")
 - Individualized notes (generated from actual session data, never cloned)
@@ -809,21 +827,22 @@ This is the single biggest competitive differentiator for Clinivise. Based on re
 
 ### 9.4 Phasing Recommendation
 
-| Phase | What to Build | Why |
-|-------|--------------|-----|
-| Phase 1 (current) | Keep current `notes` text field | Session logging core is the priority; free-text notes are fine for MVP |
-| Phase 1B-4 | Structured session note form by CPT code | Add the required clinical documentation fields |
-| Phase 2 | Digital signature + note locking | Required for billing compliance before claims submission |
-| Phase 2 | AI note generation from structured data | Competitive differentiator, massive time savings |
-| Phase 2 | BCBA co-signature workflow | Required by some payers for RBT notes |
-| Phase 2 | Note completion tracking + alerts | Dashboard showing unsigned/overdue notes |
-| Phase 3 | Progress report generation | Aggregate session note data into periodic BCBA summaries |
+| Phase             | What to Build                            | Why                                                                    |
+| ----------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
+| Phase 1 (current) | Keep current `notes` text field          | Session logging core is the priority; free-text notes are fine for MVP |
+| Phase 1B-4        | Structured session note form by CPT code | Add the required clinical documentation fields                         |
+| Phase 2           | Digital signature + note locking         | Required for billing compliance before claims submission               |
+| Phase 2           | AI note generation from structured data  | Competitive differentiator, massive time savings                       |
+| Phase 2           | BCBA co-signature workflow               | Required by some payers for RBT notes                                  |
+| Phase 2           | Note completion tracking + alerts        | Dashboard showing unsigned/overdue notes                               |
+| Phase 3           | Progress report generation               | Aggregate session note data into periodic BCBA summaries               |
 
 ---
 
 ## Sources
 
 ### Session Note Structure & Templates
+
 - [ABA Session Notes: Elements, Examples, Templates & Tips - Artemis ABA](https://www.artemisaba.com/blog/aba-session-notes)
 - [CASP Session Note Templates - Council of Autism Service Providers](https://www.casproviders.org/casp-session-note-templates)
 - [ABA Session Notes Examples & Templates - Theralytics](https://www.theralytics.net/blogs/aba-session-notes-examples)
@@ -832,11 +851,13 @@ This is the single biggest competitive differentiator for Clinivise. Based on re
 - [How to write ABA notes - SimplePractice](https://www.simplepractice.com/resource/aba-notes/)
 
 ### SOAP Notes & Formats
+
 - [ABA SOAP Notes: Tips, Examples & Template - Artemis ABA](https://www.artemisaba.com/blog/aba-soap-notes)
 - [Master ABA SOAP Notes: Guide for RBTs & BCBAs - Praxis Notes](https://www.praxisnotes.com/resources/aba-soap-notes-guide)
 - [How to Write ABA SOAP Notes - Sprypt](https://www.sprypt.com/blog/how-to-write-effective-aba-soap-notes)
 
 ### CPT Code-Specific Documentation
+
 - [CPT Code 97155 Explained: Billing, Documentation & Compliance - Brellium](https://brellium.com/resources/articles/understanding-and-applying-the-97155-cpt-code)
 - [CPT 97156 Documentation Requirements - Praxis Notes](https://www.praxisnotes.com/resources/cpt-97156-documentation-requirements)
 - [CPT Code 97151: ABA Initial Assessment & Documentation Guide - Brellium](https://brellium.com/resources/articles/how-to-cpt-code-97151-for-aba-therapy)
@@ -844,6 +865,7 @@ This is the single biggest competitive differentiator for Clinivise. Based on re
 - [BCBA Protocol Modification Documentation: CPT 97155 Guide - Praxis Notes](https://www.praxisnotes.com/resources/cpt-97155-bcba-documentation)
 
 ### Audit & Compliance
+
 - [Master ABA Insurance Audit Documentation - Praxis Notes](https://www.praxisnotes.com/resources/aba-insurance-audit-documentation)
 - [ABA Documentation Audit Fails: 7 Pitfalls - Praxis Notes](https://www.praxisnotes.com/resources/aba-documentation-audit-pitfalls)
 - [Common ABA Session Note Mistakes - Cube Therapy Billing](https://www.cubetherapybilling.com/common-aba-session-note-mistakes-and-how-to-fix-them)
@@ -852,18 +874,21 @@ This is the single biggest competitive differentiator for Clinivise. Based on re
 - [HHS OIG Audits of the ABA Medicaid Benefit - CASP](https://www.casproviders.org/events/hhs-oig-audits)
 
 ### Payer-Specific Requirements
+
 - [TRICARE Autism Care Demonstration Documentation QRG](https://tricare.triwest.com/globalassets/tricare/provider/autism-care-demonstration-documentation-and-quality-monitoring-qrg.pdf)
 - [Progress Notes - Humana Military (TRICARE)](https://www.humanamilitary.com/content/humana-military-com/us/en/provider/managedcare/acoe/progressnotes.html)
 - [Optum ABA Provider Clinical Audit Preparation](https://public.providerexpress.com/content/dam/ope-provexpr/us/pdfs/clinResourcesMain/autismABA/abaProvidClinAuditPrep.pdf)
 - [ABA Billing Guidelines 2026 - MedCloudMD](https://www.medcloudmd.com/post/aba-billing-guideline-2026)
 
 ### Billing & Compliance
+
 - [ABA Billing Codes: 10 Main Codes + Guidelines - Passage Health](https://www.passagehealth.com/blog/aba-billing-codes)
 - [ABA Billing Services: 2025-2026 Playbook - Cube Therapy Billing](https://www.cubetherapybilling.com/aba-billing-playbook)
 - [ABA Electronic Signature Compliance Guide - Praxis Notes](https://www.praxisnotes.com/resources/aba-electronic-signature-compliance-guide)
 - [BCBA Record Retention Guide - Praxis Notes](https://www.praxisnotes.com/resources/bcba-record-retention-guide)
 
 ### Record Retention & Signatures
+
 - [BCBA Record Retention Guide - Praxis Notes](https://www.praxisnotes.com/resources/bcba-record-retention-guide)
 - [ABA Electronic Signature Compliance Guide - Praxis Notes](https://www.praxisnotes.com/resources/aba-electronic-signature-compliance-guide)
 - [How to Keep Your ABA Documents Protected - Cube Therapy Billing](https://www.cubetherapybilling.com/how-to-keep-your-aba-documents-protected-step-by-step-guide)

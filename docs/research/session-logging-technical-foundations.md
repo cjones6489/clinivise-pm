@@ -12,6 +12,7 @@
 The CMS rule aggregates total timed minutes across ALL CPT codes for a date of service, then determines billable units from the aggregate.
 
 **Algorithm:**
+
 1. Sum all timed minutes across all CPT codes for the date of service
 2. Divide total by 15 to get base units
 3. If remainder >= 8 minutes, bill one additional unit
@@ -19,18 +20,19 @@ The CMS rule aggregates total timed minutes across ALL CPT codes for a date of s
 
 **Unit threshold chart:**
 
-| Minutes   | Units |
-|-----------|-------|
-| 8–22      | 1     |
-| 23–37     | 2     |
-| 38–52     | 3     |
-| 53–67     | 4     |
-| 68–82     | 5     |
-| 83–97     | 6     |
+| Minutes | Units |
+| ------- | ----- |
+| 8–22    | 1     |
+| 23–37   | 2     |
+| 38–52   | 3     |
+| 53–67   | 4     |
+| 68–82   | 5     |
+| 83–97   | 6     |
 
 **Worked Example — Single day, multiple CPT codes:**
 
 A client receives these services on one day:
+
 - 97153 (1:1 direct therapy, RBT): 52 minutes
 - 97155 (protocol modification, BCBA): 23 minutes
 - 97156 (caregiver training, BCBA): 12 minutes
@@ -42,11 +44,13 @@ Step 2: 87 / 15 = 5 units with 12 minutes remainder
 Step 3: 12 >= 8, so bill **6 total units**
 
 Step 4: Allocate units to codes:
+
 - 97153: 52 min = 3 full units (45 min) + 7 min remainder
 - 97155: 23 min = 1 full unit (15 min) + 8 min remainder
 - 97156: 12 min = 0 full units + 12 min remainder
 
 Full units so far: 3 + 1 + 0 = 4. Remaining 2 units go to codes with largest remainders:
+
 - 97156: 12 min remainder -> gets 1 unit (now 1 unit total)
 - 97155: 8 min remainder -> gets 1 unit (now 2 units total)
 - 97153 stays at 3 units (7 min remainder doesn't qualify because all 6 units are allocated)
@@ -60,6 +64,7 @@ Full units so far: 3 + 1 + 0 = 4. Remaining 2 units go to codes with largest rem
 The AMA method applies the 8-minute threshold **independently to each CPT code**. No cross-code aggregation of remainders.
 
 **Algorithm:**
+
 1. For each CPT code independently: divide minutes by 15
 2. If that code's remainder >= 8 minutes, bill one additional unit for that code
 3. If remainder < 8 minutes, those minutes are lost (cannot combine with other codes)
@@ -75,6 +80,7 @@ The AMA method applies the 8-minute threshold **independently to each CPT code**
 In this example, both methods yield the same result. But consider a different scenario:
 
 **Example where methods differ:**
+
 - 97153: 20 min -> CMS: contributes to aggregate. AMA: 1 unit (5 min remainder lost)
 - 97155: 20 min -> CMS: contributes to aggregate. AMA: 1 unit (5 min remainder lost)
 
@@ -86,19 +92,20 @@ AMA: 97153 = 1 unit (5 min lost) + 97155 = 1 unit (5 min lost) -> **2 units** to
 
 ### 1.3 When to Use CMS vs AMA
 
-| Payer Type | Method | Notes |
-|------------|--------|-------|
-| Medicare Part A/B | CMS | Federal standard |
-| Medicare Advantage | CMS | Follows CMS rules |
-| Medicaid | CMS (most states) | Some states have variations; verify per state |
-| TRICARE/CHAMPVA | CMS | Federal payers follow CMS |
-| Commercial (BCBS, Aetna, Cigna, UHC) | AMA | "Rule of Eights" / Substantial Portion Methodology |
+| Payer Type                           | Method            | Notes                                              |
+| ------------------------------------ | ----------------- | -------------------------------------------------- |
+| Medicare Part A/B                    | CMS               | Federal standard                                   |
+| Medicare Advantage                   | CMS               | Follows CMS rules                                  |
+| Medicaid                             | CMS (most states) | Some states have variations; verify per state      |
+| TRICARE/CHAMPVA                      | CMS               | Federal payers follow CMS                          |
+| Commercial (BCBS, Aetna, Cigna, UHC) | AMA               | "Rule of Eights" / Substantial Portion Methodology |
 
 **Caveat:** Some commercial payers follow CMS rules, and some state Medicaid programs have their own variations. Always verify with the specific payer.
 
 ### 1.4 Handling Mixed Payers
 
 Practices handle this by storing the calculation method **at the payer level**. When a session is logged:
+
 1. The system looks up the client's insurance -> payer
 2. The payer record has a `unit_calc_method` field (`cms` or `ama`)
 3. The session unit calculation uses the appropriate method
@@ -108,6 +115,7 @@ This is already implemented in the Clinivise schema: `payers.unitCalcMethod` def
 ### 1.5 Where the Calculation Method Is Stored
 
 **Per-payer is the correct level.** Rationale:
+
 - The method is a characteristic of the payer, not the authorization or session
 - All clients with the same payer use the same method
 - When a payer changes rules, you update one record
@@ -122,6 +130,7 @@ Edge case: If a payer has different rules for different plan types, you'd need t
 ### 2.1 Overlapping Authorizations for the Same CPT Code
 
 This happens regularly in ABA. Common scenarios:
+
 - Re-authorization processed before old auth expires (overlap period)
 - Different payers authorizing different hours for the same service
 - Auth amendment creating a new auth while old one is still active
@@ -131,6 +140,7 @@ This happens regularly in ABA. Common scenarios:
 ### 2.2 FIFO Rule (Oldest Expiration First)
 
 FIFO is an **industry best practice**, not a formal CMS regulation. The logic:
+
 1. Query all active authorizations for the client + CPT code + date of service
 2. Filter to auths where: `start_date <= session_date <= end_date` AND `status = 'approved'` AND `used_units < approved_units`
 3. Sort by `end_date ASC` (oldest expiration first)
@@ -147,12 +157,14 @@ When the selected authorization doesn't have enough remaining units:
 **Recommended approach: Warn and let the user choose.** Do NOT auto-split.
 
 Rationale:
+
 - Auto-splitting across authorizations can create compliance issues (different auths may have different approved providers, different conditions)
 - The billing staff needs to know this is happening and make a conscious decision
 - Some payers will deny claims if units are drawn from the wrong authorization
 - A session should typically map to exactly one authorization service line
 
 **Implementation:**
+
 1. At session creation, check `authorization_services.used_units + session.units <= authorization_services.approved_units`
 2. If exceeded: show a warning with remaining units and option to:
    - Reduce session units to fit
@@ -163,6 +175,7 @@ Rationale:
 ### 2.4 Can a Single Session Consume Units from Multiple Authorizations?
 
 **Technically no, and the system should not allow it by default.** A single session line (one CPT code, one date, one provider) should map to one authorization service. If a session is long enough to exhaust one auth and need another, the correct approach is:
+
 - End the first session at the point where the auth is exhausted
 - Start a new session record for the remaining time under the new auth
 - This creates a clean audit trail and prevents claim confusion
@@ -186,6 +199,7 @@ This matches the current schema: `sessions.authorizationServiceId` is a single F
 ### 3.2 Supervisor Recording
 
 The supervisor should be recorded **on the session** (as the current schema does with `sessions.supervisorId`). This serves dual purposes:
+
 1. **Billing compliance:** The supervising BCBA's NPI goes on the claim
 2. **BACB compliance reporting:** Supervision hours can be calculated from session data
 
@@ -194,6 +208,7 @@ The supervisor is also typically recorded at the provider level (`providers.supe
 ### 3.3 BACB Supervision Ratio Requirements
 
 Per BACB (current as of 2026):
+
 - **Minimum 5% of RBT service hours** must be supervised in each calendar month
 - At least **2 face-to-face contacts per month** with the supervisor
 - At least **1 must be individual** (not group)
@@ -201,6 +216,7 @@ Per BACB (current as of 2026):
 - Supervision can occur via telehealth (real-time video)
 
 **Implementation notes for Clinivise:**
+
 - Track which sessions have `supervisorId` populated AND the supervisor was physically/virtually present
 - Calculate monthly supervision percentage: `supervision_hours / total_rbt_service_hours`
 - Alert when below 5% threshold
@@ -209,6 +225,7 @@ Per BACB (current as of 2026):
 ### 3.4 Does the Supervisor Need to Be on the Authorization?
 
 **Yes, in most cases.** Many payers require the supervising BCBA to be a named provider on the authorization. If an RBT's regular BCBA is unavailable and a substitute supervises, the practice may need to:
+
 - Confirm the substitute is credentialed with the payer
 - In some cases, request an authorization amendment
 - At minimum, ensure the substitute's NPI is on the claim
@@ -223,13 +240,13 @@ Per BACB (current as of 2026):
 
 The current schema defines these (from `constants.ts`):
 
-| Status | Description |
-|--------|-------------|
-| `scheduled` | Future session on the calendar, not yet rendered |
-| `completed` | Service delivered, documented, ready for billing review |
-| `cancelled` | Session cancelled before or at time of service (not billable) |
-| `no_show` | Client did not attend (not billable to insurance) |
-| `flagged` | Needs review before billing (documentation issue, auth concern, etc.) |
+| Status      | Description                                                           |
+| ----------- | --------------------------------------------------------------------- |
+| `scheduled` | Future session on the calendar, not yet rendered                      |
+| `completed` | Service delivered, documented, ready for billing review               |
+| `cancelled` | Session cancelled before or at time of service (not billable)         |
+| `no_show`   | Client did not attend (not billable to insurance)                     |
+| `flagged`   | Needs review before billing (documentation issue, auth concern, etc.) |
 
 ### 4.2 Valid Status Transitions
 
@@ -245,6 +262,7 @@ no_show   -> cancelled    (reclassified, e.g., client actually cancelled in adva
 ```
 
 **Invalid transitions:**
+
 - `cancelled -> completed` (cannot render a cancelled session)
 - `no_show -> completed` (client wasn't there, can't retroactively complete)
 - Any status -> `scheduled` (cannot go back to scheduled once the date has passed)
@@ -254,6 +272,7 @@ no_show   -> cancelled    (reclassified, e.g., client actually cancelled in adva
 **Yes, cancelling a completed session MUST reverse the unit decrement.**
 
 This is critical for authorization accuracy:
+
 1. When a session transitions `completed -> cancelled`:
    - Decrement `authorization_services.used_units` by `session.units`
    - Use atomic SQL: `SET used_units = used_units - N`
@@ -264,12 +283,14 @@ This is critical for authorization accuracy:
 ### 4.4 No-Show and Authorization Units
 
 **No-shows do NOT consume authorization units.** Reasoning:
+
 - No service was rendered, so no CPT code is billable
 - Insurance won't pay for services not provided
-- Authorization units represent approved *service* hours, not scheduled hours
+- Authorization units represent approved _service_ hours, not scheduled hours
 - The practice may charge the family a no-show fee (private pay, not insurance)
 
 **Implementation:** When status is `no_show`:
+
 - Do NOT increment `authorization_services.used_units`
 - Do NOT create a claim line
 - Track the no-show for reporting (cancellation rate metrics)
@@ -296,12 +317,12 @@ Common triggers for flagging a session:
 
 ### 5.1 Credential-Based Modifiers (Required)
 
-| Modifier | Credential Level | Typical Provider |
-|----------|-----------------|------------------|
-| HM | Less than bachelor's degree | RBT |
-| HN | Bachelor's level | BCaBA |
-| HO | Master's level | BCBA |
-| HP | Doctoral level | BCBA-D |
+| Modifier | Credential Level            | Typical Provider |
+| -------- | --------------------------- | ---------------- |
+| HM       | Less than bachelor's degree | RBT              |
+| HN       | Bachelor's level            | BCaBA            |
+| HO       | Master's level              | BCBA             |
+| HP       | Doctoral level              | BCBA-D           |
 
 These modifiers are **required** on ABA claims and affect reimbursement rates. Incorrect modifiers are one of the most frequent causes of ABA claim denials.
 
@@ -310,12 +331,14 @@ These modifiers are **required** on ABA claims and affect reimbursement rates. I
 **Auto-populate from provider credential, allow manual override.**
 
 The current schema supports this:
+
 - `providers.credentialType` stores `bcba | bcba_d | bcaba | rbt | other`
 - `CREDENTIAL_MODIFIERS` in constants maps credential -> modifier code
 - `providers.modifierCode` stores the default modifier
 - `sessions.modifierCodes` is an array for the session-specific modifiers
 
 **Flow:**
+
 1. When creating a session, auto-fill `modifierCodes[0]` from `providers.modifierCode` based on `providers.credentialType`
 2. Allow user to override (rare, but needed for edge cases)
 3. Validate: warn if modifier doesn't match provider credential
@@ -323,11 +346,13 @@ The current schema supports this:
 ### 5.3 Additional Modifiers
 
 **Telehealth modifiers:**
+
 - **95** — Synchronous telemedicine (real-time audio/video). Preferred by most commercial payers.
 - **GT** — Via interactive audio and video. Used by some Medicare plans and older billing systems. Being phased out in favor of 95.
 - Use **Place of Service 02** (telehealth, not at patient home) or **10** (telehealth, patient at home) with these modifiers.
 
 **Distinct service modifiers (X-series):**
+
 - **XE** — Separate encounter (different visit same day)
 - **XP** — Separate practitioner (different provider performed the service)
 - **XS** — Separate structure (different body site/organ system -- rare in ABA)
@@ -336,6 +361,7 @@ The current schema supports this:
 These are used when billing multiple services on the same day that might otherwise be denied as duplicates.
 
 **Other modifiers seen in ABA:**
+
 - **59** — Distinct procedural service (predecessor to X-series, still accepted by some payers)
 - **76** — Repeat procedure by same physician (if same code billed twice same day for different sessions)
 - **77** — Repeat procedure by different physician
@@ -365,6 +391,7 @@ A session is billable ("clean for claims") when ALL of these are satisfied:
 ### 6.2 Validation at Session Creation vs Claim Generation
 
 **At session creation (soft validations, warnings):**
+
 - Auth has sufficient remaining units (warn if not)
 - Provider credential matches CPT code requirements (RBT can't bill 97155)
 - Supervisor is assigned for RBT sessions
@@ -373,6 +400,7 @@ A session is billable ("clean for claims") when ALL of these are satisfied:
 - Units don't exceed daily max for the CPT code
 
 **At claim generation (hard validations, block submission):**
+
 - All the above, plus:
 - Session note is complete and signed/finalized
 - Modifier codes are present and valid
@@ -387,6 +415,7 @@ A session is billable ("clean for claims") when ALL of these are satisfied:
 The `billedAmount` on the session is the **charge amount** (what the practice charges), NOT what the payer pays.
 
 **Flow:**
+
 1. **Session created:** `billedAmount` = `units x fee_schedule_rate` for that CPT code. This is the practice's standard charge.
 2. **Claim generated:** The claim aggregates sessions into claim lines. Each claim line carries the `billedAmount` from the session.
 3. **Claim submitted:** Payer receives the billed amount.

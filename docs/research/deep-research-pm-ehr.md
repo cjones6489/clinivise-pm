@@ -24,12 +24,12 @@ What is the optimal design architecture for Clinivise — an ABA therapy practic
 
 Following additional targeted research on industry standards:
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| **Enums** | `text` columns + TypeScript `as const` + Zod validation. No pgEnum. | Crunchy Data recommends against pgEnum. `ALTER TYPE` acquires ACCESS EXCLUSIVE lock (full table scan). Drizzle has multiple open bugs around pgEnum migration (can't delete values, broken defaults). |
-| **Money** | `numeric(10,2)` in Postgres + `decimal.js` for arithmetic. Never `parseFloat()`. | X12 837P/835 EDI uses decimal strings. Stedi API expects decimal strings. Drizzle returns `numeric` as strings — pass directly to Stedi without conversion. Integer cents would require constant conversion at every EDI boundary. |
+| Decision          | Choice                                                                                                                                                        | Rationale                                                                                                                                                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Enums**         | `text` columns + TypeScript `as const` + Zod validation. No pgEnum.                                                                                           | Crunchy Data recommends against pgEnum. `ALTER TYPE` acquires ACCESS EXCLUSIVE lock (full table scan). Drizzle has multiple open bugs around pgEnum migration (can't delete values, broken defaults).                                            |
+| **Money**         | `numeric(10,2)` in Postgres + `decimal.js` for arithmetic. Never `parseFloat()`.                                                                              | X12 837P/835 EDI uses decimal strings. Stedi API expects decimal strings. Drizzle returns `numeric` as strings — pass directly to Stedi without conversion. Integer cents would require constant conversion at every EDI boundary.               |
 | **8-Minute Rule** | Per-session unit calculation in Phase 1. Per-day aggregation at claim generation in Phase 2. Store payer method (CMS vs AMA) in payer config. Default to AMA. | CMS aggregates across codes (Medicare/Medicaid). AMA evaluates per-code independently (commercial payers). Most ABA payers are commercial → default AMA. For ABA's long sessions (1-4 hrs), rounding rarely changes unit count within a session. |
-| **Auth Overlap** | Default FIFO (oldest expiration first). Allow manual override. Alert on expiring auth with remaining units. | No regulatory mandate, but strong operational consensus among ABA billers: unused units on expiring auth are forfeited. CentralReach supports manual priority but defaults to practice choice. |
+| **Auth Overlap**  | Default FIFO (oldest expiration first). Allow manual override. Alert on expiring auth with remaining units.                                                   | No regulatory mandate, but strong operational consensus among ABA billers: unused units on expiring auth are forfeited. CentralReach supports manual priority but defaults to practice choice.                                                   |
 
 ---
 
@@ -37,15 +37,15 @@ Following additional targeted research on industry standards:
 
 Seven specialized agents researched concurrently:
 
-| Agent | Focus | Key Output |
-|-------|-------|------------|
-| Documentation Research | FHIR R4, X12 EDI, HIPAA 45 CFR 164.312, CMS billing rules, Drizzle/Clerk/Next.js docs | 10 critical implementation constraints |
-| Competitive Analysis | CentralReach, AlohaABA, Catalyst, Raven Health, Jane App, SimplePractice, Canvas Medical, Stedi, Candid Health | Competitor weaknesses, UX patterns to steal, business model validation |
-| Open Source Research | Medplum, OpenEMR, multi-tenant SaaS repos, PDF extraction tools, npm healthcare libraries | Repository pattern from Medplum, ERA parsing from OpenEMR, zero ABA open source |
-| Architecture Analysis | Multi-tenancy options, auth tracking, claims state machine, caching, AI pipeline | Option A (shared schema) confirmed, atomic increment pattern, pull-based alerts |
-| DX / Product Experience | Stack ergonomics, form complexity, data table UX, type safety flow, maintainability | 11-file CRUD pattern acceptable, composable DataTable, session form 3-tap happy path |
-| Frontier Patterns | AI-native RCM startups, CMS-0057-F, offline-first, YC healthcare companies | FHIR PA APIs by 2027, PowerSync for offline, Medicaid rate cuts context |
-| Risk / Failure Modes | Multi-tenancy leaks, auth race conditions, billing edge cases, HIPAA gaps | 32 risks identified, 11 must be addressed before coding |
+| Agent                   | Focus                                                                                                          | Key Output                                                                           |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Documentation Research  | FHIR R4, X12 EDI, HIPAA 45 CFR 164.312, CMS billing rules, Drizzle/Clerk/Next.js docs                          | 10 critical implementation constraints                                               |
+| Competitive Analysis    | CentralReach, AlohaABA, Catalyst, Raven Health, Jane App, SimplePractice, Canvas Medical, Stedi, Candid Health | Competitor weaknesses, UX patterns to steal, business model validation               |
+| Open Source Research    | Medplum, OpenEMR, multi-tenant SaaS repos, PDF extraction tools, npm healthcare libraries                      | Repository pattern from Medplum, ERA parsing from OpenEMR, zero ABA open source      |
+| Architecture Analysis   | Multi-tenancy options, auth tracking, claims state machine, caching, AI pipeline                               | Option A (shared schema) confirmed, atomic increment pattern, pull-based alerts      |
+| DX / Product Experience | Stack ergonomics, form complexity, data table UX, type safety flow, maintainability                            | 11-file CRUD pattern acceptable, composable DataTable, session form 3-tap happy path |
+| Frontier Patterns       | AI-native RCM startups, CMS-0057-F, offline-first, YC healthcare companies                                     | FHIR PA APIs by 2027, PowerSync for offline, Medicaid rate cuts context              |
+| Risk / Failure Modes    | Multi-tenancy leaks, auth race conditions, billing edge cases, HIPAA gaps                                      | 32 risks identified, 11 must be addressed before coding                              |
 
 ---
 
@@ -63,10 +63,10 @@ Seven specialized agents researched concurrently:
 
 This is the most critical finding for billing accuracy:
 
-| Method | Used By | How It Works |
-|--------|---------|-------------|
-| **CMS/Medicare** | Medicare, some Medicaid | Sum total minutes across ALL timed codes, then convert. Remainders from different codes can combine — if they total 8+ min, bill an additional unit. |
-| **Substantial Portion (SPM)** | Commercial payers (Aetna, Cigna, UHC) | Each code must independently meet 8+ minutes of its 15-minute unit. No combining remainders across codes. |
+| Method                        | Used By                               | How It Works                                                                                                                                         |
+| ----------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **CMS/Medicare**              | Medicare, some Medicaid               | Sum total minutes across ALL timed codes, then convert. Remainders from different codes can combine — if they total 8+ min, bill an additional unit. |
+| **Substantial Portion (SPM)** | Commercial payers (Aetna, Cigna, UHC) | Each code must independently meet 8+ minutes of its 15-minute unit. No combining remainders across codes.                                            |
 
 **Implementation requirement:** Store actual minutes per CPT code per session. Calculate units based on payer's method (configurable per payer). The formula `Math.floor((minutes + 7) / 15)` is an approximation — the correct formula is:
 
@@ -96,64 +96,69 @@ Additionally, the CMS method aggregates across all timed codes in a single day f
 
 ### ABA Competitor Landscape
 
-| Platform | Strength | Clinivise Opportunity |
-|----------|----------|----------------------|
-| **CentralReach** | Market leader, 4,000 practices | Universally hated UX, $59+/user/month, enterprise complexity for small practices |
-| **AlohaABA** | Simple billing, 4.9/5 satisfaction | No native data collection, limited reporting, poor onboarding |
-| **Catalyst** | Best-in-class graphing engine | Mobile crashes and data loss, no PM/billing |
-| **Raven Health** | **Free PM + 2% revenue share** (our model) | $300 implementation fee, limited AI, newer entrant |
-| **Motivity** | Transparent pricing ($24-48/learner) | Weaker billing integration |
-| **Theralytics** | Free startup tier, fast onboarding | Limited innovation, no AI |
+| Platform         | Strength                                   | Clinivise Opportunity                                                            |
+| ---------------- | ------------------------------------------ | -------------------------------------------------------------------------------- |
+| **CentralReach** | Market leader, 4,000 practices             | Universally hated UX, $59+/user/month, enterprise complexity for small practices |
+| **AlohaABA**     | Simple billing, 4.9/5 satisfaction         | No native data collection, limited reporting, poor onboarding                    |
+| **Catalyst**     | Best-in-class graphing engine              | Mobile crashes and data loss, no PM/billing                                      |
+| **Raven Health** | **Free PM + 2% revenue share** (our model) | $300 implementation fee, limited AI, newer entrant                               |
+| **Motivity**     | Transparent pricing ($24-48/learner)       | Weaker billing integration                                                       |
+| **Theralytics**  | Free startup tier, fast onboarding         | Limited innovation, no AI                                                        |
 
 **Key finding: Raven Health is our closest analog.** They validate the business model (free PM + revenue share works in ABA) but charge a $300 implementation fee and lack AI features. Clinivise differentiates on: zero onboarding cost, AI-native auth letter parsing, and modern UX that practitioners actually enjoy using.
 
 ### Design Patterns to Steal
 
-| Pattern | Source | Why It Matters |
-|---------|--------|---------------|
-| Schedule-time auth enforcement | RethinkBH | Check authorizations BEFORE scheduling, not after claim denial |
-| Session-to-billing automation | Passage Health | Session data auto-populates CPT codes, units, payer rules |
-| Three-panel layout | Elation Health | Navigation \| list \| detail — most effective for clinical workflows |
-| Color-coded scheduling | Jane App | Visual schedule as homepage — what every user checks first |
-| Role-based dashboards | Motivity | Tie clinical, ops, and billing data together per role |
-| "Days not weeks" onboarding | Theralytics | Speed-to-value is a key differentiator for small practices |
+| Pattern                        | Source         | Why It Matters                                                       |
+| ------------------------------ | -------------- | -------------------------------------------------------------------- |
+| Schedule-time auth enforcement | RethinkBH      | Check authorizations BEFORE scheduling, not after claim denial       |
+| Session-to-billing automation  | Passage Health | Session data auto-populates CPT codes, units, payer rules            |
+| Three-panel layout             | Elation Health | Navigation \| list \| detail — most effective for clinical workflows |
+| Color-coded scheduling         | Jane App       | Visual schedule as homepage — what every user checks first           |
+| Role-based dashboards          | Motivity       | Tie clinical, ops, and billing data together per role                |
+| "Days not weeks" onboarding    | Theralytics    | Speed-to-value is a key differentiator for small practices           |
 
 ### Key ABA Business Metrics
 
-| Metric | Target | Industry Avg |
-|--------|--------|-------------|
-| Gross collection rate | 92%+ | — |
-| Days in AR | <30 days | 45-60 days |
-| Claim denial rate | <5% | 12% national avg |
-| Cancellation rate | <10% | — |
-| Authorization utilization | 95%+ | Varies widely |
-| Billing lag (session → claim) | <7 days | Often 30+ days |
+| Metric                        | Target   | Industry Avg     |
+| ----------------------------- | -------- | ---------------- |
+| Gross collection rate         | 92%+     | —                |
+| Days in AR                    | <30 days | 45-60 days       |
+| Claim denial rate             | <5%      | 12% national avg |
+| Cancellation rate             | <10%     | —                |
+| Authorization utilization     | 95%+     | Varies widely    |
+| Billing lag (session → claim) | <7 days  | Often 30+ days   |
 
 ---
 
 ## Relevant Repos, Libraries, and Technical References
 
 ### Medplum — Gold Standard for Tenant-Scoped Data Access
+
 - **GitHub:** github.com/medplum/medplum | 2.2k stars | Active (v5.1.4)
 - **Why it matters:** Their `Repository` class receives a context (projects, author, access policy) and automatically applies tenant filters to every query. This is the pattern Clinivise should adopt — a scoped query builder that injects `organization_id` automatically, making it impossible to forget the filter.
 - **What to avoid:** FHIR data model is overkill. ABA billing has specific domain models better modeled directly in Drizzle.
 
 ### OpenEMR — ERA/835 Parsing Reference
+
 - **GitHub:** github.com/openemr/openemr | 5k stars | Active
 - **Why it matters:** `ParseERA.php` implements the exact reconciliation logic Clinivise needs for Phase 2: extract ISA/GS/ST headers, BPR payment info, CLP claim status, CAS adjustment codes, SVC service lines. The formula `charge_total - approved_total - patient_responsibility = sum(service_payments) + sum(adjustments)` is the ERA reconciliation equation.
 - **What to avoid:** PHP procedural architecture. Implement in TypeScript against Stedi's JSON responses.
 
 ### OCRBase + Extract Kit — PDF Extraction Pipeline
+
 - **OCRBase:** github.com/ocrbase-hq/ocrbase | 973 stars | Uses Drizzle ORM
 - **Extract Kit:** github.com/aidalinfo/extract-kit | Zod schema validation on AI-extracted data
 - **Why it matters:** The pattern of defining a Zod schema for expected output, letting the LLM extract, then validating with Zod is exactly right for auth letter parsing. OCRBase adds queue-based processing for bulk uploads.
 
 ### Dr.Agenda — Closest Stack Match
+
 - **GitHub:** github.com/Dnowdd/Dr.Agenda | 14 stars
 - **Stack:** Next.js 15, React 19, Drizzle ORM, PostgreSQL, Tailwind v4, shadcn/ui, TanStack Query/Table, React Hook Form + Zod, **next-safe-action**
 - **Why it matters:** Nearly identical tech stack. Their action-per-feature directory structure (`src/actions/add-appointment/`, `src/actions/upsert-doctor/`) is worth studying as an alternative to our single-file-per-entity pattern.
 
 ### No Open-Source ABA Tools Exist
+
 Searches for ABA practice management, CMS 8-minute rule implementations, authorization unit tracking, and healthcare TanStack Table implementations returned zero viable results. Clinivise is building entirely net-new implementations for these domains.
 
 ---
@@ -162,23 +167,25 @@ Searches for ABA practice management, CMS 8-minute rule implementations, authori
 
 ### Multi-Tenancy: Shared Schema Confirmed
 
-| Option | Verdict | Rationale |
-|--------|---------|-----------|
+| Option                                  | Verdict   | Rationale                                                                                                                                   |
+| --------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **A: Shared schema + org_id filtering** | **ADOPT** | Already our plan. Simple, single migration path, works with Drizzle and Neon serverless. Add RLS as defense-in-depth before production PHI. |
-| B: Schema-per-tenant | Reject | Drizzle has no first-class dynamic schema support. Breaks type safety, N migration sets. |
-| C: Database-per-tenant | Reject | Requires separate Neon projects, separate connection strings, routing layer. Enormous operational cost for a startup. |
-| D: Hybrid isolation | Reject | Splits data model into two systems, doubles migration complexity. The boundary between "PHI-heavy" and "not" is blurry in healthcare. |
+| B: Schema-per-tenant                    | Reject    | Drizzle has no first-class dynamic schema support. Breaks type safety, N migration sets.                                                    |
+| C: Database-per-tenant                  | Reject    | Requires separate Neon projects, separate connection strings, routing layer. Enormous operational cost for a startup.                       |
+| D: Hybrid isolation                     | Reject    | Splits data model into two systems, doubles migration complexity. The boundary between "PHI-heavy" and "not" is blurry in healthcare.       |
 
 **Defense-in-depth:** Create a scoped query builder that auto-injects `WHERE organization_id = $orgId AND deleted_at IS NULL`. This is the single highest-leverage defensive measure. Add Postgres RLS policies before handling real PHI.
 
 ### Authorization Tracking: Atomic Increments + Pull-Based Alerts
 
 **Utilization tracking:** When a session is saved, atomically increment `used_units` within the same transaction:
+
 ```sql
 UPDATE authorization_services
 SET used_units = used_units + :sessionUnits
 WHERE id = :id AND used_units + :sessionUnits <= approved_units
 ```
+
 If 0 rows affected, the authorization is exhausted. This handles concurrent logging correctly — no optimistic locking needed for counters.
 
 **Session edits:** Compute delta (`new_units - old_units`) and apply atomically. For deletes, `used_units -= session.billed_units`. Build a reconciliation function that recalculates from session sums — run nightly or on demand as a repair tool.
@@ -190,22 +197,24 @@ If 0 rows affected, the authorization is exhausted. This handles concurrent logg
 ### Claims Lifecycle: Simple Status Column + Transition Function
 
 Model claim status as a `text` column (not pgEnum) with a pure function validating transitions:
+
 ```
 draft → ready → submitted → acknowledged → accepted → paid (terminal)
                                           → rejected → draft (correction)
                            → accepted → denied → appealed → paid/denied
 ```
+
 Put transition validation in a pure function called from server actions. Business rules (required fields, payer-specific checks) live in the action handler, not the state machine.
 
 **Idempotency:** Generate a `submissionId` client-side when clicking "Submit." Store on claim row. Reject duplicate submissions server-side.
 
 ### Server Actions vs. API Routes
 
-| Use Server Actions | Use API Routes |
-|-------------------|---------------|
-| User-initiated mutations (CRUD) | Webhooks (Clerk, Stedi) |
-| Form submissions | External service callbacks |
-| Anything needing auth context | Long-running AI operations (if timeout issues) |
+| Use Server Actions              | Use API Routes                                 |
+| ------------------------------- | ---------------------------------------------- |
+| User-initiated mutations (CRUD) | Webhooks (Clerk, Stedi)                        |
+| Form submissions                | External service callbacks                     |
+| Anything needing auth context   | Long-running AI operations (if timeout issues) |
 
 For AI parsing: start synchronous in the server action (3-10s for 1-3 page auth letters). If timeouts become an issue, move to async job pattern with polling.
 
@@ -213,13 +222,13 @@ For AI parsing: start synchronous in the server action (3-10s for 1-3 page auth 
 
 At our scale (100-1000 sessions/month per org), Neon handles every query in <50ms. Adding Redis or server-side caching adds operational complexity for zero user-visible benefit.
 
-| Data | Stale Time | Invalidation |
-|------|-----------|-------------|
-| Dashboard metrics | 60s | On session/claim mutation |
-| Client list | 5 min | On client CRUD |
-| Auth utilization | 30s | On session save |
-| Payer list | 1 hour | Rarely changes |
-| CPT codes | Forever | Static reference data |
+| Data              | Stale Time | Invalidation              |
+| ----------------- | ---------- | ------------------------- |
+| Dashboard metrics | 60s        | On session/claim mutation |
+| Client list       | 5 min      | On client CRUD            |
+| Auth utilization  | 30s        | On session save           |
+| Payer list        | 1 hour     | Rarely changes            |
+| CPT codes         | Forever    | Static reference data     |
 
 ### Audit Logging: Synchronous, In-Transaction
 
@@ -259,34 +268,35 @@ Append a row to `audit_logs` in the same transaction as the mutation. At our sca
 
 ### Adopt Now
 
-| Pattern | Who | Maturity | Action |
-|---------|-----|----------|--------|
+| Pattern                                 | Who                            | Maturity         | Action                                                                              |
+| --------------------------------------- | ------------------------------ | ---------------- | ----------------------------------------------------------------------------------- |
 | AI auth letter parsing (multimodal LLM) | Reducto, Extract Kit, internal | Production-ready | Build `lib/ai.ts` wrapper with Zod-validated structured output + confidence scoring |
-| Vercel HIPAA BAA | Vercel | Production | Enable on Pro plan before any real patient data |
-| Neon HIPAA add-on | Neon | Production | Available on Scale plan with BAA and pgAudit |
+| Vercel HIPAA BAA                        | Vercel                         | Production       | Enable on Pro plan before any real patient data                                     |
+| Neon HIPAA add-on                       | Neon                           | Production       | Available on Scale plan with BAA and pgAudit                                        |
 
 ### Design For Later
 
-| Pattern | Who | Maturity | Action |
-|---------|-----|----------|--------|
-| FHIR-mappable authorization model | CMS-0057-F mandate | Regulatory (2027) | Structure auth schema to map to CoverageEligibilityRequest. First-mover advantage for ABA. |
-| Offline session timer | PowerSync + Neon | Early-adopter | Architect session timer for offline-first. Killer feature for field-based RBTs. |
-| Denial prediction model | Candid Health pattern | Early-adopter | Capture denial reasons + outcomes in schema now. Train model once you have volume. |
-| Payer rate tracking | Industry need | Concept | Schema support for tracking reimbursement rates over time (Medicaid rate cuts context). |
-| Event-driven billing pipeline | AWS reference architectures | Production-proven | Keep server actions modular so they can become event-driven services when claims volume grows. |
+| Pattern                           | Who                         | Maturity          | Action                                                                                         |
+| --------------------------------- | --------------------------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| FHIR-mappable authorization model | CMS-0057-F mandate          | Regulatory (2027) | Structure auth schema to map to CoverageEligibilityRequest. First-mover advantage for ABA.     |
+| Offline session timer             | PowerSync + Neon            | Early-adopter     | Architect session timer for offline-first. Killer feature for field-based RBTs.                |
+| Denial prediction model           | Candid Health pattern       | Early-adopter     | Capture denial reasons + outcomes in schema now. Train model once you have volume.             |
+| Payer rate tracking               | Industry need               | Concept           | Schema support for tracking reimbursement rates over time (Medicaid rate cuts context).        |
+| Event-driven billing pipeline     | AWS reference architectures | Production-proven | Keep server actions modular so they can become event-driven services when claims volume grows. |
 
 ### Watch Only
 
-| Pattern | Who | Why Watch |
-|---------|-----|-----------|
-| AI voice agents for claim follow-up | LunaBill (YC F25, $764K ARR) | Real but Phase 3+ territory |
-| TEFCA for billing | HHS, 500M records exchanged | Currently clinical data exchange only |
-| Candid Health as RCM layer | Candid ($99.5M raised) | Revenue share conflicts with our model — build on Stedi directly |
-| Local-first CRDTs | Ditto, Electric SQL | PowerSync is simpler for our use case |
+| Pattern                             | Who                          | Why Watch                                                        |
+| ----------------------------------- | ---------------------------- | ---------------------------------------------------------------- |
+| AI voice agents for claim follow-up | LunaBill (YC F25, $764K ARR) | Real but Phase 3+ territory                                      |
+| TEFCA for billing                   | HHS, 500M records exchanged  | Currently clinical data exchange only                            |
+| Candid Health as RCM layer          | Candid ($99.5M raised)       | Revenue share conflicts with our model — build on Stedi directly |
+| Local-first CRDTs                   | Ditto, Electric SQL          | PowerSync is simpler for our use case                            |
 
 ### Critical Regulatory Context
 
 **CMS-0057-F (Interoperability & Prior Authorization Rule):**
+
 - Jan 2026: Payers must meet operational provisions (72-hour expedited, 7-day standard PA decisions)
 - Jan 2027: FHIR-based Prior Authorization APIs mandatory
 - CMS allows FHIR-only PA APIs without X12 278 compliance
@@ -300,18 +310,23 @@ Append a row to `audit_logs` in the same transaction as the mutation. At our sca
 ## Opportunities to Build Something Better
 
 ### 1. Authorization-Aware Session Logging (No Competitor Does This Well)
+
 CentralReach and AlohaABA let you log sessions that exceed authorization limits — the denial happens weeks later. Clinivise should **block or warn in real-time** during session logging with an inline utilization check. "This session would use 12 of your remaining 4 units. Contact the BCBA to request additional authorization."
 
 ### 2. AI Auth Letter Parsing (Unique Differentiator)
+
 No ABA PM tool offers AI-powered extraction from authorization letter PDFs. The upload → extract → review → save workflow with confidence scoring per field is a clear competitive advantage. BCBAs currently spend 15-30 minutes manually entering authorization data from letters.
 
 ### 3. Projected Utilization + "Money Left on Table" Alerts
+
 Show practices not just current utilization, but projected utilization at expiry based on burn rate. Alert when a practice is under-utilizing an authorization (e.g., <50% used with >50% of auth period elapsed). This catches revenue that would otherwise be silently lost.
 
 ### 4. Zero-Friction Onboarding (Under 30 Minutes)
+
 CentralReach requires weeks of implementation. Theralytics proved "days not weeks" is possible. Clinivise should target sign-up → first session logged in under 30 minutes. Clerk handles auth instantly. Import CSV for existing client data. Pre-seed common payers. AI-parse the first auth letter during onboarding.
 
 ### 5. Dual 8-Minute Rule Support (Per-Payer Configuration)
+
 No open-source implementation of the CMS 8-minute rule exists. Most PM tools implement one method. Supporting both CMS and SPM methods with per-payer configuration is a genuine differentiator for practices billing multiple payer types.
 
 ---
@@ -320,57 +335,60 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 
 ### Must Address Before Coding (11 Critical Items)
 
-| # | Risk | Severity | Mitigation |
-|---|------|----------|------------|
-| 1 | Missing `organization_id` filter | Critical | Scoped query builder that auto-injects org_id + deleted_at filter |
-| 2 | Authorization race condition (concurrent logging) | Critical | Atomic SQL increment `SET used_units = used_units + N`, never read-modify-write |
-| 3 | `authActionClient` null orgId | Critical | Hard-fail immediately if orgId is falsy. NOT NULL constraint on org_id columns |
-| 4 | CMS 8-minute rule incorrect implementation | Critical | Support both CMS and SPM methods. Exhaustive tests (0-120 minutes). Store raw minutes + calculated units |
-| 5 | Money precision (parseFloat on numeric) | Critical | Integer cents throughout. `src/lib/money.ts` utility functions. Never JavaScript floats for money |
-| 6 | pgEnum vs text enum contradiction | High | Resolve to text + `as const` arrays before writing any schema |
-| 7 | New table missing organization_id | High | Base table factory function. Automated lint/test checking all tables |
-| 8 | Session → authorization_service FK | High | FK to service line (not just authorization) forces CPT code specificity |
-| 9 | Timezone handling | High | Org-level timezone. session_date derived from start_time in org TZ |
-| 10 | Webhook signature verification | Critical | Verify Clerk webhook signatures via svix. Rate limit webhook endpoints |
-| 11 | AI extraction auto-commit | High | NEVER auto-save AI-parsed data. Always show review screen with confidence scoring |
+| #   | Risk                                              | Severity | Mitigation                                                                                               |
+| --- | ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| 1   | Missing `organization_id` filter                  | Critical | Scoped query builder that auto-injects org_id + deleted_at filter                                        |
+| 2   | Authorization race condition (concurrent logging) | Critical | Atomic SQL increment `SET used_units = used_units + N`, never read-modify-write                          |
+| 3   | `authActionClient` null orgId                     | Critical | Hard-fail immediately if orgId is falsy. NOT NULL constraint on org_id columns                           |
+| 4   | CMS 8-minute rule incorrect implementation        | Critical | Support both CMS and SPM methods. Exhaustive tests (0-120 minutes). Store raw minutes + calculated units |
+| 5   | Money precision (parseFloat on numeric)           | Critical | Integer cents throughout. `src/lib/money.ts` utility functions. Never JavaScript floats for money        |
+| 6   | pgEnum vs text enum contradiction                 | High     | Resolve to text + `as const` arrays before writing any schema                                            |
+| 7   | New table missing organization_id                 | High     | Base table factory function. Automated lint/test checking all tables                                     |
+| 8   | Session → authorization_service FK                | High     | FK to service line (not just authorization) forces CPT code specificity                                  |
+| 9   | Timezone handling                                 | High     | Org-level timezone. session_date derived from start_time in org TZ                                       |
+| 10  | Webhook signature verification                    | Critical | Verify Clerk webhook signatures via svix. Rate limit webhook endpoints                                   |
+| 11  | AI extraction auto-commit                         | High     | NEVER auto-save AI-parsed data. Always show review screen with confidence scoring                        |
 
 ### Address During Phase 1
 
-| Risk | Severity | When |
-|------|----------|------|
-| TanStack Query keys must include orgId | High | First client component |
-| Server-side pagination from Day 1 | Medium | First data table |
-| File upload validation (type, size, magic bytes) | High | Auth letter upload |
-| Sentry PHI scrubbing config | High | Sentry setup |
-| FK onDelete constraints explicitly set (default RESTRICT) | Medium | Schema definition |
-| Soft delete filtering in all queries | High | Scoped query builder |
-| Auth date range validation on session creation | Medium | Session actions |
-| Auth overlap detection (FIFO: oldest first) | High | Authorization queries |
-| Clerk webhook idempotency | High | Webhook route |
-| Optimistic concurrency (updated_at check on edits) | High | Update actions |
+| Risk                                                      | Severity | When                   |
+| --------------------------------------------------------- | -------- | ---------------------- |
+| TanStack Query keys must include orgId                    | High     | First client component |
+| Server-side pagination from Day 1                         | Medium   | First data table       |
+| File upload validation (type, size, magic bytes)          | High     | Auth letter upload     |
+| Sentry PHI scrubbing config                               | High     | Sentry setup           |
+| FK onDelete constraints explicitly set (default RESTRICT) | Medium   | Schema definition      |
+| Soft delete filtering in all queries                      | High     | Scoped query builder   |
+| Auth date range validation on session creation            | Medium   | Session actions        |
+| Auth overlap detection (FIFO: oldest first)               | High     | Authorization queries  |
+| Clerk webhook idempotency                                 | High     | Webhook route          |
+| Optimistic concurrency (updated_at check on edits)        | High     | Update actions         |
 
 ### Design Now, Implement Phase 2
 
-| Risk | Severity |
-|------|----------|
-| Claim state machine + idempotency key | Critical |
-| ERA/835 matching with manual reconciliation queue | High |
-| Timely filing deadline tracking per payer | Critical |
-| Payer-specific billing rule configuration | High |
-| Provider credential expiration tracking + enforcement | High |
-| Coordination of benefits (primary/secondary insurance) | Medium |
+| Risk                                                   | Severity |
+| ------------------------------------------------------ | -------- |
+| Claim state machine + idempotency key                  | Critical |
+| ERA/835 matching with manual reconciliation queue      | High     |
+| Timely filing deadline tracking per payer              | Critical |
+| Payer-specific billing rule configuration              | High     |
+| Provider credential expiration tracking + enforcement  | High     |
+| Coordination of benefits (primary/secondary insurance) | Medium   |
 
 ---
 
 ## Recommended Technical Direction
 
 ### Design Pattern
+
 **Layered CRUD with scoped data access.** Server Components for reads → scoped query functions → Drizzle → Neon. Client mutations → next-safe-action with authActionClient → business logic in service layer → Drizzle transactions → audit log → revalidate.
 
 ### Architecture
+
 **Shared-schema multi-tenancy** with `organization_id` on every table. Application-level filtering via scoped query builder as primary mechanism. Postgres RLS as defense-in-depth before production PHI. Synchronous audit logging in-transaction.
 
 ### Key Libraries/Tools
+
 - **Drizzle ORM 0.45** — schema, queries, migrations, RLS support
 - **Neon serverless** — Postgres with connection pooling, branching for dev
 - **Clerk Pro** — org-based multi-tenancy, RBAC, MFA
@@ -380,6 +398,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 - **Sonner** — toast notifications for all action feedback
 
 ### What to Do Now
+
 1. Resolve enum strategy (text + `as const`)
 2. Resolve money strategy (integer cents)
 3. Add org timezone to organizations table
@@ -391,6 +410,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 9. Build Clerk middleware + providers (Sprint 1B, parallel)
 
 ### What to Defer
+
 - RLS policies (pre-production hardening)
 - Claims state machine + Stedi integration (Phase 2)
 - Async job queue for AI (only if sync timeouts become an issue)
@@ -400,6 +420,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 - Event sourcing (likely never)
 
 ### What to Avoid
+
 - pgEnum for status columns (can't remove values, hard to migrate)
 - Database-per-tenant or schema-per-tenant (wrong for our scale and stack)
 - parseFloat on money values (guaranteed billing errors)
@@ -429,6 +450,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 ## Sources and References
 
 ### Official Documentation
+
 - [FHIR R4 ExplanationOfBenefit](https://hl7.org/fhir/R4/explanationofbenefit.html)
 - [FHIR R4 Claim](https://hl7.org/fhir/claim.html)
 - [FHIR R4 Coverage](https://www.hl7.org/fhir/R4/coverage.html)
@@ -444,6 +466,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 - [next-safe-action Middleware Docs](https://next-safe-action.dev/docs/define-actions/middleware)
 
 ### Specifications and Standards
+
 - [CMS-0057-F Interoperability & Prior Authorization Final Rule](https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-prior-authorization-final-rule-cms-0057-f)
 - [CMS-0057-F Must-Have APIs for 2026-2027](https://fire.ly/blog/cms-0057-f-decoded-must-have-apis-vs-nice-to-have-igs-for-2026-2027/)
 - [HHS HIPAA Security Rule NPRM Fact Sheet](https://www.hhs.gov/hipaa/for-professionals/security/hipaa-security-rule-nprm/factsheet/index.html)
@@ -451,6 +474,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 - [ABA Coding Coalition - CPT Codes](https://abacodes.org/codes/)
 
 ### Platform and Product References
+
 - [Stedi Healthcare Developer Docs](https://www.stedi.com/docs/healthcare)
 - [Stedi Professional Claims (837P) API](https://www.stedi.com/docs/api-reference/healthcare/post-healthcare-claims)
 - [Stedi Eligibility (270/271) API](https://www.stedi.com/docs/healthcare/api-reference/post-healthcare-eligibility)
@@ -464,6 +488,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 - [Vercel HIPAA BAA for Pro Teams](https://vercel.com/changelog/hipaa-baas-are-now-available-to-pro-teams)
 
 ### Repositories and Code References
+
 - [Medplum](https://github.com/medplum/medplum) — 2.2k stars, FHIR-native platform, repository pattern for tenant scoping
 - [OpenEMR](https://github.com/openemr/openemr) — 5k stars, ERA/835 parsing in `src/Billing/ParseERA.php`
 - [next-safe-action](https://github.com/TheEdoRan/next-safe-action) — 3k stars, middleware chain pattern
@@ -472,6 +497,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 - [Dr.Agenda](https://github.com/Dnowdd/Dr.Agenda) — 14 stars, closest tech stack match (Next.js 15 + Drizzle + next-safe-action + shadcn)
 
 ### Competitor and Market References
+
 - [CentralReach Reviews - Capterra](https://www.capterra.com/p/140743/CentralReach/reviews/)
 - [AlohaABA Reviews - Capterra](https://www.capterra.com/p/192774/AlohaABA/)
 - [Raven Health Pricing](https://ravenhealth.com/pricing/) — Free PM + 2% revenue share model
@@ -482,6 +508,7 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 - [How Healthcare Payments Work - Out-of-Pocket](https://www.outofpocket.health/p/how-healthcare-payments-work-with-candid-health)
 
 ### Internal Codebase References
+
 - `CLAUDE.md` — Architecture, tech stack, constraints, phase context
 - `.claude/rules/database.md` — "Use text for enums" (contradicts engineering spec's pgEnum usage)
 - `.claude/rules/security.md` — PHI handling, multi-tenant isolation guidelines
@@ -492,4 +519,4 @@ No open-source implementation of the CMS 8-minute rule exists. Most PM tools imp
 
 ---
 
-*Research completed: 2026-03-20. Seven agents, ~50 sources consulted.*
+_Research completed: 2026-03-20. Seven agents, ~50 sources consulted._

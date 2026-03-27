@@ -39,7 +39,11 @@ async function autoProvision(clerkUserId: string, clerkOrgId: string) {
 
   // Check if user already exists (match by email + org for invited users)
   // Use primaryEmailAddress (Clerk's designated primary), not emailAddresses[0] (creation order)
-  const email = (clerkUser.primaryEmailAddress?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress ?? "").toLowerCase();
+  const email = (
+    clerkUser.primaryEmailAddress?.emailAddress ??
+    clerkUser.emailAddresses[0]?.emailAddress ??
+    ""
+  ).toLowerCase();
   if (!email) return null; // No email = can't provision
 
   let [user] = await db
@@ -65,11 +69,7 @@ async function autoProvision(clerkUserId: string, clerkOrgId: string) {
         })
         .where(eq(users.id, user.id));
       // Re-fetch to get updated fields
-      [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, user.id))
-        .limit(1);
+      [user] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
     }
     return user ?? null;
   }

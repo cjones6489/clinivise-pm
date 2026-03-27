@@ -26,12 +26,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
           <h1 className="text-lg font-semibold tracking-tight">Welcome to Clinivise</h1>
           <p className="text-muted-foreground text-sm">
-            Select your practice to continue. If you don&apos;t see your practice listed, contact your administrator or our support team.
+            Select your practice to continue. If you don&apos;t see your practice listed, contact
+            your administrator or our support team.
           </p>
-          <OrganizationList
-            hidePersonal
-            afterSelectOrganizationUrl="/overview"
-          />
+          <OrganizationList hidePersonal afterSelectOrganizationUrl="/overview" />
         </div>
       </div>
     );
@@ -57,7 +55,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <AppSidebar userRole={user.role} alertCount={alertCount} />
         <SidebarInset>
           <Header />
-          <main id="main-content" className="flex-1 bg-background p-4 md:p-6">{children}</main>
+          <main id="main-content" className="bg-background flex-1 p-4 md:p-6">
+            {children}
+          </main>
         </SidebarInset>
       </SidebarProvider>
     </PermissionProvider>

@@ -19,6 +19,7 @@ Objective:
 Find the non-obvious problems that would still cause failures in production, especially under unusual inputs, timing issues, partial failures, retries, malformed data, concurrency, permissions boundaries, and real-world operational conditions.
 
 Healthcare-specific focus areas:
+
 - Authorization unit tracking: race conditions between concurrent RBTs, stale utilization data, FIFO selection bugs on overlapping auths
 - Session logging: timer drift in background tabs, CMS vs AMA unit calculation edge cases, midnight-crossing sessions, DST boundaries
 - Multi-tenancy: TanStack Query cache surviving org switches, browser back-button showing wrong org data, Clerk orgId null edge cases
@@ -27,6 +28,7 @@ Healthcare-specific focus areas:
 - Mobile/tablet: virtual keyboard hiding inputs, touch target sizing in compact Mira UI, poor network during session submission
 
 Instructions:
+
 1. Review the implemented code and prior audit results together.
 2. Focus only on net-new edge cases, hidden failure modes, and places where the previous audit may have been too shallow.
 3. Look specifically for:
@@ -49,7 +51,9 @@ Instructions:
 Return the audit in exactly this structure:
 
 ## Remaining Edge-Case Risks
+
 For each issue include:
+
 - Severity: Critical / High / Medium / Low
 - Category
 - Scenario
@@ -59,21 +63,27 @@ For each issue include:
 - Recommended fix
 
 ## Resilience and Recovery Gaps
+
 List missing handling for retries, partial failures, timeouts, rollbacks, fallback behavior, and recovery paths. Pay special attention to session logging (most frequent action) and authorization tracking (most revenue-critical).
 
 ## State and Data Integrity Risks
+
 List any issues involving state transitions, duplicate actions, stale data, inconsistent writes, idempotency, or data corruption risk. Focus on authorization unit tracking and billing data.
 
 ## Security and Permission Edge Cases
+
 List subtle auth, session, role, tenant-boundary, or permission-related risks. Include Clerk org context edge cases and RBAC UI inconsistencies.
 
 ## Observability and Debuggability Gaps
+
 List places where failures could occur without clear logs, metrics, tracing, alerts, or user-visible signals. Flag any places where PHI might leak into logs or error messages.
 
 ## Remaining Test Gaps
+
 List missing edge-case tests, failure-mode tests, integration tests, and production-simulation checks. Prioritize per testing rules: org isolation > money arithmetic > auth utilization > session units > server actions > CRUD > UI.
 
 ## Final Edge-Case Readiness
+
 - Edge-case readiness score: /10
 - Safe to ship now: Yes / No
 - Remaining blockers, if any

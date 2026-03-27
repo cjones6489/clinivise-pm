@@ -13,31 +13,32 @@
 
 The formula: `floor(minutes / 15) + (minutes % 15 >= 8 ? 1 : 0)`
 
-| Minutes | Units | Explanation |
-|---------|-------|-------------|
-| 1-7 | 0 | Not billable |
-| 8-22 | 1 | First unit |
-| 23-37 | 2 | Second unit |
-| 38-52 | 3 | Third unit |
-| 53-67 | 4 | Fourth unit |
+| Minutes | Units | Explanation  |
+| ------- | ----- | ------------ |
+| 1-7     | 0     | Not billable |
+| 8-22    | 1     | First unit   |
+| 23-37   | 2     | Second unit  |
+| 38-52   | 3     | Third unit   |
+| 53-67   | 4     | Fourth unit  |
 
 **AMA (per-code) vs CMS (aggregate) method**:
+
 - **AMA**: Each CPT code evaluated independently. Remainder minutes from different codes CANNOT be combined. Used by most commercial payers.
 - **CMS**: Sum ALL timed minutes across ALL CPT codes for one patient on one date. Distribute units back. Extra unit goes to code with largest remainder. Used by Medicare/Medicaid.
 - **Our implementation**: AMA is the default (`unitCalcMethod: "ama"` on payers). CMS method stored but not yet calculated (Phase 2 for aggregate day-level billing).
 
 ### MUE Limits (Medically Unlikely Edits)
 
-| CPT | Description | Medicare MUE | Medicaid MUE | Our `maxUnitsPerDay` |
-|-----|-------------|-------------|-------------|---------------------|
-| 97151 | Assessment | **8** | 32 | 32 |
-| 97152 | Assessment support | 16 | 16 | 16 |
-| 97153 | Adaptive behavior treatment | 32 | 32 | 32 |
-| 97154 | Group treatment | 18 | 18 | 18 |
-| 97155 | Protocol modification | 24 | 24 | 24 |
-| 97156 | Caregiver training | 16 | 16 | 16 |
-| 97157 | Group caregiver training | 16 | 16 | 16 |
-| 97158 | Group protocol modification | 16 | 16 | 16 |
+| CPT   | Description                 | Medicare MUE | Medicaid MUE | Our `maxUnitsPerDay` |
+| ----- | --------------------------- | ------------ | ------------ | -------------------- |
+| 97151 | Assessment                  | **8**        | 32           | 32                   |
+| 97152 | Assessment support          | 16           | 16           | 16                   |
+| 97153 | Adaptive behavior treatment | 32           | 32           | 32                   |
+| 97154 | Group treatment             | 18           | 18           | 18                   |
+| 97155 | Protocol modification       | 24           | 24           | 24                   |
+| 97156 | Caregiver training          | 16           | 16           | 16                   |
+| 97157 | Group caregiver training    | 16           | 16           | 16                   |
+| 97158 | Group protocol modification | 16           | 16           | 16                   |
 
 **Action item**: Our `maxUnitsPerDay` uses Medicaid values. The 97151 Medicare discrepancy (8 vs 32) is significant. Consider adding `medicareMaxUnitsPerDay` field for practices billing Medicare.
 
@@ -45,63 +46,64 @@ The formula: `floor(minutes / 15) + (minutes % 15 >= 8 ? 1 : 0)`
 
 These map to CMS-1500 claim form fields:
 
-| CMS-1500 Box | Field | Our Schema | Required? |
-|-------------|-------|-----------|-----------|
-| 21 | ICD-10 Diagnosis (F84.0) | On client record | Yes |
-| 23 | Authorization Number | `authorizationId` → auth.authorizationNumber | Yes (nearly universal for ABA) |
-| 24A | Date of Service | `sessionDate` | Yes |
-| 24B | Place of Service | `placeOfService` | Yes |
-| 24D | CPT + Modifiers | `cptCode` + `modifierCodes` | Yes |
-| 24G | Units | `units` | Yes |
-| 24J | Rendering Provider NPI | Via `providerId` → provider.npi | Yes |
-| 33 | Billing Provider NPI | Organization-level | Yes |
+| CMS-1500 Box | Field                    | Our Schema                                   | Required?                      |
+| ------------ | ------------------------ | -------------------------------------------- | ------------------------------ |
+| 21           | ICD-10 Diagnosis (F84.0) | On client record                             | Yes                            |
+| 23           | Authorization Number     | `authorizationId` → auth.authorizationNumber | Yes (nearly universal for ABA) |
+| 24A          | Date of Service          | `sessionDate`                                | Yes                            |
+| 24B          | Place of Service         | `placeOfService`                             | Yes                            |
+| 24D          | CPT + Modifiers          | `cptCode` + `modifierCodes`                  | Yes                            |
+| 24G          | Units                    | `units`                                      | Yes                            |
+| 24J          | Rendering Provider NPI   | Via `providerId` → provider.npi              | Yes                            |
+| 33           | Billing Provider NPI     | Organization-level                           | Yes                            |
 
 **Action item**: Start/end times should be REQUIRED for completed sessions — our schema has them optional, but nearly every payer requires them for billing compliance.
 
 ### Modifier Requirements
 
-| Modifier | Credential | Role | Status |
-|----------|-----------|------|--------|
-| HM | < Bachelor's | RBT | Implemented ✓ |
-| HN | Bachelor's | BCaBA | Implemented ✓ |
-| HO | Master's | BCBA | Implemented ✓ |
-| HP | Doctoral | BCBA-D | Implemented ✓ |
-| 95 | Any | Telehealth (POS 02/10) | Implemented ✓ |
-| 59/XE/XP/XS/XU | Any | Distinct procedural service | Not implemented (Phase 2) |
+| Modifier       | Credential   | Role                        | Status                    |
+| -------------- | ------------ | --------------------------- | ------------------------- |
+| HM             | < Bachelor's | RBT                         | Implemented ✓             |
+| HN             | Bachelor's   | BCaBA                       | Implemented ✓             |
+| HO             | Master's     | BCBA                        | Implemented ✓             |
+| HP             | Doctoral     | BCBA-D                      | Implemented ✓             |
+| 95             | Any          | Telehealth (POS 02/10)      | Implemented ✓             |
+| 59/XE/XP/XS/XU | Any          | Distinct procedural service | Not implemented (Phase 2) |
 
 ### CPT-Credential Matching Rules
 
-| CPT | RBT? | BCaBA? | BCBA/BCBA-D? |
-|-----|-------|--------|-------------|
-| 97151 | **No** | **No** | Yes (QHP only) |
-| 97152 | Yes (supervised) | Yes (supervised) | Yes |
-| 97153 | Yes (supervised) | Yes (supervised) | Yes |
-| 97154 | Yes (supervised) | Yes (supervised) | Yes |
-| 97155 | **No** | **No** | Yes (QHP only) |
-| 97156 | **No** | **No** | Yes (QHP only) |
-| 97157 | **No** | **No** | Yes (QHP only) |
-| 97158 | **No** | **No** | Yes (QHP only) |
+| CPT   | RBT?             | BCaBA?           | BCBA/BCBA-D?   |
+| ----- | ---------------- | ---------------- | -------------- |
+| 97151 | **No**           | **No**           | Yes (QHP only) |
+| 97152 | Yes (supervised) | Yes (supervised) | Yes            |
+| 97153 | Yes (supervised) | Yes (supervised) | Yes            |
+| 97154 | Yes (supervised) | Yes (supervised) | Yes            |
+| 97155 | **No**           | **No**           | Yes (QHP only) |
+| 97156 | **No**           | **No**           | Yes (QHP only) |
+| 97157 | **No**           | **No**           | Yes (QHP only) |
+| 97158 | **No**           | **No**           | Yes (QHP only) |
 
 **Action item**: RBTs should be BLOCKED (not just warned) from logging 97151/97155/97156/97157/97158. These are QHP-only codes.
 
 ### Session Validation Checklist (Pre-Claim)
 
-| # | Rule | Phase 1-Core? | Notes |
-|---|------|--------------|-------|
-| 1 | Authorization active (approved, within date range) | Yes | FIFO auto-select handles this |
-| 2 | Authorization has remaining units | Yes | `usedUnits < approvedUnits` check |
-| 3 | CPT matches provider credential | Yes | Block RBT from QHP-only codes |
-| 4 | Start/end time present for completed sessions | Yes | Make required in validator |
-| 5 | Units match duration per 8-min rule | Phase 1-Polish | Store actualMinutes, validate later |
-| 6 | No overlapping sessions (same provider, same time) | Phase 1-Polish | Never allowed |
-| 7 | No overlapping sessions (same client, same time) | Phase 1-Polish | Allowed only for specific concurrent billing |
-| 8 | Units don't exceed MUE for the day | Phase 1-Polish | Aggregate all sessions for client+CPT+date |
-| 9 | Provider has valid NPI | Phase 2 | Check at claim generation |
-| 10 | Client has diagnosis code | Phase 2 | Check at claim generation |
+| #   | Rule                                               | Phase 1-Core?  | Notes                                        |
+| --- | -------------------------------------------------- | -------------- | -------------------------------------------- |
+| 1   | Authorization active (approved, within date range) | Yes            | FIFO auto-select handles this                |
+| 2   | Authorization has remaining units                  | Yes            | `usedUnits < approvedUnits` check            |
+| 3   | CPT matches provider credential                    | Yes            | Block RBT from QHP-only codes                |
+| 4   | Start/end time present for completed sessions      | Yes            | Make required in validator                   |
+| 5   | Units match duration per 8-min rule                | Phase 1-Polish | Store actualMinutes, validate later          |
+| 6   | No overlapping sessions (same provider, same time) | Phase 1-Polish | Never allowed                                |
+| 7   | No overlapping sessions (same client, same time)   | Phase 1-Polish | Allowed only for specific concurrent billing |
+| 8   | Units don't exceed MUE for the day                 | Phase 1-Polish | Aggregate all sessions for client+CPT+date   |
+| 9   | Provider has valid NPI                             | Phase 2        | Check at claim generation                    |
+| 10  | Client has diagnosis code                          | Phase 2        | Check at claim generation                    |
 
 ### Session Status Lifecycle
 
 Our current statuses (5) are correct for Phase 1:
+
 ```
 scheduled → completed, cancelled, no_show
 completed → cancelled, flagged
@@ -111,6 +113,7 @@ no_show → (terminal)
 ```
 
 Phase 2 additions (on the claim, not the session):
+
 - `pending_review` — awaiting supervisor co-sign
 - `ready_to_bill` — validated, ready for claim generation
 - `billed` — claim submitted
@@ -121,6 +124,7 @@ Phase 2 additions (on the claim, not the session):
 **Current gap**: Our FIFO select checks `usedUnits < approvedUnits`, but by the time the increment executes, another concurrent transaction could have consumed those units.
 
 **Fix**: Add `SELECT ... FOR UPDATE` on the auth service row within the transaction:
+
 ```sql
 -- Lock the row before incrementing
 SELECT id FROM authorization_services
@@ -146,13 +150,13 @@ This serializes concurrent session creation against the same auth service.
 
 ### ABA Practice KPIs (Tier 1 — Daily)
 
-| KPI | Target | Warning | Critical |
-|-----|--------|---------|----------|
-| Auth utilization | 85-95% | <50% or >95% | <30% or >100% |
-| Cancellation/no-show rate | <10% | 10-15% | >15% |
-| Staff utilization (billable %) | 75-85% | <70% or >90% | <60% |
-| Unsigned notes | 0 | 1-3 | >3 |
-| Billing lag (service → claim) | <2 days | 2-5 days | >5 days |
+| KPI                            | Target  | Warning      | Critical      |
+| ------------------------------ | ------- | ------------ | ------------- |
+| Auth utilization               | 85-95%  | <50% or >95% | <30% or >100% |
+| Cancellation/no-show rate      | <10%    | 10-15%       | >15%          |
+| Staff utilization (billable %) | 75-85%  | <70% or >90% | <60%          |
+| Unsigned notes                 | 0       | 1-3          | >3            |
+| Billing lag (service → claim)  | <2 days | 2-5 days     | >5 days       |
 
 ### Alert Fatigue Prevention (Critical Research)
 
@@ -160,15 +164,16 @@ Healthcare alert fatigue causes **49-96% of alerts to be overridden** (AHRQ PSNe
 
 **The "5 Rights" framework for Clinivise alerts**:
 
-| Right | Application |
-|-------|------------|
-| Right information | Only alert on actionable items (not "5 auths are healthy") |
-| Right person | RBTs see session alerts. BCBAs see caseload. Admins see practice-level. |
-| Right format | Critical = inline banner. Warning = badge/pill. Info = dashboard widget only. |
-| Right channel | Dashboard for aggregates. Session form for point-of-action. |
-| Right time | Escalating: 30d (info) → 14d (warning) → 7d (critical) |
+| Right             | Application                                                                   |
+| ----------------- | ----------------------------------------------------------------------------- |
+| Right information | Only alert on actionable items (not "5 auths are healthy")                    |
+| Right person      | RBTs see session alerts. BCBAs see caseload. Admins see practice-level.       |
+| Right format      | Critical = inline banner. Warning = badge/pill. Info = dashboard widget only. |
+| Right channel     | Dashboard for aggregates. Session form for point-of-action.                   |
+| Right time        | Escalating: 30d (info) → 14d (warning) → 7d (critical)                        |
 
 **Anti-fatigue strategies**:
+
 1. **Exception-based only**: Show problems, not happy paths
 2. **Maximum 3-5 visible alerts** before "View all (N)" link
 3. **Aggregate similar alerts**: "3 auths expiring within 14d" (one row), not 3 separate rows
@@ -177,11 +182,11 @@ Healthcare alert fatigue causes **49-96% of alerts to be overridden** (AHRQ PSNe
 
 ### Alert Dismissability
 
-| Severity | Dismissable? | Behavior |
-|----------|-------------|----------|
-| Critical | No | Persists until resolved. Can be "acknowledged" (collapses but visible) |
-| Warning | Snooze | "Dismiss for 24h / 7 days / until resolved". Log who dismissed for audit. |
-| Info | Yes | Dismissed permanently once seen |
+| Severity | Dismissable? | Behavior                                                                  |
+| -------- | ------------ | ------------------------------------------------------------------------- |
+| Critical | No           | Persists until resolved. Can be "acknowledged" (collapses but visible)    |
+| Warning  | Snooze       | "Dismiss for 24h / 7 days / until resolved". Log who dismissed for audit. |
+| Info     | Yes          | Dismissed permanently once seen                                           |
 
 **Key insight**: Replace interruptive pop-ups with passive inline alerts (banners, badges). Only use blocking dialogs for destructive actions.
 
@@ -270,6 +275,7 @@ Each section is an async server component fetching independently. Skeleton loade
 ### Drizzle Aggregation for Dashboard
 
 Use Postgres `FILTER (WHERE ...)` for conditional aggregation:
+
 ```ts
 const [metrics] = await db
   .select({
@@ -277,20 +283,22 @@ const [metrics] = await db
     totalClients: sql<number>`count(*)::int`,
   })
   .from(clients)
-  .where(and(eq(clients.organizationId, orgId), isNull(clients.deletedAt)))
+  .where(and(eq(clients.organizationId, orgId), isNull(clients.deletedAt)));
 ```
 
 Always use `coalesce` for NULL safety and `nullif(..., 0)` to prevent division-by-zero:
+
 ```ts
 avgUtilization: sql<number>`coalesce(
   round(sum(${svcAgg.totalUsed})::numeric / nullif(sum(${svcAgg.totalApproved}), 0) * 100),
   0
-)::int`
+)::int`;
 ```
 
 ### Client Overview Query with Subqueries
 
 Use subqueries for inline metrics (avoid N+1):
+
 ```ts
 // Subquery: active auth utilization per client
 const authUtil = db
@@ -302,19 +310,22 @@ const authUtil = db
   })
   .from(authorizations)
   .leftJoin(authorizationServices, eq(authorizations.id, authorizationServices.authorizationId))
-  .where(and(
-    eq(authorizations.organizationId, orgId),
-    eq(authorizations.status, 'approved'),
-    isNull(authorizations.deletedAt),
-    gte(authorizations.endDate, now),
-  ))
+  .where(
+    and(
+      eq(authorizations.organizationId, orgId),
+      eq(authorizations.status, "approved"),
+      isNull(authorizations.deletedAt),
+      gte(authorizations.endDate, now),
+    ),
+  )
   .groupBy(authorizations.clientId)
-  .as('auth_util')
+  .as("auth_util");
 ```
 
 ### Suspense + Error Boundaries
 
 ErrorBoundary wraps Suspense, not the other way around:
+
 ```tsx
 <SectionErrorBoundary fallback={<SectionError title="Alerts unavailable" />}>
   <Suspense fallback={<AlertsSkeleton />}>
@@ -363,4 +374,4 @@ ErrorBoundary wraps Suspense, not the other way around:
 
 ---
 
-*Compiled from: CMS Transmittal AB-01-56, ABA Coding Coalition, AHRQ PSNet (alert fatigue), 11+ competitor analyses, Next.js 16 docs, Drizzle ORM docs, Neon Postgres docs, 60+ industry sources.*
+_Compiled from: CMS Transmittal AB-01-56, ABA Coding Coalition, AHRQ PSNet (alert fatigue), 11+ competitor analyses, Next.js 16 docs, Drizzle ORM docs, Neon Postgres docs, 60+ industry sources._

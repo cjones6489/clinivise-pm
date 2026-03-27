@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { undefinedToNull, stripUndefined, parseTimeToMinutes, calculateUnitsFromMinutes } from "./utils";
+import {
+  undefinedToNull,
+  stripUndefined,
+  parseTimeToMinutes,
+  calculateUnitsFromMinutes,
+} from "./utils";
 
 describe("undefinedToNull", () => {
   it("converts undefined values to null", () => {

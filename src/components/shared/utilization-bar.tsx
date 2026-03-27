@@ -12,7 +12,10 @@ export function getUtilizationLevel(pct: number): UtilizationLevel {
   return "on-track";
 }
 
-export const LEVEL_COLORS: Record<UtilizationLevel, { bar: string; text: string; track: string; label: string }> = {
+export const LEVEL_COLORS: Record<
+  UtilizationLevel,
+  { bar: string; text: string; track: string; label: string }
+> = {
   "on-track": {
     bar: "bg-emerald-500",
     text: "text-emerald-600 dark:text-emerald-400",
@@ -79,7 +82,9 @@ export function UtilizationBar({
   const fillWidth = Math.min(pct, 100);
 
   const usedDisplay = showHours ? `${formatHours(usedUnits)} hrs` : `${usedUnits} units`;
-  const approvedDisplay = showHours ? `${formatHours(approvedUnits)} hrs` : `${approvedUnits} units`;
+  const approvedDisplay = showHours
+    ? `${formatHours(approvedUnits)} hrs`
+    : `${approvedUnits} units`;
   const remainingDisplay = showHours ? `${formatHours(remaining)} hrs` : `${remaining} units`;
   const valueText = `${pct}% utilized — ${remainingDisplay} remaining`;
 
@@ -102,13 +107,11 @@ export function UtilizationBar({
               style={{ width: `${fillWidth}%` }}
             />
           </div>
-          <span className={cn("text-xs font-semibold tabular-nums shrink-0", colors.text)}>
+          <span className={cn("shrink-0 text-xs font-semibold tabular-nums", colors.text)}>
             {pct}%
           </span>
         </div>
-        <div className="text-[11px] text-muted-foreground tabular-nums">
-          {usedDisplay}
-        </div>
+        <div className="text-muted-foreground text-[11px] tabular-nums">{usedDisplay}</div>
       </div>
     );
   }
@@ -124,12 +127,8 @@ export function UtilizationBar({
     >
       {/* Header: label + remaining */}
       <div className="mb-1 flex items-baseline justify-between">
-        {label && (
-          <span className="font-mono text-xs font-semibold text-foreground">{label}</span>
-        )}
-        <span className="text-[11px] text-muted-foreground">
-          {remainingDisplay} remaining
-        </span>
+        {label && <span className="text-foreground font-mono text-xs font-semibold">{label}</span>}
+        <span className="text-muted-foreground text-[11px]">{remainingDisplay} remaining</span>
       </div>
 
       {/* Bar + percentage */}
@@ -143,19 +142,15 @@ export function UtilizationBar({
             style={{ width: `${fillWidth}%` }}
           />
         </div>
-        <span className={cn("text-[11px] font-semibold tabular-nums", colors.text)}>
-          {pct}%
-        </span>
+        <span className={cn("text-[11px] font-semibold tabular-nums", colors.text)}>{pct}%</span>
       </div>
 
       {/* Footer: used/approved + status label */}
       <div className="mt-0.5 flex items-baseline justify-between">
-        <span className="text-[11px] text-muted-foreground">
+        <span className="text-muted-foreground text-[11px]">
           {usedDisplay} / {approvedDisplay}
         </span>
-        <span className={cn("text-[10px] font-medium", colors.text)}>
-          {colors.label}
-        </span>
+        <span className={cn("text-[10px] font-medium", colors.text)}>{colors.label}</span>
       </div>
     </div>
   );

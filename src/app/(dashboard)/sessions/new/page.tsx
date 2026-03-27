@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { getClientOptions } from "@/server/queries/authorizations";
 import { getProviderOptions, getClientLastSessionDefaults } from "@/server/queries/sessions";
 import { getProviderByUserId } from "@/server/queries/providers";
@@ -38,7 +45,9 @@ export default async function NewSessionPage({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild><Link href="/sessions">Sessions</Link></BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link href="/sessions">Sessions</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

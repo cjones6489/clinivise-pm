@@ -23,10 +23,14 @@ export const createClient = authActionClient
       parsedInput.intakeDate ??
       (parsedInput.status !== "inquiry" ? new Date().toISOString().split("T")[0] : undefined);
 
-    // Convert CSV string to array for secondaryDiagnosisCodes
-    const secondaryDiagnosisCodes = parsedInput.secondaryDiagnosisCodes
-      ? parsedInput.secondaryDiagnosisCodes.split(",").map((s: string) => s.trim()).filter(Boolean)
-      : undefined;
+    // Convert CSV string to array for secondaryDiagnosisCodes (empty array → null)
+    const parsed = parsedInput.secondaryDiagnosisCodes
+      ? parsedInput.secondaryDiagnosisCodes
+          .split(",")
+          .map((s: string) => s.trim())
+          .filter(Boolean)
+      : [];
+    const secondaryDiagnosisCodes = parsed.length > 0 ? parsed : undefined;
 
     const [client] = await db
       .insert(clients)
@@ -57,11 +61,16 @@ export const updateClient = authActionClient
 
     const { id, updatedAt, ...updates } = parsedInput;
 
-    // Convert CSV string to array for secondaryDiagnosisCodes
+    // Convert CSV string to array for secondaryDiagnosisCodes (empty array → null)
     if (updates.secondaryDiagnosisCodes !== undefined) {
-      (updates as Record<string, unknown>).secondaryDiagnosisCodes = updates.secondaryDiagnosisCodes
-        ? updates.secondaryDiagnosisCodes.split(",").map((s: string) => s.trim()).filter(Boolean)
-        : null;
+      const parsedCodes = updates.secondaryDiagnosisCodes
+        ? updates.secondaryDiagnosisCodes
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean)
+        : [];
+      (updates as Record<string, unknown>).secondaryDiagnosisCodes =
+        parsedCodes.length > 0 ? parsedCodes : null;
     }
 
     const [existing] = await db

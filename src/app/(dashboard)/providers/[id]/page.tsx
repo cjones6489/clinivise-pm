@@ -12,11 +12,15 @@ import {
   getProviderSessionBreakdown,
   getSupervisorOptions,
 } from "@/server/queries/providers";
-import type {
-  ProviderSessionBreakdown,
-  ProviderRecentSession,
-} from "@/server/queries/providers";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import type { ProviderSessionBreakdown, ProviderRecentSession } from "@/server/queries/providers";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MetricCard } from "@/components/shared/metric-card";
@@ -58,16 +62,96 @@ function getMockRecentSessions(): ProviderRecentSession[] {
     return d.toISOString().slice(0, 10);
   };
   return [
-    { id: "mock-1", sessionDate: day(0), clientFirstName: "Marcus", clientLastName: "Rivera", cptCode: "97153", units: 8, status: "scheduled" },
-    { id: "mock-2", sessionDate: day(1), clientFirstName: "Aiden", clientLastName: "Chen", cptCode: "97153", units: 8, status: "completed" },
-    { id: "mock-3", sessionDate: day(1), clientFirstName: "Sophia", clientLastName: "Williams", cptCode: "97155", units: 4, status: "completed" },
-    { id: "mock-4", sessionDate: day(2), clientFirstName: "Liam", clientLastName: "Patel", cptCode: "97153", units: 6, status: "completed" },
-    { id: "mock-5", sessionDate: day(2), clientFirstName: "Emma", clientLastName: "Johnson", cptCode: "97156", units: 4, status: "completed" },
-    { id: "mock-6", sessionDate: day(3), clientFirstName: "Aiden", clientLastName: "Chen", cptCode: "97153", units: 8, status: "completed" },
-    { id: "mock-7", sessionDate: day(3), clientFirstName: "Olivia", clientLastName: "Brooks", cptCode: "97153", units: 6, status: "no_show" },
-    { id: "mock-8", sessionDate: day(4), clientFirstName: "Noah", clientLastName: "Garcia", cptCode: "97155", units: 4, status: "completed" },
-    { id: "mock-9", sessionDate: day(5), clientFirstName: "Marcus", clientLastName: "Rivera", cptCode: "97153", units: 8, status: "completed" },
-    { id: "mock-10", sessionDate: day(6), clientFirstName: "Sophia", clientLastName: "Williams", cptCode: "97151", units: 12, status: "completed" },
+    {
+      id: "mock-1",
+      sessionDate: day(0),
+      clientFirstName: "Marcus",
+      clientLastName: "Rivera",
+      cptCode: "97153",
+      units: 8,
+      status: "scheduled",
+    },
+    {
+      id: "mock-2",
+      sessionDate: day(1),
+      clientFirstName: "Aiden",
+      clientLastName: "Chen",
+      cptCode: "97153",
+      units: 8,
+      status: "completed",
+    },
+    {
+      id: "mock-3",
+      sessionDate: day(1),
+      clientFirstName: "Sophia",
+      clientLastName: "Williams",
+      cptCode: "97155",
+      units: 4,
+      status: "completed",
+    },
+    {
+      id: "mock-4",
+      sessionDate: day(2),
+      clientFirstName: "Liam",
+      clientLastName: "Patel",
+      cptCode: "97153",
+      units: 6,
+      status: "completed",
+    },
+    {
+      id: "mock-5",
+      sessionDate: day(2),
+      clientFirstName: "Emma",
+      clientLastName: "Johnson",
+      cptCode: "97156",
+      units: 4,
+      status: "completed",
+    },
+    {
+      id: "mock-6",
+      sessionDate: day(3),
+      clientFirstName: "Aiden",
+      clientLastName: "Chen",
+      cptCode: "97153",
+      units: 8,
+      status: "completed",
+    },
+    {
+      id: "mock-7",
+      sessionDate: day(3),
+      clientFirstName: "Olivia",
+      clientLastName: "Brooks",
+      cptCode: "97153",
+      units: 6,
+      status: "no_show",
+    },
+    {
+      id: "mock-8",
+      sessionDate: day(4),
+      clientFirstName: "Noah",
+      clientLastName: "Garcia",
+      cptCode: "97155",
+      units: 4,
+      status: "completed",
+    },
+    {
+      id: "mock-9",
+      sessionDate: day(5),
+      clientFirstName: "Marcus",
+      clientLastName: "Rivera",
+      cptCode: "97153",
+      units: 8,
+      status: "completed",
+    },
+    {
+      id: "mock-10",
+      sessionDate: day(6),
+      clientFirstName: "Sophia",
+      clientLastName: "Williams",
+      cptCode: "97151",
+      units: 12,
+      status: "completed",
+    },
   ];
 }
 
@@ -86,7 +170,16 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
     notFound();
   }
 
-  const [metrics, caseload, availableClients, recentSessions, supervisees, supervisor, sessionBreakdown, supervisorOptions] = await Promise.all([
+  const [
+    metrics,
+    caseload,
+    availableClients,
+    recentSessions,
+    supervisees,
+    supervisor,
+    sessionBreakdown,
+    supervisorOptions,
+  ] = await Promise.all([
     getProviderMetrics(user.organizationId, id),
     getProviderCaseload(user.organizationId, id),
     canManageCaseload ? getAvailableClients(user.organizationId, id) : Promise.resolve([]),
@@ -103,15 +196,22 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
   const useMock = sessionBreakdown.totalSessions === 0;
   const displayBreakdown = useMock ? MOCK_SESSION_BREAKDOWN : sessionBreakdown;
   const displayMetrics = useMock ? MOCK_METRICS : metrics;
-  const displayRecentSessions = useMock && recentSessions.length === 0 ? getMockRecentSessions() : recentSessions;
+  const displayRecentSessions =
+    useMock && recentSessions.length === 0 ? getMockRecentSessions() : recentSessions;
 
-  const credLabel = CREDENTIAL_LABELS[provider.credentialType as CredentialType] ?? provider.credentialType;
-  const credDaysLeft = provider.credentialExpiry ? daysUntilExpiry(provider.credentialExpiry) : null;
+  const credLabel =
+    CREDENTIAL_LABELS[provider.credentialType as CredentialType] ?? provider.credentialType;
+  const credDaysLeft = provider.credentialExpiry
+    ? daysUntilExpiry(provider.credentialExpiry)
+    : null;
   const credExpiryAccent =
-    credDaysLeft === null ? undefined
-    : credDaysLeft <= 7 ? "text-red-600 dark:text-red-400"
-    : credDaysLeft <= 30 ? "text-amber-600 dark:text-amber-400"
-    : undefined;
+    credDaysLeft === null
+      ? undefined
+      : credDaysLeft <= 7
+        ? "text-red-600 dark:text-red-400"
+        : credDaysLeft <= 30
+          ? "text-amber-600 dark:text-amber-400"
+          : undefined;
 
   return (
     <div className="space-y-3">
@@ -125,11 +225,15 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild><Link href="/providers">Providers</Link></BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link href="/providers">Providers</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{provider.firstName} {provider.lastName}</BreadcrumbPage>
+            <BreadcrumbPage>
+              {provider.firstName} {provider.lastName}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -141,11 +245,13 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
             {provider.firstName} {provider.lastName}
           </h1>
           <div className="text-muted-foreground mt-0.5 text-xs">
-            {provider.npi && <>NPI: <span className="font-mono">{provider.npi}</span> &middot; </>}
-            {provider.credentialNumber && <>Cert #{provider.credentialNumber} &middot; </>}
-            {provider.credentialExpiry && (
-              <>Expires {formatDate(provider.credentialExpiry)}</>
+            {provider.npi && (
+              <>
+                NPI: <span className="font-mono">{provider.npi}</span> &middot;{" "}
+              </>
             )}
+            {provider.credentialNumber && <>Cert #{provider.credentialNumber} &middot; </>}
+            {provider.credentialExpiry && <>Expires {formatDate(provider.credentialExpiry)}</>}
             {!provider.npi && !provider.credentialNumber && !provider.credentialExpiry && (
               <>No credential details on file</>
             )}
@@ -154,7 +260,10 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
         <div className="flex items-center gap-1.5">
           <Badge variant="secondary">{credLabel}</Badge>
           {provider.isActive ? (
-            <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
+            <Badge
+              variant="outline"
+              className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400"
+            >
               Active
             </Badge>
           ) : (
@@ -196,11 +305,7 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
         />
         <MetricCard
           label="Credential Expiry"
-          value={
-            credDaysLeft === null ? "—"
-            : credDaysLeft < 0 ? "Expired"
-            : `${credDaysLeft}d`
-          }
+          value={credDaysLeft === null ? "—" : credDaysLeft < 0 ? "Expired" : `${credDaysLeft}d`}
           sub={provider.credentialExpiry ? formatDate(provider.credentialExpiry) : "No expiry date"}
           accent={credExpiryAccent}
         />
@@ -208,12 +313,16 @@ export default async function ProviderDetailPage({ params }: { params: Promise<{
 
       <ProviderDetailView
         provider={provider}
-        supervisor={supervisor ? {
-          id: supervisor.id,
-          firstName: supervisor.firstName,
-          lastName: supervisor.lastName,
-          credentialType: supervisor.credentialType,
-        } : null}
+        supervisor={
+          supervisor
+            ? {
+                id: supervisor.id,
+                firstName: supervisor.firstName,
+                lastName: supervisor.lastName,
+                credentialType: supervisor.credentialType,
+              }
+            : null
+        }
         caseload={caseload}
         availableClients={availableClients}
         recentSessions={displayRecentSessions}

@@ -4,9 +4,15 @@ import { requireAuth } from "@/lib/auth";
 import { hasClients } from "@/server/queries/clients";
 import { PageHeader } from "@/components/layout/page-header";
 import { SectionErrorBoundary, SectionError } from "@/components/shared/section-error-boundary";
-import { DashboardMetrics, DashboardMetricsSkeleton } from "@/components/dashboard/dashboard-metrics";
+import {
+  DashboardMetrics,
+  DashboardMetricsSkeleton,
+} from "@/components/dashboard/dashboard-metrics";
 import { DashboardAlerts, DashboardAlertsSkeleton } from "@/components/dashboard/dashboard-alerts";
-import { DashboardClients, DashboardClientsSkeleton } from "@/components/dashboard/dashboard-clients";
+import {
+  DashboardClients,
+  DashboardClientsSkeleton,
+} from "@/components/dashboard/dashboard-clients";
 import { GettingStartedCard } from "@/components/dashboard/getting-started-card";
 
 export const metadata: Metadata = {
@@ -22,10 +28,7 @@ export default async function OverviewPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="Dashboard"
-        description="Here's what needs attention today."
-      />
+      <PageHeader title="Dashboard" description="Here's what needs attention today." />
 
       {/* Getting Started (new practice) */}
       {showGettingStarted && <GettingStartedCard />}

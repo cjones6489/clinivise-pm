@@ -20,7 +20,5 @@ export const goalDomains = pgTable(
       .notNull()
       .$onUpdate(() => new Date()),
   },
-  (table) => [
-    index("goal_domains_org_idx").on(table.organizationId),
-  ],
+  (table) => [index("goal_domains_org_idx").on(table.organizationId)],
 );

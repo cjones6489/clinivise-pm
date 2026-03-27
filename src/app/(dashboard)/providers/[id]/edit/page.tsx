@@ -6,7 +6,14 @@ import { requirePermission } from "@/lib/permissions";
 import { getProviderById, getSupervisorOptions } from "@/server/queries/providers";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProviderForm } from "@/components/providers/provider-form";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 
 export const metadata: Metadata = {
   title: "Edit Provider | Clinivise",
@@ -31,11 +38,17 @@ export default async function EditProviderPage({ params }: { params: Promise<{ i
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild><Link href="/providers">Providers</Link></BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link href="/providers">Providers</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink asChild><Link href={`/providers/${id}`}>{provider.firstName} {provider.lastName}</Link></BreadcrumbLink>
+            <BreadcrumbLink asChild>
+              <Link href={`/providers/${id}`}>
+                {provider.firstName} {provider.lastName}
+              </Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

@@ -41,10 +41,7 @@ export class NotFoundError extends AppError {
 /** 409 — optimistic locking failure */
 export class StaleDataError extends AppError {
   constructor() {
-    super(
-      "Record was modified by another user. Please refresh and try again.",
-      "STALE_DATA",
-    );
+    super("Record was modified by another user. Please refresh and try again.", "STALE_DATA");
   }
 }
 

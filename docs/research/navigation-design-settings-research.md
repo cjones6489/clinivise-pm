@@ -10,6 +10,7 @@
 ### Platform-by-Platform Breakdown
 
 #### CentralReach
+
 - **Type**: Top horizontal navigation bar (icon row at top of every page)
 - **Menu items**: Dashboard, Contacts, Scheduling, Billing, Files, Tasks, Learn, Insights, Permissions, Messages
 - **Icons**: Icon-only in the top nav bar; each module represented by a distinct icon. Hovering reveals module name
@@ -20,6 +21,7 @@
 - **Notes**: CentralReach's top-nav approach is unusual in modern SaaS. It works because they have 10+ dense modules that each function like standalone apps. Feels more like an enterprise suite than a unified product
 
 #### AlohaABA
+
 - **Type**: Left sidebar navigation (modern design)
 - **Menu items**: Dashboard, Scheduling, Clients, Billing, Claims, Authorizations, Payroll, Reports
 - **Icons**: Icon + text labels in sidebar
@@ -30,6 +32,7 @@
 - **Notes**: Users praise it as "easy to use" and "pretty to look at." Rated as Best Value ABA Software. Clean, modern interface compared to CentralReach's enterprise feel
 
 #### SimplePractice
+
 - **Type**: Left sidebar navigation (collapsible)
 - **Menu items**: Home, Calendar, Clients, Billing, Analytics, Messages, Documents, Requests, Marketing, Settings
 - **Icons**: Icon + text labels; sidebar can collapse to icon-only mode
@@ -40,6 +43,7 @@
 - **Notes**: Most polished consumer-grade UI in the therapy PM space. The collapsible sidebar with icon-only mode is the gold standard pattern. Settings organization into Operations/Billing/Client Care is an excellent model
 
 #### Jane App
+
 - **Type**: Top horizontal tab navigation
 - **Menu items**: Schedule, Patients, Products, Reports, Admin/Settings
 - **Icons**: Minimal icon usage in top tabs -- primarily text labels
@@ -50,6 +54,7 @@
 - **Notes**: Top navigation works well for Jane's simpler structure (5-6 main tabs). Blue banner with light background. Day View is the central hub. Color-coded appointments (green shades for status). Popular with physical therapy / wellness -- less common in ABA
 
 #### Healthie
+
 - **Type**: Left sidebar navigation (customizable)
 - **Menu items**: Home/Dashboard, Calendar, Clients, Charting, Documents, Billing, Settings (customizable)
 - **Icons**: FontAwesome icon library; practices can choose icons for each nav item
@@ -60,6 +65,7 @@
 - **Notes**: Most customizable navigation of any platform studied. Sidebar items can be added, removed, or reordered. No limit on items but they recommend UX consideration. API-first company -- navigation is programmatically configurable
 
 #### Theralytics
+
 - **Type**: Dashboard-centric with module navigation
 - **Menu items**: Dashboard, Scheduling, Billing, Data Collection, Documentation, Reporting
 - **Icons**: Not specifically documented but interface described as "clean and easy to navigate"
@@ -69,6 +75,7 @@
 - **Notes**: Activity Dashboard is the central hub showing scheduling, billing, and reporting data in one view. Users can customize which metrics appear. Built specifically for ABA -- navigation reflects ABA workflows
 
 #### Artemis ABA
+
 - **Type**: Unified dashboard with module navigation
 - **Menu items**: Scheduling, Sessions, Billing, Payroll, Reports, Analytics
 - **Icons**: Interface uses icons alongside text
@@ -78,6 +85,7 @@
 - **Notes**: Drag-and-drop scheduling. Multiple calendar views (month, week, day, list). Interactive dashboards with built-in graphs, charts, and filters. Emphasis on "step-by-step flow" through the workflow
 
 #### Motivity
+
 - **Type**: Not fully documented; described as easy to navigate
 - **Menu items**: Data Collection, Scheduling, Billing, Credentialing, Reporting/BI
 - **Icons**: Not specifically documented
@@ -85,6 +93,7 @@
 - **Notes**: 130+ features organized into major modules. Amazon QuickSight-powered BI dashboards. Strongest credential tracking of any platform studied. Enterprise plans include customizable dashboards and an integrated intake portal
 
 #### Raven Health
+
 - **Type**: Mobile-first interface with dashboard navigation
 - **Menu items**: Dashboard, Scheduling, Data Collection, Session Notes, Billing, Reports
 - **Icons**: Simplified icon set for mobile
@@ -93,18 +102,18 @@
 
 ### Comparison Table
 
-| Platform | Nav Type | Item Count | Collapsible | Command Palette | Mobile Strategy | ABA-Specific Nav |
-|----------|----------|-----------|-------------|-----------------|-----------------|------------------|
-| CentralReach | Top bar (icons) | 10 | No | No | Separate mobile app | Yes (Learn module) |
-| AlohaABA | Left sidebar | ~8 | Unknown | No | Responsive web | Yes |
-| SimplePractice | Left sidebar | 10 | Yes (icon-only) | No | Native mobile app | No (general therapy) |
-| Jane App | Top tabs | 5 | No | No | Responsive web | No (wellness) |
-| Healthie | Left sidebar | Customizable | Unknown | No | White-label mobile | No (general health) |
-| Theralytics | Dashboard + nav | ~6 | Unknown | No | Mobile access | Yes |
-| Artemis ABA | Dashboard + nav | ~6 | Unknown | No | Responsive | Yes |
-| Motivity | Module nav | ~5 | Unknown | No | Mobile-friendly | Yes |
-| Raven Health | Mobile-first | ~6 | N/A | No | Mobile-first | Yes |
-| **Clinivise (current)** | **Left sidebar** | **6** | **Yes (shadcn)** | **No** | **Not yet** | **Yes** |
+| Platform                | Nav Type         | Item Count   | Collapsible      | Command Palette | Mobile Strategy     | ABA-Specific Nav     |
+| ----------------------- | ---------------- | ------------ | ---------------- | --------------- | ------------------- | -------------------- |
+| CentralReach            | Top bar (icons)  | 10           | No               | No              | Separate mobile app | Yes (Learn module)   |
+| AlohaABA                | Left sidebar     | ~8           | Unknown          | No              | Responsive web      | Yes                  |
+| SimplePractice          | Left sidebar     | 10           | Yes (icon-only)  | No              | Native mobile app   | No (general therapy) |
+| Jane App                | Top tabs         | 5            | No               | No              | Responsive web      | No (wellness)        |
+| Healthie                | Left sidebar     | Customizable | Unknown          | No              | White-label mobile  | No (general health)  |
+| Theralytics             | Dashboard + nav  | ~6           | Unknown          | No              | Mobile access       | Yes                  |
+| Artemis ABA             | Dashboard + nav  | ~6           | Unknown          | No              | Responsive          | Yes                  |
+| Motivity                | Module nav       | ~5           | Unknown          | No              | Mobile-friendly     | Yes                  |
+| Raven Health            | Mobile-first     | ~6           | N/A              | No              | Mobile-first        | Yes                  |
+| **Clinivise (current)** | **Left sidebar** | **6**        | **Yes (shadcn)** | **No**          | **Not yet**         | **Yes**              |
 
 ### Navigation Recommendations for Clinivise
 
@@ -132,16 +141,16 @@
 
 ### Color Palettes Across Platforms
 
-| Platform | Primary Color | Accent | Background | Overall Feeling |
-|----------|--------------|--------|-----------|-----------------|
-| CentralReach | Dark blue (#1a2b5e) | Orange accents | White/light gray | Corporate, enterprise, dense |
-| AlohaABA | Teal/green | Warm accents | White | Modern, clean, approachable |
-| SimplePractice | Blue-teal | Orange CTAs | White/light gray | Consumer-grade, polished |
-| Jane App | Blue (#4A90D9) | Green (status) | White with blue banner | Clean, calming, professional |
-| Healthie | Teal/green | Customizable | White | Modern, wellness-oriented |
-| Raven Health | Dark/navy | Teal accents | Light | Clean, minimal, modern |
-| Theralytics | Blue | Standard | White | Professional, analytical |
-| Artemis ABA | Purple/blue | Standard | White | Modern, professional |
+| Platform       | Primary Color       | Accent         | Background             | Overall Feeling              |
+| -------------- | ------------------- | -------------- | ---------------------- | ---------------------------- |
+| CentralReach   | Dark blue (#1a2b5e) | Orange accents | White/light gray       | Corporate, enterprise, dense |
+| AlohaABA       | Teal/green          | Warm accents   | White                  | Modern, clean, approachable  |
+| SimplePractice | Blue-teal           | Orange CTAs    | White/light gray       | Consumer-grade, polished     |
+| Jane App       | Blue (#4A90D9)      | Green (status) | White with blue banner | Clean, calming, professional |
+| Healthie       | Teal/green          | Customizable   | White                  | Modern, wellness-oriented    |
+| Raven Health   | Dark/navy           | Teal accents   | Light                  | Clean, minimal, modern       |
+| Theralytics    | Blue                | Standard       | White                  | Professional, analytical     |
+| Artemis ABA    | Purple/blue         | Standard       | White                  | Modern, professional         |
 
 ### Healthcare Color Psychology Findings
 
@@ -185,11 +194,13 @@
 ### Overall Aesthetic Assessment
 
 **What ABA practitioners hate about current tools:**
+
 - CentralReach: "Overwhelming," "steep learning curve," "feels like 2010"
 - Legacy platforms: Dense, cluttered, too many clicks to accomplish simple tasks
 - Clinical-looking interfaces that feel like they were designed for compliance, not humans
 
 **What practitioners respond to positively:**
+
 - AlohaABA: "Pretty to look at," "easy to use"
 - Raven Health: "Simple interface," "easy on the eyes"
 - SimplePractice: Consumer-grade polish, feels like modern software
@@ -203,7 +214,7 @@
    - Primary button color (instead of near-black)
    - Chart/visualization primary color
    - Progress bar fills
-   This would differentiate Clinivise from the sea of gray enterprise tools while maintaining professionalism.
+     This would differentiate Clinivise from the sea of gray enterprise tools while maintaining professionalism.
 
 3. **Keep the warm neutral backgrounds** -- `oklch(1 0 0)` (pure white) for cards, `oklch(0.97 0 0)` for muted backgrounds. This is correct and matches the best-in-class platforms.
 
@@ -242,17 +253,20 @@ Keep as-is:
 Three top-level categories with nested sections:
 
 **Operations**
+
 - Profile (Personal info, Clinical info/licenses, Notification preferences)
 - Practice (Practice details, Locations, Billing addresses, Plan info, Demo client, Data export)
 - Team (Team members, Payroll, Roles/permissions)
 
 **Billing**
+
 - Payment processing
 - Billing profiles for insurance
 - Client billing and insurance (Payers list, Billing documents, Automations)
 - Superbill settings
 
 **Client Care**
+
 - Scheduling and inquiries (Calendar settings, Cancellation policy)
 - Client portal
 - Intake forms
@@ -262,6 +276,7 @@ Three top-level categories with nested sections:
 #### CentralReach
 
 Settings are distributed across modules rather than centralized:
+
 - **Permissions module** (dedicated padlock icon): User access, permission groups, role-based restrictions
 - **Billing module settings**: Service codes, fee schedules, credential requirements per service
 - **Contact profiles**: Individual employee setup (NPI, credentials, availability)
@@ -270,6 +285,7 @@ Settings are distributed across modules rather than centralized:
 #### Jane App
 
 Settings accessible via Admin tab:
+
 - Clinic Info & Locations
 - Staff Access Levels (Full Access, Administrative/All Billing, Booking Only, Chart Only)
 - Billing Settings
@@ -280,6 +296,7 @@ Settings accessible via Admin tab:
 #### Healthie
 
 Settings in top-right corner:
+
 - Brand & Logo (custom colors, logo upload)
 - Navigation customization (add/remove sidebar items)
 - Charting templates
@@ -303,6 +320,7 @@ All platforms follow a similar pattern:
 Common fields and patterns across platforms:
 
 **Staff list page shows:**
+
 - Name + role (BCBA, RBT, Admin, Billing)
 - Avatar/initials
 - Status (Active, Inactive)
@@ -311,6 +329,7 @@ Common fields and patterns across platforms:
 - Credential status (Valid, Expiring Soon, Expired)
 
 **Staff detail/profile page contains:**
+
 - Personal information (name, email, phone)
 - Clinical information (NPI, taxonomy code, specialty)
 - Credentials and certifications (license type, number, state, expiration date)
@@ -325,6 +344,7 @@ Common fields and patterns across platforms:
 ### Provider/Staff Page Recommendations for Clinivise
 
 #### Provider List Page
+
 ```
 Columns:
 - Avatar (initials) + Name + Role (stacked: "Dr. Sarah Chen" / "BCBA")
@@ -339,6 +359,7 @@ Search: By name or NPI
 ```
 
 #### Provider Detail Page
+
 ```
 Header: Name, role badge, status badge, "Edit" button
 
@@ -405,6 +426,7 @@ CLINICAL
 ### How Platforms Handle Mobile
 
 #### CentralReach CR Mobile
+
 - **Approach**: Separate native mobile app purpose-built for RBTs
 - **Navigation**: Hamburger menu revealing module list
 - **Key modules**: Schedule (today/tomorrow), My Learners (alphabetical list with search), Map View, Data Collection, Session Notes, Signatures
@@ -412,22 +434,26 @@ CLINICAL
 - **Design**: Simplified interface vs. desktop. Focus on the RBT's daily workflow: see schedule > go to client > collect data > write notes > get signatures
 
 #### AlohaABA
+
 - **Approach**: Responsive web accessible on desktop and mobile
 - **Key mobile features**: Scheduling, data collection during sessions, billing
 - **Notes**: In-session flow designed so clinicians can "stay present rather than buried in their screen"
 
 #### SimplePractice
+
 - **Approach**: Dedicated native app for clinicians (iOS/Android)
 - **Key mobile features**: Schedule view, session notes, telehealth, messaging
 - **Notes**: App Store presence adds credibility and discoverability
 
 #### Raven Health
+
 - **Approach**: Mobile-first design (primary design target is phone/tablet)
 - **Key mobile features**: Data collection, session notes, graphs, program updates
 - **Offline**: Works without internet (critical for home visits and schools)
 - **Notes**: The only platform that is truly mobile-first rather than mobile-adapted
 
 #### Jane App
+
 - **Approach**: Mobile app for patients/clients. Admin interface is responsive web.
 - **Notes**: Practitioner-facing features are desktop-optimized
 
@@ -464,17 +490,20 @@ CLINICAL
 ### Mobile Recommendations for Clinivise
 
 **Phase 1 (current -- responsive web):**
+
 - Sidebar collapses to icon-only rail on tablet (`768-1024px`)
 - Sidebar becomes a sheet/drawer on phone (`<768px`) triggered by hamburger icon
 - Ensure all pages work at tablet width (single column layout)
 - Touch targets: already mandated at 44px minimum
 
 **Phase 2 (future -- mobile optimization):**
+
 - Consider a dedicated mobile layout for Session logging with larger buttons, timer display, and simplified data entry
 - Bottom tab bar on phone: Overview | Clients | + Session | Schedule | More
 - The "+" action in the center for quick session logging (most frequent mobile action)
 
 **Phase 3 (future -- native or PWA):**
+
 - Offline data collection and sync
 - Push notifications for schedule changes and authorization alerts
 - Camera access for document capture (auth letters)
@@ -484,6 +513,7 @@ CLINICAL
 ## Sources
 
 ### CentralReach
+
 - [Navigating CentralReach](https://help.centralreach.com/navigating-centralreach/)
 - [CR Mobile Modules](https://help.centralreach.com/cr-mobiles-modules/)
 - [Add Employee Credentials](https://help.centralreach.com/add-employee-credentials/)
@@ -492,6 +522,7 @@ CLINICAL
 - [Service Code Credential Requirements](https://help.centralreach.com/set-employee-credential-requirements-in-service-codes/)
 
 ### SimplePractice
+
 - [Left Navigation Menu Updates](https://support.simplepractice.com/hc/en-us/articles/20101922882829-Updates-to-the-left-navigation-menu)
 - [Operations Settings](https://support.simplepractice.com/hc/en-us/articles/24621381454093-Navigating-your-Operations-settings)
 - [Billing Settings](https://support.simplepractice.com/hc/en-us/articles/24621228269453-Navigating-your-Billing-settings)
@@ -501,6 +532,7 @@ CLINICAL
 - [Clinician Profile Page](https://support.simplepractice.com/hc/en-us/articles/24621381454093-Navigating-your-Operations-settings)
 
 ### Jane App
+
 - [Working With the Schedule](https://jane.app/guide/working-with-the-schedule)
 - [Patients Tab](https://jane.app/guide/the-patients-tab-a-snapshot-of-your-full-patient-list)
 - [Staff Access Levels](https://jane.app/guide/staff-access-levels)
@@ -508,12 +540,14 @@ CLINICAL
 - [Patient Profile Dashboard](https://jane.app/guide/patient-profile-dashboard)
 
 ### Healthie
+
 - [Adding or Removing Navigation Links](https://help.gethealthie.com/article/947-adding-or-removing-navigation-links)
 - [Provider Dashboard](https://help.gethealthie.com/article/535-your-provider-dashboard)
 - [Dashboards by Healthie](https://help.gethealthie.com/article/729-reporting-dashboards)
 - [Brand & Logo Setup](https://help.gethealthie.com/article/125-setting-up-your-brand-company-information-and-colors)
 
 ### ABA-Specific Platforms
+
 - [Theralytics Reporting & Analytics](https://www.theralytics.net/aba-reporting-and-analytics-software)
 - [Raven Health Platform](https://ravenhealth.com/)
 - [Artemis ABA Product Summary](https://www.artemisaba.com/artemis-product-summary)
@@ -524,6 +558,7 @@ CLINICAL
 - [Noteable ABA](https://mynoteable.com/aba)
 
 ### Design & UX Research
+
 - [Healthcare Color Psychology](https://www.progress.com/blogs/using-color-psychology-healthcare-web-design)
 - [Medical Color Palettes](https://piktochart.com/tips/medical-color-palette)
 - [Healthcare UI Design 2026 Best Practices](https://www.eleken.co/blog-posts/user-interface-design-for-healthcare-applications)

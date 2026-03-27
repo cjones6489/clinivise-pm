@@ -8,27 +8,27 @@
 
 The JavaScript ecosystem has seen several major version bumps since late 2024. Three require special attention: **Zod 3→4**, **Tailwind CSS 3→4**, and **TypeScript 5.9→6.0** (in RC). The table below captures every dependency Clinivise needs.
 
-| Package | Latest Stable | Notable Changes |
-|---------|:------------:|-----------------|
-| `next` | **16.2.0** | v16 current; new security defaults for Server Actions. v14 EOL Oct 2025. Critical CVE fixes in 16.2.x. **⚠️ VERIFY BEFORE STARTING**: Run `npm info next version` to confirm latest stable — App Router patterns are consistent across v15-v16 but server action security defaults changed in v16. |
-| `typescript` | **5.9.3** | TS 6.0 RC available (Mar 6, 2026) but not yet `latest`. TS 7.0 will be a native Go port ("Project Corsa"). **Use 5.9.3 — ecosystem not ready for 6.0.** |
-| `drizzle-orm` | **0.45.1** | Still pre-1.0; v1.0.0-beta actively in development. Widely used in production |
-| `drizzle-kit` | **0.31.10** | Beta 1.0.0-beta.18 available. Migration system redesign with DAG-based commutativity checking |
-| `@aws-sdk/client-bedrock-runtime` | **3.x** | AWS Bedrock SDK for HIPAA-compliant Claude access. Replaces direct `@anthropic-ai/sdk` for PHI workloads |
-| `@tanstack/react-query` | **5.91.3** | Mature v5, React 18+ compatible, frequent releases |
-| `@tanstack/react-table` | **8.21.3** | Stable v8 line; release cadence slowed |
-| `react-hook-form` | **7.71.2** | Works with Zod v4 via `@hookform/resolvers` (supports `zod/v4` import) |
-| `zod` | **4.3.6** ⚠️ | **Major breaking change from v3.** Template literals, `z.fromJSONSchema()`, exclusive unions, composable checks. Import path `zod/v4` for gradual migration |
-| `tailwindcss` | **4.2.1** ⚠️ | **Complete rewrite.** CSS-first config replaces `tailwind.config.js`. Lightning CSS engine (5x faster). OKLCH colors. `@import "tailwindcss"` syntax |
-| `@sentry/nextjs` | **10.45.0** | v10 major line; min supported Next.js 13.2.0 |
-| `vitest` | **4.1.0** | v4 major; standard JS testing framework. Async leak detection, Playwright browser provider |
-| `@playwright/test` | **1.58.2** | Stable 1.x line |
-| `@upstash/ratelimit` | **2.0.8** | Dynamic rate limits (change limits at runtime without recreating limiter) |
-| `@upstash/redis` | **1.37.0** | Connectionless HTTP-based Redis client |
-| `next-safe-action` | **8.1.8** | v8 major line; middleware pipeline pattern for type-safe server actions |
-| `lucide-react` | **0.577.0** | Pre-1.0 but very widely used. Frequent icon additions |
-| `date-fns` | **4.1.0** | Release cadence slowed. TC39 Temporal proposal reached Stage 4 for ES2026 |
-| `@neondatabase/serverless` | **1.0.2** | GA at 1.0. Requires Node.js ≥19. HTTP template function API changed at 1.0 |
+| Package                           | Latest Stable | Notable Changes                                                                                                                                                                                                                                                                                    |
+| --------------------------------- | :-----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `next`                            |  **16.2.0**   | v16 current; new security defaults for Server Actions. v14 EOL Oct 2025. Critical CVE fixes in 16.2.x. **⚠️ VERIFY BEFORE STARTING**: Run `npm info next version` to confirm latest stable — App Router patterns are consistent across v15-v16 but server action security defaults changed in v16. |
+| `typescript`                      |   **5.9.3**   | TS 6.0 RC available (Mar 6, 2026) but not yet `latest`. TS 7.0 will be a native Go port ("Project Corsa"). **Use 5.9.3 — ecosystem not ready for 6.0.**                                                                                                                                            |
+| `drizzle-orm`                     |  **0.45.1**   | Still pre-1.0; v1.0.0-beta actively in development. Widely used in production                                                                                                                                                                                                                      |
+| `drizzle-kit`                     |  **0.31.10**  | Beta 1.0.0-beta.18 available. Migration system redesign with DAG-based commutativity checking                                                                                                                                                                                                      |
+| `@aws-sdk/client-bedrock-runtime` |    **3.x**    | AWS Bedrock SDK for HIPAA-compliant Claude access. Replaces direct `@anthropic-ai/sdk` for PHI workloads                                                                                                                                                                                           |
+| `@tanstack/react-query`           |  **5.91.3**   | Mature v5, React 18+ compatible, frequent releases                                                                                                                                                                                                                                                 |
+| `@tanstack/react-table`           |  **8.21.3**   | Stable v8 line; release cadence slowed                                                                                                                                                                                                                                                             |
+| `react-hook-form`                 |  **7.71.2**   | Works with Zod v4 via `@hookform/resolvers` (supports `zod/v4` import)                                                                                                                                                                                                                             |
+| `zod`                             | **4.3.6** ⚠️  | **Major breaking change from v3.** Template literals, `z.fromJSONSchema()`, exclusive unions, composable checks. Import path `zod/v4` for gradual migration                                                                                                                                        |
+| `tailwindcss`                     | **4.2.1** ⚠️  | **Complete rewrite.** CSS-first config replaces `tailwind.config.js`. Lightning CSS engine (5x faster). OKLCH colors. `@import "tailwindcss"` syntax                                                                                                                                               |
+| `@sentry/nextjs`                  |  **10.45.0**  | v10 major line; min supported Next.js 13.2.0                                                                                                                                                                                                                                                       |
+| `vitest`                          |   **4.1.0**   | v4 major; standard JS testing framework. Async leak detection, Playwright browser provider                                                                                                                                                                                                         |
+| `@playwright/test`                |  **1.58.2**   | Stable 1.x line                                                                                                                                                                                                                                                                                    |
+| `@upstash/ratelimit`              |   **2.0.8**   | Dynamic rate limits (change limits at runtime without recreating limiter)                                                                                                                                                                                                                          |
+| `@upstash/redis`                  |  **1.37.0**   | Connectionless HTTP-based Redis client                                                                                                                                                                                                                                                             |
+| `next-safe-action`                |   **8.1.8**   | v8 major line; middleware pipeline pattern for type-safe server actions                                                                                                                                                                                                                            |
+| `lucide-react`                    |  **0.577.0**  | Pre-1.0 but very widely used. Frequent icon additions                                                                                                                                                                                                                                              |
+| `date-fns`                        |   **4.1.0**   | Release cadence slowed. TC39 Temporal proposal reached Stage 4 for ES2026                                                                                                                                                                                                                          |
+| `@neondatabase/serverless`        |   **1.0.2**   | GA at 1.0. Requires Node.js ≥19. HTTP template function API changed at 1.0                                                                                                                                                                                                                         |
 
 **Key migration considerations**: Zod 4 provides a `zod/v4` import path for gradual migration from v3. Tailwind CSS offers `npx @tailwindcss/upgrade` which handles ~90% of v3→v4 changes automatically. The shadcn/ui CLI auto-detects your Tailwind version and serves compatible components.
 
@@ -58,23 +58,23 @@ A **BAA is only required when the vendor touches PHI** (45 CFR § 164.502(e)). H
 
 ### Why Not the Alternatives?
 
-| Provider | Status | Verdict |
-|----------|--------|---------|
-| **WorkOS** | ✅ Active, 1M free MAUs, built-in RBAC | Good alternative but fewer pre-built UI components. More enterprise-focused, less "startup magic." |
-| **Auth.js v5** | ⚠️ Never left beta, lead maintainer quit Jan 2025, absorbed by Better Auth Sep 2025 | **Do not use.** |
-| **Lucia** | ❌ Fully deprecated March 2025 | **Do not use.** |
+| Provider       | Status                                                                              | Verdict                                                                                            |
+| -------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **WorkOS**     | ✅ Active, 1M free MAUs, built-in RBAC                                              | Good alternative but fewer pre-built UI components. More enterprise-focused, less "startup magic." |
+| **Auth.js v5** | ⚠️ Never left beta, lead maintainer quit Jan 2025, absorbed by Better Auth Sep 2025 | **Do not use.**                                                                                    |
+| **Lucia**      | ❌ Fully deprecated March 2025                                                      | **Do not use.**                                                                                    |
 
 ### Comparison Matrix
 
-| Feature | Clerk | WorkOS | Auth.js v5 | Lucia |
-|---------|-------|--------|-----------|-------|
-| Status | ✅ Active | ✅ Active | ⚠️ Sunset → Better Auth | ❌ Deprecated |
-| Free tier | 50K MAUs | **1M MAUs** | OSS | N/A |
-| Organizations | ✅ Built-in | ✅ Built-in, free | ❌ Build yourself | N/A |
-| RBAC | ✅ (add-on for custom roles) | ✅ Free, built-in | ❌ Build yourself | N/A |
-| MFA | ✅ Pro+ | ✅ Free | ❌ Build yourself | N/A |
-| Next.js integration | ⭐ Best-in-class | Very good | Good (beta) | N/A |
-| BAA needed for staff-only auth? | **No** | **No** | N/A | N/A |
+| Feature                         | Clerk                        | WorkOS            | Auth.js v5              | Lucia         |
+| ------------------------------- | ---------------------------- | ----------------- | ----------------------- | ------------- |
+| Status                          | ✅ Active                    | ✅ Active         | ⚠️ Sunset → Better Auth | ❌ Deprecated |
+| Free tier                       | 50K MAUs                     | **1M MAUs**       | OSS                     | N/A           |
+| Organizations                   | ✅ Built-in                  | ✅ Built-in, free | ❌ Build yourself       | N/A           |
+| RBAC                            | ✅ (add-on for custom roles) | ✅ Free, built-in | ❌ Build yourself       | N/A           |
+| MFA                             | ✅ Pro+                      | ✅ Free           | ❌ Build yourself       | N/A           |
+| Next.js integration             | ⭐ Best-in-class             | Very good         | Good (beta)             | N/A           |
+| BAA needed for staff-only auth? | **No**                       | **No**            | N/A                     | N/A           |
 
 ---
 
@@ -96,13 +96,13 @@ Neon (acquired by Databricks for $1B) now offers **HIPAA BAA on the Scale plan a
 
 ### Scale Plan Pricing (Post-Databricks Acquisition)
 
-| Resource | Price |
-|----------|-------|
-| Compute | **$0.222/CU-hour** (down from $0.26) |
-| Storage | **$0.35/GB-month** (down from $1.75) |
-| History (PITR) | $0.20/GB-month |
-| Minimum spend | $5/month |
-| Auto-scaling | Up to 56 CU |
+| Resource       | Price                                |
+| -------------- | ------------------------------------ |
+| Compute        | **$0.222/CU-hour** (down from $0.26) |
+| Storage        | **$0.35/GB-month** (down from $1.75) |
+| History (PITR) | $0.20/GB-month                       |
+| Minimum spend  | $5/month                             |
+| Auto-scaling   | Up to 56 CU                          |
 
 A 1 CU database running 24/7 costs approximately **$162/month** for compute alone. Scale plan includes **99.95% SLA**, SOC 2 Type 2, Private Link, SSO, and up to 30 days point-in-time recovery.
 
@@ -144,12 +144,18 @@ The BAA covers the Vercel Edge Network, CDN, serverless Functions, Edge Config, 
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+        },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
     }
@@ -167,15 +173,15 @@ Stedi provides REST APIs that accept JSON and translate to X12 EDI automatically
 
 ### Core API Endpoints
 
-| Transaction | Endpoint | Method |
-|------------|----------|--------|
-| **Eligibility (270/271)** | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/eligibility/v3` | POST |
-| **Batch Eligibility** | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/batch-eligibility` | POST |
-| **Claims (837P)** | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/professionalclaims/v3/submission` | POST |
-| **Claim Attachments** | `https://claims.us.stedi.com/2025-03-07/claim-attachments/submission` | POST |
-| **Transaction Polling** | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/transactions` | GET |
-| **277CA Report** | `.../reports/v2/{transactionId}/277` | GET |
-| **835 ERA Report** | `.../reports/v2/{transactionId}/835` | GET |
+| Transaction               | Endpoint                                                                                            | Method |
+| ------------------------- | --------------------------------------------------------------------------------------------------- | ------ |
+| **Eligibility (270/271)** | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/eligibility/v3`                   | POST   |
+| **Batch Eligibility**     | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/batch-eligibility`                | POST   |
+| **Claims (837P)**         | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/professionalclaims/v3/submission` | POST   |
+| **Claim Attachments**     | `https://claims.us.stedi.com/2025-03-07/claim-attachments/submission`                               | POST   |
+| **Transaction Polling**   | `https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/transactions`                     | GET    |
+| **277CA Report**          | `.../reports/v2/{transactionId}/277`                                                                | GET    |
+| **835 ERA Report**        | `.../reports/v2/{transactionId}/835`                                                                | GET    |
 
 **Webhooks** are fully supported for 277CA claim acknowledgments and 835 ERA remittance. Configure in the portal at `portal.stedi.com/app/webhooks` with credential sets (API keys, Basic Auth, or none). Events include `transaction processed` (277CA or 835), `file delivered`, and `file failed`. Webhooks have a **5-second timeout** with up to 5 auto-retries. Filter by transaction type or partnership (test vs. production).
 
@@ -197,10 +203,10 @@ This means Clinivise can **develop and test for free** on the Basic plan using t
 
 **Pricing breakdown:**
 
-| Plan | Monthly Cost | Production Portal | Production API | Webhooks | Batch |
-|------|:------------:|:-----------------:|:--------------:|:--------:|:-----:|
-| **Basic** | **$0** | ✅ 100 tx/month | ❌ Test keys only | ❌ | ❌ |
-| **Developer** | **$500+** | ✅ Included | ✅ Full access | ✅ | ✅ |
+| Plan          | Monthly Cost | Production Portal |  Production API   | Webhooks | Batch |
+| ------------- | :----------: | :---------------: | :---------------: | :------: | :---: |
+| **Basic**     |    **$0**    |  ✅ 100 tx/month  | ❌ Test keys only |    ❌    |  ❌   |
+| **Developer** |  **$500+**   |    ✅ Included    |  ✅ Full access   |    ✅    |  ✅   |
 
 Per-transaction costs on the Developer plan are contract-specific and not publicly listed. All plans include unlimited test transactions and premium support via Slack with <10 minute average response times.
 
@@ -229,15 +235,17 @@ Bedrock access approval is near-instant (seconds, not days). Use `@aws-sdk/clien
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
 const client = new BedrockRuntimeClient({ region: "us-east-1" });
-const response = await client.send(new InvokeModelCommand({
-  modelId: "anthropic.claude-sonnet-4-20250514-v1:0",
-  contentType: "application/json",
-  body: JSON.stringify({
-    anthropic_version: "bedrock-2023-05-31",
-    max_tokens: 4096,
-    messages: [{ role: "user", content: prompt }]
-  })
-}));
+const response = await client.send(
+  new InvokeModelCommand({
+    modelId: "anthropic.claude-sonnet-4-20250514-v1:0",
+    contentType: "application/json",
+    body: JSON.stringify({
+      anthropic_version: "bedrock-2023-05-31",
+      max_tokens: 4096,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  }),
+);
 ```
 
 ### Key Considerations
@@ -278,16 +286,16 @@ Pre-built page blocks are available (`npx shadcn add dashboard-01` pulls a compl
 
 All Category I ABA codes are **timed in 15-minute units** following the CMS 8-minute rule. These are the core codes Clinivise must support.
 
-| Code | Description | Provider | MUE (units/day) |
-|------|------------|----------|:----------------:|
-| **97151** | Behavior identification assessment (F2F + non-F2F) | BCBA/QHP | 32 (8 hrs) |
-| **97152** | Behavior identification supporting assessment | RBT under QHP | 16 (4 hrs) |
-| **97153** | Adaptive behavior treatment by protocol (1:1 direct therapy) | RBT under QHP | 32 (8 hrs) |
-| **97154** | Group adaptive behavior treatment by protocol (2–8 patients) | RBT under QHP | 18 (4.5 hrs) |
-| **97155** | Adaptive behavior treatment with protocol modification | BCBA/QHP | 24 (6 hrs) |
-| **97156** | Family adaptive behavior treatment guidance (caregiver training) | BCBA/QHP | 16 (4 hrs) |
-| **97157** | Multiple-family group treatment guidance (patient not present) | BCBA/QHP | 16 (4 hrs) |
-| **97158** | Group treatment with protocol modification (QHP-led, 2–8 patients) | BCBA/QHP | 16 (4 hrs) |
+| Code      | Description                                                        | Provider      | MUE (units/day) |
+| --------- | ------------------------------------------------------------------ | ------------- | :-------------: |
+| **97151** | Behavior identification assessment (F2F + non-F2F)                 | BCBA/QHP      |   32 (8 hrs)    |
+| **97152** | Behavior identification supporting assessment                      | RBT under QHP |   16 (4 hrs)    |
+| **97153** | Adaptive behavior treatment by protocol (1:1 direct therapy)       | RBT under QHP |   32 (8 hrs)    |
+| **97154** | Group adaptive behavior treatment by protocol (2–8 patients)       | RBT under QHP |  18 (4.5 hrs)   |
+| **97155** | Adaptive behavior treatment with protocol modification             | BCBA/QHP      |   24 (6 hrs)    |
+| **97156** | Family adaptive behavior treatment guidance (caregiver training)   | BCBA/QHP      |   16 (4 hrs)    |
+| **97157** | Multiple-family group treatment guidance (patient not present)     | BCBA/QHP      |   16 (4 hrs)    |
+| **97158** | Group treatment with protocol modification (QHP-led, 2–8 patients) | BCBA/QHP      |   16 (4 hrs)    |
 
 **97153 is the most commonly billed ABA code** — it represents direct 1:1 therapy sessions delivered by RBTs implementing the behavior intervention plan. **97155 is the primary BCBA direct-service code**, used when the analyst provides treatment while modifying protocols in real time.
 
@@ -304,12 +312,12 @@ All other codes in the 0359T–0374T range, **including 0374T**, were **retired 
 
 **Provider credential modifiers** (required by most Medicaid and many commercial payers):
 
-| Modifier | Level | ABA Role |
-|----------|-------|----------|
-| **HM** | Less than bachelor's | RBT / Behavior Technician |
-| **HN** | Bachelor's degree | BCaBA |
-| **HO** | Master's degree | BCBA |
-| **HP** | Doctoral level | BCBA-D |
+| Modifier | Level                | ABA Role                  |
+| -------- | -------------------- | ------------------------- |
+| **HM**   | Less than bachelor's | RBT / Behavior Technician |
+| **HN**   | Bachelor's degree    | BCaBA                     |
+| **HO**   | Master's degree      | BCBA                      |
+| **HP**   | Doctoral level       | BCBA-D                    |
 
 **Telehealth modifiers**: **95** (preferred, synchronous telehealth) used with POS 02 or 10. **GT** (legacy, still accepted by some payers). Audio-only (FQ) is not accepted for ABA.
 
@@ -317,14 +325,14 @@ All other codes in the 0359T–0374T range, **including 0374T**, were **retired 
 
 ### Place of Service Codes
 
-| POS | Description | ABA Usage |
-|:---:|------------|-----------|
+|  POS   | Description                      | ABA Usage                                           |
+| :----: | -------------------------------- | --------------------------------------------------- |
 | **02** | Telehealth (not in patient home) | Video sessions, patient at clinic or other location |
-| **03** | School | School-based ABA services |
-| **10** | Telehealth (patient home) | Video sessions, patient at home |
-| **11** | Office/Clinic | Clinic-based ABA programs |
-| **12** | Home | Home-based ABA programs (very common) |
-| **99** | Other/Community | Community skills training (parks, stores, etc.) |
+| **03** | School                           | School-based ABA services                           |
+| **10** | Telehealth (patient home)        | Video sessions, patient at home                     |
+| **11** | Office/Clinic                    | Clinic-based ABA programs                           |
+| **12** | Home                             | Home-based ABA programs (very common)               |
+| **99** | Other/Community                  | Community skills training (parks, stores, etc.)     |
 
 ### Critical Billing Rules for Clinivise to Enforce
 
@@ -336,27 +344,27 @@ All other codes in the 0359T–0374T range, **including 0374T**, were **retired 
 
 ### Development Phase (Phase 1)
 
-| Service | Plan | Monthly Cost | BAA Required? |
-|---------|------|:------------:|:-------------:|
-| Vercel Pro (1 seat) + HIPAA add-on | Pro + Add-on | **$370** | ✅ Yes — PHI flows through serverless functions |
-| Neon Scale (light usage) | Scale | **$5–$50** | ✅ Yes — stores patient records, claims |
-| Clerk | Pro | **$20** | ❌ No — staff credentials only, no PHI |
-| File storage (Vercel Blob) | Usage-based | **$1–$20** | ✅ Yes — auth letter PDFs contain PHI |
-| AWS Bedrock (Claude) | Usage-based | **$5–$30** | ✅ Yes — processes auth letters containing PHI |
-| Stedi (development) | Basic | **$0** | ✅ Yes — but no PHI in test mode |
-| **Total development phase** | | **~$401–$490/month** | |
+| Service                            | Plan         |     Monthly Cost     |                  BAA Required?                  |
+| ---------------------------------- | ------------ | :------------------: | :---------------------------------------------: |
+| Vercel Pro (1 seat) + HIPAA add-on | Pro + Add-on |       **$370**       | ✅ Yes — PHI flows through serverless functions |
+| Neon Scale (light usage)           | Scale        |      **$5–$50**      |     ✅ Yes — stores patient records, claims     |
+| Clerk                              | Pro          |       **$20**        |     ❌ No — staff credentials only, no PHI      |
+| File storage (Vercel Blob)         | Usage-based  |      **$1–$20**      |      ✅ Yes — auth letter PDFs contain PHI      |
+| AWS Bedrock (Claude)               | Usage-based  |      **$5–$30**      | ✅ Yes — processes auth letters containing PHI  |
+| Stedi (development)                | Basic        |        **$0**        |        ✅ Yes — but no PHI in test mode         |
+| **Total development phase**        |              | **~$401–$490/month** |                                                 |
 
 ### Production Phase (Phase 2+)
 
-| Service | Plan | Monthly Cost | Notes |
-|---------|------|:------------:|-------|
-| Vercel Pro + HIPAA | Pro + Add-on | **$370** | Same as dev |
-| Neon Scale (production load) | Scale | **$50–$200** | Scales with compute hours |
-| Clerk | Pro | **$20** | Same as dev |
-| File storage | Usage-based | **$5–$30** | Grows with document volume |
-| AWS Bedrock | Usage-based | **$20–$100** | Scales with AI feature usage |
-| Stedi | **Developer** | **$500** | ⚠️ Required for production API access |
-| **Total production phase** | | **~$965–$1,220/month** | |
+| Service                      | Plan          |      Monthly Cost      | Notes                                 |
+| ---------------------------- | ------------- | :--------------------: | ------------------------------------- |
+| Vercel Pro + HIPAA           | Pro + Add-on  |        **$370**        | Same as dev                           |
+| Neon Scale (production load) | Scale         |      **$50–$200**      | Scales with compute hours             |
+| Clerk                        | Pro           |        **$20**         | Same as dev                           |
+| File storage                 | Usage-based   |       **$5–$30**       | Grows with document volume            |
+| AWS Bedrock                  | Usage-based   |      **$20–$100**      | Scales with AI feature usage          |
+| Stedi                        | **Developer** |        **$500**        | ⚠️ Required for production API access |
+| **Total production phase**   |               | **~$965–$1,220/month** |                                       |
 
 **Revenue breakeven for Stedi**: At 2-4% of collections, Clinivise needs **$12,500–$25,000/month** in processed claims just to cover the Stedi Developer plan cost.
 
@@ -364,20 +372,20 @@ All other codes in the 0359T–0374T range, **including 0374T**, were **retired 
 
 ## 11. Key Decisions Summary
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Auth provider | **Clerk Pro ($20/mo)** | Best DX, pre-built components, org/RBAC/MFA included. No BAA needed for staff-only auth. |
-| Auth BAA | **Not required** | Staff credential data is not PHI (45 CFR § 160.103). Employment records exclusion applies. No enforcement precedent. |
-| AI provider | **AWS Bedrock (Claude)** | HIPAA-eligible, covered under AWS BAA, same pricing as direct API. Anthropic has no access to inputs/outputs. |
-| File storage | **Vercel Blob** | Covered under Vercel BAA, simplest integration, adequate for auth letter PDFs |
-| Multi-tenancy | **App-level filtering + RLS defense-in-depth** | `WHERE organization_id = ?` on all queries. Add Postgres RLS on sensitive tables in Phase 2. |
-| ID generation | **nanoid (21 chars default)** | Shorter and more URL-friendly than UUIDs. Default 21 chars provides 149 bits of entropy (collision-safe at billions of IDs). If sortable IDs are needed later (e.g., for pagination cursors), consider migrating to **cuid2** or **ulid** — but nanoid is fine for MVP. |
-| TypeScript | **5.9.3** (pin with tilde) | 6.0 RC not ecosystem-ready. Next.js/Drizzle untested against it. |
-| Tailwind | **v4** | Breaking change from v3 but shadcn/ui fully supports it. CSS-first config, no tailwind.config.js needed. |
-| Zod | **v4** | Breaking change but `zod/v4` import path enables gradual migration. react-hook-form resolvers support it. |
-| shadcn/ui style | **Mira** | Ultra-compact, ideal for data-dense billing dashboards |
-| Rate limiting | **Upstash** | Serverless-native, HTTP-based Redis, works on Vercel edge |
-| Stedi plan timing | **Basic → Developer at Phase 2 launch** | Free development/testing on Basic. $500/month Developer plan required for production API access. |
+| Decision          | Choice                                         | Rationale                                                                                                                                                                                                                                                               |
+| ----------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth provider     | **Clerk Pro ($20/mo)**                         | Best DX, pre-built components, org/RBAC/MFA included. No BAA needed for staff-only auth.                                                                                                                                                                                |
+| Auth BAA          | **Not required**                               | Staff credential data is not PHI (45 CFR § 160.103). Employment records exclusion applies. No enforcement precedent.                                                                                                                                                    |
+| AI provider       | **AWS Bedrock (Claude)**                       | HIPAA-eligible, covered under AWS BAA, same pricing as direct API. Anthropic has no access to inputs/outputs.                                                                                                                                                           |
+| File storage      | **Vercel Blob**                                | Covered under Vercel BAA, simplest integration, adequate for auth letter PDFs                                                                                                                                                                                           |
+| Multi-tenancy     | **App-level filtering + RLS defense-in-depth** | `WHERE organization_id = ?` on all queries. Add Postgres RLS on sensitive tables in Phase 2.                                                                                                                                                                            |
+| ID generation     | **nanoid (21 chars default)**                  | Shorter and more URL-friendly than UUIDs. Default 21 chars provides 149 bits of entropy (collision-safe at billions of IDs). If sortable IDs are needed later (e.g., for pagination cursors), consider migrating to **cuid2** or **ulid** — but nanoid is fine for MVP. |
+| TypeScript        | **5.9.3** (pin with tilde)                     | 6.0 RC not ecosystem-ready. Next.js/Drizzle untested against it.                                                                                                                                                                                                        |
+| Tailwind          | **v4**                                         | Breaking change from v3 but shadcn/ui fully supports it. CSS-first config, no tailwind.config.js needed.                                                                                                                                                                |
+| Zod               | **v4**                                         | Breaking change but `zod/v4` import path enables gradual migration. react-hook-form resolvers support it.                                                                                                                                                               |
+| shadcn/ui style   | **Mira**                                       | Ultra-compact, ideal for data-dense billing dashboards                                                                                                                                                                                                                  |
+| Rate limiting     | **Upstash**                                    | Serverless-native, HTTP-based Redis, works on Vercel edge                                                                                                                                                                                                               |
+| Stedi plan timing | **Basic → Developer at Phase 2 launch**        | Free development/testing on Basic. $500/month Developer plan required for production API access.                                                                                                                                                                        |
 
 ## Conclusion
 

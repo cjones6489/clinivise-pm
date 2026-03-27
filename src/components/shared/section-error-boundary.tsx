@@ -37,8 +37,8 @@ export class SectionErrorBoundary extends Component<Props, State> {
 export function SectionError({ title }: { title: string }) {
   return (
     <div className="border-border bg-card rounded-xl border px-4 py-8 text-center shadow-sm">
-      <p className="text-xs font-medium text-muted-foreground">{title}</p>
-      <p className="mt-1 text-xs text-muted-foreground">Try refreshing the page.</p>
+      <p className="text-muted-foreground text-xs font-medium">{title}</p>
+      <p className="text-muted-foreground mt-1 text-xs">Try refreshing the page.</p>
     </div>
   );
 }

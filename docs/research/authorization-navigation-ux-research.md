@@ -38,6 +38,7 @@ CentralReach is the only competitor with a true dual-access model for authorizat
 **Creating new authorizations:** From the Billing module (NOT from the client page). Steps: Billing > Authorizations > Create. Fields: auth name (recommended: "[Client Name] auth [dates]"), Manager (BCBA responsible), Payor, Valid Dates, Authorization #, Diagnosis Codes, then add Service Codes (single, grouped, or from template). Templates can be saved for common auth packages.
 
 **Known UX issues:**
+
 - Authorizations live in Billing, not where clinicians work — requires navigating away from clinical context
 - The ABI report is powerful but complex; requires training to interpret scatter charts and tree maps
 - Deleted authorizations still appear on reports (known bug)
@@ -67,6 +68,7 @@ CentralReach is the only competitor with a true dual-access model for authorizat
 **Expiring auth alerts:** Timely alerts pushed to relevant users. Also alerts when attempting to schedule beyond authorization limits (blocking at schedule-time, not just notification).
 
 **Known UX issues:**
+
 - Scheduling calendar interface needs improvement
 - Some reporting features lacking
 - No patient-facing app
@@ -91,6 +93,7 @@ CentralReach is the only competitor with a true dual-access model for authorizat
 **Cross-client view:** No cross-client authorization list or dedicated authorization reporting page found. Theralytics relies on its general reporting/analytics module (customizable by location, payer, appointment type, staff) but does not appear to have a purpose-built "all expiring authorizations" view.
 
 **Known UX issues:**
+
 - Adding authorization information described as "easy and seamless" by users
 - High praise for ease of use (4.9/5 Capterra for ease of use)
 - No specific authorization complaints surfaced
@@ -118,6 +121,7 @@ CentralReach is the only competitor with a true dual-access model for authorizat
 **Cross-client view:** Dashboard-level aggregate views of authorization usage and pending renewals exist. Not a dedicated standalone list, but operational dashboards surface auth health across the practice.
 
 **Known UX issues:**
+
 - Positions itself as "flag before booking, not after denial" — proactive approach
 - Newer platform with less market feedback available
 - Strong content marketing but limited public documentation of actual UI
@@ -135,6 +139,7 @@ CentralReach is the only competitor with a true dual-access model for authorizat
 Raven Health offers basic authorization management as part of its practice management module, but **lacks automated authorization checks or advanced scheduling logic**. This is a significant limitation compared to all other ABA competitors.
 
 **Features:**
+
 - Store client insurance information
 - Basic auth status tracking
 - AI-driven prior authorization tracking (marketed, details unclear)
@@ -168,6 +173,7 @@ Authorization tracking in SimplePractice is essentially a form field, not a work
 **Creating new authorizations:** Client Overview page only.
 
 **Known UX issues:**
+
 - Must manually edit Box 23 on secondary claim forms
 - Must manually remove authorization numbers for payers that don't require them
 - No auto-decrementing = practices lose revenue from missed/expired auths
@@ -195,6 +201,7 @@ Authorization is a field within the insurance policy record, not a standalone co
 **Creating new authorizations:** Within the patient's insurance policy only.
 
 **Known UX issues:**
+
 - No historical authorization tracking
 - Manual replacement workflow = error-prone
 - No auto-decrementing, no utilization tracking, no expiration alerts
@@ -220,6 +227,7 @@ Best non-ABA implementation found:
 **Creating new authorizations:** From client profile only. Must enable feature first: Settings > Insurance > Track Client Insurance Eligibility.
 
 **Known UX issues:**
+
 - Report is CSV download, not an interactive dashboard
 - No scheduling blocks when auth is exhausted
 - Simplified navigation improvements shipped October 2025
@@ -230,17 +238,17 @@ Best non-ABA implementation found:
 
 ## 2. Comparison Table
 
-| Dimension | CentralReach | AlohaABA | Theralytics | Passage Health | Raven Health | SimplePractice | Jane App | Healthie |
-|-----------|-------------|----------|-------------|----------------|--------------|----------------|----------|---------|
-| **Auth access point** | Billing module (standalone) + Client widget + ABI report | Client profile + Schedule view | Client Management > Client > Manage Client > Auths | Client record + Scheduling + Dashboard | Client record (basic) | Client Overview (form field) | Patient > Insurance Policy (sub-field) | Client > Insurance Eligibility |
-| **Cross-client auth list** | Yes — Billing > Authorizations grid (full page) | No — reports only | No | Dashboard aggregates only | No | No | Insurance Policies report (not auth-specific) | Yes — Insurance Authorization Report (CSV) |
-| **Create auth from** | Billing module only (not client page) | Client profile | Client profile only | Client record | Client record | Client Overview | Insurance Policy | Client profile |
-| **Auto-decrement units** | Yes | Yes | Yes | Yes | Unclear | No | No | Yes (calendar-connected) |
-| **Schedule-time blocking** | Yes (with override) | Yes (with alerts) | Yes (prevents overbooking) | Yes (blocks booking) | No | No | No | No |
-| **Expiration alerts** | ABI report calendar widget | Push alerts | Dashboard toggle | Dashboard + scheduling flags | Basic | No | No | Report-based |
-| **Utilization visualization** | Scatter charts, tree maps, utilization rate % | In-schedule utilization, utilization reports | Per-code breakdown (units/hours) | Pacing metrics, hours used/remaining | None | None | None | Visits used/remaining count |
-| **Primary UX pattern** | Data grid + analytics dashboard | Embedded in workflow (client + schedule) | Expandable detail panel | Ambient/integrated | Minimal data field | Form field | Insurance sub-field | Client tracker + CSV report |
-| **Complexity** | High (requires training) | Medium | Low-Medium | Medium | Low | Very Low | Very Low | Low-Medium |
+| Dimension                     | CentralReach                                             | AlohaABA                                     | Theralytics                                        | Passage Health                         | Raven Health          | SimplePractice               | Jane App                                      | Healthie                                   |
+| ----------------------------- | -------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------- | -------------------------------------- | --------------------- | ---------------------------- | --------------------------------------------- | ------------------------------------------ |
+| **Auth access point**         | Billing module (standalone) + Client widget + ABI report | Client profile + Schedule view               | Client Management > Client > Manage Client > Auths | Client record + Scheduling + Dashboard | Client record (basic) | Client Overview (form field) | Patient > Insurance Policy (sub-field)        | Client > Insurance Eligibility             |
+| **Cross-client auth list**    | Yes — Billing > Authorizations grid (full page)          | No — reports only                            | No                                                 | Dashboard aggregates only              | No                    | No                           | Insurance Policies report (not auth-specific) | Yes — Insurance Authorization Report (CSV) |
+| **Create auth from**          | Billing module only (not client page)                    | Client profile                               | Client profile only                                | Client record                          | Client record         | Client Overview              | Insurance Policy                              | Client profile                             |
+| **Auto-decrement units**      | Yes                                                      | Yes                                          | Yes                                                | Yes                                    | Unclear               | No                           | No                                            | Yes (calendar-connected)                   |
+| **Schedule-time blocking**    | Yes (with override)                                      | Yes (with alerts)                            | Yes (prevents overbooking)                         | Yes (blocks booking)                   | No                    | No                           | No                                            | No                                         |
+| **Expiration alerts**         | ABI report calendar widget                               | Push alerts                                  | Dashboard toggle                                   | Dashboard + scheduling flags           | Basic                 | No                           | No                                            | Report-based                               |
+| **Utilization visualization** | Scatter charts, tree maps, utilization rate %            | In-schedule utilization, utilization reports | Per-code breakdown (units/hours)                   | Pacing metrics, hours used/remaining   | None                  | None                         | None                                          | Visits used/remaining count                |
+| **Primary UX pattern**        | Data grid + analytics dashboard                          | Embedded in workflow (client + schedule)     | Expandable detail panel                            | Ambient/integrated                     | Minimal data field    | Form field                   | Insurance sub-field                           | Client tracker + CSV report                |
+| **Complexity**                | High (requires training)                                 | Medium                                       | Low-Medium                                         | Medium                                 | Low                   | Very Low                     | Very Low                                      | Low-Medium                                 |
 
 ---
 
@@ -251,30 +259,33 @@ Best non-ABA implementation found:
 From Capterra reviews, industry reports, and billing service providers (2024-2026):
 
 **Navigation/workflow complaints:**
+
 - **"Authorization is in the wrong place"** — CentralReach's decision to put auth management in the Billing module forces clinicians to context-switch away from the client record. BCBAs who need to check auth status while planning sessions must navigate to Billing, find the client, check utilization, then navigate back.
 - **"I can't see all my expiring auths in one place"** — Platforms without cross-client auth views (Theralytics, SimplePractice, Jane) force billing staff to click into each client individually to check authorization status. With 50+ clients, this is a daily time sink.
 - **"No one told me the auth was expiring"** — Platforms without proactive alerts lead to missed reauthorizations. The downstream cost: denied claims, service gaps, and revenue leakage estimated at $21-43K per BCBA per year (from existing Clinivise research).
 
 **Data entry complaints:**
+
 - **"I have to enter the same auth info twice"** — Practices that use both a PM tool and a separate billing system report double data entry for authorizations.
 - **"Reauthorizations are copy-paste hell"** — Without a clone/duplicate feature (only TherapyPM and CentralReach offer this), users manually re-enter all auth data every 3-6 months per client.
 - **"The system didn't catch that the auth expired"** — SimplePractice and Jane don't auto-decrement, so users discover expired/exhausted auths only when claims are denied.
 
 **Reporting complaints:**
+
 - **"CentralReach reports are powerful but require a PhD"** — Scatter charts and tree maps are analytically rich but too complex for daily operational use.
 - **"I just want a list of who's expiring this month"** — The most common billing staff need is a simple filterable list, not an analytics dashboard.
 - **"Quarterly re-auth deadlines get missed"** — Medicaid often requires updated authorization documentation every 90 days. Without automated tracking, QTR deadlines get missed, which stops all claims.
 
 ### 3.2 Platform-Specific Complaints
 
-| Platform | Auth-Specific Complaints |
-|----------|------------------------|
-| CentralReach | Auth buried in Billing module; analytics too complex for daily use; deleted auths still appear on reports; advanced features slow and buggy; downtime during updates |
-| AlohaABA | Calendar/scheduling interface needs improvement; reporting features lacking; no patient app |
-| Theralytics | No cross-client auth view (inferred gap, not a user complaint — users praise ease of use) |
-| SimplePractice | No auto-decrementing (most common complaint); must manually track usage; no alerts; secondary insurance auth handling is manual |
-| Jane App | No historical auth tracking; manual replacement workflow; no utilization tracking |
-| Raven Health | No automated auth checks; no advanced scheduling logic; basic feature set |
+| Platform       | Auth-Specific Complaints                                                                                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CentralReach   | Auth buried in Billing module; analytics too complex for daily use; deleted auths still appear on reports; advanced features slow and buggy; downtime during updates |
+| AlohaABA       | Calendar/scheduling interface needs improvement; reporting features lacking; no patient app                                                                          |
+| Theralytics    | No cross-client auth view (inferred gap, not a user complaint — users praise ease of use)                                                                            |
+| SimplePractice | No auto-decrementing (most common complaint); must manually track usage; no alerts; secondary insurance auth handling is manual                                      |
+| Jane App       | No historical auth tracking; manual replacement workflow; no utilization tracking                                                                                    |
+| Raven Health   | No automated auth checks; no advanced scheduling logic; basic feature set                                                                                            |
 
 ---
 
@@ -306,6 +317,7 @@ The creation point determines which persona "owns" auth management. In small pra
 AlohaABA's key insight — surfacing auth utilization in the schedule view — is the pattern that gets the most user praise. Passage Health extends this to "ambient" auth awareness everywhere (scheduling, client record, dashboard). The market is moving away from "go to the auth module" toward "auth data follows you."
 
 **Clinivise should surface auth health:**
+
 - Client detail page: auth section with per-CPT utilization bars
 - Dashboard: expiring auth alerts widget, utilization overview
 - Session logging: show remaining auth units for the selected CPT code

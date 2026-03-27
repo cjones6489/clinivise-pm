@@ -56,7 +56,10 @@ export function ProviderTable({ data }: { data: Provider[] }) {
   return (
     <div className="space-y-3">
       <DataTableToolbar table={table} searchKey="name" searchPlaceholder="Search providers..." />
-      <DataTable table={table} onRowClick={(provider) => router.push(`/providers/${provider.id}`)} />
+      <DataTable
+        table={table}
+        onRowClick={(provider) => router.push(`/providers/${provider.id}`)}
+      />
       <DataTablePagination table={table} />
       <ConfirmDialog
         open={!!archiveTarget}

@@ -103,7 +103,12 @@ export const cosignSessionNoteSchema = z.object({
 
 export const createNoteGoalSchema = z.object({
   sessionNoteId: z.string().min(1),
-  goalId: z.string().min(1).optional().or(z.literal("")).transform((v) => v || undefined),
+  goalId: z
+    .string()
+    .min(1)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   goalName: z.string().trim().min(1, "Goal name is required").max(500),
   procedure: optionalText,
   measurementType: z.enum(MEASUREMENT_TYPES).default("discrete_trial"),
@@ -141,7 +146,11 @@ export const createNoteGoalSchema = z.object({
   intervalsScored: z.coerce.number().int().min(0).optional(),
   intervalsTotal: z.coerce.number().int().min(0).optional(),
 
-  promptLevel: z.enum(PROMPT_LEVELS).optional().or(z.literal("")).transform((v) => v || undefined),
+  promptLevel: z
+    .enum(PROMPT_LEVELS)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   reinforcement: optionalText,
   progressStatus: z.enum(GOAL_PROGRESS_STATUSES).default("not_assessed"),
   notes: optionalText,
@@ -186,7 +195,11 @@ export const updateNoteGoalSchema = z.object({
   intervalsScored: z.coerce.number().int().min(0).optional(),
   intervalsTotal: z.coerce.number().int().min(0).optional(),
 
-  promptLevel: z.enum(PROMPT_LEVELS).optional().or(z.literal("")).transform((v) => v || undefined),
+  promptLevel: z
+    .enum(PROMPT_LEVELS)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   reinforcement: optionalText,
   progressStatus: z.enum(GOAL_PROGRESS_STATUSES).optional(),
   notes: optionalText,
@@ -206,7 +219,11 @@ export const createNoteBehaviorSchema = z.object({
   behaviorDescription: optionalText,
   consequence: optionalText,
   durationSeconds: z.coerce.number().int().min(0).optional(),
-  intensity: z.enum(BEHAVIOR_INTENSITIES).optional().or(z.literal("")).transform((v) => v || undefined),
+  intensity: z
+    .enum(BEHAVIOR_INTENSITIES)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   notes: optionalText,
 });
 
@@ -218,7 +235,11 @@ export const updateNoteBehaviorSchema = z.object({
   behaviorDescription: optionalText,
   consequence: optionalText,
   durationSeconds: z.coerce.number().int().min(0).optional(),
-  intensity: z.enum(BEHAVIOR_INTENSITIES).optional().or(z.literal("")).transform((v) => v || undefined),
+  intensity: z
+    .enum(BEHAVIOR_INTENSITIES)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   notes: optionalText,
 });
 

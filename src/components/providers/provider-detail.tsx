@@ -85,7 +85,9 @@ export function ProviderDetailView({
 }) {
   const credLabel =
     CREDENTIAL_LABELS[provider.credentialType as CredentialType] ?? provider.credentialType;
-  const isSupervisor = SUPERVISOR_CREDENTIAL_TYPES.includes(provider.credentialType as CredentialType);
+  const isSupervisor = SUPERVISOR_CREDENTIAL_TYPES.includes(
+    provider.credentialType as CredentialType,
+  );
 
   return (
     <Tabs defaultValue="overview">
@@ -94,9 +96,7 @@ export function ProviderDetailView({
         <TabsTrigger value="performance">Performance</TabsTrigger>
         <TabsTrigger value="caseload">Caseload ({caseload.length})</TabsTrigger>
         <TabsTrigger value="sessions">Recent Sessions</TabsTrigger>
-        {(isSupervisor || supervisor) && (
-          <TabsTrigger value="supervision">Supervision</TabsTrigger>
-        )}
+        {(isSupervisor || supervisor) && <TabsTrigger value="supervision">Supervision</TabsTrigger>}
         {canEdit && <TabsTrigger value="edit">Edit</TabsTrigger>}
       </TabsList>
 
@@ -121,23 +121,29 @@ export function ProviderDetailView({
               }
             />
             <KVRow label="Type" value={credLabel} />
-            {provider.npi && <KVRow label="NPI" value={<span className="font-mono">{provider.npi}</span>} />}
+            {provider.npi && (
+              <KVRow label="NPI" value={<span className="font-mono">{provider.npi}</span>} />
+            )}
             {provider.credentialNumber && (
-              <KVRow label="Certificate #" value={<span className="font-mono">{provider.credentialNumber}</span>} />
+              <KVRow
+                label="Certificate #"
+                value={<span className="font-mono">{provider.credentialNumber}</span>}
+              />
             )}
             {provider.credentialExpiry && (
               <KVRow
                 label="Expiry"
                 value={
-                  <span className={cn(
-                    daysUntilExpiry(provider.credentialExpiry) <= 7
-                      ? "text-red-600 dark:text-red-400"
-                      : daysUntilExpiry(provider.credentialExpiry) <= 30
-                        ? "text-amber-600 dark:text-amber-400"
-                        : undefined,
-                  )}>
-                    {formatDate(provider.credentialExpiry)}
-                    {" "}
+                  <span
+                    className={cn(
+                      daysUntilExpiry(provider.credentialExpiry) <= 7
+                        ? "text-red-600 dark:text-red-400"
+                        : daysUntilExpiry(provider.credentialExpiry) <= 30
+                          ? "text-amber-600 dark:text-amber-400"
+                          : undefined,
+                    )}
+                  >
+                    {formatDate(provider.credentialExpiry)}{" "}
                     <span className="text-muted-foreground text-[11px]">
                       ({daysUntilExpiry(provider.credentialExpiry)}d remaining)
                     </span>
@@ -145,12 +151,13 @@ export function ProviderDetailView({
                 }
               />
             )}
-            {provider.modifierCode && (
-              <KVRow label="Modifier Code" value={provider.modifierCode} />
-            )}
-            {!provider.npi && !provider.credentialNumber && !provider.credentialExpiry && !provider.modifierCode && (
-              <p className="text-muted-foreground py-2 text-xs">No credential details on file</p>
-            )}
+            {provider.modifierCode && <KVRow label="Modifier Code" value={provider.modifierCode} />}
+            {!provider.npi &&
+              !provider.credentialNumber &&
+              !provider.credentialExpiry &&
+              !provider.modifierCode && (
+                <p className="text-muted-foreground py-2 text-xs">No credential details on file</p>
+              )}
           </SectionCard>
 
           {/* Supervision */}
@@ -204,23 +211,33 @@ export function ProviderDetailView({
                   />
                   <KVRow
                     label="Completed"
-                    value={<span className="tabular-nums text-emerald-600 dark:text-emerald-400">{sessionBreakdown.completedSessions}</span>}
+                    value={
+                      <span className="text-emerald-600 tabular-nums dark:text-emerald-400">
+                        {sessionBreakdown.completedSessions}
+                      </span>
+                    }
                   />
                   <KVRow
                     label="Scheduled"
-                    value={<span className="tabular-nums">{sessionBreakdown.scheduledSessions}</span>}
+                    value={
+                      <span className="tabular-nums">{sessionBreakdown.scheduledSessions}</span>
+                    }
                   />
                   <KVRow
                     label="Cancelled"
-                    value={<span className="tabular-nums">{sessionBreakdown.cancelledSessions}</span>}
+                    value={
+                      <span className="tabular-nums">{sessionBreakdown.cancelledSessions}</span>
+                    }
                   />
                   <KVRow
                     label="No Shows"
                     value={
-                      <span className={cn(
-                        "tabular-nums",
-                        sessionBreakdown.noShowSessions > 0 && "text-red-600 dark:text-red-400",
-                      )}>
+                      <span
+                        className={cn(
+                          "tabular-nums",
+                          sessionBreakdown.noShowSessions > 0 && "text-red-600 dark:text-red-400",
+                        )}
+                      >
                         {sessionBreakdown.noShowSessions}
                       </span>
                     }
@@ -228,10 +245,12 @@ export function ProviderDetailView({
                   <KVRow
                     label="Flagged"
                     value={
-                      <span className={cn(
-                        "tabular-nums",
-                        sessionBreakdown.flaggedSessions > 0 && "text-red-600 dark:text-red-400",
-                      )}>
+                      <span
+                        className={cn(
+                          "tabular-nums",
+                          sessionBreakdown.flaggedSessions > 0 && "text-red-600 dark:text-red-400",
+                        )}
+                      >
                         {sessionBreakdown.flaggedSessions}
                       </span>
                     }
@@ -272,7 +291,9 @@ export function ProviderDetailView({
             <SectionCard title="Hours & Duration">
               <KVRow
                 label="Total Hours (Completed)"
-                value={<span className="tabular-nums">{sessionBreakdown.totalHours.toFixed(1)}h</span>}
+                value={
+                  <span className="tabular-nums">{sessionBreakdown.totalHours.toFixed(1)}h</span>
+                }
               />
               <KVRow
                 label="Avg Session Duration"
@@ -293,7 +314,10 @@ export function ProviderDetailView({
                   {sessionBreakdown.cptDistribution.map((cpt) => {
                     const desc = ABA_CPT_CODES[cpt.cptCode as CptCode]?.description;
                     return (
-                      <div key={cpt.cptCode} className="border-border/40 flex items-center justify-between border-b py-1.5 last:border-0">
+                      <div
+                        key={cpt.cptCode}
+                        className="border-border/40 flex items-center justify-between border-b py-1.5 last:border-0"
+                      >
                         <div>
                           <span className="text-xs font-medium tabular-nums">{cpt.cptCode}</span>
                           {desc && (
@@ -330,9 +354,7 @@ export function ProviderDetailView({
       <TabsContent value="sessions" className="pt-4">
         <SectionCard
           title="Recent Sessions"
-          action={
-            <span className="text-muted-foreground text-[11px]">Last 10 sessions</span>
-          }
+          action={<span className="text-muted-foreground text-[11px]">Last 10 sessions</span>}
         >
           {recentSessions.length > 0 ? (
             <div className="overflow-x-auto">
@@ -345,9 +367,7 @@ export function ProviderDetailView({
                     <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
                       Client
                     </th>
-                    <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
-                      CPT
-                    </th>
+                    <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">CPT</th>
                     <th className="text-muted-foreground px-2 py-1.5 text-right font-medium">
                       Units
                     </th>
@@ -360,10 +380,7 @@ export function ProviderDetailView({
                   {recentSessions.map((s) => (
                     <tr key={s.id} className="border-border border-b last:border-0">
                       <td className="px-2 py-1.5 tabular-nums">
-                        <Link
-                          href={`/sessions/${s.id}`}
-                          className="hover:underline"
-                        >
+                        <Link href={`/sessions/${s.id}`} className="hover:underline">
                           {formatDate(s.sessionDate)}
                         </Link>
                       </td>
@@ -498,7 +515,10 @@ function RateBar({
     <div className="flex items-center gap-3">
       <span className="text-muted-foreground w-28 shrink-0 text-xs">{label}</span>
       <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
-        <div className={cn("h-full rounded-full transition-all", color)} style={{ width: `${pct}%` }} />
+        <div
+          className={cn("h-full rounded-full transition-all", color)}
+          style={{ width: `${pct}%` }}
+        />
       </div>
       <span className="w-10 text-right text-xs font-medium tabular-nums">{pct}%</span>
     </div>

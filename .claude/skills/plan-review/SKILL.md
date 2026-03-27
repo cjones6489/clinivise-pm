@@ -21,6 +21,7 @@ Apply these thinking heuristics throughout your review:
 ## Clinivise-Specific Failure Modes
 
 For each new codepath, consider:
+
 - **Multi-tenancy leaks**: Does every query filter by `organization_id`? Does `authActionClient` inject org context? Can URL manipulation expose cross-org data?
 - **Authorization unit races**: Concurrent RBTs logging sessions against the same auth — is the unit decrement atomic (`SET used_units = used_units + N`)? Never read-modify-write.
 - **FIFO auth selection**: Overlapping auths for same CPT code — does FIFO logic handle split-across-auths? Is the selection visible to the user?
@@ -78,6 +79,7 @@ Wait for the user's response before moving to the next finding.
 ## Completion
 
 After all findings are addressed, output:
+
 - **Architecture Decision Summary**: Key decisions made during review
 - **Component Map**: Which components will be created/modified and their responsibilities
 - **Test Plan**: Concrete test specs with inputs, expected outputs, and assertions

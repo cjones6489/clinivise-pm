@@ -2,7 +2,7 @@
 
 > **Purpose**: Define every page in the application — who uses it, what they see, what they do, and what data powers it. This is the source of truth that bridges the wireframe (how it looks) with the implementation (how it works).
 >
-> **How to use**: Before building or redesigning any page, read its entry here first. The wireframe (`docs/design/clinivise-wireframes.jsx`) shows the visual layout. This doc explains the *why* and *what*.
+> **How to use**: Before building or redesigning any page, read its entry here first. The wireframe (`docs/design/clinivise-wireframes.jsx`) shows the visual layout. This doc explains the _why_ and _what_.
 
 ---
 
@@ -12,25 +12,26 @@ Clinivise is an **all-in-one ABA platform** — clinical operations (goals, data
 
 What ABA tools typically include, so we know what practitioners expect:
 
-| Feature Area | CentralReach | AlohaABA | Theralytics | Raven Health | SimplePractice |
-|---|---|---|---|---|---|
-| Scheduling | AI-powered, multi-view calendar | Drag-and-drop, conflict alerts | Calendar with availability | Drag-and-drop | Color-coded calendar |
-| Client management | Intake forms → auto-create profile | Client records + portal | Client profiles | Client records | Client portal + intake |
-| Authorization tracking | Electronic auth management | Auth management + alerts | Auth tracking | Auth tracking | N/A (not ABA-specific) |
-| Session logging | Notes → auto-billing entries | Session notes + data | Data collection + AI notes | Real-time data + offline | Progress notes + templates |
-| Billing / Claims | Bulk invoicing, clearinghouse, ERA | Claims, AR, invoicing | Flexible claim processing | Claims + revenue | Insurance claims filing |
-| Data collection | Program books, data sheets, offline | Via HiRasmus/Motivity | Built-in curriculum + graphing | Built-in + offline + graphing | N/A |
-| Payroll | Integrated | Built-in | N/A | N/A | N/A |
-| Eligibility checks | Built-in | Live eligibility | N/A | N/A | Insurance verification |
-| AI features | AI scheduling | N/A | AI session note summaries | AI session notes | N/A |
-| Parent portal | Yes | Yes | N/A | N/A | Client portal |
-| Reporting | KPI dashboards, BI | Reports + analytics | Dashboards + graphing | Graphing + reporting | Income + referral reports |
+| Feature Area           | CentralReach                        | AlohaABA                       | Theralytics                    | Raven Health                  | SimplePractice             |
+| ---------------------- | ----------------------------------- | ------------------------------ | ------------------------------ | ----------------------------- | -------------------------- |
+| Scheduling             | AI-powered, multi-view calendar     | Drag-and-drop, conflict alerts | Calendar with availability     | Drag-and-drop                 | Color-coded calendar       |
+| Client management      | Intake forms → auto-create profile  | Client records + portal        | Client profiles                | Client records                | Client portal + intake     |
+| Authorization tracking | Electronic auth management          | Auth management + alerts       | Auth tracking                  | Auth tracking                 | N/A (not ABA-specific)     |
+| Session logging        | Notes → auto-billing entries        | Session notes + data           | Data collection + AI notes     | Real-time data + offline      | Progress notes + templates |
+| Billing / Claims       | Bulk invoicing, clearinghouse, ERA  | Claims, AR, invoicing          | Flexible claim processing      | Claims + revenue              | Insurance claims filing    |
+| Data collection        | Program books, data sheets, offline | Via HiRasmus/Motivity          | Built-in curriculum + graphing | Built-in + offline + graphing | N/A                        |
+| Payroll                | Integrated                          | Built-in                       | N/A                            | N/A                           | N/A                        |
+| Eligibility checks     | Built-in                            | Live eligibility               | N/A                            | N/A                           | Insurance verification     |
+| AI features            | AI scheduling                       | N/A                            | AI session note summaries      | AI session notes              | N/A                        |
+| Parent portal          | Yes                                 | Yes                            | N/A                            | N/A                           | Client portal              |
+| Reporting              | KPI dashboards, BI                  | Reports + analytics            | Dashboards + graphing          | Graphing + reporting          | Income + referral reports  |
 
 ### What Clinivise does differently
 
 We don't try to be CentralReach (60+ features, $300+/month). We target the gap: **small practices (1-50 staff) that need clean PM + billing, not a bloated enterprise suite.** Free PM tool, monetized via 2-4% of collected revenue on billing.
 
 Our edge:
+
 - **Modern UX** — CentralReach users complain about crashes, data loss, confusing navigation, and "logistical nightmare" workflows. We win by being fast, clean, and reliable.
 - **AI-native** — Auth letter parsing, session note drafts, pre-claim error scrubbing. Not bolted on — designed in.
 - **ABA-specific** — Not a generic EHR adapted for ABA. Purpose-built for CPT 97153-97158, authorization tracking, and the CMS 8-minute rule.
@@ -39,14 +40,14 @@ Our edge:
 
 ### What we deliberately exclude (and why)
 
-| Feature | Why we skip it |
-|---|---|
-| Clinical data collection (DTT, graphing) | Practices already use Catalyst, Motivity, or Hi Rasmus. Integrations later, not competition. |
-| Scheduling / calendar | Complex to build well. Practices use Google Calendar or existing tools. Phase 2+ if demand proves it. |
-| Payroll | Not core to PM. Practices use Gusto, ADP, or AlohaABA's payroll. |
-| Telehealth | Not ABA-specific. Practices use Zoom or platform-provided telehealth. |
-| Parent portal | Phase 3. Nice-to-have, not essential for operations. |
-| Learning management (LMS) | Enterprise feature. Not relevant for small practices. |
+| Feature                                  | Why we skip it                                                                                        |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Clinical data collection (DTT, graphing) | Practices already use Catalyst, Motivity, or Hi Rasmus. Integrations later, not competition.          |
+| Scheduling / calendar                    | Complex to build well. Practices use Google Calendar or existing tools. Phase 2+ if demand proves it. |
+| Payroll                                  | Not core to PM. Practices use Gusto, ADP, or AlohaABA's payroll.                                      |
+| Telehealth                               | Not ABA-specific. Practices use Zoom or platform-provided telehealth.                                 |
+| Parent portal                            | Phase 3. Nice-to-have, not essential for operations.                                                  |
+| Learning management (LMS)                | Enterprise feature. Not relevant for small practices.                                                 |
 
 ---
 
@@ -57,24 +58,31 @@ Exceptional UI/UX is not a nice-to-have — it's the product strategy. ABA pract
 Every page, every feature, every interaction must be designed with these principles:
 
 ### 1. Workflow-first, not data-first
+
 Start with what the user is trying to do, not what the database stores. The schema serves the UI. Ask: "What did they just do? What are they trying to accomplish? What's their next action?" Then design the page to serve that flow.
 
 ### 2. Speed over ceremony
+
 The most frequent action (session logging) should take under 30 seconds. Pre-fill everything derivable from context. Minimize clicks. The UI should feel like it's working WITH the user, anticipating their needs.
 
 ### 3. Information hierarchy is everything
+
 Every page has a hero moment — one visually dominant element. Three tiers of visual weight: primary (hero numbers, key status), secondary (section cards, supporting data), tertiary (metadata, timestamps). If everything looks the same, nothing stands out.
 
 ### 4. Data density without clutter
+
 This is a billing/PM tool. Users WANT to see lots of data. Use compact spacing, small text, dense tables. But organize with clear visual hierarchy, section cards with title bars, and key-value pairs — not walls of form inputs.
 
 ### 5. Zero data anxiety
+
 Visible save state on every form. Confirmation dialogs only for destructive actions. Optimistic UI with rollback on failure. Never silently discard input. This directly counters CentralReach's #1 user complaint.
 
 ### 6. Designed, not generated
+
 Every screen should feel intentionally crafted. No bare headings with loose content — use section cards. No disabled form inputs for display — use key-value pairs. No placeholder stubs — use designed empty states. No flat tables — use rich rows with inline context and badges.
 
 ### 7. Anticipate the next action
+
 Every page should have contextual action buttons for what the user most likely wants to do next. Client detail → "Log Session." Auth list → "Upload Auth Letter." Don't make users navigate elsewhere for the obvious next step.
 
 ---
@@ -85,23 +93,23 @@ Be honest about what we ship at launch vs. what's coming. Don't promise auto-sav
 
 ### What we CAN promise at MVP
 
-| Promise | How we deliver it |
-|---|---|
-| **"See your authorizations at a glance"** | Utilization bars on client detail, dashboard alerts for expiring/over-utilized auths, per-CPT progress tracking |
-| **"Log sessions in 30 seconds"** | Pre-fill from context, auto-calculated units, one-screen form, Quick Log for repeat sessions |
+| Promise                                       | How we deliver it                                                                                                                                        |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **"See your authorizations at a glance"**     | Utilization bars on client detail, dashboard alerts for expiring/over-utilized auths, per-CPT progress tracking                                          |
+| **"Log sessions in 30 seconds"**              | Pre-fill from context, auto-calculated units, one-screen form, Quick Log for repeat sessions                                                             |
 | **"Catch billing errors before they happen"** | CPT-credential validation, unit mismatch warnings, overlap detection, max units/day enforcement — the only free ABA tool with built-in compliance checks |
-| **"Free, forever"** | All PM features are free. Billing (Phase 2) is the paid upgrade at 2-4% of collections |
-| **"Never fight your software"** | Modern UI, Cmd+K command palette, flat navigation, designed for RBTs on tablets and BCBAs on laptops |
+| **"Free, forever"**                           | All PM features are free. Billing (Phase 2) is the paid upgrade at 2-4% of collections                                                                   |
+| **"Never fight your software"**               | Modern UI, Cmd+K command palette, flat navigation, designed for RBTs on tablets and BCBAs on laptops                                                     |
 
 ### What's NOT in MVP (don't claim these yet)
 
-| Feature | When | Why it's deferred |
-|---|---|---|
-| Auto-save on all forms | Phase 2 | Complex to implement well. MVP has localStorage drafts for Log Session specifically. |
-| AI auth letter parsing | Phase 2 (AI track) | Requires AI infrastructure (Bedrock, Inngest). MVP has manual auth entry. |
-| Claim scrubbing / billing | Phase 2 | Requires Stedi integration. This is the monetization layer. |
-| Real-time eligibility checks | Phase 2 | Requires Stedi 270/271 integration. |
-| Role-specific dashboards | Phase 2 | MVP dashboard shows practice-wide data with a "Your Sessions Today" widget for RBT relevance. |
+| Feature                      | When               | Why it's deferred                                                                             |
+| ---------------------------- | ------------------ | --------------------------------------------------------------------------------------------- |
+| Auto-save on all forms       | Phase 2            | Complex to implement well. MVP has localStorage drafts for Log Session specifically.          |
+| AI auth letter parsing       | Phase 2 (AI track) | Requires AI infrastructure (Bedrock, Inngest). MVP has manual auth entry.                     |
+| Claim scrubbing / billing    | Phase 2            | Requires Stedi integration. This is the monetization layer.                                   |
+| Real-time eligibility checks | Phase 2            | Requires Stedi 270/271 integration.                                                           |
+| Role-specific dashboards     | Phase 2            | MVP dashboard shows practice-wide data with a "Your Sessions Today" widget for RBT relevance. |
 
 ### Aha Moments (optimize the design for these)
 
@@ -119,16 +127,16 @@ These are the moments when a new user thinks "this is better than what I had." E
 
 Use practitioner-friendly language throughout the app — not software-engineer jargon.
 
-| Instead of | Say |
-|---|---|
-| "Create a provider record" | "Add a team member" |
-| "Add a client entity" | "Add a client" |
-| "Configure payer settings" | "Set up insurance companies" |
-| "Organization profile" | "Practice info" |
-| "Revalidate data" | (never show this to users) |
+| Instead of                   | Say                                                |
+| ---------------------------- | -------------------------------------------------- |
+| "Create a provider record"   | "Add a team member"                                |
+| "Add a client entity"        | "Add a client"                                     |
+| "Configure payer settings"   | "Set up insurance companies"                       |
+| "Organization profile"       | "Practice info"                                    |
+| "Revalidate data"            | (never show this to users)                         |
 | "Authorization service line" | "Authorized service" or "Approved hours for {CPT}" |
-| "Soft delete" | "Archive" |
-| "organization_id" | (never show this to users) |
+| "Soft delete"                | "Archive"                                          |
+| "organization_id"            | (never show this to users)                         |
 
 The Getting Started card, empty states, and error messages should all use plain, friendly language. If an RBT can't understand it in 3 seconds, rewrite it.
 
@@ -173,11 +181,12 @@ SETTINGS
 
 **Who uses it**: Everyone, daily. This is the landing page after login.
 
-**User story**: *"The practice owner opens Clinivise Monday morning to see what needs attention this week — expiring auths, flagged sessions, and overall practice health."*
+**User story**: _"The practice owner opens Clinivise Monday morning to see what needs attention this week — expiring auths, flagged sessions, and overall practice health."_
 
 **Hero moment**: The priority alerts card. What's broken RIGHT NOW.
 
 **Layout** (from wireframe):
+
 - **Header**: "Dashboard" title + "Good morning — here's what needs attention today." + action buttons (Export, Log Session)
 - **Metric cards row** (4 cards):
   - Active Clients (count, with total)
@@ -191,6 +200,7 @@ SETTINGS
 - **Your Sessions Today** (for RBTs/BCBAs): A compact card showing sessions the current user's provider has logged today, with a "Log Session" CTA. Makes the dashboard relevant to clinicians, not just management. Shows: "{N} sessions logged today · {X} hours". If no sessions today: "No sessions logged yet today. Log your first session →". Only visible when the current user has a linked provider record.
 
 **Utilization alert thresholds** (from `constants.ts`):
+
 - 0-79%: normal (default color)
 - 80-94%: warning (amber) — "Nearing limit"
 - 95-99%: critical (red) — "Almost exhausted"
@@ -198,6 +208,7 @@ SETTINGS
 - <50% used with >50% period elapsed: under-utilized (amber) — flag for review
 
 **Data required**:
+
 - Client count: `COUNT(*)` from `clients` WHERE `status` != 'archived' AND `deleted_at IS NULL`
 - Authorization utilization: aggregate `used_units / approved_units` from `authorization_services` joined through active `authorizations`
 - Session hours this week: `SUM(units * 15 / 60)` from `sessions` WHERE date in current week (units are 15-minute increments)
@@ -205,6 +216,7 @@ SETTINGS
 - Client overview: `clients` LEFT JOIN `providers` (BCBA), `client_insurance` → `payers`, `authorizations` → `authorization_services`
 
 **Actions from this page**:
+
 - Primary: Log Session (→ `/sessions/new`)
 - Secondary: Export (→ CSV of client overview table with columns matching the displayed table)
 - Alert actions: Verify (→ `/clients/[id]` Insurance tab), Renew (→ `/clients/[id]` Authorizations tab), Review (→ session detail)
@@ -220,11 +232,12 @@ SETTINGS
 
 **Who uses it**: BCBAs (reviewing caseload), admins (managing roster), billing staff (checking insurance status). Daily.
 
-**User story**: *"A BCBA wants to quickly find a client to check their authorization status before a parent meeting."*
+**User story**: _"A BCBA wants to quickly find a client to check their authorization status before a parent meeting."_
 
 **Hero moment**: The table itself — rich, scannable rows with inline context.
 
 **Layout** (from wireframe):
+
 - **Header**: "Clients" title + "{N} clients in your caseload" + search input + Filters button + "Add Client" button
 - **Table** with columns:
   - Client (name bolded, "DOB: {date} · {diagnosisCode}" underneath in muted text)
@@ -236,10 +249,12 @@ SETTINGS
   - Arrow icon (→) indicating clickable row
 
 **Data required**:
+
 - `clients` LEFT JOIN `providers` (BCBA name via `assigned_bcba_id`), LEFT JOIN `client_contacts` (first contact WHERE `is_legal_guardian = true`), LEFT JOIN `client_insurance` → `payers` (priority 1 policy's payer name)
 - Auth status: most recent authorization WHERE `status` = 'approved' AND `end_date` >= today, calculated `days_remaining = end_date - today`
 
 **Actions from this page**:
+
 - Primary: Add Client (→ `/clients/new`)
 - Secondary: Search (client-side table filter on name), Filters (by status, BCBA, payer)
 - Row click: → `/clients/[id]`
@@ -254,17 +269,19 @@ SETTINGS
 
 **Who uses it**: BCBAs (primary), RBTs (checking auth status), billing staff (insurance info), admins. Multiple times daily.
 
-**User story**: *"A BCBA opens Ethan Miller's page to check if his 97153 authorization has enough units for this week's sessions, and to see if his insurance is still active."*
+**User story**: _"A BCBA opens Ethan Miller's page to check if his 97153 authorization has enough units for this week's sessions, and to see if his insurance is still active."_
 
 **Hero moment**: The metric cards showing authorization utilization at a glance.
 
 **Layout** (from wireframe):
+
 - **Back link**: "← Back to Clients" (text-primary, clickable)
 - **Header**: Large client name (22px bold) + "DOB: {date} · Age {N} · {diagnosisCode}: {diagnosisDescription}" + "Guardian: {name} · {phone} · {email}" + status badges on right (status badge + "Auth: {N}d left" if active auth)
 - **Action buttons row**: Log Session (primary blue), Upload Auth Letter (outline), Run Eligibility Check (outline, Phase 2)
 - **Tabs**: Overview | Care Team | Insurance | Authorizations | Sessions | Documents | Edit (if canEdit)
 
 **Overview tab**:
+
 - **Metric cards** (4):
   - Total Approved: sum of `approved_units` across active auth services, displayed as hours (`units * 15 / 60`), sub-text shows breakdown by CPT ("97153: 100 · 97155: 20")
   - Used: sum of `used_units`, displayed as hours, sub-text shows "61% utilized" with color coding
@@ -301,6 +318,7 @@ SETTINGS
 ```
 
 **Interaction pattern** (combobox-search-and-add — NOT drag-and-drop):
+
 1. Click "+ Add Provider to Care Team" → popover opens (not modal, keep team visible for context)
 2. Search input auto-focused, type-ahead filters available providers (those NOT already on this team)
 3. Each row: avatar initials, name, credential badge, # current clients (load context)
@@ -311,6 +329,7 @@ SETTINGS
 **Team member row**: Avatar initials + name + credential badge + role dropdown (inline, changeable) + ★ primary toggle (star icon, single-click) + ⋯ overflow menu (Remove from team, View provider profile)
 
 **Role groups (section headers):**
+
 - Supervising (BCBAs, BCBA-Ds, BCaBAs)
 - Direct Service (RBTs, lead RBTs)
 
@@ -318,14 +337,14 @@ SETTINGS
 
 **Key design decisions:**
 
-| Decision | Choice | Reasoning |
-|----------|--------|-----------|
-| No drag-and-drop | Combobox-add | Faster (3 clicks vs 5+), works on tablets, accessible, supports inline role assignment |
-| Popover not modal | Keep team visible | Context: see who's already on the team while adding |
-| Auto-role from credential | RBT→Direct, BCBA→Supervising | Reduces clicks; 80% of the time the default is correct |
-| Grouped by role | Section headers | ABA teams have clear hierarchy; scannable |
-| Primary = star toggle | Separate from role | Orthogonal concerns; most common edit is changing primary, should be 1 click |
-| Remove via overflow menu | Not prominent button | Destructive action behind intentional click |
+| Decision                  | Choice                       | Reasoning                                                                              |
+| ------------------------- | ---------------------------- | -------------------------------------------------------------------------------------- |
+| No drag-and-drop          | Combobox-add                 | Faster (3 clicks vs 5+), works on tablets, accessible, supports inline role assignment |
+| Popover not modal         | Keep team visible            | Context: see who's already on the team while adding                                    |
+| Auto-role from credential | RBT→Direct, BCBA→Supervising | Reduces clicks; 80% of the time the default is correct                                 |
+| Grouped by role           | Section headers              | ABA teams have clear hierarchy; scannable                                              |
+| Primary = star toggle     | Separate from role           | Orthogonal concerns; most common edit is changing primary, should be 1 click           |
+| Remove via overflow menu  | Not prominent button         | Destructive action behind intentional click                                            |
 
 **Empty state**: "No care team assigned yet. Add providers to this client's care team." + [Add Provider] button.
 
@@ -346,6 +365,7 @@ SETTINGS
 **Edit tab** (if canEdit): The full client edit form (fields: first/last name, DOB, gender, phone, email, address, diagnosis code/description, assigned BCBA, intake date, status, referral source, notes, hold reason).
 
 **Data required**:
+
 - `clients` record with all fields
 - `client_contacts` (guardian lookup: first WHERE `is_legal_guardian = true`)
 - `client_insurance` → `payers` JOIN (all policies, ordered by priority)
@@ -354,6 +374,7 @@ SETTINGS
 - `providers` for care team display (Phase 1: BCBA via `assigned_bcba_id`; Phase 2: `client_providers` junction table)
 
 **Actions from this page**:
+
 - Primary: Log Session (→ `/sessions/new?clientId={id}`)
 - Secondary: Upload Auth Letter (→ upload + AI parse, Phase 2), Run Eligibility Check (Phase 2)
 - Tab-specific: Add/edit insurance (Insurance tab), Add/edit authorization (Authorizations tab), view/edit session (Sessions tab)
@@ -368,11 +389,12 @@ SETTINGS
 
 **Who uses it**: BCBAs, admins. Weekly (new clients) or occasionally (edits).
 
-**User story**: *"An admin is onboarding a new client referred by a pediatrician. They need to enter the basics — name, DOB, diagnosis, guardian info, and insurance — so the BCBA can start the assessment."*
+**User story**: _"An admin is onboarding a new client referred by a pediatrician. They need to enter the basics — name, DOB, diagnosis, guardian info, and insurance — so the BCBA can start the assessment."_
 
 **No wireframe exists for this page.** Layout based on current implementation.
 
 **Layout**:
+
 - **Back link**: "← Back to Clients" (new client page only)
 - **Header**: "Add Client" (new) or shown as Edit tab on client detail
 - **Form** (4 sections):
@@ -392,11 +414,12 @@ SETTINGS
 
 **Who uses it**: BCBAs (tracking renewals), billing staff (checking coverage before claims), admins. Weekly.
 
-**User story**: *"The billing coordinator reviews all authorizations on Monday to identify which ones are expiring this month and need renewal requests submitted."*
+**User story**: _"The billing coordinator reviews all authorizations on Monday to identify which ones are expiring this month and need renewal requests submitted."_
 
 **Hero moment**: The utilization bars and "Expiring Soon" filter.
 
 **Layout** (from wireframe):
+
 - **Header**: "Authorizations" title + "Track all client authorizations and renewals" + "Upload Auth Letter" button (primary)
 - **Filter tabs**: All | Active | Expiring Soon | Expired | Pending
   - "Active" maps to DB status `approved` with `end_date` > today
@@ -419,10 +442,12 @@ SETTINGS
   - Status (badge: Active=green, Expiring=amber, Expired=red, Pending=outline, Denied=red, Exhausted=muted)
 
 **Data required**:
+
 - `authorizations` JOIN `clients` (name) JOIN `authorization_services` (for utilization aggregates)
 - Calculated fields: `days_left = end_date - today`, `utilization_pct = SUM(used_units) / SUM(approved_units)`, `projected_pct` based on weekly burn rate × remaining weeks
 
 **Actions from this page**:
+
 - Primary: Upload Auth Letter (→ AI parse flow, Phase 2 — links to Add Manually for MVP)
 - Secondary: Add Manually (→ `/authorizations/new` or dialog)
 - Filter by status tab
@@ -438,11 +463,12 @@ SETTINGS
 
 **Who uses it**: BCBAs, admins. When a new authorization letter arrives from a payer.
 
-**User story**: *"A BCBA received an authorization letter from Blue Cross approving 120 units of 97153 and 20 units of 97155 for the next 6 months. They need to enter this so session logging tracks against the approved units."*
+**User story**: _"A BCBA received an authorization letter from Blue Cross approving 120 units of 97153 and 20 units of 97155 for the next 6 months. They need to enter this so session logging tracks against the approved units."_
 
 **No wireframe exists for this page.** Design based on domain requirements.
 
 **Layout**:
+
 - **Form** (3 sections):
   - Authorization Info: client (select/combobox), client insurance policy (select from client's active policies), authorization number (text), status (select: pending/approved/denied/expired/exhausted), start date, end date, diagnosis code (pre-fill from client), notes
   - Service Lines (repeatable section): CPT code (select from `ABA_CPT_CODES`), approved units (number), used units (number, typically 0 for new auths). Add/remove service lines.
@@ -461,11 +487,12 @@ SETTINGS
 
 **Who uses it**: RBTs (logging sessions), BCBAs (reviewing), billing staff (preparing claims). Daily.
 
-**User story**: *"An RBT just finished a 3-hour session with a client at their home. They need to log it — client, time, CPT code — before driving to the next appointment."*
+**User story**: _"An RBT just finished a 3-hour session with a client at their home. They need to log it — client, time, CPT code — before driving to the next appointment."_
 
 **Hero moment**: The "Log Session" button and the session count/hours metrics.
 
 **Layout** (from wireframe):
+
 - **Header**: "Sessions" title + "{N} sessions logged this month" + "Import CSV" button (Phase 2) + "Log Session" button (primary)
 - **Metric cards** (4):
   - This Week: total hours (`SUM(units * 15 / 60)` for current week)
@@ -483,11 +510,13 @@ SETTINGS
   - Billed (badge): "—" for MVP, "No" (gray) / "Billed" (blue) in Phase 2 when claims exist
 
 **Data required**:
+
 - `sessions` JOIN `clients` (name) JOIN `providers` (name)
 - Aggregates: hours this week, session count 7d, flagged count, unbilled count
 - Session duration is calculated from `start_time` and `end_time` (no separate `duration_minutes` column — duration is derived)
 
 **Actions from this page**:
+
 - Primary: Log Session (→ `/sessions/new`)
 - Secondary: Import CSV (Phase 2)
 - Row click: → session detail/edit (dialog or inline expand)
@@ -502,11 +531,12 @@ SETTINGS
 
 **Who uses it**: RBTs (primarily), BCBAs. Multiple times daily. **The single most frequent action in the entire app.**
 
-**User story**: *"An RBT just finished a 3-hour direct therapy session (97153) with Marcus Thompson at his home. They need to log it in under 30 seconds before driving to the next client."*
+**User story**: _"An RBT just finished a 3-hour direct therapy session (97153) with Marcus Thompson at his home. They need to log it in under 30 seconds before driving to the next client."_
 
 **Hero moment**: The auto-calculated units display — the user enters start/end time and instantly sees duration, units, and modifier.
 
 **Layout** (from wireframe):
+
 - **Back link**: "← Back to Sessions"
 - **Header**: "Log Session"
 - **Quick Log section** (above the form, for returning users): Shows the user's last 3-5 sessions as compact cards: "{Client Name} · {CPT} · {Units} units · {POS} — {date}". Each has a "Log Again" button that pre-fills the entire form from that session (same client, CPT, POS, provider) with only date (today) and times left empty. This turns a 30-second form into a 5-10 second interaction. Hidden when the user has no previous sessions.
@@ -524,12 +554,14 @@ SETTINGS
 - **Actions**: Save Session (primary), Cancel
 
 **Pre-fill logic**:
+
 - Date: today
 - Provider: current user's linked provider record (if user role is RBT or BCBA)
 - CPT: last used CPT code for the selected client (query most recent session for this client)
 - POS: last used POS for the selected client
 
 **Data required**:
+
 - Client list (active clients, combobox search)
 - Provider list (active providers)
 - Current user → provider mapping (for pre-fill)
@@ -538,11 +570,13 @@ SETTINGS
 - `calculateUnits()` from `src/lib/utils.ts` for CMS 8-minute rule
 
 **Actions from this page**:
+
 - Primary: Save Session → creates session record, atomically increments `used_units` on the matched authorization service (`SET used_units = used_units + N`), redirects to `/sessions` with success toast
 - Secondary: Cancel (→ back to sessions)
 
 **Session validation checks** (ship with sessions — competitive differentiator):
 These run client-side before save and surface as warnings (not blockers, since the session was already delivered):
+
 1. **CPT-credential validation**: Warn if provider credential type doesn't match the CPT code's allowed provider (e.g., BCBA logging 97153 should be RBT, RBT logging 97155 should be BCBA). Uses `ABA_CPT_CODES.provider` field.
 2. **maxUnitsPerDay enforcement**: Warn if total units for this client + CPT code today would exceed `ABA_CPT_CODES.maxUnitsPerDay` (e.g., 97153 max 32 units/day).
 3. **Session overlap detection**: Warn if this provider already has a session logged during an overlapping time range on the same date.
@@ -555,6 +589,7 @@ When multiple active authorizations cover the selected CPT code, the system auto
 **Auth date validation**: The authorization check compares `session_date` against `auth.start_date` and `auth.end_date` (inclusive on both ends). A session is covered if `start_date <= session_date <= end_date`, regardless of when the session is logged (supports backdated entry).
 
 **Mobile / tablet considerations** (RBTs log sessions from the field):
+
 - Below 768px: stack all form rows to single column, increase touch target sizes
 - Time entry: use native `<input type="time">` on mobile (invokes OS time picker, touch-optimized)
 - Client/Provider selects: use combobox with full-width on mobile
@@ -571,13 +606,14 @@ When multiple active authorizations cover the selected CPT code, the system auto
 
 **Who uses it**: Admins, owners. Weekly or when onboarding new staff.
 
-**User story**: *"The practice owner is hiring a new RBT and needs to add them to the system with their credential info and assign a supervising BCBA."*
+**User story**: _"The practice owner is hiring a new RBT and needs to add them to the system with their credential info and assign a supervising BCBA."_
 
 **Hero moment**: The table showing all staff with credential type and status at a glance.
 
 **No wireframe exists for this page.** Layout based on current implementation + standard patterns.
 
 **Layout**:
+
 - **Header**: "Providers" title + "Manage your practice's staff and credentials" + "Add Provider" button (primary)
 - **Search + table** with columns:
   - Name (last, first — bold, with credential abbreviation in muted text underneath, e.g. "BCBA-D")
@@ -588,10 +624,12 @@ When multiple active authorizations cover the selected CPT code, the system auto
   - Actions (dropdown: Edit, Archive)
 
 **Data required**:
+
 - `providers` with self-join for supervisor name, filtered by `deleted_at IS NULL`, ordered by last name
 - Role gating: only `owner` and `admin` can access this page
 
 **Actions from this page**:
+
 - Primary: Add Provider (→ `/providers/new`)
 - Secondary: Search (filter on name)
 - Row click: → `/providers/[id]`
@@ -605,11 +643,12 @@ When multiple active authorizations cover the selected CPT code, the system auto
 
 **Who uses it**: Admins, owners. Occasionally.
 
-**User story**: *"An admin needs to update a provider's NPI number and check when their RBT credential expires."*
+**User story**: _"An admin needs to update a provider's NPI number and check when their RBT credential expires."_
 
 **No wireframe exists for this page.** Layout based on current implementation.
 
 **Layout**:
+
 - **Back link**: "← Back to Providers"
 - **Header**: Provider name (large bold) + credential badge + status badge
 - **Overview section** (default view): Key-value pairs showing — Credential Type, NPI, Credential Number, Credential Expiry, Supervisor, Modifier Code, Status
@@ -625,9 +664,10 @@ When multiple active authorizations cover the selected CPT code, the system auto
 
 **Who uses it**: Admins, owners. Rarely (initial setup and occasional payer management).
 
-**User story**: *"The admin needs to add a new insurance payer (Cigna) because a new client has coverage through them."*
+**User story**: _"The admin needs to add a new insurance payer (Cigna) because a new client has coverage through them."_
 
 **Layout** (from wireframe):
+
 - **Tabs**: Organization | Team | Payers | Billing
 - **Organization tab**: Practice info form — name, NPI, tax ID, taxonomy code (default "103K00000X"), address (line 1, city, state, zip), phone, email, timezone (select, default "America/New_York"). Maps to `organizations` table.
 - **Team tab**: Embed Clerk's `<OrganizationProfile>` component for team/invite management. No custom UI needed.
@@ -681,21 +721,25 @@ These patterns apply to EVERY page:
 When a brand-new practice signs up, every list is empty and every metric is 0. The dashboard must NOT be a wall of zeroes — it should guide the user through setup.
 
 **Getting Started card** (appears on Dashboard when `providers.count === 0` OR `clients.count === 0`):
+
 ```
 Welcome to Clinivise! Set up your practice in 3 steps:
   ✓ / ○  Add your practice info        → /settings (Organization tab)
   ✓ / ○  Add your first provider       → /providers/new
   ✓ / ○  Add your first client         → /clients/new
 ```
+
 Each step links to the relevant page and shows a checkmark when completed. The card disappears once the practice has at least 1 provider AND 1 client. Below the card, show the normal dashboard layout (metric cards will show meaningful zeroes once data exists).
 
 **Post-creation redirect**: After adding the first client, redirect to the client detail page with a setup checklist in the Overview tab:
+
 ```
 Next steps for {client name}:
   ○  Add a guardian contact            → Contacts tab
   ○  Add insurance policy              → Insurance tab
   ○  Enter authorization               → Authorizations tab
 ```
+
 This checklist appears when the client has 0 contacts, 0 insurance, or 0 authorizations. It disappears as data is added.
 
 ### Client Status Pipeline
@@ -703,6 +747,7 @@ This checklist appears when the client has 0 contacts, 0 insurance, or 0 authori
 The 9 client statuses (`inquiry` → `intake` → `waitlist` → `pending_assessment` → `pending_treatment_auth` → `active` → `on_hold` → `discharged` → `archived`) represent an intake-to-discharge lifecycle. For MVP:
 
 **Valid transitions** (enforced in the status dropdown, not in the backend):
+
 - `inquiry` → `intake`, `archived`
 - `intake` → `waitlist`, `pending_assessment`, `archived`
 - `waitlist` → `intake`, `pending_assessment`, `archived`
@@ -742,6 +787,7 @@ Full re-authorization workflow (progress reports, payer submission) is Phase 2. 
 ### Session Detail Interaction
 
 When clicking a session row (in Sessions List or Client Detail Sessions tab), show a **dialog** with:
+
 - All session fields displayed as key-value pairs (not a form)
 - Status badge, auth utilization impact, validation warnings
 - Edit button (if canEdit) that converts to an editable form in the same dialog
@@ -754,6 +800,7 @@ Available on every page via `Cmd+K` (Mac) or `Ctrl+K` (Windows). Uses the shadcn
 **Searchable entities**: Clients (by name), Providers (by name), Pages (by title)
 
 **Quick actions**:
+
 - "Log Session" → `/sessions/new`
 - "Add Client" → `/clients/new`
 - "Add Provider" → `/providers/new`
@@ -763,21 +810,26 @@ Available on every page via `Cmd+K` (Mac) or `Ctrl+K` (Windows). Uses the shadcn
 **Search behavior**: Fuzzy match on entity names, prioritize exact prefix matches. Results show entity type icon + name + subtitle (e.g., "Ethan Miller · Client · F84.0"). Click navigates to the entity's detail page.
 
 ### Page Header Pattern
+
 Every page has a header with: title (text-lg+ bold), subtitle/description (text-xs muted), and action buttons (right-aligned). Detail pages add a back link and contextual metadata (DOB, age, diagnosis, etc.).
 
 ### Empty States
+
 Every list/table has a designed empty state with: icon (32px+), message explaining what goes here, and a CTA button to create the first item. Never a blank page.
 
 Key empty states:
+
 - **Dashboard (no data)**: Getting Started card (see above) + metric cards showing 0
 - **Sessions list**: "No sessions logged yet. Log your first session to start tracking hours." CTA: "Log Session"
 - **Clients list**: "No clients yet. Add your first client to start managing their care." CTA: "Add Client"
 - **Client overview (no auth)**: Metric cards show "—" with "Add an authorization to start tracking utilization"
 
 ### Loading States
+
 Skeleton components matching the content shape. Never a centered spinner. Metric cards get individual skeletons. Tables get row skeletons with shimmer.
 
 ### Error States
+
 Inline error with retry action. Toast for action failures (via Sonner). Error boundary for page-level crashes (`error.tsx`).
 
 ### Auto-Save & Draft Persistence
@@ -797,6 +849,7 @@ Inline error with retry action. Toast for action failures (via Sonner). Error bo
 ### Insurance Termination Conflict
 
 When a client's insurance `terminationDate` passes but they still have an active authorization through that payer:
+
 - Dashboard surfaces alert: "Insurance terminated but authorization still active for {client}"
 - Client detail Overview shows both the insurance status (Expired badge) and auth status (Active badge) — making the conflict visible
 - This is a critical billing risk: sessions may be delivered but claims will be denied
@@ -804,23 +857,25 @@ When a client's insurance `terminationDate` passes but they still have an active
 ### Sessions Filter Tabs
 
 The Sessions List should support filter tabs for common workflows:
+
 - All | This Week | Flagged | Unbilled (Phase 2)
 - "Flagged" shows sessions with status = `flagged` (validation warnings, no auth, etc.)
 - "Unbilled" shows sessions with status = `completed` and no linked claim (Phase 2)
 
 ### Role Gating
 
-| Action | Roles |
-|---|---|
-| View clients, sessions, authorizations | All roles |
-| Create/edit clients, contacts, insurance | Owner, Admin, BCBA |
-| Create/edit authorizations | Owner, Admin, BCBA |
-| Log sessions (all statuses including cancel/no-show) | All roles (RBTs need this daily) |
-| Create/edit providers | Owner, Admin |
-| Manage payers, settings | Owner, Admin |
-| Archive/soft-delete records | Owner, Admin (BCBAs can archive own clients' insurance) |
+| Action                                               | Roles                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------- |
+| View clients, sessions, authorizations               | All roles                                               |
+| Create/edit clients, contacts, insurance             | Owner, Admin, BCBA                                      |
+| Create/edit authorizations                           | Owner, Admin, BCBA                                      |
+| Log sessions (all statuses including cancel/no-show) | All roles (RBTs need this daily)                        |
+| Create/edit providers                                | Owner, Admin                                            |
+| Manage payers, settings                              | Owner, Admin                                            |
+| Archive/soft-delete records                          | Owner, Admin (BCBAs can archive own clients' insurance) |
 
 ### Revalidation
+
 After any mutation (create, update, delete), the relevant page revalidates via `revalidatePath`. Lists refresh automatically. Detail pages refresh their data.
 
 ### Correction Workflows (when things go wrong)
@@ -849,19 +904,20 @@ Every practice switching to Clinivise has existing data. For MVP:
 
 ## Data Model Summary
 
-| Page | Primary Tables | Key JOINs |
-|---|---|---|
-| Dashboard | clients, authorizations, authorization_services, sessions, client_insurance | clients → providers (BCBA), client_insurance → payers, authorizations → authorization_services |
-| Clients List | clients | LEFT JOIN providers (BCBA), client_contacts (guardian), client_insurance → payers, authorizations (days left) |
-| Client Detail | clients, client_contacts, client_insurance, authorizations, authorization_services, sessions | All above + providers for care team |
-| Add/Edit Auth | authorizations, authorization_services | clients, client_insurance |
-| Authorizations List | authorizations, authorization_services | JOIN clients |
-| Sessions List | sessions | JOIN clients, JOIN providers |
-| Log Session | sessions (INSERT), authorization_services (UPDATE used_units) | Query: clients, providers, authorizations + authorization_services |
-| Providers | providers | Self-join for supervisor |
-| Settings | payers, organizations | None |
+| Page                | Primary Tables                                                                               | Key JOINs                                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Dashboard           | clients, authorizations, authorization_services, sessions, client_insurance                  | clients → providers (BCBA), client_insurance → payers, authorizations → authorization_services                |
+| Clients List        | clients                                                                                      | LEFT JOIN providers (BCBA), client_contacts (guardian), client_insurance → payers, authorizations (days left) |
+| Client Detail       | clients, client_contacts, client_insurance, authorizations, authorization_services, sessions | All above + providers for care team                                                                           |
+| Add/Edit Auth       | authorizations, authorization_services                                                       | clients, client_insurance                                                                                     |
+| Authorizations List | authorizations, authorization_services                                                       | JOIN clients                                                                                                  |
+| Sessions List       | sessions                                                                                     | JOIN clients, JOIN providers                                                                                  |
+| Log Session         | sessions (INSERT), authorization_services (UPDATE used_units)                                | Query: clients, providers, authorizations + authorization_services                                            |
+| Providers           | providers                                                                                    | Self-join for supervisor                                                                                      |
+| Settings            | payers, organizations                                                                        | None                                                                                                          |
 
 ### Key schema notes
+
 - **Units**: `authorization_services.approved_units` and `used_units` store 15-minute unit counts. Display as hours in UI: `hours = units * 15 / 60`.
 - **Session duration**: Derived from `start_time` and `end_time` timestamps. No separate `duration_minutes` column.
 - **Auth renewal**: `authorizations.previous_authorization_id` links renewals to their predecessor (self-referencing FK).
@@ -869,5 +925,5 @@ Every practice switching to Clinivise has existing data. For MVP:
 
 ---
 
-*Last updated: 2026-03-21 (v4 — three audit passes: technical, edge-case, PM/designer)*
-*Status: MVP pages 1-11 defined with cross-page workflows, session validation, first-time experience, mobile considerations, MVP value proposition, aha moments, correction workflows, and data migration. Phase 2-3 high-level only.*
+_Last updated: 2026-03-21 (v4 — three audit passes: technical, edge-case, PM/designer)_
+_Status: MVP pages 1-11 defined with cross-page workflows, session validation, first-time experience, mobile considerations, MVP value proposition, aha moments, correction workflows, and data migration. Phase 2-3 high-level only._

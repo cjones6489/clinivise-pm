@@ -75,11 +75,13 @@ function GoalCard({
   onStatusChange: (goalId: string, status: string) => void;
 }) {
   return (
-    <div className="border-b border-border/30 px-4 py-3 last:border-b-0">
+    <div className="border-border/30 border-b px-4 py-3 last:border-b-0">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold tabular-nums text-muted-foreground">{goal.goalNumber}.</span>
+            <span className="text-muted-foreground text-xs font-bold tabular-nums">
+              {goal.goalNumber}.
+            </span>
             <span className="text-xs font-semibold">{goal.title}</span>
             <Badge variant={GOAL_STATUS_VARIANT[goal.status as GoalStatus]} className="text-[9px]">
               {GOAL_STATUS_LABELS[goal.status as GoalStatus] ?? goal.status}
@@ -89,7 +91,9 @@ function GoalCard({
             </Badge>
           </div>
           {goal.description && (
-            <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">{goal.description}</p>
+            <p className="text-muted-foreground mt-1 text-[11px] leading-relaxed">
+              {goal.description}
+            </p>
           )}
         </div>
         {canEdit && (
@@ -104,24 +108,69 @@ function GoalCard({
                 <HugeiconsIcon icon={Add01Icon} size={14} className="mr-2" />
                 Add Objective
               </DropdownMenuItem>
-              {goal.status === "active" && (
-                <DropdownMenuItem onClick={() => onStatusChange(goal.id, "met")}>
-                  <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mr-2" />
-                  Mark as Met
+              {/* Status transitions based on current status */}
+              {goal.status === "baseline" && (
+                <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                  Start Teaching
                 </DropdownMenuItem>
               )}
               {goal.status === "active" && (
-                <DropdownMenuItem onClick={() => onStatusChange(goal.id, "on_hold")}>
-                  Put on Hold
+                <>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "mastered")}>
+                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mr-2" />
+                    Mark Mastered
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "on_hold")}>
+                    Put on Hold
+                  </DropdownMenuItem>
+                </>
+              )}
+              {goal.status === "mastered" && (
+                <>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "maintenance")}>
+                    Move to Maintenance
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                    Return to Active
+                  </DropdownMenuItem>
+                </>
+              )}
+              {goal.status === "maintenance" && (
+                <>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "generalization")}>
+                    Move to Generalization
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                    Return to Active
+                  </DropdownMenuItem>
+                </>
+              )}
+              {goal.status === "generalization" && (
+                <>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "met")}>
+                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mr-2" />
+                    Mark as Met
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                    Return to Active
+                  </DropdownMenuItem>
+                </>
+              )}
+              {goal.status === "on_hold" && (
+                <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
+                  Reactivate
                 </DropdownMenuItem>
               )}
-              {(goal.status === "on_hold" || goal.status === "met") && (
+              {(goal.status === "met" || goal.status === "discontinued") && (
                 <DropdownMenuItem onClick={() => onStatusChange(goal.id, "active")}>
                   Reactivate
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onDelete(goal)} className="text-destructive focus:text-destructive">
+              <DropdownMenuItem
+                onClick={() => onDelete(goal)}
+                className="text-destructive focus:text-destructive"
+              >
                 <HugeiconsIcon icon={Delete01Icon} size={14} className="mr-2" />
                 Archive Goal
               </DropdownMenuItem>
@@ -131,7 +180,7 @@ function GoalCard({
       </div>
 
       {/* Metadata */}
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+      <div className="text-muted-foreground mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
         {goal.masteryCriteria && <span>Mastery: {goal.masteryCriteria}</span>}
         {goal.baselineData && <span>Baseline: {goal.baselineData}</span>}
         {goal.startDate && <span>Started {formatDate(goal.startDate)}</span>}
@@ -144,23 +193,46 @@ function GoalCard({
       {goal.objectives.length > 0 && (
         <div className="mt-2.5 space-y-1">
           {goal.objectives.map((obj) => (
-            <div key={obj.id} className="flex items-start gap-2 rounded-md bg-muted/30 px-2.5 py-1.5">
+            <div
+              key={obj.id}
+              className="bg-muted/30 flex items-start gap-2 rounded-md px-2.5 py-1.5"
+            >
               {obj.status === "met" ? (
-                <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="mt-0.5 shrink-0 text-emerald-500" />
+                <HugeiconsIcon
+                  icon={CheckmarkCircle02Icon}
+                  size={14}
+                  className="mt-0.5 shrink-0 text-emerald-500"
+                />
               ) : (
-                <HugeiconsIcon icon={Target01Icon} size={14} className="mt-0.5 shrink-0 text-muted-foreground" />
+                <HugeiconsIcon
+                  icon={Target01Icon}
+                  size={14}
+                  className="text-muted-foreground mt-0.5 shrink-0"
+                />
               )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-medium tabular-nums text-muted-foreground">{goal.goalNumber}.{obj.objectiveNumber}</span>
+                  <span className="text-muted-foreground text-[11px] font-medium tabular-nums">
+                    {goal.goalNumber}.{obj.objectiveNumber}
+                  </span>
                   <span className="text-[11px]">{obj.description}</span>
                 </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
+                <div className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5 text-[10px]">
                   {obj.masteryCriteria && <span>Mastery: {obj.masteryCriteria}</span>}
-                  {obj.currentPerformance && <span className="font-medium text-foreground">{obj.currentPerformance}</span>}
-                  {obj.dataCollectionType && <span>{DATA_COLLECTION_TYPE_LABELS[obj.dataCollectionType as DataCollectionType] ?? obj.dataCollectionType}</span>}
+                  {obj.currentPerformance && (
+                    <span className="text-foreground font-medium">{obj.currentPerformance}</span>
+                  )}
+                  {obj.dataCollectionType && (
+                    <span>
+                      {DATA_COLLECTION_TYPE_LABELS[obj.dataCollectionType as DataCollectionType] ??
+                        obj.dataCollectionType}
+                    </span>
+                  )}
                   {obj.status !== "active" && (
-                    <Badge variant={GOAL_STATUS_VARIANT[obj.status as GoalStatus]} className="text-[8px] px-1 py-0">
+                    <Badge
+                      variant={GOAL_STATUS_VARIANT[obj.status as GoalStatus]}
+                      className="px-1 py-0 text-[8px]"
+                    >
                       {GOAL_STATUS_LABELS[obj.status as GoalStatus] ?? obj.status}
                     </Badge>
                   )}
@@ -216,10 +288,10 @@ function AddGoalDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold">Add Treatment Goal</DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
+          <DialogDescription className="text-muted-foreground text-xs">
             Add a goal from the client&apos;s treatment plan.
           </DialogDescription>
         </DialogHeader>
@@ -238,10 +310,14 @@ function AddGoalDialog({
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="h-8 w-full text-xs"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="h-8 w-full text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       {GOAL_TYPES.map((t) => (
-                        <SelectItem key={t} value={t} className="text-xs">{GOAL_TYPE_LABELS[t]}</SelectItem>
+                        <SelectItem key={t} value={t} className="text-xs">
+                          {GOAL_TYPE_LABELS[t]}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -257,12 +333,21 @@ function AddGoalDialog({
                 name="domainId"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value || NONE_VALUE} onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}>
-                    <SelectTrigger className="h-8 w-full text-xs"><SelectValue /></SelectTrigger>
+                  <Select
+                    value={field.value || NONE_VALUE}
+                    onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                  >
+                    <SelectTrigger className="h-8 w-full text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE} className="text-xs">No domain</SelectItem>
+                      <SelectItem value={NONE_VALUE} className="text-xs">
+                        No domain
+                      </SelectItem>
                       {goalDomains.map((d) => (
-                        <SelectItem key={d.id} value={d.id} className="text-xs">{d.name}</SelectItem>
+                        <SelectItem key={d.id} value={d.id} className="text-xs">
+                          {d.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -273,29 +358,50 @@ function AddGoalDialog({
 
           <Field>
             <Label className="text-xs font-medium">Title</Label>
-            <Input {...register("title")} placeholder="e.g., Manding for preferred items" className="h-8 text-xs" />
+            <Input
+              {...register("title")}
+              placeholder="e.g., Manding for preferred items"
+              className="h-8 text-xs"
+            />
             <FieldError>{errors.title?.message}</FieldError>
           </Field>
 
           <Field>
             <Label className="text-xs font-medium">Description (SMART goal statement)</Label>
-            <Textarea {...register("description")} placeholder="Given [context], client will [behavior] with [criteria] by [date]" className="text-xs" rows={3} />
+            <Textarea
+              {...register("description")}
+              placeholder="Given [context], client will [behavior] with [criteria] by [date]"
+              className="text-xs"
+              rows={3}
+            />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
             <Field>
               <Label className="text-xs font-medium">Mastery Criteria</Label>
-              <Input {...register("masteryCriteria")} placeholder="80% across 3 sessions" className="h-8 text-xs" />
+              <Input
+                {...register("masteryCriteria")}
+                placeholder="80% across 3 sessions"
+                className="h-8 text-xs"
+              />
             </Field>
             <Field>
               <Label className="text-xs font-medium">Baseline Data</Label>
-              <Input {...register("baselineData")} placeholder="20% at intake" className="h-8 text-xs" />
+              <Input
+                {...register("baselineData")}
+                placeholder="20% at intake"
+                className="h-8 text-xs"
+              />
             </Field>
           </div>
 
           <Field>
             <Label className="text-xs font-medium">Target Behavior</Label>
-            <Input {...register("targetBehavior")} placeholder="Independent manding using 2+ word phrases" className="h-8 text-xs" />
+            <Input
+              {...register("targetBehavior")}
+              placeholder="Independent manding using 2+ word phrases"
+              className="h-8 text-xs"
+            />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
@@ -311,7 +417,11 @@ function AddGoalDialog({
 
           <Field>
             <Label className="text-xs font-medium">Treatment Plan Reference</Label>
-            <Input {...register("treatmentPlanRef")} placeholder="ITP v2, Section 3.1" className="h-8 text-xs" />
+            <Input
+              {...register("treatmentPlanRef")}
+              placeholder="ITP v2, Section 3.1"
+              className="h-8 text-xs"
+            />
           </Field>
 
           <Field>
@@ -377,19 +487,33 @@ function AddObjectiveDialog({
         <form onSubmit={handleSubmit((data) => execute(data))} className="space-y-3">
           <Field>
             <Label className="text-xs font-medium">Objective #</Label>
-            <Input type="number" min={1} {...register("objectiveNumber")} className="h-8 text-xs w-24" />
+            <Input
+              type="number"
+              min={1}
+              {...register("objectiveNumber")}
+              className="h-8 w-24 text-xs"
+            />
             <FieldError>{errors.objectiveNumber?.message}</FieldError>
           </Field>
 
           <Field>
             <Label className="text-xs font-medium">Description</Label>
-            <Textarea {...register("description")} placeholder="Request 3+ preferred items using 2-word phrases with 80% independence across 20 trials" className="text-xs" rows={3} />
+            <Textarea
+              {...register("description")}
+              placeholder="Request 3+ preferred items using 2-word phrases with 80% independence across 20 trials"
+              className="text-xs"
+              rows={3}
+            />
             <FieldError>{errors.description?.message}</FieldError>
           </Field>
 
           <Field>
             <Label className="text-xs font-medium">Mastery Criteria</Label>
-            <Input {...register("masteryCriteria")} placeholder="80% across 3 sessions" className="h-8 text-xs" />
+            <Input
+              {...register("masteryCriteria")}
+              placeholder="80% across 3 sessions"
+              className="h-8 text-xs"
+            />
           </Field>
 
           <Field>
@@ -398,12 +522,21 @@ function AddObjectiveDialog({
               name="dataCollectionType"
               control={control}
               render={({ field }) => (
-                <Select value={field.value || NONE_VALUE} onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}>
-                  <SelectTrigger className="h-8 w-full text-xs"><SelectValue /></SelectTrigger>
+                <Select
+                  value={field.value || NONE_VALUE}
+                  onValueChange={(v) => field.onChange(v === NONE_VALUE ? "" : v)}
+                >
+                  <SelectTrigger className="h-8 w-full text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE_VALUE} className="text-xs">Not specified</SelectItem>
+                    <SelectItem value={NONE_VALUE} className="text-xs">
+                      Not specified
+                    </SelectItem>
                     {DATA_COLLECTION_TYPES.map((t) => (
-                      <SelectItem key={t} value={t} className="text-xs">{DATA_COLLECTION_TYPE_LABELS[t]}</SelectItem>
+                      <SelectItem key={t} value={t} className="text-xs">
+                        {DATA_COLLECTION_TYPE_LABELS[t]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -436,7 +569,9 @@ export function ClientGoals({
   canEdit: boolean;
 }) {
   const [addGoalOpen, setAddGoalOpen] = useState(false);
-  const [addObjective, setAddObjective] = useState<{ goalId: string; nextNumber: number } | null>(null);
+  const [addObjective, setAddObjective] = useState<{ goalId: string; nextNumber: number } | null>(
+    null,
+  );
   const [deleteTarget, setDeleteTarget] = useState<GoalWithObjectives | null>(null);
 
   const { execute: executeUpdate } = useAction(updateGoal, {
@@ -447,8 +582,17 @@ export function ClientGoals({
     onError: ({ error }) => toast.error(error.serverError ?? "Failed to archive goal"),
   });
 
-  const activeGoals = goals.filter((g) => g.status === "active" || g.status === "on_hold");
-  const inactiveGoals = goals.filter((g) => g.status === "met" || g.status === "discontinued");
+  const ACTIVE_STATUSES = [
+    "baseline",
+    "active",
+    "mastered",
+    "maintenance",
+    "generalization",
+    "on_hold",
+  ];
+  const INACTIVE_STATUSES = ["met", "discontinued"];
+  const activeGoals = goals.filter((g) => ACTIVE_STATUSES.includes(g.status));
+  const inactiveGoals = goals.filter((g) => INACTIVE_STATUSES.includes(g.status));
 
   const domainGroups = new Map<string, GoalWithObjectives[]>();
   for (const goal of activeGoals) {
@@ -458,24 +602,30 @@ export function ClientGoals({
     domainGroups.set(domain, list);
   }
 
-  const nextGoalNumber = goals.length > 0
-    ? Math.max(...goals.map((g) => g.goalNumber)) + 1
-    : 1;
+  const nextGoalNumber = goals.length > 0 ? Math.max(...goals.map((g) => g.goalNumber)) + 1 : 1;
 
   const totalObjectives = goals.reduce((sum, g) => sum + g.objectives.length, 0);
-  const metObjectives = goals.reduce((sum, g) => sum + g.objectives.filter((o) => o.status === "met").length, 0);
+  const metObjectives = goals.reduce(
+    (sum, g) => sum + g.objectives.filter((o) => o.status === "met").length,
+    0,
+  );
 
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
+        <div className="text-muted-foreground text-xs">
           {goals.length > 0
             ? `${activeGoals.length} active · ${totalObjectives} objective${totalObjectives !== 1 ? "s" : ""}${metObjectives > 0 ? ` · ${metObjectives} met` : ""}`
             : null}
         </div>
         {canEdit && (
-          <Button variant="outline" size="sm" className="text-xs" onClick={() => setAddGoalOpen(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs"
+            onClick={() => setAddGoalOpen(true)}
+          >
             <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
             Add Goal
           </Button>
@@ -484,16 +634,21 @@ export function ClientGoals({
 
       {/* Empty state */}
       {goals.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-border/40 bg-card py-8 text-center shadow-sm">
-          <div className="mb-3 rounded-lg bg-muted p-3">
+        <div className="border-border/40 bg-card flex flex-col items-center justify-center rounded-lg border py-8 text-center shadow-sm">
+          <div className="bg-muted mb-3 rounded-lg p-3">
             <HugeiconsIcon icon={Target01Icon} size={24} className="text-muted-foreground" />
           </div>
           <p className="text-xs font-medium">No treatment goals yet</p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-[11px]">
             Add goals from the treatment plan so session notes can reference them.
           </p>
           {canEdit && (
-            <Button variant="outline" size="sm" className="mt-3 text-xs" onClick={() => setAddGoalOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 text-xs"
+              onClick={() => setAddGoalOpen(true)}
+            >
               <HugeiconsIcon icon={Add01Icon} size={14} className="mr-1.5" />
               Add Goal
             </Button>
@@ -502,38 +657,79 @@ export function ClientGoals({
       ) : (
         <>
           {[...domainGroups.entries()].map(([domain, domainGoals]) => (
-            <div key={domain} className="overflow-hidden rounded-lg border border-border/40 bg-card shadow-sm">
-              <div className="border-b border-border/40 bg-muted/20 px-4 py-2">
-                <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">{domain}</span>
-                <span className="ml-2 text-[11px] font-normal normal-case tracking-normal text-muted-foreground">({domainGoals.length})</span>
+            <div
+              key={domain}
+              className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm"
+            >
+              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
+                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                  {domain}
+                </span>
+                <span className="text-muted-foreground ml-2 text-[11px] font-normal tracking-normal normal-case">
+                  ({domainGoals.length})
+                </span>
               </div>
               {domainGoals.map((goal) => (
                 <GoalCard
                   key={goal.id}
                   goal={goal}
                   canEdit={canEdit}
-                  onAddObjective={(goalId, nextNum) => setAddObjective({ goalId, nextNumber: nextNum })}
+                  onAddObjective={(goalId, nextNum) =>
+                    setAddObjective({ goalId, nextNumber: nextNum })
+                  }
                   onDelete={(g) => setDeleteTarget(g)}
-                  onStatusChange={(id, status) => executeUpdate({ id, status: status as "active" | "met" | "on_hold" | "discontinued" })}
+                  onStatusChange={(id, status) =>
+                    executeUpdate({
+                      id,
+                      status: status as
+                        | "baseline"
+                        | "active"
+                        | "mastered"
+                        | "maintenance"
+                        | "generalization"
+                        | "met"
+                        | "on_hold"
+                        | "discontinued",
+                    })
+                  }
                 />
               ))}
             </div>
           ))}
 
           {inactiveGoals.length > 0 && (
-            <div className="overflow-hidden rounded-lg border border-border/40 bg-card shadow-sm">
-              <div className="border-b border-border/40 bg-muted/20 px-4 py-2">
-                <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Met & Discontinued</span>
-                <span className="ml-2 text-[11px] font-normal normal-case tracking-normal text-muted-foreground">({inactiveGoals.length})</span>
+            <div className="border-border/40 bg-card overflow-hidden rounded-lg border shadow-sm">
+              <div className="border-border/40 bg-muted/20 border-b px-4 py-2">
+                <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                  Met & Discontinued
+                </span>
+                <span className="text-muted-foreground ml-2 text-[11px] font-normal tracking-normal normal-case">
+                  ({inactiveGoals.length})
+                </span>
               </div>
               {inactiveGoals.map((goal) => (
                 <GoalCard
                   key={goal.id}
                   goal={goal}
                   canEdit={canEdit}
-                  onAddObjective={(goalId, nextNum) => setAddObjective({ goalId, nextNumber: nextNum })}
+                  onAddObjective={(goalId, nextNum) =>
+                    setAddObjective({ goalId, nextNumber: nextNum })
+                  }
                   onDelete={(g) => setDeleteTarget(g)}
-                  onStatusChange={(id, status) => executeUpdate({ id, status: status as "active" | "met" | "on_hold" | "discontinued" })}
+                  onStatusChange={(id, status) =>
+                    executeUpdate({
+                      id,
+                      status: status as
+                        | "baseline"
+                        | "active"
+                        | "mastered"
+                        | "maintenance"
+                        | "generalization"
+                        | "met"
+                        | "on_hold"
+                        | "discontinued",
+                    })
+                  }
                 />
               ))}
             </div>
@@ -556,7 +752,9 @@ export function ClientGoals({
       {addObjective && (
         <AddObjectiveDialog
           open={!!addObjective}
-          onOpenChange={(open) => { if (!open) setAddObjective(null); }}
+          onOpenChange={(open) => {
+            if (!open) setAddObjective(null);
+          }}
           goalId={addObjective.goalId}
           nextObjectiveNumber={addObjective.nextNumber}
         />
@@ -565,10 +763,18 @@ export function ClientGoals({
       {/* Delete Confirmation */}
       <ConfirmDialog
         open={!!deleteTarget}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
         title="Archive goal"
-        description={deleteTarget ? `Archive "${deleteTarget.title}" and all its objectives? This can be undone.` : ""}
-        onConfirm={async () => { if (deleteTarget) await executeDelete({ id: deleteTarget.id }); }}
+        description={
+          deleteTarget
+            ? `Archive "${deleteTarget.title}" and all its objectives? This can be undone.`
+            : ""
+        }
+        onConfirm={async () => {
+          if (deleteTarget) await executeDelete({ id: deleteTarget.id });
+        }}
         variant="destructive"
         confirmLabel="Archive"
       />

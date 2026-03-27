@@ -23,8 +23,8 @@ import {
 
 function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between border-b border-border/40 py-1.5 last:border-0">
-      <span className="text-xs text-muted-foreground">{label}</span>
+    <div className="border-border/40 flex items-baseline justify-between border-b py-1.5 last:border-0">
+      <span className="text-muted-foreground text-xs">{label}</span>
       <span className="text-xs font-medium">{value}</span>
     </div>
   );
@@ -32,9 +32,11 @@ function KVRow({ label, value }: { label: string; value: React.ReactNode }) {
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <div className="border-b border-border/60 bg-muted/20 px-4 py-2.5">
-        <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">{title}</span>
+    <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
+      <div className="border-border/60 bg-muted/20 border-b px-4 py-2.5">
+        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+          {title}
+        </span>
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -71,14 +73,34 @@ export function AuthorizationDetail({
       {/* Overview — read-only KV display (not a form) */}
       <TabsContent value="overview" className="space-y-4 pt-4">
         <SectionCard title="Authorization Details">
-          <KVRow label="Client" value={`${authorization.clientFirstName} ${authorization.clientLastName}`} />
+          <KVRow
+            label="Client"
+            value={`${authorization.clientFirstName} ${authorization.clientLastName}`}
+          />
           <KVRow label="Payer" value={authorization.payerName} />
           {authorization.authorizationNumber && (
-            <KVRow label="Auth #" value={<span className="font-mono tabular-nums">{authorization.authorizationNumber}</span>} />
+            <KVRow
+              label="Auth #"
+              value={
+                <span className="font-mono tabular-nums">{authorization.authorizationNumber}</span>
+              }
+            />
           )}
           <KVRow label="Status" value={<AuthStatusBadge status={authorization.status} />} />
-          <KVRow label="Period" value={`${formatDate(authorization.startDate)} — ${formatDate(authorization.endDate)}`} />
-          <KVRow label="Expiry" value={<ExpiryBadge endDate={authorization.endDate} startDate={authorization.startDate} showFullDate />} />
+          <KVRow
+            label="Period"
+            value={`${formatDate(authorization.startDate)} — ${formatDate(authorization.endDate)}`}
+          />
+          <KVRow
+            label="Expiry"
+            value={
+              <ExpiryBadge
+                endDate={authorization.endDate}
+                startDate={authorization.startDate}
+                showFullDate
+              />
+            }
+          />
           {authorization.diagnosisCode && (
             <KVRow label="Diagnosis" value={authorization.diagnosisCode} />
           )}
@@ -86,7 +108,10 @@ export function AuthorizationDetail({
             <KVRow label="Member ID" value={authorization.clientInsuranceMemberId} />
           )}
           {authorization.notes && (
-            <KVRow label="Notes" value={<span className="max-w-xs text-right">{authorization.notes}</span>} />
+            <KVRow
+              label="Notes"
+              value={<span className="max-w-xs text-right">{authorization.notes}</span>}
+            />
           )}
         </SectionCard>
       </TabsContent>
@@ -111,17 +136,23 @@ export function AuthorizationDetail({
                       approvedUnits={svc.approvedUnits}
                       label={`${svc.cptCode}${meta ? ` — ${meta.description}` : ""}`}
                     />
-                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
+                    <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-0.5 text-[11px]">
                       {svc.frequency && (
                         <span>
-                          Frequency: {SERVICE_FREQUENCY_LABELS[svc.frequency as ServiceFrequency] ?? svc.frequency}
+                          Frequency:{" "}
+                          {SERVICE_FREQUENCY_LABELS[svc.frequency as ServiceFrequency] ??
+                            svc.frequency}
                         </span>
                       )}
                       {svc.maxUnitsPerDay != null && (
-                        <span>Max/day: <span className="tabular-nums">{svc.maxUnitsPerDay}</span></span>
+                        <span>
+                          Max/day: <span className="tabular-nums">{svc.maxUnitsPerDay}</span>
+                        </span>
                       )}
                       {svc.maxUnitsPerWeek != null && (
-                        <span>Max/week: <span className="tabular-nums">{svc.maxUnitsPerWeek}</span></span>
+                        <span>
+                          Max/week: <span className="tabular-nums">{svc.maxUnitsPerWeek}</span>
+                        </span>
                       )}
                     </div>
                   </div>
