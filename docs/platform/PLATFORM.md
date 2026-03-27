@@ -426,7 +426,7 @@ Decisions made during platform architecture review (2026-03-27).
 | D2 | Add Documents as a dedicated client tab | **Decided** | Every competitor has per-client document management. We have the schema. |
 | D3 | Tier scheduling features (MVP vs enhancements) | **Decided** | MVP = calendar + appointments + recurring + auth-aware + conflicts. Drive time, credential blocking, reminders = Phase 2+. |
 | D4 | Move Reports from Phase 3 to Phase 2 | **Decided** | Basic CSV exports (hours, sessions, auth utilization) use existing data. AlohaABA ships reports from day one. |
-| D5 | Consider moving Payers from sidebar into Settings | **Open** | Redundant: Payers is both a nav item and a Settings section. Removing from nav drops us to 7 items. Revisit when Billing group ships. |
+| D5 | Keep Payers and Authorizations as standalone nav items | **Decided** | PM-first positioning. Auth tracking is our #1 differentiator — keeping it top-level reinforces this. Payers is a daily-use item (calling payers, checking portal URLs, verifying timely filing). Both reinforce our practice management focus. |
 | D6 | Design the RBT experience | **Open** | See below. |
 
 ---
