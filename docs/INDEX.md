@@ -12,6 +12,8 @@ Central index of all project documentation.
 | Agent Instructions | [`AGENTS.md`](../AGENTS.md)   | AI coding assistant behavioral rules                 |
 | Working Roadmap    | [`ROADMAP.md`](../ROADMAP.md) | Phase 1 task breakdown with status tracking          |
 | **Platform Architecture** | [`platform/PLATFORM.md`](platform/PLATFORM.md) | **Master doc**: nav structure, page inventory, feature matrix, build status. Start here for "what is this platform." |
+| **Client Pages Design** | [`platform/pages/clients.md`](platform/pages/clients.md) | Client list + detail page specs. Tabs: Overview, Care Team, Goals, Authorizations, Sessions, Edit. Wireframes + implementation status. |
+| **Goals Feature Spec** | [`platform/features/goals.md`](platform/features/goals.md) | **God doc** for goals: 3-layer architecture, data model, lifecycle, competitor field analysis, list + drawer design, phased roadmap. |
 
 ## Specs
 
