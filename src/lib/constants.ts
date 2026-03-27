@@ -190,6 +190,16 @@ export const DATA_COLLECTION_TYPE_LABELS: Record<DataCollectionType, string> = {
 export const AUTH_STATUSES = ["pending", "approved", "denied", "expired", "exhausted"] as const;
 export type AuthStatus = (typeof AUTH_STATUSES)[number];
 
+export const AUTH_TYPES = ["initial", "recertification", "concurrent_review", "peer_to_peer"] as const;
+export type AuthType = (typeof AUTH_TYPES)[number];
+
+export const AUTH_TYPE_LABELS: Record<AuthType, string> = {
+  initial: "Initial",
+  recertification: "Recertification",
+  concurrent_review: "Concurrent Review",
+  peer_to_peer: "Peer-to-Peer",
+};
+
 export const SESSION_STATUSES = [
   "scheduled",
   "completed",

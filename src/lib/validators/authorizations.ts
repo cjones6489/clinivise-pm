@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 import { idSchema, dateStringSchema, authStatusSchema, updatedAtSchema } from "./index";
-import { ABA_CPT_CODES, SERVICE_FREQUENCIES } from "@/lib/constants";
+import { ABA_CPT_CODES, SERVICE_FREQUENCIES, AUTH_TYPES } from "@/lib/constants";
 
 const cptCodes = Object.keys(ABA_CPT_CODES) as [string, ...string[]];
 
@@ -29,8 +29,6 @@ const serviceLineSchema = z.object({
     .or(z.literal(""))
     .transform((v) => v || undefined),
 });
-
-const AUTH_TYPES = ["initial", "recertification", "concurrent_review", "peer_to_peer"] as const;
 
 const optionalText = z
   .string()

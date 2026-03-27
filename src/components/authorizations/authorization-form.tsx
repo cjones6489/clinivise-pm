@@ -376,10 +376,10 @@ export function AuthorizationForm({
             />
           </Field>
           <Field>
-            <Label className="text-xs font-medium">Requesting Provider</Label>
+            <Label className="text-xs font-medium">Requesting Provider Name</Label>
             <Input
               {...register("requestingProviderId")}
-              placeholder="BCBA who requested this auth"
+              placeholder="Dr. Sarah Chen, BCBA"
               className="h-8 text-xs"
               disabled={disabled}
             />

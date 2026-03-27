@@ -14,7 +14,9 @@ import { formatDate } from "@/lib/utils";
 import { FileValidationIcon } from "@hugeicons/core-free-icons";
 import {
   ABA_CPT_CODES,
+  AUTH_TYPE_LABELS,
   type CptCode,
+  type AuthType,
   SERVICE_FREQUENCY_LABELS,
   type ServiceFrequency,
 } from "@/lib/constants";
@@ -90,12 +92,7 @@ export function AuthorizationDetail({
           {authorization.authType && (
             <KVRow
               label="Auth Type"
-              value={{
-                initial: "Initial",
-                recertification: "Recertification",
-                concurrent_review: "Concurrent Review",
-                peer_to_peer: "Peer-to-Peer",
-              }[authorization.authType] ?? authorization.authType}
+              value={AUTH_TYPE_LABELS[authorization.authType as AuthType] ?? authorization.authType}
             />
           )}
           <KVRow
@@ -118,10 +115,10 @@ export function AuthorizationDetail({
           {authorization.clientInsuranceMemberId && (
             <KVRow label="Member ID" value={authorization.clientInsuranceMemberId} />
           )}
-          {authorization.denialReason && (
+          {authorization.status === "denied" && authorization.denialReason && (
             <KVRow label="Denial Reason" value={authorization.denialReason} />
           )}
-          {authorization.appealDeadline && (
+          {authorization.status === "denied" && authorization.appealDeadline && (
             <KVRow label="Appeal Deadline" value={formatDate(authorization.appealDeadline)} />
           )}
           {authorization.notes && (
