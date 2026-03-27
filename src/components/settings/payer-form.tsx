@@ -44,9 +44,12 @@ export function PayerForm({ payer, onSuccess }: { payer?: Payer; onSuccess: () =
     defaultValues: {
       name: payer?.name ?? "",
       stediPayerId: payer?.stediPayerId ?? "",
+      electronicPayerId: payer?.electronicPayerId ?? "",
       payerType: (payer?.payerType as CreatePayerInput["payerType"]) ?? "commercial",
       phone: payer?.phone ?? "",
       authPhone: payer?.authPhone ?? "",
+      authDepartmentEmail: payer?.authDepartmentEmail ?? "",
+      portalUrl: payer?.portalUrl ?? "",
       claimsAddress: payer?.claimsAddress ?? "",
       timelyFilingDays: payer?.timelyFilingDays ?? undefined,
       unitCalcMethod: (payer?.unitCalcMethod as CreatePayerInput["unitCalcMethod"]) ?? "ama",
@@ -101,8 +104,12 @@ export function PayerForm({ payer, onSuccess }: { payer?: Payer; onSuccess: () =
 
       <div className="grid grid-cols-2 gap-4">
         <Field>
-          <Label className="text-xs font-medium">Stedi Payer ID</Label>
-          <Input {...register("stediPayerId")} className="h-8 text-xs" />
+          <Label className="text-xs font-medium">Electronic Payer ID</Label>
+          <Input
+            {...register("electronicPayerId")}
+            placeholder="5-digit EDI payer ID"
+            className="h-8 text-xs tabular-nums"
+          />
         </Field>
         <Field>
           <Label className="text-xs font-medium">Type</Label>
@@ -137,6 +144,33 @@ export function PayerForm({ payer, onSuccess }: { payer?: Payer; onSuccess: () =
           <Input {...register("authPhone")} className="h-8 text-xs" />
         </Field>
       </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <Label className="text-xs font-medium">Auth Department Email</Label>
+          <Input
+            {...register("authDepartmentEmail")}
+            type="email"
+            placeholder="auth@payer.com"
+            className="h-8 text-xs"
+          />
+          <FieldError>{errors.authDepartmentEmail?.message}</FieldError>
+        </Field>
+        <Field>
+          <Label className="text-xs font-medium">Provider Portal URL</Label>
+          <Input
+            {...register("portalUrl")}
+            placeholder="https://provider.payer.com"
+            className="h-8 text-xs"
+          />
+          <FieldError>{errors.portalUrl?.message}</FieldError>
+        </Field>
+      </div>
+
+      <Field>
+        <Label className="text-xs font-medium">Stedi Payer ID</Label>
+        <Input {...register("stediPayerId")} placeholder="Stedi internal ID" className="h-8 text-xs" />
+      </Field>
 
       <Field>
         <Label className="text-xs font-medium">Claims Address</Label>

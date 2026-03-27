@@ -10,9 +10,22 @@ const optionalString = z
 export const createPayerSchema = z.object({
   name: z.string().trim().min(1, "Payer name is required"),
   stediPayerId: optionalString,
+  electronicPayerId: optionalString,
   payerType: payerTypeSchema.default("commercial"),
   phone: optionalString,
   authPhone: optionalString,
+  authDepartmentEmail: z
+    .string()
+    .email()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => (v ? v.toLowerCase() : undefined)),
+  portalUrl: z
+    .string()
+    .url()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   claimsAddress: optionalString,
   timelyFilingDays: z
     .union([z.literal(""), z.coerce.number().int().min(1).max(365)])
