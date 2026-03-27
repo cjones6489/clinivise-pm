@@ -117,7 +117,7 @@ function TeamMemberRow({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
+            className="h-8 w-8 opacity-40 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
             disabled={isPending}
           >
             <HugeiconsIcon icon={MoreHorizontalCircle01Icon} size={16} />
@@ -155,9 +155,10 @@ function ModalTeamRow({
   onSetPrimary: () => void;
   onRemove: () => void;
 }) {
+  const avatarColor = CREDENTIAL_AVATAR[member.credentialType] ?? CREDENTIAL_AVATAR.other;
   return (
     <div className="border-border/20 flex items-center gap-2.5 border-b px-4 py-2 last:border-b-0">
-      <div className="bg-primary/10 text-primary flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold">
+      <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${avatarColor}`}>
         {getInitials(member.providerFirstName, member.providerLastName)}
       </div>
       <div className="min-w-0 flex-1">
@@ -295,7 +296,7 @@ function ManageTeamModal({
                         onClick={() => handleAdd(p)}
                         className="hover:bg-accent/50 flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors disabled:opacity-50"
                       >
-                        <div className="bg-primary/10 text-primary flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold">
+                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${CREDENTIAL_AVATAR[p.credentialType] ?? CREDENTIAL_AVATAR.other}`}>
                           {getInitials(p.firstName, p.lastName)}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -327,7 +328,7 @@ function ManageTeamModal({
                         onClick={() => handleAdd(p)}
                         className="hover:bg-accent/50 flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition-colors disabled:opacity-50"
                       >
-                        <div className="bg-primary/10 text-primary flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold">
+                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${CREDENTIAL_AVATAR[p.credentialType] ?? CREDENTIAL_AVATAR.other}`}>
                           {getInitials(p.firstName, p.lastName)}
                         </div>
                         <div className="min-w-0 flex-1">
