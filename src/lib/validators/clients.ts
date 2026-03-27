@@ -64,6 +64,32 @@ const clientFieldsSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => v || undefined),
+  secondaryDiagnosisCodes: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  primaryLanguage: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  interpreterNeeded: z.boolean().optional(),
+  referringProviderName: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  referringProviderNpi: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  medicaidId: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
   intakeDate: dateStringSchema
     .optional()
     .or(z.literal(""))

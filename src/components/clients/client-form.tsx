@@ -73,6 +73,12 @@ export function ClientForm({
       zipCode: client?.zipCode ?? "",
       diagnosisCode: client?.diagnosisCode ?? "",
       diagnosisDescription: client?.diagnosisDescription ?? "",
+      secondaryDiagnosisCodes: client?.secondaryDiagnosisCodes?.join(", ") ?? "",
+      primaryLanguage: client?.primaryLanguage ?? "",
+      interpreterNeeded: client?.interpreterNeeded ?? false,
+      referringProviderName: client?.referringProviderName ?? "",
+      referringProviderNpi: client?.referringProviderNpi ?? "",
+      medicaidId: client?.medicaidId ?? "",
       intakeDate: client?.intakeDate ?? "",
       status: (client?.status as ClientStatus) ?? "inquiry",
       referralSource: client?.referralSource ?? "",
@@ -273,11 +279,11 @@ export function ClientForm({
         <h3 className="text-sm font-semibold">Clinical</h3>
         <div className="grid grid-cols-2 gap-4">
           <Field>
-            <Label className="text-xs font-medium">Diagnosis Code</Label>
+            <Label className="text-xs font-medium">Primary Diagnosis Code</Label>
             <Input {...register("diagnosisCode")} className="h-8 text-xs" disabled={disabled} />
           </Field>
           <Field>
-            <Label className="text-xs font-medium">Diagnosis Description</Label>
+            <Label className="text-xs font-medium">Description</Label>
             <Input
               {...register("diagnosisDescription")}
               className="h-8 text-xs"
@@ -285,7 +291,16 @@ export function ClientForm({
             />
           </Field>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <Field>
+          <Label className="text-xs font-medium">Secondary Diagnosis Codes</Label>
+          <Input
+            {...register("secondaryDiagnosisCodes")}
+            placeholder="F90.9, F41.1 (comma-separated ICD-10 codes)"
+            className="h-8 text-xs"
+            disabled={disabled}
+          />
+        </Field>
+        <div className="grid grid-cols-3 gap-4">
           <Field>
             <Label className="text-xs font-medium">Intake Date</Label>
             <Input
@@ -295,6 +310,39 @@ export function ClientForm({
               disabled={disabled}
             />
             <FieldError>{errors.intakeDate?.message}</FieldError>
+          </Field>
+          <Field>
+            <Label className="text-xs font-medium">Primary Language</Label>
+            <Input {...register("primaryLanguage")} placeholder="English" className="h-8 text-xs" disabled={disabled} />
+          </Field>
+          <Field>
+            <Label className="text-xs font-medium">Medicaid ID</Label>
+            <Input {...register("medicaidId")} className="h-8 text-xs tabular-nums" disabled={disabled} />
+          </Field>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            {...register("interpreterNeeded")}
+            id="interpreterNeeded"
+            className="h-4 w-4 rounded border-border"
+            disabled={disabled}
+          />
+          <Label htmlFor="interpreterNeeded" className="text-xs font-medium">Interpreter needed</Label>
+        </div>
+      </div>
+
+      {/* Referring Provider */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-semibold">Referring Provider</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <Field>
+            <Label className="text-xs font-medium">Provider Name</Label>
+            <Input {...register("referringProviderName")} placeholder="Dr. Jane Smith" className="h-8 text-xs" disabled={disabled} />
+          </Field>
+          <Field>
+            <Label className="text-xs font-medium">NPI</Label>
+            <Input {...register("referringProviderNpi")} placeholder="10-digit NPI" className="h-8 text-xs tabular-nums" disabled={disabled} />
           </Field>
         </div>
       </div>

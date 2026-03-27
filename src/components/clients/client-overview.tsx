@@ -147,6 +147,41 @@ export function ClientOverview({
 
       {/* Two-column info grid */}
       <div className="grid gap-2.5 sm:grid-cols-2">
+        {/* Clinical Info */}
+        <SectionCard title="Clinical Info">
+          {client.diagnosisCode && (
+            <KVRow label="Diagnosis" value={<span className="font-mono">{client.diagnosisCode}</span>} />
+          )}
+          {client.diagnosisDescription && (
+            <KVRow label="Description" value={client.diagnosisDescription} />
+          )}
+          {client.secondaryDiagnosisCodes && client.secondaryDiagnosisCodes.length > 0 && (
+            <KVRow label="Comorbidities" value={<span className="font-mono">{client.secondaryDiagnosisCodes.join(", ")}</span>} />
+          )}
+          {client.primaryLanguage && (
+            <KVRow label="Language" value={client.primaryLanguage} />
+          )}
+          {client.interpreterNeeded && (
+            <KVRow label="Interpreter" value="Needed" />
+          )}
+          {client.referringProviderName && (
+            <KVRow label="Referring Provider" value={
+              <span>
+                {client.referringProviderName}
+                {client.referringProviderNpi && (
+                  <span className="text-muted-foreground ml-1 font-mono text-[11px]">NPI {client.referringProviderNpi}</span>
+                )}
+              </span>
+            } />
+          )}
+          {client.medicaidId && (
+            <KVRow label="Medicaid ID" value={<span className="font-mono">{client.medicaidId}</span>} />
+          )}
+          {!client.diagnosisCode && !client.referringProviderName && !client.primaryLanguage && (
+            <p className="text-muted-foreground py-2 text-xs">No clinical details on file</p>
+          )}
+        </SectionCard>
+
         {/* Insurance */}
         <SectionCard title="Insurance">
           {primaryInsurance ? (

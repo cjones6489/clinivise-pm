@@ -23,11 +23,17 @@ export const createClient = authActionClient
       parsedInput.intakeDate ??
       (parsedInput.status !== "inquiry" ? new Date().toISOString().split("T")[0] : undefined);
 
+    // Convert CSV string to array for secondaryDiagnosisCodes
+    const secondaryDiagnosisCodes = parsedInput.secondaryDiagnosisCodes
+      ? parsedInput.secondaryDiagnosisCodes.split(",").map((s: string) => s.trim()).filter(Boolean)
+      : undefined;
+
     const [client] = await db
       .insert(clients)
       .values({
         ...stripUndefined(parsedInput),
         intakeDate,
+        secondaryDiagnosisCodes,
         organizationId: ctx.organizationId,
       })
       .returning();
@@ -50,6 +56,13 @@ export const updateClient = authActionClient
     requirePermission(ctx.userRole, "clients.write");
 
     const { id, updatedAt, ...updates } = parsedInput;
+
+    // Convert CSV string to array for secondaryDiagnosisCodes
+    if (updates.secondaryDiagnosisCodes !== undefined) {
+      (updates as Record<string, unknown>).secondaryDiagnosisCodes = updates.secondaryDiagnosisCodes
+        ? updates.secondaryDiagnosisCodes.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : null;
+    }
 
     const [existing] = await db
       .select({ id: clients.id })
