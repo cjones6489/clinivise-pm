@@ -1,19 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import type { Client, ClientInsuranceWithPayer, CareTeamMember } from "@/server/queries/clients";
+import type {
+  Client,
+  ClientContact,
+  ClientInsuranceWithPayer,
+  CareTeamMember,
+  PayerOption,
+} from "@/server/queries/clients";
 import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
+import { ClientContactsCard } from "./client-contacts-card";
+import { ClientInsuranceCard } from "./client-insurance-card";
 import { CARE_TEAM_ROLE_LABELS, type CareTeamRole } from "@/lib/constants";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
 import {
   CREDENTIAL_LABELS,
-  PAYER_TYPE_LABELS,
   ABA_CPT_CODES,
   AUTH_ALERT_THRESHOLDS,
   unitsToHours,
   type CredentialType,
-  type PayerType,
   type CptCode,
 } from "@/lib/constants";
 import { formatDate, daysUntilExpiry } from "@/lib/utils";
@@ -58,21 +64,27 @@ function SectionCard({
 
 export function ClientOverview({
   client,
+  contacts,
   insurance,
+  payerOptions,
   authorizations,
   sessions,
   careTeam,
   authUtilization,
+  canEdit,
+  canManagePayers,
 }: {
   client: Client;
+  contacts: ClientContact[];
   insurance: ClientInsuranceWithPayer[];
+  payerOptions: PayerOption[];
   authorizations: AuthorizationListItem[];
   sessions: SessionListItem[];
   careTeam: CareTeamMember[];
   authUtilization: ClientAuthUtilization | null;
+  canEdit: boolean;
+  canManagePayers: boolean;
 }) {
-  const primaryInsurance = insurance.find((i) => i.priority === 1);
-
   // Utilization metrics from the new per-CPT query
   const totalApproved = authUtilization?.totalApprovedUnits ?? 0;
   const totalUsed = authUtilization?.totalUsedUnits ?? 0;
@@ -200,35 +212,18 @@ export function ClientOverview({
           )}
         </SectionCard>
 
-        {/* Insurance */}
-        <SectionCard title="Insurance">
-          {primaryInsurance ? (
-            <>
-              <KVRow label="Payer" value={primaryInsurance.payerName} />
-              <KVRow label="Member ID" value={primaryInsurance.memberId} />
-              {primaryInsurance.groupNumber && (
-                <KVRow label="Group" value={primaryInsurance.groupNumber} />
-              )}
-              {primaryInsurance.payerType && (
-                <KVRow
-                  label="Type"
-                  value={
-                    PAYER_TYPE_LABELS[primaryInsurance.payerType as PayerType] ??
-                    primaryInsurance.payerType
-                  }
-                />
-              )}
-              {primaryInsurance.effectiveDate && (
-                <KVRow label="Effective" value={formatDate(primaryInsurance.effectiveDate)} />
-              )}
-              {primaryInsurance.terminationDate && (
-                <KVRow label="Term Date" value={formatDate(primaryInsurance.terminationDate)} />
-              )}
-            </>
-          ) : (
-            <p className="text-muted-foreground py-2 text-xs">No insurance on file</p>
-          )}
-        </SectionCard>
+        {/* Insurance (full CRUD component) */}
+        <ClientInsuranceCard
+          insurance={insurance}
+          contacts={contacts}
+          clientId={client.id}
+          payerOptions={payerOptions}
+          canEdit={canEdit}
+          canManagePayers={canManagePayers}
+        />
+
+        {/* Contacts (full CRUD component) */}
+        <ClientContactsCard contacts={contacts} clientId={client.id} canEdit={canEdit} />
 
         {/* Care Team */}
         <SectionCard title="Care Team">

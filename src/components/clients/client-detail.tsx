@@ -15,8 +15,6 @@ import { ClientOverview } from "./client-overview";
 import { ClientCareTeam } from "./client-care-team";
 import { ClientGoals } from "./client-goals";
 import { ClientForm } from "./client-form";
-import { ClientContactsCard } from "./client-contacts-card";
-import { ClientInsuranceCard } from "./client-insurance-card";
 import { ClientAuthorizationsCard } from "./client-authorizations-card";
 import { ClientSessionsCard } from "./client-sessions-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -56,8 +54,6 @@ export function ClientDetail({
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="care-team">Care Team</TabsTrigger>
         <TabsTrigger value="goals">Goals</TabsTrigger>
-        <TabsTrigger value="contacts">Contacts</TabsTrigger>
-        <TabsTrigger value="insurance">Insurance</TabsTrigger>
         <TabsTrigger value="authorizations">Authorizations</TabsTrigger>
         <TabsTrigger value="sessions">Sessions</TabsTrigger>
         {canEdit && <TabsTrigger value="edit">Edit</TabsTrigger>}
@@ -66,11 +62,15 @@ export function ClientDetail({
       <TabsContent value="overview" className="pt-4">
         <ClientOverview
           client={client}
+          contacts={contacts}
           insurance={insurance}
+          payerOptions={payerOptions}
           authorizations={authorizations}
           sessions={sessions}
           careTeam={careTeam}
           authUtilization={authUtilization}
+          canEdit={canEdit}
+          canManagePayers={canManagePayers}
         />
       </TabsContent>
 
@@ -89,21 +89,6 @@ export function ClientDetail({
           goals={goals}
           goalDomains={goalDomains}
           canEdit={canEdit}
-        />
-      </TabsContent>
-
-      <TabsContent value="contacts" className="pt-4">
-        <ClientContactsCard contacts={contacts} clientId={client.id} canEdit={canEdit} />
-      </TabsContent>
-
-      <TabsContent value="insurance" className="pt-4">
-        <ClientInsuranceCard
-          insurance={insurance}
-          contacts={contacts}
-          clientId={client.id}
-          payerOptions={payerOptions}
-          canEdit={canEdit}
-          canManagePayers={canManagePayers}
         />
       </TabsContent>
 
