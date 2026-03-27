@@ -182,7 +182,9 @@ The "at a glance" tab. Everything a provider needs to know about this client wit
 
 ### Care Team Tab
 
-> **Competitive context:** Only Motivity and CentralReach have a dedicated care team section among our competitors. Most platforms (Raven, AlohaABA, TherapyPM) rely on scheduling relationships — no explicit team management. Our dedicated tab with roles, primary toggle, and grouped display already puts us ahead. ABA Matrix has the best assignment history UX (white/gray for current/past).
+> **Competitive context:** Only Motivity and CentralReach have a dedicated care team section. Most platforms rely on scheduling relationships. Our tab with roles, primary toggle, and grouped display is ahead of our tier.
+>
+> **UI pattern research (2026-03-27):** Studied Linear, Notion, GitHub, Slack, Figma, Google Docs for team assignment UX. Conclusion: modals are for permission-heavy flows (Slack channels, Figma sharing). Our care team add is a lightweight 2-5 person selection from 5-20 providers — a **popover** (GitHub SelectPanel / Notion person picker pattern) is the right weight.
 
 #### Who uses this
 - **BCBA** — managing who's on the case, setting primary provider, adding/removing RBTs
@@ -192,163 +194,154 @@ The "at a glance" tab. Everything a provider needs to know about this client wit
 #### How often
 Weekly (BCBAs managing caseloads), occasionally (admin during staff changes).
 
-#### Wireframe
+#### Design Principles for This Tab
+1. **One card, not separate grouped cards** — the team is one unit, not two. Use a single card with inline group dividers.
+2. **Popover for adding, inline for managing** — add members via a lightweight popover; set primary and remove via inline actions on the team list.
+3. **Credential colors are the visual language** — violet for BCBAs, emerald for RBTs, sky for BCaBAs. Consistent across the tab, popover, and overview card.
+4. **2 clicks to add, 2 clicks to remove** — no unnecessary ceremony.
+
+#### Wireframe — Team List
 
 ```
 +------------------------------------------------------------------+
-| CARE TEAM                                    [+ Add Team Member]  |
-+------------------------------------------------------------------+
-| 3 active members · 1 past                                         |
+| 3 active · 1 past                        [+ Add Member ▾]        |
 +==================================================================+
-| BCBAs & SUPERVISORS                                               |
-+------------------------------------------------------------------+
-| SC  Dr. Sarah Chen         BCBA     ★ Primary    [···]           |
-|     Supervising BCBA                                              |
-+------------------------------------------------------------------+
-| RBTs & TECHNICIANS                                                |
-+------------------------------------------------------------------+
-| JS  Jessica Smith          RBT      ★ Primary    [···]           |
-|     Lead RBT                                                      |
-|                                                                    |
-| DP  David Park             RBT                    [···]           |
-|     RBT                                                           |
+| ● BCBAs & Supervisors (1)                                        |
+|------------------------------------------------------------------|
+| [SC] Dr. Sarah Chen        BCBA  ★       Supervising · Jan 2026  |
+|                                                          [···]    |
+|=================================================================='
+| ● RBTs & Technicians (2)                                         |
+|------------------------------------------------------------------|
+| [JS] Jessica Smith          RBT  ★       Lead RBT · Mar 2025     |
+|                                                          [···]    |
+|------------------------------------------------------------------|
+| [DP] David Park             RBT          RBT · Sep 2025          |
+|                                                          [···]    |
 +==================================================================+
-| PAST ASSIGNMENTS                                    [v Expand]    |
-+------------------------------------------------------------------+
-| (collapsed by default — click to expand)                          |
-| AR  Alex Rodriguez         RBT      Jan 15 — Mar 01, 2026       |
-|     Transferred to different caseload                             |
-+------------------------------------------------------------------+
-```
-
-#### Team Member Row
-
-Each row shows:
-- **Avatar** — initials circle, primary-colored if primary
-- **Name** — full name, clickable link to provider detail page
-- **Credential** — badge (BCBA, RBT, BCaBA, etc.)
-- **Primary badge** — ★ star icon, primary-colored, with "Primary" label
-- **Role** — subtitle text (Supervising BCBA, Lead RBT, RBT, etc.)
-- **Overflow menu** [···] — Set as Primary, Remove from Team
-
-#### Role Groups
-
-Team members are visually grouped by credential tier:
-1. **BCBAs & Supervisors** — BCBA, BCBA-D, BCaBA with supervising roles
-2. **RBTs & Technicians** — RBT, BT, lead RBT
-
-Within each group, primary member sorts first.
-
-#### Past Assignments Section (NEW — to implement)
-
-Below active members, a collapsible "Past Assignments" section:
-- Gray background to distinguish from active
-- Shows: name, credential, assignment date range (start — end)
-- Notes field visible if populated (e.g., "Transferred to different caseload")
-- Collapsed by default. Expand to see full history.
-- Only shown if there are past assignments (endDate is set).
-
-This matches ABA Matrix's white/gray current/past visual pattern.
-
-#### Add Team Member Dialog
-
-```
-+------------------------------------------------------------------+
-| Add Team Member                                         [x]      |
-|                                                                    |
-| Search providers...                                               |
-| [________________________________] (search input)                 |
-|                                                                    |
-| BCBAs & SUPERVISORS                                               |
-| +--------------------------------------------------------------+ |
-| | SC  Dr. Sarah Chen          BCBA        [Already on team]    | |
-| | MJ  Dr. Maria Johnson       BCBA        [+ Add]             | |
-| +--------------------------------------------------------------+ |
-|                                                                    |
-| RBTs & TECHNICIANS                                                |
-| +--------------------------------------------------------------+ |
-| | JS  Jessica Smith           RBT         [Already on team]    | |
-| | DP  David Park              RBT         [Already on team]    | |
-| | TW  Tanya Williams          RBT         [+ Add]             | |
-| +--------------------------------------------------------------+ |
-|                                                                    |
-| (all active org providers shown, grouped by credential)           |
-| (providers already on team shown as disabled "Already on team")   |
+| ○ Past (1)                                         [Show/Hide]   |
+|------------------------------------------------------------------|
+| [AR] Alex Rodriguez         RBT          Jan — Mar 2026          |
+|                                           Coverage during leave   |
 +------------------------------------------------------------------+
 ```
 
-**Add flow:**
-1. Open dialog → see all org providers grouped by credential
-2. Search to filter by name
-3. Click "+ Add" → provider is added with auto-role from credential
-4. Dialog stays open (can add multiple)
-5. Close dialog → team refreshes
+**Key design changes from current:**
+- **Single card** wrapping all members (not separate cards per group)
+- **Colored dot** on group headers (● violet, ● emerald, ○ muted for past)
+- **Star ★ overlaid on avatar** for primary (not a separate badge)
+- **"Since" date** on every active member
+- **Overflow menu [···]** appears on hover (opacity-40 → 100), always visible on touch
+- **Past section** is inline in the same card, collapsed, with muted styling (opacity-60)
 
-**Auto-role mapping:**
-- BCBA/BCBA-D → `supervising_bcba` role
-- BCaBA → `bcaba` role
-- RBT → `rbt` role
+#### Wireframe — Add Member Popover
+
+```
+                                    +---------------------------+
+    [+ Add Member ▾] ──────────── | Search by name...          |
+                                    |---------------------------|
+                                    | ● BCBAs & Supervisors     |
+                                    | [SC] Sarah Chen    ✓      |
+                                    | [MJ] Maria Johnson [Add]  |
+                                    |---------------------------|
+                                    | ● RBTs & Technicians      |
+                                    | [JS] Jessica Smith  ✓     |
+                                    | [DP] David Park     ✓     |
+                                    | [TW] Tanya Williams [Add] |
+                                    +---------------------------+
+```
+
+**Popover behavior:**
+- **Trigger:** "Add Member" button opens a popover anchored below it
+- **Search:** Auto-focused input, type-ahead filtering by name or credential label
+- **Provider rows:** Credential-colored avatar, name, credential label
+- **Already on team:** Checkmark ✓ instead of [Add] button (not hidden, not disabled — just marked)
+- **Click to add:** Instant — fires server action, provider gets a ✓, revalidation adds them to the team list behind the popover
+- **Close:** Click outside, press Escape, or click the trigger button again
+- **Width:** ~320px, max-height ~360px with scroll
+- **No confirmation step, no "Done" button** — it's a selection, not a form submission
+
+**Why popover, not modal:**
+- Adding 1-2 providers from 5-20 is a 2-click action. A modal adds unnecessary ceremony.
+- The popover keeps the team list visible — user sees the change happen in real-time.
+- Matches GitHub assignees, Notion person picker — proven patterns for small-team selection.
 
 #### Overflow Menu Actions
 
 ```
-[···] menu per team member:
+[···] menu per active team member:
 ├── ★ Set as Primary     (if not already primary)
-├── Change Role →         (submenu with role options)
 ├── ─────────────
 └── Remove from Team     (confirmation dialog)
 ```
 
-**Remove confirmation:** "Remove Jessica Smith from Marcus Thompson's care team? They can still log sessions for this client."
+**Remove confirmation:** "Remove Jessica Smith from this care team? They can still log sessions for this client."
 
-Remove sets `endDate` to today (soft remove — preserves history).
+Remove sets `endDate` to today (soft remove — preserves assignment history).
+
+#### Auto-role mapping (on add)
+- BCBA/BCBA-D → `supervising_bcba` role
+- BCaBA → `bcaba` role
+- RBT/other → `rbt` role
 
 #### States
 
 **Empty state:**
 ```
 +------------------------------------------------------------------+
-|  [team icon]                                                      |
-|  No team members assigned                                         |
-|  Add providers from your practice to this client's care team.     |
-|  [+ Add Team Member]                                              |
+|     [BC] [RT] [BT]  (stacked credential-colored avatars)         |
+|     Build the care team                                           |
+|     Add BCBAs, RBTs, and other providers.                        |
+|     [+ Add Team Members]                                          |
 +------------------------------------------------------------------+
 ```
 
-**Loading:** Skeleton rows matching the team member row layout.
+**Loading:** Skeleton rows matching the member row height.
 
-**All providers assigned:**
+**All providers assigned (in popover):**
 ```
-(in the add dialog, when all active providers are already on the team)
-"All active providers are already on this client's care team."
++---------------------------+
+| (user icon)               |
+| All providers assigned    |
+| Every active provider is  |
+| already on this team.     |
++---------------------------+
+```
+
+**No search results (in popover):**
+```
++---------------------------+
+| No providers match "xyz"  |
++---------------------------+
 ```
 
 #### Implementation Status
 
-- [x] Team member list with role groups (BCBAs & Supervisors, RBTs & Technicians)
-- [x] Primary toggle with star indicator
-- [x] Search-to-add dialog with credential grouping
-- [x] Auto-role from credential on add
+- [x] Team member list with credential-colored avatars (violet/emerald/sky)
+- [x] Primary toggle with gold star overlay on avatar
+- [x] Name links to provider detail page
+- [x] "Since" date on every member
+- [x] Hover-reveal overflow menu (visible at 40% opacity for touch)
+- [x] Set primary action
 - [x] Remove from team with confirmation (soft remove via endDate)
-- [x] Overflow menu (set primary, remove)
-- [x] Empty state with CTA
-- [x] "Already on team" disabled state in add dialog
-- [ ] **Past assignments section** (endDate history, collapsible, gray styling)
-- [ ] **Assignment notes display** (notes field from client_providers)
-- [ ] **Name links to provider detail** page
-- [ ] **Change Role submenu** in overflow menu
+- [x] Past assignments section (collapsible, muted styling, date range + notes)
+- [x] Past care team query (`getPastCareTeam`)
+- [x] Empty state with stacked credential avatars
+- [x] Group headers with colored dots and counts
+- [ ] **Convert modal → popover** (GitHub SelectPanel pattern)
+- [ ] **Single card layout** (merge separate group cards into one)
+- [ ] **Checkmark on already-assigned** in popover (not disabled/"On team" text)
 
 #### Data Requirements
 
-**Existing (no changes needed):**
+**All data requirements are met:**
 - Table: `client_providers` with role, isPrimary, startDate, endDate, notes
-- Query: `getCareTeam(orgId, clientId)` — active members where endDate IS NULL
+- Query: `getCareTeam(orgId, clientId)` — active members (endDate IS NULL)
+- Query: `getPastCareTeam(orgId, clientId)` — past members (endDate IS NOT NULL)
 - Query: `getAvailableProviders(orgId, clientId)` — active providers NOT on team
 - Actions: `addToTeam`, `updateTeamMember`, `removeFromTeam`
 
-**New for past assignments:**
-- [ ] Query: `getPastCareTeam(orgId, clientId)` — members where endDate IS NOT NULL, ordered by endDate desc
-- [ ] Pass `pastCareTeam` to the Care Team tab component
+No new schema, queries, or actions needed for the remaining UI changes.
 
 ---
 
