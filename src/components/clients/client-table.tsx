@@ -19,6 +19,13 @@ import { DataTable } from "@/components/shared/data-table";
 import { DataTableToolbar } from "@/components/shared/data-table-toolbar";
 import { DataTablePagination } from "@/components/shared/data-table-pagination";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function ClientTable({ data, canEdit }: { data: ClientListItem[]; canEdit: boolean }) {
   const router = useRouter();
@@ -34,6 +41,14 @@ export function ClientTable({ data, canEdit }: { data: ClientListItem[]; canEdit
       toast.error(error.serverError ?? "Failed to archive client");
     },
   });
+
+  const payerOptions = useMemo(() => {
+    const names = new Set<string>();
+    for (const row of data) {
+      if (row.payerName) names.add(row.payerName);
+    }
+    return Array.from(names).sort();
+  }, [data]);
 
   const columns = useMemo(
     () =>
@@ -55,7 +70,28 @@ export function ClientTable({ data, canEdit }: { data: ClientListItem[]; canEdit
 
   return (
     <div className="space-y-3">
-      <DataTableToolbar table={table} searchKey="name" searchPlaceholder="Search clients..." />
+      <DataTableToolbar table={table} searchKey="name" searchPlaceholder="Search clients...">
+        {payerOptions.length > 1 && (
+          <Select
+            value={table.getColumn("payer")?.getFilterValue() as string ?? "all"}
+            onValueChange={(value) => {
+              table.getColumn("payer")?.setFilterValue(value === "all" ? undefined : value);
+            }}
+          >
+            <SelectTrigger className="h-8 w-full text-xs sm:w-44">
+              <SelectValue placeholder="All payers" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All payers</SelectItem>
+              {payerOptions.map((name) => (
+                <SelectItem key={name} value={name}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </DataTableToolbar>
       <DataTable table={table} onRowClick={(client) => router.push(`/clients/${client.id}`)} />
       <DataTablePagination table={table} />
       <ConfirmDialog

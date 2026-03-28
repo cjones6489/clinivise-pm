@@ -58,7 +58,12 @@ export function getClientColumns(opts: {
     },
     {
       id: "payer",
+      accessorFn: (row) => row.payerName ?? "",
       header: "Payer",
+      filterFn: (row, _columnId, filterValue) => {
+        if (!filterValue) return true;
+        return row.getValue<string>("payer") === filterValue;
+      },
       cell: ({ row }) => {
         const { payerName } = row.original;
         if (!payerName) return <span className="text-muted-foreground">—</span>;
