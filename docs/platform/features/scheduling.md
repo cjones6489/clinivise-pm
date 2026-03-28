@@ -402,10 +402,30 @@ These clinical/business rules must be respected by the scheduling system:
 - 50% of supervision must be individual (not group)
 - Only BCBA/BCBA-D/BCaBA can supervise (as of Jan 2026 — non-certified supervisors eliminated)
 
-### Authorization Pacing
+### Authorization Structure & Pacing
+
+**Auth model: total-period pool.** The dominant auth structure in ABA is a total number of
+units approved for a date range (e.g., 3,640 units of 97153 from Apr 15 to Oct 14). This
+is a pool, NOT a monthly allocation. No proration of partial months. Practices can front-load
+or back-load within daily MUE limits.
+
+**Some payers layer sub-caps:** Weekly (NC Medicaid: Sunday-Saturday, non-rollable) or monthly
+caps on top of the total pool. These are payer-specific and configured via payer settings.
+Sub-cap proration is NOT standard — default to no proration.
+
+**Underutilization is the real problem, not overutilization.** Practices fight to hit 70-80%
+of approved units due to cancellations (38% avg rate), staffing gaps, and scheduling friction.
+One industry expert with 20 years experience has never seen a practice need to scale back at
+the end of an auth period. Overscheduling by 10-20% is standard practice.
+
 - Schedule 100% of authorized hours at auth start
-- Overschedule by 10-20% to account for cancellations (20-30% cancellation rate is normal in ABA)
-- Track pacing weekly: actual delivered vs expected based on linear interpolation
+- Overschedule by 10-20% to account for cancellations
+- **Pacing emphasis: "are you on track to UTILIZE this auth?"**
+  - Green (on pace): actual within 90-110% of expected linear interpolation
+  - Yellow (behind): 70-89% of expected
+  - Orange (significantly behind): 50-69%
+  - Red (at risk): below 50% — likely inability to use authorized units
+  - Over pace: >110% — risk of exhausting auth early (rare, positive problem)
 - Alert on under-utilization: <50% used with >50% of period elapsed
 
 ### Scheduling Patterns
