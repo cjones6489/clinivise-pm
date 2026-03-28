@@ -186,28 +186,15 @@ Indexes:
 ```
 group_session_id    text (nullable)  -- null = 1:1, non-null = group member
                                      -- all sessions in same group share this ID
+                                     -- Added in initial migration (schema-forward for
+                                     -- group sessions feature, built separately)
 ```
 
-### Appointment Templates Additions
-
-```
-is_group            boolean NOT NULL DEFAULT false
-```
-
-### New Table: `group_template_clients`
-
-Links clients to group templates (which clients are in this recurring group).
-
-```
-group_template_clients:
-  id                  text PK (nanoid)
-  template_id         text NOT NULL FK → appointment_templates
-  client_id           text NOT NULL FK → clients
-
-Indexes:
-  (template_id)
-  (template_id, client_id) UNIQUE
-```
+> **Group sessions** (97154, 97157, 97158) are a separate feature spec:
+> `docs/platform/features/group-sessions.md` (to be created). Group-specific schema
+> (appointment_templates.is_group, group_template_clients junction table), creation flow,
+> calendar display, and lifecycle are scoped there. The `group_session_id` column is
+> added now so we don't need a migration later.
 
 ### New Indexes on Existing `sessions` Table
 

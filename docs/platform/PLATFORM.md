@@ -407,7 +407,8 @@ ADMIN
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Calendar/Scheduling | Not started | #1 competitive gap. Research needed. MVP scoped. |
+| Calendar/Scheduling (1:1) | Not started | #1 competitive gap. 51 decisions in CEO plan. 12 research docs. Spec: `features/scheduling.md` |
+| Group Sessions (97154/97157/97158) | Not started | Separate feature after 1:1 calendar ships. Spec: `features/group-sessions.md` (to create) |
 | Claims submission (Stedi) | Not started | Schema stubs exist. Monetization engine. |
 | ERA/payment posting | Not started | |
 | Eligibility verification | Not started | Schema stub exists. |

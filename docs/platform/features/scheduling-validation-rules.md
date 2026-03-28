@@ -82,9 +82,9 @@ guidance that payers can override. The system uses three tiers:
 - **Admin override:** Yes (practice may run a group of 9 with documentation)
 - **Audit log:** Required
 - **User message:** "Group code [97154/97158] requires 2-8 clients. Currently [N] client(s) assigned."
-- **Group creation flow:** When group CPT selected, UI switches to multi-client select. Each client validated for auth coverage. Creates N session rows linked by `group_session_id`.
-- **Mid-session size change:** If a client cancels and group drops to 1, prompt: "Convert to 97153 (1:1) or cancel?"
-- **Implementation:** Validate at session creation + at completion + on individual cancellation. Plan decisions E24, E29, E30, E31.
+- **MVP scope:** Validate group size and provider overlap. Block creation of 97154/97158 with <2 clients. Block provider leading two simultaneous groups.
+- **Group creation flow, lifecycle, and templates:** Deferred to separate feature spec (`docs/platform/features/group-sessions.md`). Includes multi-client select, group roster popover, mid-session size changes, per-client completion. See CEO plan deferred section.
+- **Implementation:** E24 (group validation). Group-specific E29-E31 and D24-D26 moved to group sessions feature.
 - **Source:** CPT-005, CPT-006, OVLP-002, SCENE-006
 
 ### HB-006: 97158 Must Be QHP-Delivered
