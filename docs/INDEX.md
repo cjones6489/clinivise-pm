@@ -15,7 +15,7 @@ Central index of all project documentation.
 | **Client Pages Design** | [`platform/pages/clients.md`](platform/pages/clients.md) | Client list + detail page specs. Tabs: Overview, Care Team, Goals, Authorizations, Sessions, Edit. Wireframes + implementation status. |
 | **Goals Feature Spec** | [`platform/features/goals.md`](platform/features/goals.md) | **God doc** for goals: 3-layer architecture, data model, lifecycle, competitor field analysis, list + drawer design, phased roadmap. |
 | **Authorizations Feature Spec** | [`platform/features/authorizations.md`](platform/features/authorizations.md) | **God doc** for authorizations: competitor analysis, auth tab redesign wireframe, existing component wiring map, phased roadmap. |
-| **Client Clinical Metadata Spec** | [`platform/features/client-clinical-metadata.md`](platform/features/client-clinical-metadata.md) | **God doc** for structured clinical metadata: safety alerts, session-essential context (communication, reinforcers, sensory), data model, UI wireframes, phased roadmap. No competitor has this. |
+| **Scheduling Feature Spec** | [`platform/features/scheduling.md`](platform/features/scheduling.md) | **God doc** for scheduling/calendar: 13-platform competitive analysis, data model (templates + availability + time-off), Schedule-X calendar UI, auth-aware booking, phased roadmap. |
 
 ## Specs
 
@@ -55,7 +55,10 @@ Central index of all project documentation.
 | **Platform Navigation Audit**                    | [`research/platform-navigation-audit.md`](research/platform-navigation-audit.md)                                     | Sidebar/nav structure of 7 entry-to-mid-tier ABA platforms. Recommended nav evolution. |
 | **Session Note Template Customization**          | [`research/session-note-template-customization-research.md`](research/session-note-template-customization-research.md) | Template customization patterns across ABA EHR platforms |
 | **Session History View Patterns**                | [`research/session-history-view-patterns.md`](research/session-history-view-patterns.md)                               | **Competitive research**: 12 platforms analyzed for client session history UI. Columns, statuses, filtering, note status display, session actions, pagination. Gap analysis + recommended column layout. |
-| **Client Clinical Metadata**                     | [`research/client-clinical-metadata-research.md`](research/client-clinical-metadata-research.md)                       | **Clinical metadata research**: 10 platforms + ABA intake form analysis. No competitor has structured clinical metadata. Safety alerts, communication, reinforcers, sensory profile, medications. 50+ sources. |
+| **Scheduling Competitive Research**              | [`research/scheduling-calendar-competitive-research.md`](research/scheduling-calendar-competitive-research.md)         | **Scheduling research**: 13 ABA platforms analyzed. Feature matrix, auth validation patterns, session conversion workflows, mobile capabilities, unique differentiators per platform. |
+| **Scheduling Domain Research**                   | [`research/scheduling-domain-research.md`](research/scheduling-domain-research.md)                                     | **ABA scheduling domain**: Role workflows (scheduler/BCBA/RBT/owner), BACB supervision rules, payer constraints, MUE limits, scheduling patterns, practitioner pain points, benchmarks. |
+| **Calendar UI Patterns**                         | [`research/calendar-scheduling-ui-patterns-research.md`](research/calendar-scheduling-ui-patterns-research.md)         | **Calendar UI research**: SimplePractice/Jane App/Healthie/Elation patterns, React library comparison (Schedule-X recommended), accessibility, performance, mobile responsive patterns. |
+| **AI Scheduling Frontier**                       | [`research/ai-scheduling-frontier-research.md`](research/ai-scheduling-frontier-research.md)                           | **AI scheduling research**: TheraDriver, ABA Engine, Hi Rasmus, Catalyst, CentralReach ScheduleAI. Parent portals, telehealth, waitlist auto-fill, EVV, staff availability patterns. |
 
 ## AI
 
