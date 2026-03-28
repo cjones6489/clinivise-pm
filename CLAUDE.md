@@ -8,15 +8,28 @@ All-in-one ABA therapy platform — clinical operations, practice management, an
 
 **Clinivise is NOT CentralReach.** We are building a modern, simplified all-in-one EHR/PM in the same tier as:
 
-- **Raven Health** — AI-powered, mobile-first, per-learner pricing, BCBA-founded
-- **Hipp Health** — Multi-modal capture, payer-calibrated AI notes, "practice on autopilot"
-- **Passage Health** — Clean PM + Frontera AI for clinical intelligence
-- **TherapyPM** — Simplified practice management for small therapy practices
+**Primary competitors (use for feature analysis):**
+- **Hipp Health** — AI-native all-in-one, $6.2M funded (Oct 2025), compliance agent, payer-calibrated AI notes
+- **Passage Health** — Clean PM + Frontera AI ($42M), best auth-to-scheduling integration
+- **Theralytics** — BCBA-built, transparent pricing ($15-25/client/mo), free 6-month startup tier, SOC 2 Type II
+- **TherapyPM** — Simplified multi-therapy PM, ultra-affordable (from $8/mo), 500+ clinics
 - **Therapy Lake** — Entry-level all-in-one for growing practices
+
+**Secondary competitors (watch, reference occasionally):**
+- **Raven Health** — Mobile-first, BCBA-founded, revenue-share pricing. Platform features gated behind demos, limited public info for feature analysis.
+- **CR Essentials** — CentralReach's small-practice play (<50 employees). Backed by incumbent's 4,000-practice base.
+- **Artemis ABA** — Salesforce-built, AI session notes/treatment plans/denial management. Mid-market overlap.
+- **ABA Matrix** — All-in-one with AI narratives, strong graphing tools.
+- **Noteable** — Multi-disciplinary (ABA + OT + Speech), 98% clean claim rate, one-handed data collection.
+- **PortiaPro** — All-in-one with Canadian support, AI note generation.
+
+**Clinical-only (watch for Phase 3 data collection):**
+- **Hi Rasmus** — Strong DTT/frequency/graphing, mobile-first. Partners with AlohaABA/TherapyPM for PM.
+- **Motivity** — Research-grant funded, clinical depth, $24/learner/mo. Expanding into PM.
 
 **What this means for every feature decision:**
 
-1. **Simple first.** If Raven/Hipp solve it with one screen, we don't need three. No multi-step approval workflows, no configurable pipelines, no enterprise admin panels.
+1. **Simple first.** If Hipp/Passage solve it with one screen, we don't need three. No multi-step approval workflows, no configurable pipelines, no enterprise admin panels.
 2. **Follow established patterns.** Don't invent new workflows. Research what simplified EHRs actually do, then build that. The industry has converged on standard patterns — follow them.
 3. **Clinical features should feel lightweight.** Session notes, goals, data collection — these should be fast to complete, not bureaucratic. An RBT should finish a note in under 2 minutes.
 4. **No premature complexity.** Don't build payer-specific configurations, template builders, or approval chains for MVP. Ship the 80% case. Add configurability when practices ask for it.
@@ -46,7 +59,7 @@ New clinical domain with no prior research doc. Things like:
 
 Risk if wrong: schema migration, compliance failure, payer audit gaps.
 
-Action: Fetch real templates/standards, verify against competitors (CentralReach, Motivity, Catalyst/Rethink, Raven Health, AlohaABA), verify against assessment tools, create a research doc in `docs/research/` with sources, verify proposed schema against research BEFORE writing any migration.
+Action: Fetch real templates/standards, verify against competitors (Hipp Health, Passage Health, Theralytics, TherapyPM, TherapyLake + secondary: CentralReach, Motivity, AlohaABA), verify against assessment tools, create a research doc in `docs/research/` with sources, verify proposed schema against research BEFORE writing any migration.
 
 **Tier 2 — Quick targeted check (15–30 min)**
 Extending an existing, well-researched domain. Things like:

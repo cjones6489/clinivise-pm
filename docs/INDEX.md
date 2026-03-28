@@ -14,6 +14,8 @@ Central index of all project documentation.
 | **Platform Architecture** | [`platform/PLATFORM.md`](platform/PLATFORM.md) | **Master doc**: nav structure, page inventory, feature matrix, build status. Start here for "what is this platform." |
 | **Client Pages Design** | [`platform/pages/clients.md`](platform/pages/clients.md) | Client list + detail page specs. Tabs: Overview, Care Team, Goals, Authorizations, Sessions, Edit. Wireframes + implementation status. |
 | **Goals Feature Spec** | [`platform/features/goals.md`](platform/features/goals.md) | **God doc** for goals: 3-layer architecture, data model, lifecycle, competitor field analysis, list + drawer design, phased roadmap. |
+| **Authorizations Feature Spec** | [`platform/features/authorizations.md`](platform/features/authorizations.md) | **God doc** for authorizations: competitor analysis, auth tab redesign wireframe, existing component wiring map, phased roadmap. |
+| **Client Clinical Metadata Spec** | [`platform/features/client-clinical-metadata.md`](platform/features/client-clinical-metadata.md) | **God doc** for structured clinical metadata: safety alerts, session-essential context (communication, reinforcers, sensory), data model, UI wireframes, phased roadmap. No competitor has this. |
 
 ## Specs
 
@@ -52,6 +54,8 @@ Central index of all project documentation.
 | **Goals Feature Scope**                          | [`research/goals-feature-scope-research.md`](research/goals-feature-scope-research.md)                               | **Full goals feature set**: 5 platforms analyzed (Motivity/Raven/Passage/CentralReach/Catalyst). Feature map by category, table stakes vs differentiators, 3-layer architecture (tab → drawer → clinical workspace), 10 open questions, phased roadmap. |
 | **Platform Navigation Audit**                    | [`research/platform-navigation-audit.md`](research/platform-navigation-audit.md)                                     | Sidebar/nav structure of 7 entry-to-mid-tier ABA platforms. Recommended nav evolution. |
 | **Session Note Template Customization**          | [`research/session-note-template-customization-research.md`](research/session-note-template-customization-research.md) | Template customization patterns across ABA EHR platforms |
+| **Session History View Patterns**                | [`research/session-history-view-patterns.md`](research/session-history-view-patterns.md)                               | **Competitive research**: 12 platforms analyzed for client session history UI. Columns, statuses, filtering, note status display, session actions, pagination. Gap analysis + recommended column layout. |
+| **Client Clinical Metadata**                     | [`research/client-clinical-metadata-research.md`](research/client-clinical-metadata-research.md)                       | **Clinical metadata research**: 10 platforms + ABA intake form analysis. No competitor has structured clinical metadata. Safety alerts, communication, reinforcers, sensory profile, medications. 50+ sources. |
 
 ## AI
 

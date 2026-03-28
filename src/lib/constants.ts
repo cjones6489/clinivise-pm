@@ -232,10 +232,22 @@ export const DOCUMENT_TYPES = [
   "authorization_letter",
   "assessment_report",
   "treatment_plan",
+  "consent_form",
   "insurance_card",
+  "progress_report",
   "other",
 ] as const;
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
+
+export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
+  authorization_letter: "Auth Letter",
+  assessment_report: "Assessment",
+  treatment_plan: "Treatment Plan",
+  consent_form: "Consent Form",
+  insurance_card: "Insurance Card",
+  progress_report: "Progress Report",
+  other: "Other",
+};
 
 export const PLACE_OF_SERVICE_CODES = ["02", "03", "10", "11", "12", "99"] as const;
 export type PlaceOfServiceCode = (typeof PLACE_OF_SERVICE_CODES)[number];

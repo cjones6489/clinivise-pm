@@ -7,6 +7,7 @@ import {
   providers,
   authorizations,
   authorizationServices,
+  sessionNotes,
 } from "@/server/db/schema";
 import { eq, and, asc, desc, lte, gte, lt, isNull, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -16,6 +17,8 @@ import { alias } from "drizzle-orm/pg-core";
 const supervisorAlias = alias(providers, "supervisor");
 
 // ── Types ────────────────────────────────────────────────────────────────────
+
+export type NoteStatusValue = "missing" | "draft" | "signed";
 
 export type SessionListItem = {
   id: string;
@@ -45,6 +48,7 @@ export type SessionListItem = {
   cancelledBy: string | null;
   serviceAddress: string | null;
   notes: string | null;
+  noteStatus: NoteStatusValue;
   createdAt: Date;
 };
 
@@ -133,6 +137,10 @@ const SESSION_LIST_COLUMNS = {
   cancelledBy: sessions.cancelledBy,
   serviceAddress: sessions.serviceAddress,
   notes: sessions.notes,
+  noteStatus:
+    sql<NoteStatusValue>`case when ${sessionNotes.id} is null then 'missing' else ${sessionNotes.status} end`.as(
+      "note_status",
+    ),
   createdAt: sessions.createdAt,
 } as const;
 
@@ -143,7 +151,8 @@ function sessionListBase() {
     .innerJoin(clients, eq(sessions.clientId, clients.id))
     .innerJoin(providers, eq(sessions.providerId, providers.id))
     .leftJoin(supervisorAlias, eq(sessions.supervisorId, supervisorAlias.id))
-    .leftJoin(authorizations, eq(sessions.authorizationId, authorizations.id));
+    .leftJoin(authorizations, eq(sessions.authorizationId, authorizations.id))
+    .leftJoin(sessionNotes, eq(sessions.id, sessionNotes.sessionId));
 }
 
 export async function getSessionListMetrics(orgId: string): Promise<SessionListMetrics> {
@@ -274,6 +283,10 @@ export async function getSessionById(orgId: string, id: string): Promise<Session
       cancelledBy: sessions.cancelledBy,
       serviceAddress: sessions.serviceAddress,
       notes: sessions.notes,
+      noteStatus:
+        sql<NoteStatusValue>`case when ${sessionNotes.id} is null then 'missing' else ${sessionNotes.status} end`.as(
+          "note_status",
+        ),
       createdAt: sessions.createdAt,
       updatedAt: sessions.updatedAt,
       authServiceApprovedUnits: authorizationServices.approvedUnits,
@@ -287,6 +300,7 @@ export async function getSessionById(orgId: string, id: string): Promise<Session
     .leftJoin(supervisorAlias, eq(sessions.supervisorId, supervisorAlias.id))
     .leftJoin(authorizations, eq(sessions.authorizationId, authorizations.id))
     .leftJoin(authorizationServices, eq(sessions.authorizationServiceId, authorizationServices.id))
+    .leftJoin(sessionNotes, eq(sessions.id, sessionNotes.sessionId))
     .where(and(eq(sessions.organizationId, orgId), eq(sessions.id, id)))
     .limit(1);
 
@@ -298,41 +312,13 @@ export async function getClientSessions(
   clientId: string,
 ): Promise<SessionListItem[]> {
   return db
-    .select({
-      id: sessions.id,
-      organizationId: sessions.organizationId,
-      clientId: sessions.clientId,
-      clientFirstName: clients.firstName,
-      clientLastName: clients.lastName,
-      providerId: sessions.providerId,
-      providerFirstName: providers.firstName,
-      providerLastName: providers.lastName,
-      providerCredentialType: providers.credentialType,
-      supervisorFirstName: supervisorAlias.firstName,
-      supervisorLastName: supervisorAlias.lastName,
-      authorizationId: sessions.authorizationId,
-      authorizationNumber: authorizations.authorizationNumber,
-      authorizationServiceId: sessions.authorizationServiceId,
-      sessionDate: sessions.sessionDate,
-      startTime: sessions.startTime,
-      endTime: sessions.endTime,
-      cptCode: sessions.cptCode,
-      modifierCodes: sessions.modifierCodes,
-      units: sessions.units,
-      actualMinutes: sessions.actualMinutes,
-      placeOfService: sessions.placeOfService,
-      status: sessions.status,
-      cancellationReason: sessions.cancellationReason,
-      cancelledBy: sessions.cancelledBy,
-      serviceAddress: sessions.serviceAddress,
-      notes: sessions.notes,
-      createdAt: sessions.createdAt,
-    })
+    .select(SESSION_LIST_COLUMNS)
     .from(sessions)
     .innerJoin(clients, eq(sessions.clientId, clients.id))
     .innerJoin(providers, eq(sessions.providerId, providers.id))
     .leftJoin(supervisorAlias, eq(sessions.supervisorId, supervisorAlias.id))
     .leftJoin(authorizations, eq(sessions.authorizationId, authorizations.id))
+    .leftJoin(sessionNotes, eq(sessions.id, sessionNotes.sessionId))
     .where(and(eq(sessions.organizationId, orgId), eq(sessions.clientId, clientId)))
     .orderBy(desc(sessions.sessionDate), desc(sessions.createdAt));
 }
@@ -342,41 +328,13 @@ export async function getAuthorizationSessions(
   authorizationId: string,
 ): Promise<SessionListItem[]> {
   return db
-    .select({
-      id: sessions.id,
-      organizationId: sessions.organizationId,
-      clientId: sessions.clientId,
-      clientFirstName: clients.firstName,
-      clientLastName: clients.lastName,
-      providerId: sessions.providerId,
-      providerFirstName: providers.firstName,
-      providerLastName: providers.lastName,
-      providerCredentialType: providers.credentialType,
-      supervisorFirstName: supervisorAlias.firstName,
-      supervisorLastName: supervisorAlias.lastName,
-      authorizationId: sessions.authorizationId,
-      authorizationNumber: authorizations.authorizationNumber,
-      authorizationServiceId: sessions.authorizationServiceId,
-      sessionDate: sessions.sessionDate,
-      startTime: sessions.startTime,
-      endTime: sessions.endTime,
-      cptCode: sessions.cptCode,
-      modifierCodes: sessions.modifierCodes,
-      units: sessions.units,
-      actualMinutes: sessions.actualMinutes,
-      placeOfService: sessions.placeOfService,
-      status: sessions.status,
-      cancellationReason: sessions.cancellationReason,
-      cancelledBy: sessions.cancelledBy,
-      serviceAddress: sessions.serviceAddress,
-      notes: sessions.notes,
-      createdAt: sessions.createdAt,
-    })
+    .select(SESSION_LIST_COLUMNS)
     .from(sessions)
     .innerJoin(clients, eq(sessions.clientId, clients.id))
     .innerJoin(providers, eq(sessions.providerId, providers.id))
     .leftJoin(supervisorAlias, eq(sessions.supervisorId, supervisorAlias.id))
     .leftJoin(authorizations, eq(sessions.authorizationId, authorizations.id))
+    .leftJoin(sessionNotes, eq(sessions.id, sessionNotes.sessionId))
     .where(and(eq(sessions.organizationId, orgId), eq(sessions.authorizationId, authorizationId)))
     .orderBy(desc(sessions.sessionDate), desc(sessions.createdAt));
 }

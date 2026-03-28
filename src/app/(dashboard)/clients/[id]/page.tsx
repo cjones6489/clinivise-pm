@@ -12,8 +12,9 @@ import {
   getPayerOptions,
 } from "@/server/queries/clients";
 import { getClientGoals, getGoalDomains } from "@/server/queries/goals";
-import { getClientAuthorizations, getClientAuthUtilization } from "@/server/queries/authorizations";
+import { getClientAuthorizations, getClientAuthUtilization, getClientAuthorizationsWithServices } from "@/server/queries/authorizations";
 import { getClientSessions } from "@/server/queries/sessions";
+import { getClientDocuments } from "@/server/queries/documents";
 import { ExpiryBadge } from "@/components/shared/expiry-badge";
 import { Button } from "@/components/ui/button";
 import { ClientDetail } from "@/components/clients/client-detail";
@@ -52,7 +53,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     insurance,
     payerOptions,
     authorizations,
+    authsWithServices,
     sessions,
+    clientDocuments,
     authUtilization,
   ] = await Promise.all([
     getClientById(user.organizationId, id),
@@ -65,7 +68,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     getClientInsurance(user.organizationId, id),
     canEdit ? getPayerOptions(user.organizationId) : Promise.resolve([]),
     getClientAuthorizations(user.organizationId, id),
+    getClientAuthorizationsWithServices(user.organizationId, id),
     getClientSessions(user.organizationId, id),
+    getClientDocuments(user.organizationId, id),
     getClientAuthUtilization(user.organizationId, id),
   ]);
 
@@ -162,7 +167,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         insurance={insurance}
         payerOptions={payerOptions}
         authorizations={authorizations}
+        authsWithServices={authsWithServices}
         sessions={sessions}
+        documents={clientDocuments}
         canEdit={canEdit}
         canManagePayers={canManagePayers}
         authUtilization={authUtilization}

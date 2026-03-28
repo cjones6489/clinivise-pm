@@ -7,11 +7,16 @@
 
 ## Product Positioning
 
-Entry-level all-in-one ABA EHR/PM — same tier as Raven Health, Hipp Health, Passage Health, TherapyPM, TherapyLake. **Not** CentralReach (enterprise). Target: small practices (1-50 staff). Free PM tier, monetized via 2-4% of collected revenue on billing.
+Entry-level all-in-one ABA EHR/PM. **Not** CentralReach (enterprise). Target: small practices (1-50 staff). Free PM tier, monetized via 2-4% of collected revenue on billing.
+
+**Primary competitors (feature analysis baseline):** Hipp Health, Passage Health, Theralytics, TherapyPM, TherapyLake.
+**Secondary competitors (watch list):** Raven Health (gated), CR Essentials, Artemis ABA, ABA Matrix, Noteable, PortiaPro.
+**Clinical-only (Phase 3 reference):** Hi Rasmus, Motivity.
+See `CLAUDE.md` for full competitive set with descriptions.
 
 **Decision rules:**
 1. Simple first — if a simpler approach exists in our competitor tier, use it
-2. Follow established patterns — don't invent workflows, follow what Raven/Passage/Aloha do
+2. Follow established patterns — don't invent workflows, follow what Passage/Theralytics/TherapyPM do
 3. Lightweight clinical features — session notes, goals, basic data visualization. Not Motivity-level data collection.
 4. No premature complexity — build the simple version, validate with domain expert, then iterate
 5. Validate with domain experts — the founder has BCBA input. Ask before assuming clinical requirements.
@@ -382,16 +387,21 @@ ADMIN
 | Goal lifecycle | Done | baseline → active → mastered → maintenance → generalization → met |
 | Schema audit | Done | 28 fields added across 6 tables, verified against CMS-1500/CASP/TRICARE |
 
-### Phase 2A: Goals UI + Visualization (IN PROGRESS)
+### Phase 2A: Client Page Redesign + Clinical Context (IN PROGRESS)
 
-> Goals are a layered system. See `docs/research/goals-feature-scope-research.md` for full scope.
+> Client detail tabs redesigned with competitive research verification. Clinical metadata is a differentiation opportunity — no competitor has it.
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Goals tab visual redesign | In progress | Colored accents by type, domain summaries, bigger status badges |
-| Goal Detail Drawer | Not started | Click goal → drawer with description, mastery, mini chart, recent sessions |
-| Basic progress graphing | Not started | Line chart (accuracy % over time) from session_note_goals data. Low effort. |
-| "Last session" on goal cards | Not started | Inline indicator showing most recent session data per goal |
+| Care Team tab redesign | Done | Credential-colored avatars, add-member modal, past assignments |
+| Goals tab visual redesign | Done | Colored accents by type, domain summaries, inline expansion, protocol field |
+| Auth tab redesign | Done | Per-CPT utilization bars, expiry badges, active/historical separation |
+| Sessions tab redesign | Done | Compact table, note status badges, start time, summary line |
+| Goal inline expansion (Layer 2) | Not started | Click goal → expand with description, mastery, mini chart, recent sessions |
+| Basic progress graphing | Not started | Line chart (accuracy % over time) from session_note_goals data |
+| **Client clinical metadata** | Not started | Safety alerts, communication, reinforcers, sensory. No competitor has this. Spec: `features/client-clinical-metadata.md` |
+| Note status on Overview recent sessions | Not started | Quick win — data already flows |
+| Note status on global sessions page | Not started | Quick win — column already available |
 
 ### Phase 2B: Scheduling + Billing (NOT STARTED)
 

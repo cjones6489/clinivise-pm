@@ -12,6 +12,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MoreHorizontalCircle01Icon } from "@hugeicons/core-free-icons";
 import { SessionStatusBadge } from "./session-status-badge";
+import { NoteStatusBadge } from "./note-status-badge";
 import { formatDate } from "@/lib/utils";
 import {
   CREDENTIAL_LABELS,
@@ -65,6 +66,17 @@ export function getSessionColumns(opts: {
       accessorKey: "units",
       header: "Units",
       cell: ({ getValue }) => <span className="tabular-nums">{getValue<number>()}</span>,
+    },
+    {
+      id: "noteStatus",
+      header: "Note",
+      cell: ({ row }) => {
+        const { status, noteStatus } = row.original;
+        if (status === "completed" || status === "flagged") {
+          return <NoteStatusBadge status={noteStatus} />;
+        }
+        return <span className="text-muted-foreground">—</span>;
+      },
     },
     {
       accessorKey: "status",

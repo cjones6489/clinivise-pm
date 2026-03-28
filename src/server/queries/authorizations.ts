@@ -8,7 +8,7 @@ import {
   clientInsurance,
   payers,
 } from "@/server/db/schema";
-import { eq, and, isNull, sql, asc, type SQL } from "drizzle-orm";
+import { eq, and, isNull, sql, asc, inArray, type SQL } from "drizzle-orm";
 import { AUTH_ALERT_THRESHOLDS } from "@/lib/constants";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -434,6 +434,86 @@ export async function getClientAuthorizations(
     .orderBy(authorizations.endDate);
 
   return rows;
+}
+
+// ── Client Authorizations with Service Lines (for auth tab redesign) ────────
+
+export type ClientAuthWithServices = {
+  id: string;
+  payerName: string;
+  authorizationNumber: string | null;
+  status: string;
+  startDate: string;
+  endDate: string;
+  totalApproved: number;
+  totalUsed: number;
+  services: {
+    cptCode: string;
+    approvedUnits: number;
+    usedUnits: number;
+  }[];
+};
+
+export async function getClientAuthorizationsWithServices(
+  orgId: string,
+  clientId: string,
+): Promise<ClientAuthWithServices[]> {
+  // Get all auths for this client
+  const authRows = await db
+    .select({
+      id: authorizations.id,
+      payerName: payers.name,
+      authorizationNumber: authorizations.authorizationNumber,
+      status: authorizations.status,
+      startDate: authorizations.startDate,
+      endDate: authorizations.endDate,
+    })
+    .from(authorizations)
+    .innerJoin(payers, eq(authorizations.payerId, payers.id))
+    .where(and(scopedWhere(orgId), eq(authorizations.clientId, clientId)))
+    .orderBy(authorizations.endDate);
+
+  if (authRows.length === 0) return [];
+
+  // Get all service lines for these auths in one query
+  const authIds = authRows.map((a) => a.id);
+  const serviceRows = await db
+    .select({
+      authorizationId: authorizationServices.authorizationId,
+      cptCode: authorizationServices.cptCode,
+      approvedUnits: authorizationServices.approvedUnits,
+      usedUnits: authorizationServices.usedUnits,
+    })
+    .from(authorizationServices)
+    .where(
+      and(
+        eq(authorizationServices.organizationId, orgId),
+        inArray(authorizationServices.authorizationId, authIds),
+      ),
+    )
+    .orderBy(asc(authorizationServices.cptCode));
+
+  // Group services by auth
+  const servicesByAuth = new Map<string, ClientAuthWithServices["services"]>();
+  for (const svc of serviceRows) {
+    const existing = servicesByAuth.get(svc.authorizationId) ?? [];
+    existing.push({
+      cptCode: svc.cptCode,
+      approvedUnits: svc.approvedUnits,
+      usedUnits: svc.usedUnits,
+    });
+    servicesByAuth.set(svc.authorizationId, existing);
+  }
+
+  return authRows.map((auth) => {
+    const services = servicesByAuth.get(auth.id) ?? [];
+    return {
+      ...auth,
+      totalApproved: services.reduce((sum, s) => sum + s.approvedUnits, 0),
+      totalUsed: services.reduce((sum, s) => sum + s.usedUnits, 0),
+      services,
+    };
+  });
 }
 
 export async function getClientOptions(orgId: string): Promise<ClientOption[]> {

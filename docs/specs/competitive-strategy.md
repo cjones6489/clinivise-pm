@@ -2,21 +2,22 @@
 
 > **Positioning:** Free ABA practice management with built-in intelligence. The only platform where authorizations track themselves, sessions document themselves, and claims scrub themselves — so you can focus on clients, not paperwork.
 >
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-27
 
 ---
 
 ## Market Position
 
-| Dimension         | CentralReach             | AlohaABA  | Theralytics | Raven Health         | **Clinivise**                         |
-| ----------------- | ------------------------ | --------- | ----------- | -------------------- | ------------------------------------- |
-| **Price**         | ~$50/employee            | $30/staff | $15/user    | Free + % billing     | **Free + 2-4% billing**               |
-| **UX Quality**    | Poor (legacy)            | Decent    | Good        | Decent               | **Excellent (Mira design system)**    |
-| **Auth Tracking** | Full but buried          | Basic     | Basic       | Basic                | **Full lifecycle, inline everywhere** |
-| **AI**            | 5 bolted-on products     | None      | None        | Shallow (notes only) | **Native — invisible intelligence**   |
-| **Chart Review**  | NoteGuardAI (extra cost) | None      | None        | None                 | **Built-in, free tier**               |
-| **Target**        | Enterprise               | Small-mid | Small       | Small startup        | **Small (1-50), growing to mid**      |
-| **Data Moat**     | 4B data points           | None      | None        | None                 | **Growing — payer rules flywheel**    |
+| Dimension         | CentralReach             | AlohaABA  | Theralytics        | Hipp Health           | Passage Health       | **Clinivise**                         |
+| ----------------- | ------------------------ | --------- | ------------------ | --------------------- | -------------------- | ------------------------------------- |
+| **Price**         | ~$50/employee            | $30/staff | $15-25/client      | Gated                 | Gated                | **Free + 2-4% billing**               |
+| **UX Quality**    | Poor (legacy)            | Decent    | Good               | Modern (AI-native)    | Clean                | **Excellent (Mira design system)**    |
+| **Auth Tracking** | Full but buried          | Basic     | Basic              | AI compliance agent   | Auto scheduling check| **Full lifecycle, inline everywhere** |
+| **AI**            | 5 bolted-on products     | None      | AI notes (new)     | **Heavy (core DNA)**  | Frontera AI ($42M)   | **Native — invisible intelligence**   |
+| **Chart Review**  | NoteGuardAI (extra cost) | None      | None               | Compliance agent      | None                 | **Built-in, free tier**               |
+| **Target**        | Enterprise               | Small-mid | Small              | Growth-stage          | Small-mid            | **Small (1-50), growing to mid**      |
+| **Data Moat**     | 4B data points           | None      | None               | None                  | Frontera partnership | **Growing — payer rules flywheel**    |
+| **Funding**       | PE-backed (large)        | Unknown   | Bootstrapped       | $6.2M seed (Oct 2025)| $42M (Frontera)      | **Bootstrapped**                      |
 
 ---
 
@@ -58,16 +59,42 @@
 
 **Positioning:** "Everything you love about Theralytics, but free, and with intelligence built in."
 
-### Raven Health (closest model competitor)
+### Hipp Health (most direct competitor — AI-native all-in-one)
 
-Validates our exact pricing model (free + % of collections). The one to watch.
+$6.2M seed (Oct 2025), founded by ex-Workday VP + ex-Pipe ML lead. Same thesis as us: modern, AI-native, all-in-one. Plans to expand into OT and speech therapy.
 
 | Their Weakness                                                          | Our Exploit                                                                                      |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| No billing depth (their monetization is billing, but features are thin) | Full claims lifecycle via Stedi — this is literally how we make money                            |
-| Limited integrations                                                    | Stedi (billing), Clerk (auth), future payer APIs                                                 |
-| Unproven at scale                                                       | Build on proven infrastructure (Vercel, Neon, Clerk)                                             |
+| No traditional auth dashboard (AI-agent-only approach)                  | Dashboard baseline + AI monitoring. Practices expect visual utilization — we give both.           |
+| $6.2M burn rate with gated pricing                                      | Free PM tier, revenue-share billing. Lower switching cost.                                       |
+| Platform features gated, not transparent                                | Open pricing, clear feature set. Practices can evaluate before committing.                       |
+| Multi-therapy expansion dilutes ABA focus                               | ABA-first depth. Every workflow designed for ABA-specific needs.                                 |
+
+**Positioning:** "Hipp bets on AI replacing your dashboard. We bet on AI making your dashboard smarter."
+
+### Passage Health (clean PM + Frontera AI)
+
+Ranked #1 in multiple 2026 comparison articles. Strong content/SEO strategy. Frontera AI partnership ($42M) gives them AI muscle.
+
+| Their Weakness                                                          | Our Exploit                                                                                      |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| AI is a partnership (Frontera), not native                              | AI built into the core product, not a bolt-on integration                                        |
+| Pricing gated behind sales calls                                        | Transparent free tier. Try before you buy.                                                       |
+| Auth-to-scheduling integration is their best feature                    | Match their scheduling integration AND add utilization intelligence + predictive burndown         |
+| No public free tier                                                     | Free PM tier removes all switching friction                                                      |
+
+**Positioning:** "Passage is clean. Clinivise is clean AND free AND intelligent."
+
+### Raven Health (secondary — pricing model validator)
+
+Validates our revenue-share pricing model (free + 2% of claims). However, platform features are entirely gated behind demos with limited public documentation. Passage Health's comparison claims Raven has "no automated authorization checks." Useful as a pricing reference, not for feature analysis.
+
+| Their Weakness                                                          | Our Exploit                                                                                      |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| No billing depth (monetization is billing, but features are thin)       | Full claims lifecycle via Stedi — this is literally how we make money                            |
+| No automated authorization checks (per Passage comparison)              | Full auth lifecycle with utilization bars, expiry alerts, scheduling enforcement                  |
 | Shallow AI (just note generation)                                       | Full AI lifecycle: auth parsing → utilization intelligence → claim scrubbing → denial prediction |
+| Limited public info makes evaluation hard for practices                 | Transparent features, open pricing, self-serve evaluation                                        |
 
 **Positioning:** "Same free model, 10x the depth."
 
@@ -75,8 +102,13 @@ Validates our exact pricing model (free + % of collections). The one to watch.
 
 | Competitor         | Key Weakness                                                            | Our Advantage                                                                                               |
 | ------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **CR Essentials**  | CentralReach brand baggage, enterprise DNA under small-practice skin    | Built small-first, not trimmed-down enterprise. No legacy architecture.                                     |
+| **Artemis ABA**    | Salesforce-built (heavy UX), mid-market positioning, gated pricing      | Lightweight modern stack. Free tier. ABA-focused, not Salesforce-generic.                                   |
 | **RethinkBH**      | Can't edit data after entry, terrible support, doesn't scale            | Edit anything with audit trail. Modern architecture that scales.                                            |
 | **Motivity**       | PM features still maturing, expensive ($48/learner all-in-one)          | PM-first with clinical depth coming. Free tier.                                                             |
+| **Noteable**       | Multi-disciplinary dilutes ABA depth, $300/mo for 5 staff              | ABA-native depth at free tier. Every workflow ABA-specific.                                                 |
+| **ABA Matrix**     | Auth tracking not prominent, gated pricing                              | Auth lifecycle is our core differentiator. Transparent pricing.                                             |
+| **PortiaPro**      | Family-owned, smaller team, US+Canada split focus                       | Focused US market. Modern infrastructure. AI-native.                                                        |
 | **SimplePractice** | Not ABA-specific, no auto-decrementing auth units, no ABA billing codes | ABA-native: CPT codes, modifiers, CMS 8-minute rule, auth lifecycle built in.                               |
 | **ABA Engine**     | No clinical features, no billing, no AI, 5 employees, bootstrapped      | Full stack PM + billing + AI. Absorb their best operational ideas (intake pipeline, geographic scheduling). |
 | **Brellium**       | Separate tool, costs extra, not a PM platform                           | Chart review built into free PM tier. Small practices get audit protection without another vendor.          |

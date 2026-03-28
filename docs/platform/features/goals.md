@@ -144,6 +144,8 @@ baseline → active → mastered → maintenance → generalization → met
 
 ## Competitor Field Analysis (Verified 2026-03-27)
 
+> **Platforms analyzed:** Motivity, Passage Health, CentralReach, Catalyst/Ensora, ABA Matrix. These are the platforms with publicly documented clinical/goals UI. Entry-level PM competitors (Theralytics, TherapyPM, TherapyLake) have basic goals but limited public documentation of their goals UI. Hipp Health's goals UI is gated. Hi Rasmus (clinical-only) is the strongest clinical competitor for Phase 3 data collection.
+
 ### What Competitors Show on Goal List View
 
 | Field | Shown? | Platforms |
@@ -355,4 +357,6 @@ When you click a goal card, it **expands in place** to reveal detail sections be
 
 - `docs/research/goals-feature-scope-research.md` — full competitive analysis
 - `docs/research/session-note-requirements-research.md` — session-goal data connection
-- Motivity help docs, Passage Health design case study, CentralReach help center, Catalyst/Ensora product pages, ABA Matrix documentation
+- Clinical UI analysis: Motivity help docs, Passage Health design case study, CentralReach help center, Catalyst/Ensora product pages, ABA Matrix documentation
+- Entry-level PM competitors: Theralytics, TherapyPM, TherapyLake (basic goals UI, limited public documentation)
+- Clinical-only: Hi Rasmus (strong DTT/frequency/graphing — Phase 3 reference)

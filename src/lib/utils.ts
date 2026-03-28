@@ -14,6 +14,18 @@ export function formatDateTime(date: string | Date): string {
   return format(new Date(date), "MMM d, yyyy h:mm a");
 }
 
+export function formatTimeCompact(date: string | Date): string {
+  return format(new Date(date), "h:mma").toLowerCase();
+}
+
+export function formatFileSize(bytes: number | null): string {
+  if (bytes === null || bytes === undefined) return "—";
+  if (bytes === 0) return "0 B";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 /**
  * Calendar days remaining until an authorization expires.
  * Uses `differenceInCalendarDays` (counts calendar-day boundaries) instead of

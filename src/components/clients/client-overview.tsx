@@ -14,6 +14,7 @@ import { ClientContactsCard } from "./client-contacts-card";
 import { ClientInsuranceCard } from "./client-insurance-card";
 import { CARE_TEAM_ROLE_LABELS, type CareTeamRole } from "@/lib/constants";
 import { SessionStatusBadge } from "@/components/sessions/session-status-badge";
+import { NoteStatusBadge } from "@/components/sessions/note-status-badge";
 import {
   CREDENTIAL_LABELS,
   ABA_CPT_CODES,
@@ -325,6 +326,9 @@ export function ClientOverview({
                     Units
                   </th>
                   <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
+                    Note
+                  </th>
+                  <th className="text-muted-foreground px-2 py-1.5 text-left font-medium">
                     Status
                   </th>
                 </tr>
@@ -344,6 +348,13 @@ export function ClientOverview({
                       </span>
                     </td>
                     <td className="px-2 py-1.5 text-right tabular-nums">{s.units}</td>
+                    <td className="px-2 py-1.5">
+                      {s.status === "completed" || s.status === "flagged" ? (
+                        <NoteStatusBadge status={s.noteStatus} />
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
                     <td className="px-2 py-1.5">
                       <SessionStatusBadge status={s.status} />
                     </td>

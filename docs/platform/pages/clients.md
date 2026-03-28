@@ -88,14 +88,21 @@ The metric cards row — authorization utilization at a glance. A BCBA should kn
 +------------------------------------------------------------------+
 | <- Clients                                                        |
 | Thompson, Marcus                                                  |
-| DOB: 03/15/2020 . Age 6 . F84.0: Autism Spectrum Disorder       |
-| Guardian: Maria Thompson . Aetna (Member: AET-29481)             |
+| DOB: 03/15/2020 · Age 6 · F84.0: Autism Spectrum Disorder       |
+| Guardian: Maria Thompson · Aetna (Member: AET-29481)             |
 |                                                                    |
-| [Active]  [BCBA]              [Log Session] [Edit] [Archive v]    |
+| [Active] [🔴 Allergies (2)] [🟠 Elopement] [🔴 Seizures]         |
+|                                          [Log Session] [Edit]      |
 +------------------------------------------------------------------+
 ```
 
-**Header data:** Name, DOB + age, primary diagnosis, guardian name (from contacts), primary payer + member ID. Status badge. Credential badge (if provider is assigned). Action buttons.
+**Header data:** Name, DOB + age, primary diagnosis, guardian name (from contacts), primary payer + member ID. Status badge. **Safety alert badges** (red/amber, see below). Action buttons.
+
+**Safety alert badges** — visible on every tab, never hidden:
+- 🔴 Red (life-threatening): Allergies (count), Seizures, PICA
+- 🟠 Amber (behavioral): Elopement (moderate/high), SIB, Aggression, Medical Alert
+- Only render when the flag is set. Most clients will have 0-2 badges.
+- Full spec: `docs/platform/features/client-clinical-metadata.md`
 
 The header should give enough context that the user rarely needs to scroll down for basic identity information.
 
@@ -127,6 +134,11 @@ The "at a glance" tab. Everything a provider needs to know about this client wit
 +------------------------------------------------------------------+
 | [Under-utilization alert banner — if applicable]                  |
 +------------------------------------------------------------------+
+| SAFETY ALERTS (only if any flags set)                             |
+| 🔴 Allergies: Peanuts (severe), Amoxicillin (moderate)           |
+| 🟠 Elopement: High risk — door alarms, 1:1 supervision          |
+| 🔴 Seizures: Absence, ~2/month — call 911 if >5 min             |
++------------------------------------------------------------------+
 | CLINICAL INFO              | INSURANCE                            |
 | Diagnosis: F84.0           | Payer: Aetna                        |
 | Secondary: F90.9, F41.1    | Member ID: AET-29481                |
@@ -137,9 +149,16 @@ The "at a glance" tab. Everything a provider needs to know about this client wit
 |                             |                                     |
 |                             | [+ Add Policy] (if no insurance)    |
 +----------------------------+-------------------------------------+
+| CLINICAL QUICK VIEW                                   [Edit →]    |
+| Communication: Vocal speech (phrases)                             |
+| Reinforcers: Goldfish, iPad, bubbles, tickles, playground         |
+| Toileting: Daytime trained                                        |
+| Dietary: No peanuts (allergy), no red dye                        |
+| Sensory: Hypersensitive to loud sounds, fluorescent light        |
++------------------------------------------------------------------+
 | CONTACTS                   | CARE TEAM                            |
 | Maria Thompson (mother)    | JS  Jessica Smith, RBT (Primary)    |
-|   Guardian . Emergency     |     Caseload provider                |
+|   Guardian · Emergency     |     Caseload provider                |
 |   (512) 555-0101           | SC  Dr. Sarah Chen, BCBA            |
 |   maria@email.com          |     Supervising BCBA                 |
 |                             |                                     |
@@ -149,9 +168,9 @@ The "at a glance" tab. Everything a provider needs to know about this client wit
 +----------------------------+-------------------------------------+
 | AUTHORIZED SERVICES (per-CPT utilization bars)                    |
 | 97153 — Adaptive Behavior Treatment                               |
-| ████████████████░░░░ 78% (94/120 units) . 47.0/60.0 hrs         |
+| ████████████████░░░░ 78% (94/120 units) · 47.0/60.0 hrs         |
 | 97155 — Protocol Modification                                     |
-| ██████░░░░░░░░░░░░░░ 30% (12/40 units) . 6.0/20.0 hrs          |
+| ██████░░░░░░░░░░░░░░ 30% (12/40 units) · 6.0/20.0 hrs          |
 +------------------------------------------------------------------+
 | RECENT SESSIONS                                    Last 5 shown   |
 | Date    | CPT   | Provider       | Units | Status                |
@@ -168,15 +187,19 @@ The "at a glance" tab. Everything a provider needs to know about this client wit
 
 **Key design decisions:**
 
-1. **2-column grid for the top section** — Clinical Info + Insurance on the first row, Contacts + Care Team on the second row. This matches the AlohaABA/Passage pattern of showing all identity info without tab switching.
+1. **Safety alerts at the top** — If any safety flags are set, the Safety Alerts card renders first, above all other content. This is the hospital EHR pattern — safety-critical info is never buried. No competitor in our tier does this.
 
-2. **Contacts as compact list** — Name, relationship badges (guardian, emergency), phone, email. Not a full table. "Add Contact" link at the bottom. This is sufficient for the 1-3 contacts most clients have.
+2. **Clinical Quick View card** — Structured session-essential context (communication, reinforcers, toileting, dietary, sensory) in a compact scannable format. Every RBT needs this before a session. No competitor has this as structured data.
 
-3. **Insurance as KV pairs** — Payer, member ID, group, type, dates. If multiple policies, show primary with a "2 policies" badge linking to the full view. "Add Policy" CTA when empty.
+3. **2-column grid for identity section** — Clinical Info + Insurance on the first row, Contacts + Care Team on the second row. This matches the AlohaABA/Passage pattern of showing all identity info without tab switching.
 
-4. **Auth utilization bars stay prominent** — This is the hero data. Color-coded per our thresholds (80% amber, 95% red).
+4. **Contacts as compact list** — Name, relationship badges (guardian, emergency), phone, email. Not a full table. "Add Contact" link at the bottom. This is sufficient for the 1-3 contacts most clients have.
 
-5. **Recent sessions include note status** — A "Note" column showing Missing/Draft/Signed badges. This answers the "where do notes live" question — they're visible from the client's session history without a separate tab.
+5. **Insurance as KV pairs** — Payer, member ID, group, type, dates. If multiple policies, show primary with a "2 policies" badge linking to the full view. "Add Policy" CTA when empty.
+
+6. **Auth utilization bars stay prominent** — This is the hero data. Color-coded per our thresholds (80% amber, 95% red).
+
+7. **Recent sessions include note status** — A "Note" column showing Missing/Draft/Signed badges. This answers the "where do notes live" question — they're visible from the client's session history without a separate tab.
 
 ---
 
@@ -595,23 +618,261 @@ This is NOT a tab on the client detail page — it's a separate page linked from
 
 ### Authorizations Tab
 
-Client's authorizations with utilization bars. Links to auth detail pages. No changes needed.
+> **Full feature spec:** `docs/platform/features/authorizations.md`
+> **Competitive context (verified 2026-03-27):** Our Overview tab is competitive (per-CPT bars, days remaining, weekly averages). Our Auth tab is behind every competitor — single line of text per auth, no visual utilization, no expiry indicator, no per-CPT breakdown. The components exist, they're just not wired in.
+
+#### Who uses this
+- **BCBA** — checking if auth is running low before scheduling, reviewing upcoming expirations
+- **Admin** — uploading new auth letters, updating approved units
+- **Billing staff** — verifying auth covers sessions before submitting claims
+
+#### How often
+Weekly (BCBAs planning sessions), on auth receipt (admin updating), on billing cycle (billing staff verifying).
+
+#### Current State (4/10)
+
+```
++------------------------------------------------------------------+
+| Authorizations                              [Add Authorization]   |
+|                                                                    |
+| Blue Cross Blue Shield  #AUTH-2026-1000  [Approved]               |
+| Period: Nov 25, 2025 — May 24, 2026  Utilization: 77/140 (55%)   |
+| Services: 2                                                       |
++------------------------------------------------------------------+
+```
+
+One line of text per auth. No visual hierarchy. "Services: 2" is meaningless. No expiry indicator. No per-CPT detail. No utilization bars.
+
+#### Target State (matches competitors)
+
+```
++------------------------------------------------------------------+
+| Authorizations                              [Add Authorization]   |
++==================================================================+
+| Blue Cross Blue Shield  #AUTH-2026-1000                           |
+| [Approved]  Nov 25, 2025 — May 24, 2026            [58d left]    |
+|                                                                    |
+| 97153 — Adaptive Behavior Treatment                               |
+| ████████████░░░░░░░░ 60% (60/100 units) · 30.0/50.0 hrs         |
+|                                                                    |
+| 97155 — Protocol Modification                                     |
+| ██████░░░░░░░░░░░░░░ 43% (17/40 units) · 4.3/10.0 hrs           |
+|                                                                    |
+| Aggregate: 77/140 units (55%)              Weekly avg: 6.2 hrs    |
++==================================================================+
+| EXPIRED / HISTORICAL                              [Show/Hide]     |
+| (collapsed — previous authorizations)                             |
++------------------------------------------------------------------+
+```
+
+#### What Changes
+
+1. **Per-CPT utilization bars** on each auth card — same `UtilizationBar` component already used on Overview. Show each service line with its CPT code, description, used/approved, and hours.
+
+2. **Days remaining badge** — color-coded: green (>30d), amber (7-30d), red (<7d), expired. Use existing `ExpiryBadge` component.
+
+3. **Visual utilization bar** per service line (not just aggregate text).
+
+4. **Aggregate summary line** — total units + weekly average (already calculated on Overview).
+
+5. **Active vs Historical separation** — active/pending auths shown prominently, expired/exhausted in collapsible section below (same pattern as Care Team past assignments and Goals met section).
+
+6. **Click to navigate** — clicking an auth card navigates to the full auth detail page (`/authorizations/[id]`).
+
+#### What We Already Have (just needs wiring)
+
+| Component | Location | Used On | Needed On |
+|---|---|---|---|
+| `UtilizationBar` | `components/shared/utilization-bar.tsx` | Overview tab | Auth tab cards |
+| `ExpiryBadge` | `components/shared/expiry-badge.tsx` | Overview tab, auth list page | Auth tab cards |
+| `daysUntilExpiry` | `lib/utils.ts` | Overview tab | Auth tab cards |
+| `getClientAuthUtilization` | `server/queries/authorizations.ts` | Overview tab | Already passed to client detail |
+| `unitsToHours` | `lib/constants.ts` | Overview tab | Auth tab cards |
+
+#### States
+
+**Empty state:**
+```
++------------------------------------------------------------------+
+|     No authorizations yet                                         |
+|     Add an authorization to track utilization and expiry.        |
+|     [+ Add Authorization]                                         |
++------------------------------------------------------------------+
+```
+
+**Loading:** Skeleton cards matching the auth card height (payer line + 2 utilization bars + aggregate line).
+
+**All expired:**
+```
++------------------------------------------------------------------+
+| Authorizations                              [Add Authorization]   |
+|                                                                    |
+| [!] No active authorization — all authorizations have expired.   |
+|                                                                    |
+| EXPIRED (3)                                        [Show/Hide]    |
+| (collapsed list of expired auths)                                 |
++------------------------------------------------------------------+
+```
+
+#### Implementation Status
+
+- [x] Auth list on client page (basic text display)
+- [x] Add Authorization dialog
+- [x] Click to navigate to auth detail page
+- [x] **Per-CPT utilization bars** on each auth card (wired `UtilizationBar`)
+- [x] **ExpiryBadge** (days remaining) on each auth card
+- [x] **Aggregate summary line** (total units + weekly avg)
+- [x] **Active vs Historical separation** (collapsible expired section)
+- [x] **Visual redesign** — card layout with payer header, status badge, date range, service lines
+- [x] **No active auth warning** — amber banner when all auths expired
+- [x] **New query** `getClientAuthorizationsWithServices` — per-auth service line data
+
+#### Data Requirements
+
+**No new schema, queries, or actions needed.** The data is already fetched:
+- `getClientAuthUtilization` returns per-auth, per-CPT utilization data
+- Authorization services (CPT code, approved units, used units) already in the query
+- Days until expiry calculated client-side via `daysUntilExpiry` utility
+- Weekly average already calculated on the Overview tab
+
+The redesign is purely a UI wiring task — connecting existing data and components to the auth tab cards.
 
 ---
 
 ### Sessions Tab
 
-Client's session history. Add note status column.
+> **Competitive research:** `docs/research/session-history-view-patterns.md`
+> **Key finding:** Note status inline is table stakes — every competitor shows it. Our tab currently shows no note status, no start time, and uses a card-per-session layout instead of a compact table.
+
+#### Who uses this
+- **BCBA** — reviewing session history, checking for missing/unsigned notes, monitoring utilization
+- **RBT/BT** — reviewing their own past sessions, checking if notes are complete
+- **Admin/Billing** — verifying sessions have notes before claim submission
+
+#### How often
+Daily (BCBAs reviewing notes), weekly (billing staff auditing), before each session (RBTs checking recent history).
+
+#### Current State (4/10)
 
 ```
-| Date    | CPT   | Provider       | Units | Status    | Note        |
-|---------|-------|----------------|-------|-----------|-------------|
-| Mar 26  | 97153 | Smith, J (RBT) | 8     | Completed | [Draft]     |
-| Mar 25  | 97153 | Smith, J (RBT) | 8     | Completed | [Missing] ! |
-| Mar 24  | 97155 | Chen, S (BCBA) | 4     | Completed | [Signed]    |
++------------------------------------------------------------------+
+| Sessions                                       [Log Session]      |
+|                                                                    |
+| Mar 26  97153  [Completed]                                        |
+| Provider: Smith, J (RBT)  Units: 8  Auth: #AUTH-2026-1000        |
+|                                                                    |
+| Mar 25  97153  [Completed]                                        |
+| Provider: Smith, J (RBT)  Units: 8  Auth: #AUTH-2026-1000        |
++------------------------------------------------------------------+
 ```
 
-Click a row → session detail page (existing behavior).
+Card-per-session layout. No note status. No start time. No visual density. Wastes vertical space. A BCBA reviewing 20 sessions has to scroll extensively.
+
+#### Target State (matches competitors)
+
+```
++------------------------------------------------------------------+
+| Sessions                                       [Log Session]      |
+| 24 sessions · 96 units · 48.0 hrs                                |
++==================================================================+
+| Date    | Time  | CPT   | Provider       | Units | Note   | Status|
+|---------|-------|-------|----------------|-------|--------|-------|
+| Mar 26  | 9:00a | 97153 | Smith, J (RBT) | 8     | [Draft]| Comp. |
+| Mar 25  | 9:00a | 97153 | Smith, J (RBT) | 8     | [Miss!]| Comp. |
+| Mar 24  | 1:00p | 97155 | Chen, S (BCBA) | 4     | [Signed]| Comp.|
+| Mar 22  | 9:00a | 97153 | Smith, J (RBT) | 8     | [Signed]| Comp.|
+| Mar 21  | 9:00a | 97153 | Park, D (RBT)  | 6     | [Signed]| Comp.|
++------------------------------------------------------------------+
+| Showing 1-10 of 24                         [10 v] [< 1 of 3 >]  |
++------------------------------------------------------------------+
+```
+
+#### What Changes
+
+1. **Table layout** instead of card-per-session. Compact rows (`py-2 px-3 text-xs`) matching our data table pattern. BCBAs can scan 20+ sessions without scrolling.
+
+2. **Note status column** — the #1 gap. Badge per session:
+   - **Missing** (red/destructive) — no note exists for this session
+   - **Draft** (amber) — note started but not signed
+   - **Signed** (emerald) — note completed and signed
+   Color-coded so BCBAs can spot missing notes instantly.
+
+3. **Start time column** — data already exists (`startTime` on SessionListItem`), just not displayed. Compact format: "9:00a", "1:00p".
+
+4. **Summary line** below the card title — total sessions, total units, total hours for all sessions (not just the page). Gives instant utilization context.
+
+5. **Row click navigates** to session detail page (existing behavior preserved).
+
+6. **Pagination** — server-side, 10 per page. Current implementation already paginates on the global sessions page. Client tab should match.
+
+#### Note Status Display
+
+The note status is determined by joining `session_notes` to `sessions`:
+- If no `session_notes` row exists for the session → **Missing**
+- If `session_notes.status = 'draft'` → **Draft**
+- If `session_notes.status = 'signed'` → **Signed**
+
+Badge styling:
+| Status | Badge variant | Color |
+|---|---|---|
+| Missing | destructive | Red background, "!" indicator |
+| Draft | outline/amber | Amber text |
+| Signed | outline/emerald | Emerald text |
+
+#### What We Already Have
+
+| Component/Data | Location | Status |
+|---|---|---|
+| `SessionListItem` type | `server/queries/sessions.ts` | Has `startTime`, `units`, `status` — needs note status added |
+| `SessionStatusBadge` | `components/sessions/session-status-badge.tsx` | Exists for session status |
+| `getClientSessions` query | `server/queries/sessions.ts` | Exists — needs LEFT JOIN to `session_notes` for note status |
+| `formatDate` | `lib/utils.ts` | Exists |
+| `unitsToHours` | `lib/constants.ts` | Exists |
+| Table component | `components/ui/table.tsx` | shadcn table available |
+
+#### States
+
+**Empty state:**
+```
++------------------------------------------------------------------+
+|     No sessions yet                                               |
+|     Log a session to start tracking service delivery.            |
+|     [Log Session]                                                 |
++------------------------------------------------------------------+
+```
+
+**Loading:** Skeleton rows matching table row height (6-8 skeleton rows).
+
+**Cancelled/No-show sessions:** Shown inline with muted text styling. Session status badge handles the visual differentiation.
+
+#### Implementation Status
+
+- [x] Session list on client page (basic card layout)
+- [x] Session data query (`getClientSessions`)
+- [x] Click to navigate to session detail
+- [x] Session status badges
+- [ ] **Switch from cards to table layout** (compact rows)
+- [ ] **Add note status column** (LEFT JOIN session_notes, badge component)
+- [ ] **Add start time column** (format from existing `startTime` field)
+- [ ] **Add summary line** (total sessions, units, hours)
+- [ ] **Note status badge component** (Missing/Draft/Signed with colors)
+- [ ] **Pagination** on client sessions tab (match global sessions page pattern)
+
+#### Data Requirements
+
+**One query change needed:**
+- Modify `getClientSessions` to LEFT JOIN `session_notes` table and return `noteStatus: 'missing' | 'draft' | 'signed'`
+- The `session_notes` table has a unique index on `sessionId` (one note per session), so the LEFT JOIN is clean
+
+**No schema changes needed.** The `session_notes.status` field already stores `'draft' | 'signed'`. The "missing" state is derived from the absence of a `session_notes` row.
+
+#### Phase 2 (NEXT) — Not building now
+
+- Expand note statuses: `in_review`, `cosigned`, `returned` (needs schema migration + workflow changes)
+- "Needs Review" and "Missing Notes" filter tabs on global sessions page
+- Date range picker filter
+- Inline sign/approve actions (Motivity pattern)
+- Bulk note actions for supervisors
 
 ---
 
@@ -666,27 +927,37 @@ No changes needed to the create form.
 
 ## Implementation Status
 
-### What exists today (Phase 1 — built)
+### What exists today (built)
 - [x] Client list with search, status filter, auth utilization/expiry columns
-- [x] Client detail with 8 tabs (Overview, Care Team, Goals, Contacts, Insurance, Authorizations, Sessions, Edit)
-- [x] Overview with metric cards, auth utilization, insurance card, care team card, recent sessions
+- [x] Client detail with 6 tabs (Overview, Care Team, Goals, Authorizations, Sessions, Edit)
+- [x] Overview with metric cards, auth utilization, contacts card, insurance card, care team card, recent sessions
 - [x] Clinical Info card (SA-1: diagnosis, secondary codes, language, interpreter, referring provider, Medicaid ID)
-- [x] Full goals UI with behavior reduction, assessment source, expanded lifecycle
+- [x] Care Team tab — credential-colored avatars, add-member modal, past assignments, primary toggle
+- [x] Goals tab — domain-grouped, colored accents, inline expansion, protocol field, 8-status lifecycle
+- [x] Auth tab — per-CPT utilization bars, expiry badges, active/historical separation, aggregate summary
+- [x] Sessions tab — compact table layout, note status badges, start time, summary line
 - [x] Session notes (CPT-specific forms, goal data, behavior incidents, sign workflow)
 - [x] All SA-1 through SA-8 field additions
 
-### What needs to change (design pass)
-- [ ] **D1: Merge Contacts tab into Overview** — render contacts as a compact section card
-- [ ] **D1: Merge Insurance tab into Overview** — render insurance as a KV section card
-- [ ] **Remove Contacts and Insurance tab triggers** from client-detail.tsx
-- [ ] **Add note status column** to Sessions tab and Overview recent sessions
+### What still needs work (design pass)
+- [ ] **Clinical metadata: Safety alert badges** on client header (allergies, elopement, seizures, PICA, SIB, aggression)
+- [ ] **Clinical metadata: Safety Alerts card** on Overview tab (when flags set)
+- [ ] **Clinical metadata: Clinical Quick View card** on Overview tab (communication, reinforcers, toileting, dietary, sensory)
+- [ ] **Clinical metadata: Edit tab sections** (Safety & Medical Alerts + Session Context with allergy/reinforcer CRUD)
+- [ ] **Clinical metadata: Schema changes** — 14 new columns on clients + `client_allergies` + `client_reinforcers` tables
+- [ ] **Add note status to Overview recent sessions** — match Sessions tab badges
 - [ ] **Add Documents tab** (Phase 2 — needs document upload UI)
 - [ ] **Payer filter** on client list page
 
-### Data requirements
-All data already exists. No new tables, queries, or schema changes needed for D1. The Overview tab already receives contacts, insurance, care team, auth utilization, and sessions as props — it just needs to render contacts and insurance as section cards.
+### Data requirements for remaining work
+**Clinical metadata (next):**
+- 14 new columns on `clients` table (safety flags + session-essential fields)
+- New `client_allergies` table (10 columns)
+- New `client_reinforcers` table (10 columns)
+- New constants for dropdowns (communication methods, speech levels, etc.)
+- Full spec: `docs/platform/features/client-clinical-metadata.md`
 
-Documents tab will need:
+**Documents tab (future):**
 - Query: `getClientDocuments(orgId, clientId)`
 - Action: `uploadDocument`, `deleteDocument`
 - UI: Upload dialog, document type selector, file list table

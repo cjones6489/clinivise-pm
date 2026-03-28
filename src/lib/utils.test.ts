@@ -4,6 +4,7 @@ import {
   stripUndefined,
   parseTimeToMinutes,
   calculateUnitsFromMinutes,
+  formatTimeCompact,
 } from "./utils";
 
 describe("undefinedToNull", () => {
@@ -150,5 +151,33 @@ describe("calculateUnitsFromMinutes", () => {
 
   it("negative minutes = -1 (invalid)", () => {
     expect(calculateUnitsFromMinutes(-30)).toBe(-1);
+  });
+});
+
+// ── formatTimeCompact ────────────────────────────────────────────────────────
+
+describe("formatTimeCompact", () => {
+  it("formats morning time", () => {
+    expect(formatTimeCompact(new Date("2026-03-27T09:00:00"))).toBe("9:00am");
+  });
+
+  it("formats afternoon time", () => {
+    expect(formatTimeCompact(new Date("2026-03-27T13:30:00"))).toBe("1:30pm");
+  });
+
+  it("formats noon", () => {
+    expect(formatTimeCompact(new Date("2026-03-27T12:00:00"))).toBe("12:00pm");
+  });
+
+  it("formats midnight", () => {
+    expect(formatTimeCompact(new Date("2026-03-27T00:00:00"))).toBe("12:00am");
+  });
+
+  it("formats time with minutes", () => {
+    expect(formatTimeCompact(new Date("2026-03-27T14:45:00"))).toBe("2:45pm");
+  });
+
+  it("accepts string input", () => {
+    expect(formatTimeCompact("2026-03-27T09:15:00")).toBe("9:15am");
   });
 });

@@ -10,14 +10,16 @@ import type {
   PayerOption,
 } from "@/server/queries/clients";
 import type { GoalWithObjectives, GoalDomain } from "@/server/queries/goals";
-import type { AuthorizationListItem, ClientAuthUtilization } from "@/server/queries/authorizations";
+import type { AuthorizationListItem, ClientAuthUtilization, ClientAuthWithServices } from "@/server/queries/authorizations";
 import type { SessionListItem } from "@/server/queries/sessions";
+import type { DocumentListItem } from "@/server/queries/documents";
 import { ClientOverview } from "./client-overview";
 import { ClientCareTeam } from "./client-care-team";
 import { ClientGoals } from "./client-goals";
 import { ClientForm } from "./client-form";
 import { ClientAuthorizationsCard } from "./client-authorizations-card";
 import { ClientSessionsCard } from "./client-sessions-card";
+import { ClientDocumentsCard } from "./client-documents-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function ClientDetail({
@@ -31,7 +33,9 @@ export function ClientDetail({
   insurance,
   payerOptions,
   authorizations,
+  authsWithServices,
   sessions,
+  documents,
   canEdit,
   canManagePayers,
   authUtilization,
@@ -46,7 +50,9 @@ export function ClientDetail({
   insurance: ClientInsuranceWithPayer[];
   payerOptions: PayerOption[];
   authorizations: AuthorizationListItem[];
+  authsWithServices: ClientAuthWithServices[];
   sessions: SessionListItem[];
+  documents: DocumentListItem[];
   canEdit: boolean;
   canManagePayers: boolean;
   authUtilization: ClientAuthUtilization | null;
@@ -59,6 +65,7 @@ export function ClientDetail({
         <TabsTrigger value="goals">Goals</TabsTrigger>
         <TabsTrigger value="authorizations">Authorizations</TabsTrigger>
         <TabsTrigger value="sessions">Sessions</TabsTrigger>
+        <TabsTrigger value="documents">Documents</TabsTrigger>
         {canEdit && <TabsTrigger value="edit">Edit</TabsTrigger>}
       </TabsList>
 
@@ -98,7 +105,7 @@ export function ClientDetail({
 
       <TabsContent value="authorizations" className="pt-4">
         <ClientAuthorizationsCard
-          authorizations={authorizations}
+          authorizations={authsWithServices}
           clientId={client.id}
           canEdit={canEdit}
         />
@@ -106,6 +113,10 @@ export function ClientDetail({
 
       <TabsContent value="sessions" className="pt-4">
         <ClientSessionsCard sessions={sessions} clientId={client.id} canEdit={canEdit} />
+      </TabsContent>
+
+      <TabsContent value="documents" className="pt-4">
+        <ClientDocumentsCard documents={documents} clientId={client.id} canEdit={canEdit} />
       </TabsContent>
 
       {canEdit && (
