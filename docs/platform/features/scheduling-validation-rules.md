@@ -82,8 +82,10 @@ guidance that payers can override. The system uses three tiers:
 - **Admin override:** Yes (practice may run a group of 9 with documentation)
 - **Audit log:** Required
 - **User message:** "Group code [97154/97158] requires 2-8 clients. Currently [N] client(s) assigned."
-- **Implementation:** Validate at session creation + at completion. Plan decision E24.
-- **Source:** CPT-005, CPT-006, OVLP-002
+- **Group creation flow:** When group CPT selected, UI switches to multi-client select. Each client validated for auth coverage. Creates N session rows linked by `group_session_id`.
+- **Mid-session size change:** If a client cancels and group drops to 1, prompt: "Convert to 97153 (1:1) or cancel?"
+- **Implementation:** Validate at session creation + at completion + on individual cancellation. Plan decisions E24, E29, E30, E31.
+- **Source:** CPT-005, CPT-006, OVLP-002, SCENE-006
 
 ### HB-006: 97158 Must Be QHP-Delivered
 - **Rule:** 97158 (group treatment with protocol modification) must be rendered by a BCBA/BCaBA.

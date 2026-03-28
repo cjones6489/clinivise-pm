@@ -181,6 +181,34 @@ Indexes:
   (organization_id, provider_id, date)
 ```
 
+### Sessions Table Additions
+
+```
+group_session_id    text (nullable)  -- null = 1:1, non-null = group member
+                                     -- all sessions in same group share this ID
+```
+
+### Appointment Templates Additions
+
+```
+is_group            boolean NOT NULL DEFAULT false
+```
+
+### New Table: `group_template_clients`
+
+Links clients to group templates (which clients are in this recurring group).
+
+```
+group_template_clients:
+  id                  text PK (nanoid)
+  template_id         text NOT NULL FK → appointment_templates
+  client_id           text NOT NULL FK → clients
+
+Indexes:
+  (template_id)
+  (template_id, client_id) UNIQUE
+```
+
 ### New Indexes on Existing `sessions` Table
 
 Calendar queries need date-range + provider/client lookups:
@@ -188,6 +216,7 @@ Calendar queries need date-range + provider/client lookups:
 ```
 sessions_provider_date_idx  ON (organization_id, provider_id, session_date)
 sessions_client_date_idx    ON (organization_id, client_id, session_date)
+sessions_group_idx          ON (organization_id, group_session_id) WHERE group_session_id IS NOT NULL
 ```
 
 ### New Constants
