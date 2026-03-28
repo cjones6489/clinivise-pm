@@ -453,10 +453,26 @@ These clinical/business rules must be respected by the scheduling system:
 
 ## Sources
 
-- `docs/research/scheduling-calendar-competitive-research.md` — 13 platform competitive analysis
-- `docs/research/scheduling-domain-research.md` — ABA clinical requirements, payer rules, practitioner pain points
-- `docs/research/calendar-scheduling-ui-patterns-research.md` — Healthcare + SaaS UI patterns, library comparison
-- `docs/research/ai-scheduling-frontier-research.md` — TheraDriver, ABA Engine, AI scheduling trends
-- Technical integration analysis of existing Clinivise schema (sessions, authorizations, providers, care team)
+All scheduling research lives in `docs/research/scheduling/`.
+
+### Pre-Build Research (competitive + technical)
+- `scheduling-calendar-competitive-research.md` — 13 platform competitive analysis
+- `scheduling-domain-research.md` — ABA clinical requirements, payer rules, practitioner pain points
+- `calendar-scheduling-ui-patterns-research.md` — Healthcare + SaaS UI patterns, library comparison
+- `ai-scheduling-frontier-research.md` — TheraDriver, ABA Engine, AI scheduling trends
+
+### ABA Edge Case Research (audit inputs)
+- **`aba-scheduling-edge-cases-master.md`** — **72 deduplicated edge cases** across 5 categories (10 hard blocks, 27 warnings, 16 monitoring, 12 informational, 7 deferred). The authoritative reference for implementation.
+- `scheduling-practitioner-pain-points.md` — 20 pain points from BCBAs, RBTs, clinic managers
+- `scheduling-clinical-edge-cases.md` — 25 clinical edge cases (supervision, group sessions, concurrent billing, payer rules)
+- `scheduling-billing-failure-modes-research.md` — 25 billing failure modes (auth mismatches, claim denials, cancellation economics)
+- `scheduling-operational-edge-cases.md` — 26 operational scenarios (turnover, disruptions, travel, compliance)
+- `scheduling-user-complaints-research.md` — 23 competitor complaints (CentralReach, AlohaABA, Theralytics)
+
+### External Standards
 - BACB Ethics Code and Supervision Standards (2026)
 - ABA Coding Coalition CPT-credential matching rules
+- Technical integration analysis of existing Clinivise schema (sessions, authorizations, providers, care team)
+
+### Review Artifacts (outside repo)
+- CEO plan + eng/design review decisions: `~/.gstack/projects/cjones6489-clinivise-pm/ceo-plans/2026-03-27-scheduling-calendar.md`
