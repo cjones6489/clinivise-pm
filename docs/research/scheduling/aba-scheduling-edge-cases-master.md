@@ -4,6 +4,20 @@
 >
 > **Last updated:** 2026-03-28
 >
+> **IMPORTANT — Validation framing (corrected 2026-03-28):**
+> The "HARD BLOCK" category in this document was overstated. After deeper research:
+> - **Only CPT code DEFINITIONS are truly universal** (7 rules — see CEO plan).
+> - **Everything labeled "HARD BLOCK" for concurrent billing rules** is actually AMA/ABA
+>   Coding Coalition guidance that individual payers can override. NC Medicaid blocks
+>   97153+97155 concurrent billing. TRICARE restricts most concurrent billing. Anthem
+>   has challenged it in some states. The ABA Coding Coalition states: "Policies vary
+>   across payers, so providers should check their contract with each payer."
+> - **MUE limits** are CMS rules. Commercial payers may apply different limits.
+> - The implementation should treat non-definitional "HARD BLOCK" items as **configurable
+>   defaults with payer override capability**, not absolute blocks.
+> - See CEO plan "Validation Philosophy Amendment (CORRECTED)" for the authoritative
+>   three-tier validation model.
+>
 > **Synthesized from:**
 > - `scheduling-practitioner-pain-points.md` (20 pain points)
 > - `scheduling-clinical-edge-cases.md` (25 edge cases)
@@ -11,6 +25,8 @@
 > - `scheduling-operational-edge-cases.md` (26 scenarios)
 > - `scheduling-user-complaints-research.md` (23 complaints + cross-platform issues)
 > - `scheduling-domain-research.md` (domain context, validation rules, benchmarks)
+> - `aba-scheduling-audit.md` (detailed CPT matrix, auth lifecycle, supervision, state rules)
+> - `claude_scheduling_research.md` (payer rules table, platform complaints, practitioner research)
 
 ---
 

@@ -259,13 +259,16 @@ Expands to full form with: supervisor, place of service, units (auto-calculated 
 | Status | Color | Visual |
 |--------|-------|--------|
 | Scheduled | Blue (primary) | Solid block |
-| Confirmed | Emerald | Solid block |
 | Completed | Emerald (muted) | Solid with checkmark |
 | Cancelled | Muted/grey | Strikethrough text |
 | No Show | Red (muted) | Grey with X |
 
-**Toggle schemes (future):**
-- By provider — each provider gets a distinct accent color
+> Note: "Confirmed" status was removed per design decision D9. Appointment confirmation
+> is not a standard ABA workflow — sessions are recurring and assumed to happen unless
+> cancelled. No ABA competitor uses a confirmed status.
+
+**Toggle schemes (included in MVP per CEO cherry-pick):**
+- By provider — 8-color auto-assigned palette (blue, emerald, amber, violet, rose, teal, orange, slate)
 - By CPT code — color per service type (97153=blue, 97155=purple, 97156=teal)
 
 ### Session Conversion
@@ -287,17 +290,36 @@ Scheduled Appointment Card:
 
 ### Validation Rules at Booking
 
-**Hard blocks (prevent creation):**
-1. Same provider overlapping 1:1 sessions (existing check)
-2. Provider scheduling outside their availability hours
+> **Important framing:** Only CPT code DEFINITIONS are universal hard blocks. Everything else
+> is AMA/ABA Coding Coalition guidance that payers can override. The ABA Coding Coalition
+> states: "Policies vary across payers, so providers should check their contract with each
+> payer." See CEO plan "Validation Philosophy Amendment" for full rationale.
 
-**Warnings (allow creation with notice):**
+**Tier 1 — Hard blocks (code definitions, always enforced):**
+1. Same provider overlapping 1:1 sessions (provider can't be in two places)
+2. Same client overlapping incompatible sessions (client can't be in two places)
+3. RBT billing QHP-only codes 97155-97158 (code requires QHP credential)
+4. Same provider billing 97153+97155 for overlapping time (codes define different roles)
+5. Group codes (97154, 97158) with fewer than 2 clients
+6. Auth utilization exceeding 100% of approved units (projected: approved - used - scheduled)
+
+**Tier 2 — Configurable warnings (AMA/ABA defaults, payer-overridable):**
 1. No active authorization for this client + CPT + date range
-2. Scheduled units would exceed remaining authorized units
-3. MUE exceeded for this CPT code on this date
-4. Provider credential doesn't match CPT code requirements (e.g., RBT billing QHP-only code)
+2. Scheduled units approaching auth limits (80% warning, 95% critical)
+3. MUE exceeded for this CPT code on this date (CMS defaults, payer may differ)
+4. Concurrent code pairs flagged by ABA Coding Coalition defaults
 5. No supervisor assigned for RBT session
-6. Provider has time off on this date
+6. Provider credential expiring within 30 days or expired
+7. Provider has time off on this date (deferred — availability tables not in MVP)
+
+Warning message pattern: "Flagged under default ABA rules. Check your payer contract
+for [Payer X]. [Allow for this payer] [Block for this payer] [Dismiss]"
+Saves payer-specific overrides through normal workflow.
+
+**Tier 3 — Informational (display context):**
+1. Auth pacing (on-pace, behind, at-risk)
+2. Concurrent BCBA-RBT sessions (valid supervision overlap indicator)
+3. Drive time between sessions at different locations
 
 ### Recurring Template Management
 
